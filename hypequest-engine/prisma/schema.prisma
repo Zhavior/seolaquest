@@ -1,0 +1,36 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id               String    @id @default(uuid())
+  email            String    @unique
+  name             String?
+  subscriptionTier String    @default("FREE_PEASANT")
+  questsRemaining  Int       @default(100)
+  maxCredits       Int       @default(100)
+  xpMultiplier     Float     @default(1.0)
+  level            Int       @default(1)
+  xp               Int       @default(0)
+  unlockedTheme    String    @default("PARCHMENT_WOOD")
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  keywords         Keyword[]
+}
+
+model Keyword {
+  id           String   @id @default(uuid())
+  phrase       String
+  heroClass    String   @default("Warrior 🥷")
+  platform     String   @default("Reddit & Twitter")
+  status       String   @default("Active")
+  matchesFound Int      @default(0)
+  userId       String?
+  user         User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt    DateTime @default(now())
+}
