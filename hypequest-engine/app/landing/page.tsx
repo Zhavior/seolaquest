@@ -2,10 +2,11 @@
 import React from 'react'
 import { motion, type Variants } from 'framer-motion'
 import { Zap, Crosshair } from 'lucide-react'
-import { SignInButton, SignUpButton, SignedIn, SignedOut, UserButton } from '@clerk/nextjs'
+import { SignInButton, SignUpButton, UserButton, useAuth } from '@clerk/nextjs'
 import Link from 'next/link'
 
 export default function LandingPage() {
+  const { isLoaded, userId } = useAuth()
   const fadeUp: Variants = {
     hidden: { opacity: 0, y: 50 },
     visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: "easeOut" } }
@@ -24,26 +25,30 @@ export default function LandingPage() {
             <span className="text-2xl font-black uppercase tracking-tighter">HypeQuest</span>
           </div>
           <div className="flex gap-4">
-            <SignedOut>
-              <SignInButton mode="modal">
-                <button className="hidden md:block bg-transparent border-3 border-black px-6 py-2 font-black uppercase tracking-wider hover:bg-gray-100 transition-colors">
-                  Sign In
-                </button>
-              </SignInButton>
-              <SignUpButton mode="modal">
-                <button className="bg-[#A3E635] border-3 border-black px-6 py-2 font-black uppercase tracking-wider shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-y-1 hover:shadow-[0px_0px_0px_0px_rgba(0,0,0,1)] transition-all">
-                  Get Started
-                </button>
-              </SignUpButton>
-            </SignedOut>
-            <SignedIn>
-              <Link href="/">
-                <button className="bg-[#A3E635] border-3 border-black px-6 py-2 mr-4 font-black uppercase tracking-wider shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-y-1 hover:shadow-[0px_0px_0px_0px_rgba(0,0,0,1)] transition-all">
-                  Dashboard
-                </button>
-              </Link>
-              <UserButton />
-            </SignedIn>
+            {isLoaded && !userId && (
+              <>
+                <SignInButton mode="modal">
+                  <button className="hidden md:block bg-transparent border-3 border-black px-6 py-2 font-black uppercase tracking-wider hover:bg-gray-100 transition-colors">
+                    Sign In
+                  </button>
+                </SignInButton>
+                <SignUpButton mode="modal">
+                  <button className="bg-[#A3E635] border-3 border-black px-6 py-2 font-black uppercase tracking-wider shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-y-1 hover:shadow-[0px_0px_0px_0px_rgba(0,0,0,1)] transition-all">
+                    Get Started
+                  </button>
+                </SignUpButton>
+              </>
+            )}
+            {isLoaded && userId && (
+              <>
+                <Link href="/">
+                  <button className="bg-[#A3E635] border-3 border-black px-6 py-2 mr-4 font-black uppercase tracking-wider shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-y-1 hover:shadow-[0px_0px_0px_0px_rgba(0,0,0,1)] transition-all">
+                    Dashboard
+                  </button>
+                </Link>
+                <UserButton />
+              </>
+            )}
           </div>
         </div>
       </nav>
@@ -72,20 +77,20 @@ export default function LandingPage() {
           </p>
           
           <div className="mt-12 flex flex-col sm:flex-row gap-6 justify-center">
-            <SignedOut>
+            {isLoaded && !userId && (
               <SignUpButton mode="modal">
                 <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="bg-[#FFE600] border-4 border-black px-12 py-6 font-black uppercase text-2xl shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center gap-4 w-full sm:w-auto">
                   <Zap size={28} className="fill-black" /> Play Now
                 </motion.button>
               </SignUpButton>
-            </SignedOut>
-            <SignedIn>
+            )}
+            {isLoaded && userId && (
               <Link href="/">
                 <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="bg-[#FFE600] border-4 border-black px-12 py-6 font-black uppercase text-2xl shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center gap-4 w-full sm:w-auto">
                   <Zap size={28} className="fill-black" /> Enter Dashboard
                 </motion.button>
               </Link>
-            </SignedIn>
+            )}
           </div>
         </motion.div>
       </section>
