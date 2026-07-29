@@ -80,6 +80,7 @@ export default function DashboardClient({
   const [keywords, setKeywords] = useState(dbKeywords)
   const [leads, setLeads] = useState(dbLeads)
   const [newKeyword, setNewKeyword] = useState('')
+  const [selectedHeroClass, setSelectedHeroClass] = useState('Warrior 🥷')
   const [filter, setFilter] = useState('ALL')
   const [notice, setNotice] = useState('')
   const [isPending, startTransition] = useTransition()
@@ -286,10 +287,10 @@ export default function DashboardClient({
         </div>
       </div>
 
-      {/* KEYWORD MANAGEMENT SECTION */}
+      {/* KEYWORD & HERO AGENT MANAGEMENT SECTION */}
       <section className="bg-white border-4 border-black p-5 shadow-[6px_6px_0_0_#000]">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-          <div className="flex flex-1 gap-3">
+          <div className="flex flex-1 flex-col sm:flex-row gap-3">
             <input
               value={newKeyword}
               onChange={(event) => setNewKeyword(event.target.value)}
@@ -297,14 +298,23 @@ export default function DashboardClient({
               placeholder="Track a phrase, e.g. need a website"
               className="min-w-0 flex-1 border-3 border-black bg-[#F4F0EA] p-3 font-bold focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#FFE600]"
             />
+            <select
+              value={selectedHeroClass}
+              onChange={(e) => setSelectedHeroClass(e.target.value)}
+              className="border-3 border-black bg-[#FFE600] p-3 font-black text-sm uppercase focus:outline-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
+            >
+              <option value="Warrior 🥷">Warrior 🥷 (Aggressive Leads)</option>
+              <option value="Mage 🧙‍♂️">Mage 🧙‍♂️ (SaaS Mentions)</option>
+              <option value="Knight 🦸‍♂️">Knight 🦸‍♂️ (Freelance Contracts)</option>
+              <option value="Slayer 🧛‍♂️">Slayer 🧛‍♂️ (Competitor Swaps)</option>
+            </select>
             <button
               type="button"
               onClick={addKeyword}
               disabled={isPending}
-              className="border-3 border-black bg-[#FFE600] p-3 font-black shadow-[3px_3px_0_0_#000] disabled:opacity-50"
-              aria-label="Add keyword"
+              className="border-3 border-black bg-[#A3E635] hover:bg-lime-400 p-3 font-black shadow-[3px_3px_0_0_#000] disabled:opacity-50 flex items-center justify-center gap-1.5 uppercase text-xs"
             >
-              <Plus />
+              <Plus /> Deploy Hero Agent
             </button>
           </div>
           <button
@@ -313,7 +323,7 @@ export default function DashboardClient({
             disabled={isPending || keywords.length === 0}
             className="border-3 border-black bg-[#06B6D4] px-5 py-3 font-black uppercase shadow-[3px_3px_0_0_#000] disabled:opacity-50 flex items-center justify-center gap-2"
           >
-            <Radar size={20} /> {isPending ? 'Working…' : 'Scan Reddit now'}
+            <Radar size={20} /> {isPending ? 'Working…' : 'Scan Network Now'}
           </button>
         </div>
         {notice && (
@@ -328,32 +338,39 @@ export default function DashboardClient({
         )}
       </section>
 
-      {/* TRACKED QUESTS BADGES */}
+      {/* TRACKED QUESTS HERO AGENT ROSTER */}
       <section>
         <h2 className="inline-flex items-center gap-2 bg-white border-4 border-black px-4 py-2 font-black text-2xl uppercase shadow-[4px_4px_0_0_#000]">
-          <Swords /> Tracked Quests ({keywords.length})
+          <Swords /> Deployed Hero Agents on Quests ({keywords.length})
         </h2>
         <div className="mt-4 flex flex-wrap gap-3">
-          {keywords.map((keyword) => (
-            <div
-              key={keyword.id}
-              className="flex items-center gap-2 border-3 border-black bg-[#A3E635] px-3 py-2 font-bold shadow-[3px_3px_0_0_#000]"
-            >
-              <span>“{keyword.phrase}”</span>
-              <button
-                type="button"
-                onClick={() => removeKeyword(keyword.id)}
-                disabled={isPending}
-                className="border-2 border-black bg-white p-1 hover:bg-red-400"
-                aria-label={`Remove ${keyword.phrase}`}
+          {keywords.map((keyword, idx) => {
+            const heroIcon = idx % 4 === 0 ? 'Warrior 🥷' : idx % 4 === 1 ? 'Mage 🧙‍♂️' : idx % 4 === 2 ? 'Knight 🦸‍♂️' : 'Slayer 🧛‍♂️'
+
+            return (
+              <div
+                key={keyword.id}
+                className="flex items-center gap-3 border-3 border-black bg-[#A3E635] px-4 py-2.5 font-bold shadow-[4px_4px_0_0_#000]"
               >
-                <Trash2 size={16} />
-              </button>
-            </div>
-          ))}
+                <span className="bg-black text-white font-black text-xs px-2 py-0.5 border border-black uppercase">
+                  {heroIcon} ON QUEST
+                </span>
+                <span className="font-black">“{keyword.phrase}”</span>
+                <button
+                  type="button"
+                  onClick={() => removeKeyword(keyword.id)}
+                  disabled={isPending}
+                  className="border-2 border-black bg-white p-1 hover:bg-red-400"
+                  aria-label={`Recall ${keyword.phrase}`}
+                >
+                  <Trash2 size={16} />
+                </button>
+              </div>
+            )
+          })}
           {!keywords.length && (
             <p className="font-bold text-gray-600">
-              Add your first keyword above. Nothing is monitored until you do!
+              Deploy your first Hero Agent (Warrior, Mage, Knight, Slayer) above to monitor keywords on live quests!
             </p>
           )}
         </div>
