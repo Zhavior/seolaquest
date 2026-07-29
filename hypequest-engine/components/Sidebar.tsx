@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { useUser, SignOutButton, SignedIn } from '@clerk/nextjs'
+import { useUser, SignOutButton } from '@clerk/nextjs'
 import { CreditCard, Key, LayoutDashboard, LogOut, Menu, Settings, UserCircle, X, Zap } from 'lucide-react'
 
 const publicPaths = new Set(['/landing', '/login', '/onboarding'])

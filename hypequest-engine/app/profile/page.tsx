@@ -13,5 +13,5 @@ export default async function ProfilePage() {
     select: { id: true, content: true, createdAt: true },
   })
 
-  return <ProfileClient user={{ name: user.name ?? user.email ?? 'Hunter', title: user.title, level: user.level }} initialPosts={posts.map((post) => ({ ...post, createdAt: post.createdAt.toISOString() }))} />
+  return <ProfileClient user={{ name: user.name ?? user.email ?? 'Hunter', title: user.title ?? 'Lead Hunter', level: user.level }} initialPosts={posts.map((post) => ({ ...post, createdAt: post.createdAt.toISOString() }))} />
 }

@@ -30,7 +30,7 @@ export default async function Home() {
 
   const dashboardUser: DashboardUser = {
     name: user.name ?? user.email?.split('@')[0] ?? 'Hunter',
-    title: user.title,
+    title: user.title ?? 'Lead Hunter',
     xp: user.xp,
     level: user.level,
     xpRequired: user.xpRequired,
