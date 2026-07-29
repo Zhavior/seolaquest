@@ -132,7 +132,7 @@ export function Sidebar() {
               <div className="flex-1 min-w-0">
                 <p className="truncate font-black text-sm uppercase">{displayName}</p>
                 <div className="flex items-center gap-1 text-[10px] font-bold text-zinc-500">
-                  <Shield size={12} className="text-blue-500" /> LVL 5 HUNTER
+                  <Shield size={12} className="text-blue-500" /> LVL 10 HUNTER
                 </div>
               </div>
             </div>
