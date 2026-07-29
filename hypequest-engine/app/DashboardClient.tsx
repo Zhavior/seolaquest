@@ -54,17 +54,17 @@ function getIntentScore(id: string): number {
     hash = (hash << 5) - hash + id.charCodeAt(i)
     hash |= 0
   }
-  return 85 + (Math.abs(hash) % 14)
+  return 80 + (Math.abs(hash) % 20)
 }
 
-const SEVEN_DAY_ANALYTICS = [
-  { day: 'Mon', claimed: 12, dismissed: 3 },
-  { day: 'Tue', claimed: 18, dismissed: 5 },
-  { day: 'Wed', claimed: 14, dismissed: 2 },
-  { day: 'Thu', claimed: 22, dismissed: 6 },
-  { day: 'Fri', claimed: 19, dismissed: 4 },
-  { day: 'Sat', claimed: 25, dismissed: 7 },
-  { day: 'Sun', claimed: 31, dismissed: 8 },
+const EMPTY_SEVEN_DAY_ANALYTICS = [
+  { day: 'Mon', claimed: 0, dismissed: 0 },
+  { day: 'Tue', claimed: 0, dismissed: 0 },
+  { day: 'Wed', claimed: 0, dismissed: 0 },
+  { day: 'Thu', claimed: 0, dismissed: 0 },
+  { day: 'Fri', claimed: 0, dismissed: 0 },
+  { day: 'Sat', claimed: 0, dismissed: 0 },
+  { day: 'Sun', claimed: 0, dismissed: 0 },
 ]
 
 export default function DashboardClient({
@@ -84,8 +84,8 @@ export default function DashboardClient({
   const [notice, setNotice] = useState('')
   const [isPending, startTransition] = useTransition()
   const [isManaShopOpen, setIsManaShopOpen] = useState(false)
-  const [remainingQuests, setRemainingQuests] = useState(120)
-  const [claimedCount, setClaimedCount] = useState(14)
+  const [remainingQuests, setRemainingQuests] = useState(0) // Zero for any new customer
+  const [claimedCount, setClaimedCount] = useState(0)
   const [particles, setParticles] = useState<{ id: number; x: number; y: number }[]>([])
 
   const filteredLeads = useMemo(
@@ -93,10 +93,10 @@ export default function DashboardClient({
     [filter, leads],
   )
   const platforms = ['ALL', ...Array.from(new Set(leads.map((lead) => lead.platform)))]
-  const xpPercent = Math.min(100, Math.round((user.xp / user.xpRequired) * 100))
+  const xpPercent = Math.min(100, Math.round((user.xp / Math.max(1, user.xpRequired)) * 100))
 
-  const characterTitle = user.level >= 10 ? 'Dragon Slayer Overlord 🐉' : user.title || 'Knight Slasher'
-  const subscriptionTier = 'ENTERPRISE_OVERLORD'
+  const characterTitle = user.title || (user.level >= 10 ? 'Dragon Slayer Overlord 🐉' : 'Knight Slasher')
+  const subscriptionTier = 'FREE_HUNTER'
 
   function addKeyword() {
     const phrase = newKeyword.trim()
@@ -161,7 +161,7 @@ export default function DashboardClient({
       {/* 5. 🧪 TOP-CENTER LOW MANA ALERT TOAST */}
       <LowManaToast
         remainingCredits={remainingQuests}
-        totalCredits={1000}
+        totalCredits={100}
         onOpenShop={() => setIsManaShopOpen(true)}
       />
 
@@ -178,11 +178,11 @@ export default function DashboardClient({
         )}
       </AnimatePresence>
 
-      {/* 6. 👑 ENTERPRISE DEV SESSION BAR */}
+      {/* 6. 👑 SESSION BAR */}
       <div className="bg-[#18181B] text-white border-4 border-black p-4 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] flex flex-wrap items-center justify-between gap-4">
         <div className="flex items-center gap-3">
           <span className="bg-[#FFE600] text-black font-black text-xs uppercase px-2.5 py-1 border-2 border-black">
-            👑 SESSION: {subscriptionTier}
+            SESSION: {subscriptionTier}
           </span>
           <span className="font-black text-sm uppercase text-gray-300">
             Account: <span className="text-[#A3E635]">{characterTitle}</span> ({user.name})
@@ -192,7 +192,7 @@ export default function DashboardClient({
           <div className="flex items-center gap-2">
             <FlaskConical className="w-5 h-5 text-[#06B6D4]" />
             <span className="font-black text-xs uppercase text-cyan-300">
-              Mana Balance: <span className="text-white text-sm">{remainingQuests} / 1000 Quests</span>
+              Mana Balance: <span className="text-white text-sm">{remainingQuests} / 100 Quests</span>
             </span>
           </div>
           <button
@@ -371,8 +371,8 @@ export default function DashboardClient({
         </div>
 
         <div className="grid grid-cols-7 gap-2 items-end h-32 border-b-2 border-black pb-2 pt-4">
-          {SEVEN_DAY_ANALYTICS.map((item, idx) => {
-            const heightPct = Math.min(100, (item.claimed / 35) * 100)
+          {EMPTY_SEVEN_DAY_ANALYTICS.map((item, idx) => {
+            const heightPct = item.claimed ? Math.min(100, (item.claimed / 35) * 100) : 0
             return (
               <div key={item.day} className="flex flex-col items-center gap-1 h-full justify-end">
                 <motion.div
