@@ -104,18 +104,77 @@ export default function DashboardClient({
   }
 
   return (
-    <div className="min-h-screen max-w-7xl mx-auto p-4 md:p-8 text-black">
-      <header className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between mb-8">
-        <div className="bg-[#FFE600] border-4 border-black px-5 py-3 shadow-[6px_6px_0_0_#000] rotate-[-1deg]">
-          <p className="font-black uppercase tracking-widest text-xs">HypeQuest command center</p>
-          <h1 className="text-4xl font-black uppercase tracking-tight">Find real demand</h1>
+    <div className="min-h-screen max-w-7xl mx-auto p-4 md:p-8 text-black space-y-8">
+      {/* HERO METRICS HEADER */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        
+        {/* LEVEL & XP CARD */}
+        <div className="bg-[#FFE600] border-4 border-black p-6 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] -rotate-1">
+          <div className="flex items-center justify-between">
+            <span className="bg-black text-white font-black text-xs uppercase px-2 py-0.5 border border-black">
+              HERO LEVEL {user.level}
+            </span>
+            <Zap className="w-6 h-6 stroke-[2.5px]" />
+          </div>
+          <h2 className="text-3xl font-black uppercase mt-2">{user.title}</h2>
+          
+          {/* XP BAR */}
+          <div className="mt-4">
+            <div className="flex justify-between text-xs font-black mb-1">
+              <span>XP PROGRESS</span>
+              <span>{user.xp} / {user.xpRequired} XP</span>
+            </div>
+            <div className="w-full h-5 bg-white border-2 border-black overflow-hidden relative">
+              <motion.div
+                className="h-full bg-[#A3E635]"
+                initial={{ width: '0%' }}
+                animate={{ width: `${xpPercent}%` }}
+                transition={{ type: 'spring', stiffness: 100 }}
+              />
+            </div>
+          </div>
         </div>
-        <div className="bg-white border-4 border-black p-4 shadow-[5px_5px_0_0_#000] min-w-[280px]">
-          <div className="flex justify-between font-black uppercase text-sm"><span>Level {user.level} · {user.title}</span><span>{user.xp}/{user.xpRequired}</span></div>
-          <div className="h-4 mt-2 border-2 border-black bg-gray-100"><div className="h-full bg-[#A3E635] border-r-2 border-black" style={{ width: `${xpPercent}%` }} /></div>
-          <p className="mt-2 text-xs font-bold text-gray-600">{user.name}</p>
+
+        {/* EST MRR OPPORTUNITY */}
+        <div className="bg-[#06B6D4] border-4 border-black p-6 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] rotate-1 text-white">
+          <span className="bg-black text-cyan-300 font-black text-xs uppercase px-2 py-0.5 border border-white">
+            POTENTIAL PIPELINE
+          </span>
+          <h2 className="text-4xl font-black text-black mt-2">
+            ${(leads.length * 150).toLocaleString()} / mo
+          </h2>
+          <p className="text-xs font-black text-black mt-2">
+            🔥 {leads.length} High-Intent Quests awaiting direct reply in your active feed.
+          </p>
         </div>
-      </header>
+
+        {/* ATTACK MODE SCAN BUTTON */}
+        <div className="bg-white border-4 border-black p-6 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] flex flex-col justify-between">
+          <div>
+            <span className="bg-red-500 text-white font-black text-xs uppercase px-2 py-0.5 border border-black">
+              API RADAR ACTIVE
+            </span>
+            <h3 className="text-xl font-black uppercase mt-2">Force Network Scan</h3>
+          </div>
+
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.95 }}
+            animate={isPending ? { x: [-4, 4, -4, 4, 0], rotate: [-2, 2, -2, 2, 0] } : {}}
+            transition={{ repeat: isPending ? Infinity : 0, duration: 0.2 }}
+            onClick={scan}
+            disabled={isPending || keywords.length === 0}
+            className="mt-4 w-full bg-[#EF4444] hover:bg-red-600 text-white font-black text-base uppercase py-3 border-3 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center gap-2 disabled:opacity-50"
+          >
+            {isPending ? (
+              <>💥 SCANNING SOCIAL NETWORK...</>
+            ) : (
+              <>⚔️ ATTACK MODE (SCAN NOW)</>
+            )}
+          </motion.button>
+        </div>
+
+      </div>
 
       <section className="bg-white border-4 border-black p-5 shadow-[6px_6px_0_0_#000] mb-8">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
