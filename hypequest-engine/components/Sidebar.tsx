@@ -4,7 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useUser, SignOutButton } from '@clerk/nextjs'
-import { CreditCard, Key, LayoutDashboard, LogOut, Menu, Settings, UserCircle, X, Zap } from 'lucide-react'
+import { CreditCard, Key, LayoutDashboard, LogOut, Menu, Pencil, Settings, UserCircle, X, Zap } from 'lucide-react'
 
 const publicPaths = new Set(['/landing', '/login', '/onboarding'])
 
@@ -30,12 +30,21 @@ export function Sidebar() {
   return (
     <>
       <div className="fixed top-0 left-0 right-0 z-40 flex h-16 items-center justify-between border-b-4 border-black bg-[#FFE600] px-4 md:hidden">
-        <div className="flex items-center gap-2 font-black uppercase"><Zap className="fill-white text-white" /> HypeQuest</div>
-        <button type="button" onClick={() => setIsOpen(true)} className="border-2 border-black bg-white p-2"><Menu /></button>
+        <div className="relative flex items-center gap-2 font-black uppercase text-xl">
+          <Pencil className="absolute -left-2 -top-1 w-7 h-7 text-[#06B6D4] stroke-[3px] -rotate-12 opacity-80 pointer-events-none" />
+          <Zap className="fill-white text-white relative z-10" /> <span className="relative z-10">HypeQuest</span>
+        </div>
+        <button type="button" onClick={() => setIsOpen(true)} className="border-2 border-black bg-white p-2 shadow-[2px_2px_0_0_#000]"><Menu /></button>
       </div>
       {isOpen && <button type="button" aria-label="Close menu overlay" onClick={() => setIsOpen(false)} className="fixed inset-0 z-40 bg-black/50 md:hidden" />}
       <aside className={`fixed left-0 top-0 z-50 flex h-[100dvh] w-64 flex-col border-r-4 border-black bg-white transition-transform md:sticky md:translate-x-0 ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
-        <div className="flex h-16 items-center justify-between border-b-4 border-black bg-[#FFE600] px-4 font-black uppercase text-2xl"><span className="flex items-center gap-2"><Zap className="fill-white text-white" /> HypeQuest</span><button type="button" onClick={() => setIsOpen(false)} className="border-2 border-black bg-white p-1 md:hidden"><X size={18} /></button></div>
+        <div className="flex h-16 items-center justify-between border-b-4 border-black bg-[#FFE600] px-4 font-black uppercase text-2xl">
+          <span className="relative flex items-center gap-2">
+            <Pencil className="absolute -left-3 -top-1 w-9 h-9 text-[#06B6D4] stroke-[3.5px] -rotate-12 opacity-80 pointer-events-none" />
+            <Zap className="fill-white text-white relative z-10 stroke-[2.5px]" /> <span className="relative z-10">HypeQuest</span>
+          </span>
+          <button type="button" onClick={() => setIsOpen(false)} className="border-2 border-black bg-white p-1 md:hidden shadow-[2px_2px_0_0_#000]"><X size={18} /></button>
+        </div>
         <nav className="flex-1 space-y-2 p-4">
           {navItems.map((item) => {
             const Icon = item.icon

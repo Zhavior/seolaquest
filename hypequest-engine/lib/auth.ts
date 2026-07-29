@@ -6,7 +6,7 @@ export async function getCurrentUser() {
   
   if (!userId) {
     if (process.env.NODE_ENV === 'development') {
-      let fallbackUser = await prisma.user.findFirst();
+      let fallbackUser = await prisma.user.findUnique({ where: { id: 'local_dev_user' } });
       if (!fallbackUser) {
         fallbackUser = await prisma.user.create({
           data: {
