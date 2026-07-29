@@ -4,16 +4,21 @@ import { useMemo, useState, useTransition } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   BarChart3,
+  CheckCircle2,
   ExternalLink,
   Filter,
   FlaskConical,
   Flame,
   Plus,
   Radar,
+  Radio,
+  Search,
   Sparkles,
   Swords,
+  Terminal,
   Trash2,
   Trophy,
+  X,
   Zap,
 } from 'lucide-react'
 import LowManaToast from '@/components/LowManaToast'
@@ -54,8 +59,32 @@ function getIntentScore(id: string): number {
     hash = (hash << 5) - hash + id.charCodeAt(i)
     hash |= 0
   }
-  return 80 + (Math.abs(hash) % 20)
+  return 85 + (Math.abs(hash) % 13)
 }
+
+const MOCK_LEAD_POOL = [
+  {
+    author: 'u/saas_founder_99',
+    platform: 'Reddit • r/SaaS',
+    content: 'We need an automated social listening tool for our startup. What are you guys using instead of Mention or Brand24?',
+    matched: 'social listening tool',
+    url: 'https://reddit.com/r/SaaS',
+  },
+  {
+    author: '@alex_builds',
+    platform: 'Twitter / X',
+    content: 'Anyone know a good freelance developer available this week for a custom Next.js landing page rebuild? Budget $1,500.',
+    matched: 'freelance developer',
+    url: 'https://x.com',
+  },
+  {
+    author: 'u/indie_hacker_mike',
+    platform: 'Reddit • r/Entrepreneur',
+    content: 'Looking for a reliable agency or tool to generate B2B leads from Reddit discussions. Any recommendations?',
+    matched: 'generate B2B leads',
+    url: 'https://reddit.com/r/Entrepreneur',
+  },
+]
 
 const EMPTY_SEVEN_DAY_ANALYTICS = [
   { day: 'Mon', claimed: 0, dismissed: 0 },
@@ -85,9 +114,14 @@ export default function DashboardClient({
   const [notice, setNotice] = useState('')
   const [isPending, startTransition] = useTransition()
   const [isManaShopOpen, setIsManaShopOpen] = useState(false)
-  const [remainingQuests, setRemainingQuests] = useState(0) // Zero for any new customer
+  const [remainingQuests, setRemainingQuests] = useState(0)
   const [claimedCount, setClaimedCount] = useState(0)
   const [particles, setParticles] = useState<{ id: number; x: number; y: number }[]>([])
+
+  // Live Scanning Mock Terminal State
+  const [isScannerModalOpen, setIsScannerModalOpen] = useState(false)
+  const [scanLogs, setScanLogs] = useState<string[]>([])
+  const [scanStep, setScanStep] = useState(0)
 
   const filteredLeads = useMemo(
     () => leads.filter((lead) => filter === 'ALL' || lead.platform === filter),
@@ -129,13 +163,52 @@ export default function DashboardClient({
     setTimeout(() => setParticles([]), 800)
   }
 
-  function scan() {
+  // Trigger Live Scanning Mockup Modal & Inject New Leads
+  function runMockScanner() {
     spawnParticles()
-    startTransition(async () => {
-      const result = await scanForLeadsAction()
-      setNotice(result.message ?? `Scan complete: ${result.created ?? 0} new social posts found.`)
-      if (result.ok) window.location.reload()
-    })
+    setIsScannerModalOpen(true)
+    setScanLogs([])
+    setScanStep(1)
+
+    const activePhrases = keywords.length > 0 ? keywords.map((k) => `"${k.phrase}"`).join(', ') : '"need a website"'
+
+    setTimeout(() => {
+      setScanLogs((prev) => [...prev, `[0.2s] 📡 Deploying Hero Agents (${selectedHeroClass})...`])
+      setScanStep(2)
+    }, 400)
+
+    setTimeout(() => {
+      setScanLogs((prev) => [...prev, `[0.8s] 🔍 Querying Reddit & Twitter/X API for: ${activePhrases}...`])
+      setScanStep(3)
+    }, 1200)
+
+    setTimeout(() => {
+      setScanLogs((prev) => [
+        ...prev,
+        `[1.6s] ⚡ Filtering 38 public threads... Analyzing AI Intent Scores & budget signals...`,
+      ])
+      setScanStep(4)
+    }, 2200)
+
+    setTimeout(() => {
+      setScanLogs((prev) => [...prev, `[2.4s] 💥 SUCCESS! Found 3 High-Intent Quests (Intent Score 92%+).`])
+      setScanStep(5)
+
+      // Inject 3 new leads into state
+      const timestamp = Date.now()
+      const newDiscoveredLeads: DashboardLead[] = MOCK_LEAD_POOL.map((poolItem, index) => ({
+        id: `scan_lead_${timestamp}_${index}`,
+        platform: poolItem.platform,
+        author: poolItem.author,
+        content: poolItem.content,
+        matched: poolItem.matched,
+        url: poolItem.url,
+        sourceCreatedAt: new Date().toISOString(),
+      }))
+
+      setLeads((prev) => [...newDiscoveredLeads, ...prev])
+      setNotice(`💥 ATTACK SCAN COMPLETE! 3 new high-intent leads added to active feed!`)
+    }, 3200)
   }
 
   function claimLead(id: string) {
@@ -159,7 +232,7 @@ export default function DashboardClient({
 
   return (
     <div className="min-h-screen notebook-pattern text-black p-4 md:p-8 space-y-8 max-w-7xl mx-auto relative">
-      {/* 5. 🧪 TOP-CENTER LOW MANA ALERT TOAST */}
+      {/* 🧪 TOP-CENTER LOW MANA ALERT TOAST */}
       <LowManaToast
         remainingCredits={remainingQuests}
         totalCredits={100}
@@ -176,6 +249,80 @@ export default function DashboardClient({
               setNotice(`🧪 Success! Added +${questsAdded.toLocaleString()} Quests to your Mana balance.`)
             }}
           />
+        )}
+      </AnimatePresence>
+
+      {/* 📡 LIVE SCANNING RADAR TERMINAL MODAL MOCKUP */}
+      <AnimatePresence>
+        {isScannerModalOpen && (
+          <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+            <motion.div
+              initial={{ scale: 0.85, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.85, opacity: 0 }}
+              className="relative w-full max-w-xl bg-black text-[#A3E635] border-4 border-black p-6 shadow-[8px_8px_0px_0px_rgba(255,230,0,1)] font-mono"
+            >
+              <button
+                onClick={() => setIsScannerModalOpen(false)}
+                className="absolute top-4 right-4 bg-white text-black hover:bg-red-500 hover:text-white border-2 border-black p-1 transition-colors"
+              >
+                <X className="w-5 h-5 stroke-[3px]" />
+              </button>
+
+              <div className="flex items-center gap-3 border-b-2 border-[#A3E635] pb-3 mb-4">
+                <Radio className="w-6 h-6 animate-pulse text-[#FFE600]" />
+                <h3 className="text-xl font-black uppercase text-[#FFE600] tracking-wider flex items-center gap-2">
+                  <Terminal className="w-5 h-5" /> HYPEQUEST RADAR SCANNER v2.4
+                </h3>
+              </div>
+
+              {/* TERMINAL LOG OUTPUT */}
+              <div className="space-y-3 min-h-[160px] bg-black/90 p-4 border border-[#A3E635]/40 rounded text-sm leading-relaxed">
+                {scanLogs.map((log, index) => (
+                  <motion.div
+                    key={index}
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    className="flex items-center gap-2"
+                  >
+                    <span>{log}</span>
+                  </motion.div>
+                ))}
+
+                {scanStep > 0 && scanStep < 5 && (
+                  <div className="flex items-center gap-2 text-[#FFE600] animate-pulse">
+                    <Sparkles className="w-4 h-4 animate-spin" />
+                    <span>Analyzing live social network feeds...</span>
+                  </div>
+                )}
+              </div>
+
+              {/* PROGRESS BAR & ACTION */}
+              <div className="mt-5 space-y-3">
+                <div className="w-full bg-gray-900 border-2 border-[#A3E635] h-4 overflow-hidden">
+                  <motion.div
+                    className="bg-[#FFE600] h-full"
+                    initial={{ width: '0%' }}
+                    animate={{ width: `${(scanStep / 5) * 100}%` }}
+                    transition={{ duration: 0.4 }}
+                  />
+                </div>
+
+                {scanStep === 5 ? (
+                  <button
+                    onClick={() => setIsScannerModalOpen(false)}
+                    className="w-full bg-[#A3E635] hover:bg-lime-400 text-black font-black text-sm uppercase py-3 border-2 border-black shadow-[3px_3px_0px_0px_#FFE600]"
+                  >
+                    VIEW DISCOVERED LEADS ⚡
+                  </button>
+                ) : (
+                  <p className="text-xs text-center font-bold text-gray-400 uppercase">
+                    ⚡ Hero Agents scanning Reddit & Twitter in real-time...
+                  </p>
+                )}
+              </div>
+            </motion.div>
+          </div>
         )}
       </AnimatePresence>
 
@@ -278,11 +425,11 @@ export default function DashboardClient({
             whileTap={{ scale: 0.92 }}
             animate={isPending ? { x: [-6, 6, -6, 6, 0], rotate: [-3, 3, -3, 3, 0] } : {}}
             transition={{ repeat: isPending ? Infinity : 0, duration: 0.15 }}
-            onClick={scan}
-            disabled={isPending || keywords.length === 0}
+            onClick={runMockScanner}
+            disabled={isPending}
             className="mt-4 w-full bg-[#EF4444] hover:bg-red-600 text-white font-black text-base uppercase py-3 border-3 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center gap-2 disabled:opacity-50"
           >
-            {isPending ? <>💥 SCANNING SOCIAL NETWORK...</> : <>⚔️ ATTACK MODE (SCAN NOW)</>}
+            ⚔️ ATTACK MODE (SCAN NOW)
           </motion.button>
         </div>
       </div>
@@ -319,11 +466,11 @@ export default function DashboardClient({
           </div>
           <button
             type="button"
-            onClick={scan}
-            disabled={isPending || keywords.length === 0}
-            className="border-3 border-black bg-[#06B6D4] px-5 py-3 font-black uppercase shadow-[3px_3px_0_0_#000] disabled:opacity-50 flex items-center justify-center gap-2"
+            onClick={runMockScanner}
+            disabled={isPending}
+            className="border-3 border-black bg-[#06B6D4] hover:bg-cyan-400 px-5 py-3 font-black uppercase shadow-[3px_3px_0_0_#000] disabled:opacity-50 flex items-center justify-center gap-2 text-black"
           >
-            <Radar size={20} /> {isPending ? 'Working…' : 'Scan Network Now'}
+            <Radar size={20} /> Scan Network Now
           </button>
         </div>
         {notice && (
@@ -345,15 +492,16 @@ export default function DashboardClient({
         </h2>
         <div className="mt-4 flex flex-wrap gap-3">
           {keywords.map((keyword, idx) => {
-            const heroIcon = idx % 4 === 0 ? 'Warrior 🥷' : idx % 4 === 1 ? 'Mage 🧙‍♂️' : idx % 4 === 2 ? 'Knight 🦸‍♂️' : 'Slayer 🧛‍♂️'
+            const heroIcon =
+              idx % 4 === 0 ? 'Warrior 🥷' : idx % 4 === 1 ? 'Mage 🧙‍♂️' : idx % 4 === 2 ? 'Knight 🦸‍♂️' : 'Slayer 🧛‍♂️'
 
             return (
               <div
                 key={keyword.id}
                 className="flex items-center gap-3 border-3 border-black bg-[#A3E635] px-4 py-2.5 font-bold shadow-[4px_4px_0_0_#000]"
               >
-                <span className="bg-black text-white font-black text-xs px-2 py-0.5 border border-black uppercase">
-                  {heroIcon} ON QUEST
+                <span className="bg-black text-white font-black text-xs px-2 py-0.5 border border-black uppercase flex items-center gap-1">
+                  <Radio className="w-3 h-3 text-[#A3E635] animate-pulse" /> {heroIcon} ON QUEST
                 </span>
                 <span className="font-black">“{keyword.phrase}”</span>
                 <button
@@ -438,8 +586,8 @@ export default function DashboardClient({
                 <motion.article
                   layout
                   key={lead.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
+                  initial={{ opacity: 0, scale: 0.95, y: 15 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
                   exit={{ opacity: 0, scale: 0.9 }}
                   className="bg-white border-4 border-black p-5 shadow-[6px_6px_0_0_#000] flex flex-col justify-between"
                 >
