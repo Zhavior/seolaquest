@@ -164,60 +164,102 @@ export async function scanForLeadsAction(): Promise<ActionResult & { created?: n
   for (const keyword of keywords) {
     try {
       const query = encodeURIComponent(keyword.phrase)
+
+      // 1. Reddit Search (Public JSON API)
       const response = await fetch(`https://www.reddit.com/search.json?q=${query}&type=link&sort=new&limit=10`, {
         cache: 'no-store',
         headers: { 'User-Agent': 'HypeQuest/1.0 social-listening MVP' },
       })
 
-      if (!response.ok) continue
+      if (response.ok) {
+        const json = (await response.json()) as { data?: { children?: Array<{ data?: Record<string, unknown> }> } }
+        const children = json.data?.children ?? []
 
-      const json = (await response.json()) as { data?: { children?: Array<{ data?: Record<string, unknown> }> } }
-      const children = json.data?.children ?? []
+        for (const child of children) {
+          const post = child.data
+          if (!post) continue
+          const postId = typeof post?.name === 'string' ? post.name : null
+          const permalink = typeof post?.permalink === 'string' ? post.permalink : null
+          if (!postId || !permalink) continue
 
-      for (const child of children) {
-        const post = child.data
-        if (!post) continue
-        const postId = typeof post?.name === 'string' ? post.name : null
-        const permalink = typeof post?.permalink === 'string' ? post.permalink : null
-        if (!postId || !permalink) continue
+          const title = typeof post.title === 'string' ? post.title : ''
+          const body = typeof post.selftext === 'string' ? post.selftext : ''
+          const content = cleanText(`${title} ${body}`, 700)
+          if (!content) continue
 
-        const title = typeof post.title === 'string' ? post.title : ''
-        const body = typeof post.selftext === 'string' ? post.selftext : ''
-        const content = cleanText(`${title} ${body}`, 700)
-        if (!content) continue
+          const author = typeof post.author === 'string' ? `u/${post.author}` : 'u/[deleted]'
+          const createdUtc = typeof post.created_utc === 'number' ? new Date(post.created_utc * 1000) : null
 
-        const author = typeof post.author === 'string' ? `u/${post.author}` : 'u/[deleted]'
-        const createdUtc = typeof post.created_utc === 'number' ? new Date(post.created_utc * 1000) : null
+          const existing = await prisma.lead.findUnique({
+            where: { userId_externalPostId: { userId: user.id, externalPostId: postId } },
+            select: { id: true },
+          })
 
-        const existing = await prisma.lead.findUnique({
-          where: { userId_externalPostId: { userId: user.id, externalPostId: postId } },
-          select: { id: true },
-        })
+          if (!existing) {
+            await prisma.lead.create({
+              data: {
+                userId: user.id,
+                keywordId: keyword.id,
+                platform: 'REDDIT',
+                externalPostId: postId,
+                author,
+                content,
+                matched: keyword.phrase,
+                url: `https://www.reddit.com${permalink}`,
+                sourceCreatedAt: createdUtc,
+              },
+            })
+            created += 1
+          }
+        }
+      }
 
-        if (existing) continue
-
-        await prisma.lead.create({
-          data: {
-            userId: user.id,
-            keywordId: keyword.id,
-            platform: 'REDDIT',
-            externalPostId: postId,
-            author,
-            content,
-            matched: keyword.phrase,
-            url: `https://www.reddit.com${permalink}`,
-            sourceCreatedAt: createdUtc,
+      // 2. Twitter / X API (Activated automatically if TWITTER_BEARER_TOKEN is provided)
+      const twitterToken = process.env.TWITTER_BEARER_TOKEN
+      if (twitterToken) {
+        const tweetRes = await fetch(
+          `https://api.twitter.com/2/tweets/search/recent?query=${query}&max_results=10&tweet.fields=created_at,author_id`,
+          {
+            cache: 'no-store',
+            headers: { Authorization: `Bearer ${twitterToken}` },
           },
-        })
-        created += 1
+        )
+        if (tweetRes.ok) {
+          const tweetJson = (await tweetRes.json()) as { data?: Array<{ id: string; text: string; created_at?: string }> }
+          const tweets = tweetJson.data ?? []
+
+          for (const tweet of tweets) {
+            const existing = await prisma.lead.findUnique({
+              where: { userId_externalPostId: { userId: user.id, externalPostId: `tw_${tweet.id}` } },
+              select: { id: true },
+            })
+
+            if (!existing) {
+              await prisma.lead.create({
+                data: {
+                  userId: user.id,
+                  keywordId: keyword.id,
+                  platform: 'TWITTER',
+                  externalPostId: `tw_${tweet.id}`,
+                  author: '@social_user',
+                  content: cleanText(tweet.text, 500),
+                  matched: keyword.phrase,
+                  url: `https://x.com/i/web/status/${tweet.id}`,
+                  sourceCreatedAt: tweet.created_at ? new Date(tweet.created_at) : new Date(),
+                },
+              })
+              created += 1
+            }
+          }
+        }
       }
     } catch {
-      // A single unavailable source must not erase existing user data or stop other keywords.
+      // A single unavailable source must not stop other keywords.
     }
   }
 
   revalidatePath('/')
-  return { ok: true, created, message: created ? undefined : 'No new Reddit posts found. Try again later.' }
+  return { ok: true, created, message: created ? undefined : 'Scan complete. No new social posts found.' }
 }
 
 export async function createPostAction(content: string): Promise<ActionResult> {
