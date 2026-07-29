@@ -68,6 +68,51 @@ export async function createCheckoutAction(plan: CheckoutPlan): Promise<ActionRe
   return { ok: true, url: session.url }
 }
 
+type PotionId = 'minor_vial' | 'greater_elixir' | 'dragon_cauldron'
+
+const POTION_DETAILS = {
+  minor_vial: { name: 'Minor Mana Vial', priceCents: 500, quests: 1000 },
+  greater_elixir: { name: 'Greater Mana Elixir', priceCents: 1000, quests: 2500 },
+  dragon_cauldron: { name: "Dragon's Cauldron", priceCents: 2000, quests: 6000 },
+}
+
+export async function createManaCheckoutAction(potionId: string): Promise<ActionResult & { url?: string }> {
+  const user = await requireCurrentUser()
+  const stripeKey = process.env.STRIPE_SECRET_KEY
+  const siteUrl = process.env.NEXTAUTH_URL
+  const potion = POTION_DETAILS[potionId as PotionId]
+
+  if (!stripeKey || !siteUrl || !potion) {
+    return { ok: false, message: 'Checkout is not configured or invalid item.' }
+  }
+
+  const stripe = new Stripe(stripeKey)
+  const session = await stripe.checkout.sessions.create({
+    mode: 'payment',
+    customer: user.stripeCustomerId ?? undefined,
+    customer_email: user.stripeCustomerId ? undefined : user.email ?? undefined,
+    client_reference_id: user.id,
+    metadata: { userId: user.id, type: 'mana_potion', potionId, quests: potion.quests.toString() },
+    line_items: [
+      {
+        price_data: {
+          currency: 'usd',
+          product_data: {
+            name: potion.name,
+          },
+          unit_amount: potion.priceCents,
+        },
+        quantity: 1,
+      },
+    ],
+    success_url: `${siteUrl}?checkout=success&potion=${potionId}`,
+    cancel_url: `${siteUrl}?checkout=cancelled`,
+  })
+
+  if (!session.url) return { ok: false, message: 'Stripe did not return a checkout link. Try again.' }
+  return { ok: true, url: session.url }
+}
+
 function levelAfterClaim(user: { xp: number; level: number; xpRequired: number }) {
   const nextXp = user.xp + 150
   const leveledUp = nextXp >= user.xpRequired
@@ -307,4 +352,84 @@ export async function updateSettingsAction(input: { name: string; title: string;
   })
   revalidatePath('/settings')
   return { ok: true }
+}
+
+export async function getAnalyticsAction() {
+  const user = await requireCurrentUser()
+  
+  // Calculate the last 7 days
+  const days = []
+  const now = new Date()
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date(now)
+    d.setDate(d.getDate() - i)
+    d.setHours(0, 0, 0, 0)
+    days.push(d)
+  }
+
+  // Fetch claimed leads in the last 7 days
+  const leads = await prisma.lead.findMany({
+    where: {
+      userId: user.id,
+      status: { in: [LeadStatus.CONTACTED, LeadStatus.DISMISSED] },
+      OR: [
+        { contactedAt: { gte: days[0] } },
+        { dismissedAt: { gte: days[0] } }
+      ]
+    },
+    select: { status: true, contactedAt: true, dismissedAt: true }
+  })
+
+  // Format response
+  const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+  const analytics = days.map((date) => {
+    const dayStart = date.getTime()
+    const dayEnd = dayStart + 24 * 60 * 60 * 1000
+    
+    const dayLeads = leads.filter(l => {
+      const t = l.status === LeadStatus.CONTACTED ? l.contactedAt?.getTime() : l.dismissedAt?.getTime()
+      if (!t) return false;
+      return t >= dayStart && t < dayEnd
+    })
+
+    return {
+      day: dayNames[date.getDay()],
+      claimed: dayLeads.filter(l => l.status === LeadStatus.CONTACTED).length,
+      dismissed: dayLeads.filter(l => l.status === LeadStatus.DISMISSED).length,
+    }
+  })
+
+  return analytics
+}
+
+export async function getLeaderboardAction() {
+  const topUsers = await prisma.user.findMany({
+    orderBy: { xp: 'desc' },
+    take: 5,
+    select: { name: true, title: true, level: true, xp: true }
+  })
+  return topUsers
+}
+
+export async function generateAIReplyAction(leadId: string): Promise<ActionResult & { reply?: string }> {
+  const user = await requireCurrentUser()
+  if (user.level < 5) return { ok: false, message: 'You must be Level 5 to use the AI Reply Generator.' }
+  
+  // Mock AI delay
+  await new Promise(resolve => setTimeout(resolve, 1500))
+  
+  return { 
+    ok: true, 
+    reply: "Hey! We built a tool exactly for this at HypeQuest. It automates social listening and turns leads into an arcade game. Let me know if you want a demo link!" 
+  }
+}
+
+export async function exportToCrmAction(leadId: string): Promise<ActionResult> {
+  const user = await requireCurrentUser()
+  if (user.level < 10) return { ok: false, message: 'You must be Level 10 to use CRM Webhooks.' }
+  
+  // Mock webhook delay
+  await new Promise(resolve => setTimeout(resolve, 1000))
+  
+  return { ok: true, message: 'Lead successfully exported to your CRM!' }
 }

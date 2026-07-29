@@ -42,20 +42,26 @@ const POTION_ITEMS = [
   },
 ]
 
+import { createManaCheckoutAction } from '@/app/actions'
+
 export default function ManaShopModal({ onClose, onPurchaseSuccess }: ManaShopModalProps) {
   const [selectedPotion, setSelectedPotion] = useState<string | null>(null)
   const [purchasedId, setPurchasedId] = useState<string | null>(null)
 
-  const handleBuy = (id: string, questsStr: string) => {
-    const quests = parseInt(questsStr.replace(/[^0-9]/g, ''), 10)
+  const handleBuy = async (id: string, questsStr: string) => {
     setSelectedPotion(id)
-    setTimeout(() => {
-      setPurchasedId(id)
-      if (onPurchaseSuccess) onPurchaseSuccess(quests)
-      setTimeout(() => {
-        onClose()
-      }, 1400)
-    }, 600)
+    try {
+      const res = await createManaCheckoutAction(id)
+      if (res.ok && res.url) {
+        window.location.href = res.url
+      } else {
+        alert(res.message || 'Failed to create checkout')
+        setSelectedPotion(null)
+      }
+    } catch (e) {
+      alert('Error creating checkout')
+      setSelectedPotion(null)
+    }
   }
 
   return (

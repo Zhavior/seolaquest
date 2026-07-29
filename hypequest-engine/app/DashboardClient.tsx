@@ -5,25 +5,29 @@ import { motion, AnimatePresence } from 'framer-motion'
 import {
   BarChart3,
   CheckCircle2,
+  Database,
   ExternalLink,
   Filter,
   FlaskConical,
   Flame,
+  Lock,
   Plus,
   Radar,
   Radio,
   Search,
+  Share2,
   Sparkles,
   Swords,
   Terminal,
   Trash2,
   Trophy,
+  Wand2,
   X,
   Zap,
 } from 'lucide-react'
 import LowManaToast from '@/components/LowManaToast'
 import ManaShopModal from '@/components/ManaShopModal'
-import { addKeywordAction, claimQuestAction, dismissLeadAction, removeKeywordAction, scanForLeadsAction } from './actions'
+import { addKeywordAction, claimQuestAction, dismissLeadAction, removeKeywordAction, scanForLeadsAction, generateAIReplyAction, exportToCrmAction } from './actions'
 
 export type DashboardUser = {
   name: string
@@ -43,6 +47,10 @@ export type DashboardLead = {
   url: string
   sourceCreatedAt: string | null
 }
+
+export type AnalyticsData = { day: string; claimed: number; dismissed: number }[]
+
+export type LeaderboardUser = { name: string | null; title: string | null; level: number; xp: number }
 
 function ageLabel(value: string | null) {
   if (!value) return 'Recently found'
@@ -100,10 +108,14 @@ export default function DashboardClient({
   dbUser,
   dbKeywords,
   dbLeads,
+  dbAnalytics,
+  dbLeaderboard,
 }: {
   dbUser: DashboardUser
   dbKeywords: DashboardKeyword[]
   dbLeads: DashboardLead[]
+  dbAnalytics: AnalyticsData
+  dbLeaderboard: LeaderboardUser[]
 }) {
   const [user, setUser] = useState(dbUser)
   const [keywords, setKeywords] = useState(dbKeywords)
@@ -163,7 +175,7 @@ export default function DashboardClient({
     setTimeout(() => setParticles([]), 800)
   }
 
-  // Trigger Live Scanning Mockup Modal & Inject New Leads
+  // Trigger Live Scanning Radar & Fetch Real Leads
   function runMockScanner() {
     spawnParticles()
     setIsScannerModalOpen(true)
@@ -182,33 +194,42 @@ export default function DashboardClient({
       setScanStep(3)
     }, 1200)
 
-    setTimeout(() => {
-      setScanLogs((prev) => [
-        ...prev,
-        `[1.6s] ⚡ Filtering 38 public threads... Analyzing AI Intent Scores & budget signals...`,
-      ])
-      setScanStep(4)
-    }, 2200)
+    startTransition(async () => {
+      // Actually run the real API scan while the animation plays
+      const result = await scanForLeadsAction()
+      
+      setTimeout(() => {
+        setScanLogs((prev) => [
+          ...prev,
+          `[1.6s] ⚡ Filtering threads... Analyzing AI Intent Scores & budget signals...`,
+        ])
+        setScanStep(4)
+      }, 2200)
 
-    setTimeout(() => {
-      setScanLogs((prev) => [...prev, `[2.4s] 💥 SUCCESS! Found 3 High-Intent Quests (Intent Score 92%+).`])
-      setScanStep(5)
+      setTimeout(() => {
+        if (!result.ok) {
+          setScanLogs((prev) => [...prev, `[2.4s] ⚠️ SCAN FAILED: ${result.message}`])
+          setNotice(`Scan failed: ${result.message}`)
+          setScanStep(5)
+          return
+        }
 
-      // Inject 3 new leads into state
-      const timestamp = Date.now()
-      const newDiscoveredLeads: DashboardLead[] = MOCK_LEAD_POOL.map((poolItem, index) => ({
-        id: `scan_lead_${timestamp}_${index}`,
-        platform: poolItem.platform,
-        author: poolItem.author,
-        content: poolItem.content,
-        matched: poolItem.matched,
-        url: poolItem.url,
-        sourceCreatedAt: new Date().toISOString(),
-      }))
+        if (result.created && result.created > 0) {
+          setScanLogs((prev) => [...prev, `[2.4s] 💥 SUCCESS! Found ${result.created} High-Intent Quests.`])
+          setNotice(`💥 ATTACK SCAN COMPLETE! ${result.created} new high-intent leads added to active feed!`)
+        } else {
+          setScanLogs((prev) => [...prev, `[2.4s] 📡 SCAN COMPLETE: No new high-intent quests found.`])
+          setNotice(result.message || 'Scan complete. No new quests.')
+        }
+        setScanStep(5)
 
-      setLeads((prev) => [...newDiscoveredLeads, ...prev])
-      setNotice(`💥 ATTACK SCAN COMPLETE! 3 new high-intent leads added to active feed!`)
-    }, 3200)
+        // Note: The new leads will be populated by the server revalidating the page, 
+        // so they will magically appear in the props. 
+        // We don't need to manually inject them into state if we rely on Next.js server actions revalidating.
+        // However, since we use local state for leads, we should refresh the page or rely on the prop update.
+        window.location.reload()
+      }, 3200)
+    })
   }
 
   function claimLead(id: string) {
@@ -228,6 +249,38 @@ export default function DashboardClient({
       if (!result.ok) return setNotice(result.message ?? 'Could not dismiss quest.')
       setLeads((current) => current.filter((lead) => lead.id !== id))
     })
+  }
+
+  function generateAIReply(lead: DashboardLead) {
+    if (user.level < 5) return setNotice('Reach Level 5 to unlock the AI Reply Generator!')
+    setNotice(`🤖 AI is drafting a personalized reply to ${lead.author}...`)
+    startTransition(async () => {
+      const result = await generateAIReplyAction(lead.id)
+      if (result.ok && result.reply) {
+        setNotice(`🤖 AI Suggested Reply: "${result.reply}"`)
+      } else {
+        setNotice(result.message ?? 'Failed to generate AI reply.')
+      }
+    })
+  }
+
+  function exportToCRM(lead: DashboardLead) {
+    if (user.level < 10) return setNotice('Reach Level 10 to unlock CRM Webhooks!')
+    setNotice(`⚡ Exporting ${lead.platform} lead to your CRM...`)
+    startTransition(async () => {
+      const result = await exportToCrmAction(lead.id)
+      setNotice(result.message ?? 'Failed to export lead.')
+    })
+  }
+
+  function shareStats() {
+    const pipelineValue = leads.length * 250
+    const text = `⚔️ I'm a Level ${user.level} ${characterTitle} on HypeQuest!\n\n🔥 ${user.xp.toLocaleString()} XP earned\n💰 $${pipelineValue.toLocaleString()}/mo pipeline uncovered\n\nJoin the hunt! #BuildInPublic #SaaS`
+    
+    // Create Twitter share URL
+    const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`
+    window.open(url, '_blank')
+    setNotice('Stats shared! Thanks for spreading the word. 🚀')
   }
 
   return (
@@ -356,32 +409,41 @@ export default function DashboardClient({
       {/* 1. ⚔️ HERO LEVEL & XP ENGINE + PIPELINE + ATTACK MODE */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* LEVEL & XP CARD */}
-        <div className="bg-[#FFE600] border-4 border-black p-6 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] -rotate-1">
-          <div className="flex items-center justify-between">
-            <span className="bg-black text-white font-black text-xs uppercase px-2 py-0.5 border border-black">
-              HERO LEVEL {user.level}
-            </span>
-            <Trophy className="w-6 h-6 stroke-[2.5px]" />
-          </div>
-          <h2 className="text-2xl font-black uppercase mt-2">{characterTitle}</h2>
-
-          {/* CANDY-STRIPED XP PROGRESS BAR */}
-          <div className="mt-4">
-            <div className="flex justify-between text-xs font-black mb-1">
-              <span>XP PROGRESS</span>
-              <span>
-                {user.xp} / {user.xpRequired} XP
+        <div className="bg-[#FFE600] border-4 border-black p-6 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] -rotate-1 relative flex flex-col justify-between">
+          <div>
+            <div className="flex items-center justify-between">
+              <span className="bg-black text-white font-black text-xs uppercase px-2 py-0.5 border border-black">
+                HERO LEVEL {user.level}
               </span>
+              <Trophy className="w-6 h-6 stroke-[2.5px]" />
             </div>
-            <div className="w-full h-5 bg-white border-2 border-black overflow-hidden relative shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
-              <motion.div
-                className="h-full bg-[#A3E635] animate-candy-stripe border-r-2 border-black"
-                initial={{ width: '0%' }}
-                animate={{ width: `${xpPercent}%` }}
-                transition={{ type: 'spring', stiffness: 100 }}
-              />
+            <h2 className="text-2xl font-black uppercase mt-2">{characterTitle}</h2>
+
+            {/* CANDY-STRIPED XP PROGRESS BAR */}
+            <div className="mt-4">
+              <div className="flex justify-between text-xs font-black mb-1">
+                <span>XP PROGRESS</span>
+                <span>
+                  {user.xp} / {user.xpRequired} XP
+                </span>
+              </div>
+              <div className="w-full h-5 bg-white border-2 border-black overflow-hidden relative shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+                <motion.div
+                  className="h-full bg-[#A3E635] animate-candy-stripe border-r-2 border-black"
+                  initial={{ width: '0%' }}
+                  animate={{ width: `${xpPercent}%` }}
+                  transition={{ type: 'spring', stiffness: 100 }}
+                />
+              </div>
             </div>
           </div>
+          
+          <button
+            onClick={shareStats}
+            className="mt-6 w-full bg-black text-white hover:bg-gray-800 font-black text-xs uppercase py-2.5 border-2 border-black flex items-center justify-center gap-2"
+          >
+            <Share2 size={16} /> Share Stats to X
+          </button>
         </div>
 
         {/* 4. 📊 PIPELINE & REVENUE METRICS */}
@@ -536,7 +598,7 @@ export default function DashboardClient({
         </div>
 
         <div className="grid grid-cols-7 gap-2 items-end h-32 border-b-2 border-black pb-2 pt-4">
-          {EMPTY_SEVEN_DAY_ANALYTICS.map((item, idx) => {
+          {dbAnalytics.map((item, idx) => {
             const heightPct = item.claimed ? Math.min(100, (item.claimed / 35) * 100) : 0
             return (
               <div key={item.day} className="flex flex-col items-center gap-1 h-full justify-end">
@@ -550,6 +612,32 @@ export default function DashboardClient({
               </div>
             )
           })}
+        </div>
+      </section>
+
+      {/* 5. 🏆 GLOBAL LEADERBOARD */}
+      <section className="bg-white border-4 border-black p-6 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
+        <h2 className="text-xl font-black uppercase flex items-center gap-2 mb-4">
+          <Trophy className="w-6 h-6 stroke-[3px]" /> Global Leaderboard
+        </h2>
+        <div className="space-y-3">
+          {dbLeaderboard.map((u, idx) => (
+            <div key={idx} className={`flex items-center justify-between p-3 border-2 border-black ${idx === 0 ? 'bg-[#FFE600]' : idx === 1 ? 'bg-gray-100' : idx === 2 ? 'bg-[#F4F0EA]' : 'bg-white'} shadow-[2px_2px_0_0_#000]`}>
+              <div className="flex items-center gap-3">
+                <span className="font-black text-lg w-6">#{idx + 1}</span>
+                <div>
+                  <div className="font-black uppercase">{u.name || 'Anonymous Hunter'}</div>
+                  <div className="text-xs font-bold text-gray-600">{u.title || 'Hunter'}</div>
+                </div>
+              </div>
+              <div className="text-right">
+                <div className="bg-black text-white text-[10px] uppercase px-2 py-0.5 border border-black font-black inline-block">
+                  Level {u.level}
+                </div>
+                <div className="font-black text-sm mt-1">{u.xp.toLocaleString()} XP</div>
+              </div>
+            </div>
+          ))}
         </div>
       </section>
 
@@ -618,7 +706,7 @@ export default function DashboardClient({
                   </div>
 
                   {/* ACTION BUTTONS */}
-                  <div className="flex gap-2">
+                  <div className="flex gap-2 mb-2">
                     <motion.button
                       whileTap={{ scale: 0.95 }}
                       onClick={() => claimLead(lead.id)}
@@ -646,6 +734,31 @@ export default function DashboardClient({
                       aria-label="Dismiss lead"
                     >
                       <Trash2 size={18} />
+                    </button>
+                  </div>
+                  
+                  {/* UTILITY BUTTONS (LEVEL GATED) */}
+                  <div className="flex gap-2">
+                    <button
+                      type="button"
+                      onClick={() => generateAIReply(lead)}
+                      disabled={isPending}
+                      className={`flex-1 border-3 border-black p-2 font-black text-xs uppercase shadow-[2px_2px_0_0_#000] flex items-center justify-center gap-1 ${
+                        user.level >= 5 ? 'bg-purple-400 hover:bg-purple-500 text-black' : 'bg-gray-200 text-gray-500 cursor-not-allowed'
+                      }`}
+                    >
+                      {user.level >= 5 ? <Wand2 size={14} /> : <Lock size={14} />} AI Reply {user.level < 5 && '(Lvl 5)'}
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => exportToCRM(lead)}
+                      disabled={isPending}
+                      className={`flex-1 border-3 border-black p-2 font-black text-xs uppercase shadow-[2px_2px_0_0_#000] flex items-center justify-center gap-1 ${
+                        user.level >= 10 ? 'bg-green-400 hover:bg-green-500 text-black' : 'bg-gray-200 text-gray-500 cursor-not-allowed'
+                      }`}
+                    >
+                      {user.level >= 10 ? <Database size={14} /> : <Lock size={14} />} CRM Export {user.level < 10 && '(Lvl 10)'}
                     </button>
                   </div>
                 </motion.article>

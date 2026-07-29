@@ -1,12 +1,13 @@
-import DashboardClient, { type DashboardKeyword, type DashboardLead, type DashboardUser } from './DashboardClient'
+import DashboardClient, { type DashboardKeyword, type DashboardLead, type DashboardUser, type AnalyticsData, type LeaderboardUser } from './DashboardClient'
 import prisma from '@/lib/prisma'
 import { requireCurrentUser } from '@/lib/auth'
+import { getAnalyticsAction, getLeaderboardAction } from './actions'
 
 export const dynamic = 'force-dynamic'
 
 export default async function Home() {
   const user = await requireCurrentUser()
-  const [keywords, leads] = await Promise.all([
+  const [keywords, leads, analyticsData, leaderboardData] = await Promise.all([
     prisma.trackedKeyword.findMany({
       where: { userId: user.id },
       orderBy: { createdAt: 'desc' },
@@ -26,6 +27,8 @@ export default async function Home() {
         sourceCreatedAt: true,
       },
     }),
+    getAnalyticsAction(),
+    getLeaderboardAction(),
   ])
 
   const dashboardUser: DashboardUser = {
@@ -41,5 +44,13 @@ export default async function Home() {
     sourceCreatedAt: lead.sourceCreatedAt?.toISOString() ?? null,
   }))
 
-  return <DashboardClient dbUser={dashboardUser} dbKeywords={dashboardKeywords} dbLeads={dashboardLeads} />
+  return (
+    <DashboardClient 
+      dbUser={dashboardUser} 
+      dbKeywords={dashboardKeywords} 
+      dbLeads={dashboardLeads}
+      dbAnalytics={analyticsData}
+      dbLeaderboard={leaderboardData}
+    />
+  )
 }

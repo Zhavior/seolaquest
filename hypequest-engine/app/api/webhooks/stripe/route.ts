@@ -30,8 +30,23 @@ export async function POST(req: Request) {
       const checkout = event.data.object
       const userId = checkout.metadata?.userId
       const customerId = typeof checkout.customer === 'string' ? checkout.customer : checkout.customer?.id
+      
       if (userId && customerId) {
-        await prisma.user.update({ where: { id: userId }, data: { stripeCustomerId: customerId, plan: 'PRO', subscriptionStatus: 'active' } })
+        if (checkout.metadata?.type === 'mana_potion') {
+          const questsToAdd = parseInt(checkout.metadata.quests || '0', 10)
+          await prisma.user.update({
+            where: { id: userId },
+            data: {
+              stripeCustomerId: customerId,
+              questsRemaining: { increment: questsToAdd }
+            }
+          })
+        } else {
+          await prisma.user.update({
+            where: { id: userId },
+            data: { stripeCustomerId: customerId, plan: 'PRO', subscriptionStatus: 'active' }
+          })
+        }
       }
     }
 
