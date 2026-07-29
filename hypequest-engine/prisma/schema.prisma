@@ -21,7 +21,10 @@ model User {
   plan               String    @default("FREE")
   subscriptionStatus String    @default("inactive")
   subscriptionTier   String    @default("FREE_PEASANT")
+  crmWebhookUrl      String?
   questsRemaining    Int       @default(100)
+  spellsCast         Int       @default(0)
+  questsExported     Int       @default(0)
   maxCredits         Int       @default(100)
   xpMultiplier       Float     @default(1.0)
   level              Int       @default(1)

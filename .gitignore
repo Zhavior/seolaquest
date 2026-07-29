@@ -23,6 +23,9 @@
 # misc
 .DS_Store
 *.pem
+sqlite.db
+HyperQuestz
+hypequest
 
 # debug
 npm-debug.log*

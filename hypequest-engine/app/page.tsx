@@ -1,11 +1,24 @@
-import DashboardClient, { type DashboardKeyword, type DashboardLead, type DashboardUser, type AnalyticsData, type LeaderboardUser } from './DashboardClient'
+import nextDynamic from 'next/dynamic'
+import { Suspense } from 'react'
+import Loading from './loading'
+import { type DashboardKeyword, type DashboardLead, type DashboardUser, type AnalyticsData, type LeaderboardUser } from './DashboardClient'
+
+const DashboardClient = nextDynamic(() => import('./DashboardClient'))
 import prisma from '@/lib/prisma'
 import { requireCurrentUser } from '@/lib/auth'
 import { getAnalyticsAction, getLeaderboardAction } from './actions'
 
 export const dynamic = 'force-dynamic'
 
-export default async function Home() {
+export default function Home() {
+  return (
+    <Suspense fallback={<Loading />}>
+      <DashboardData />
+    </Suspense>
+  )
+}
+
+async function DashboardData() {
   const user = await requireCurrentUser()
   const [keywords, leads, analyticsData, leaderboardData] = await Promise.all([
     prisma.trackedKeyword.findMany({

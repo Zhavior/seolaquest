@@ -67,11 +67,11 @@ export default function ManaShopModal({ onClose, onPurchaseSuccess }: ManaShopMo
   return (
     <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
       <motion.div
-        initial={{ scale: 0.85, y: 30, opacity: 0 }}
+        initial={{ scale: 0.9, y: "-100vh", opacity: 0 }}
         animate={{ scale: 1, y: 0, opacity: 1 }}
-        exit={{ scale: 0.85, y: 30, opacity: 0 }}
-        transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-        className="relative w-full max-w-2xl bg-[#F4F0EA] text-black border-4 border-black p-6 md:p-8 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]"
+        exit={{ scale: 0.9, y: "-100vh", opacity: 0 }}
+        transition={{ type: 'spring', stiffness: 350, damping: 20 }}
+        className="relative w-full max-w-2xl bg-[#F4F0EA] text-black border-4 border-black p-6 md:p-8 shadow-[12px_12px_0px_0px_rgba(0,0,0,1)]"
       >
         <button
           onClick={onClose}
@@ -100,7 +100,7 @@ export default function ManaShopModal({ onClose, onPurchaseSuccess }: ManaShopMo
               <motion.div
                 key={item.id}
                 whileHover={{ y: -4 }}
-                className="relative bg-white border-3 border-black p-5 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] flex flex-col justify-between"
+                className="relative bg-white border-3 border-black p-5 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] flex flex-col justify-between group overflow-visible"
               >
                 <div
                   className="text-[10px] font-black uppercase text-white px-2 py-0.5 border border-black inline-block self-start mb-3"
@@ -109,10 +109,14 @@ export default function ManaShopModal({ onClose, onPurchaseSuccess }: ManaShopMo
                   {item.badge}
                 </div>
 
-                <div className="text-center my-2">
-                  <div className="w-16 h-16 mx-auto bg-slate-100 border-2 border-black flex items-center justify-center shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] mb-3">
+                <div className="text-center my-2 relative">
+                  <motion.div 
+                    whileHover={{ rotate: 45, scale: 1.15 }}
+                    transition={{ type: 'spring', stiffness: 350, damping: 15 }}
+                    className="w-16 h-16 mx-auto bg-slate-100 border-2 border-black flex items-center justify-center shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] mb-3"
+                  >
                     <Icon className="w-10 h-10 stroke-[2.5px]" style={{ color: item.accentColor }} />
-                  </div>
+                  </motion.div>
                   <h3 className="font-black text-lg uppercase leading-tight">{item.name}</h3>
                   <div className="text-2xl font-black text-black mt-1">{item.quests}</div>
                   <div className="text-xs font-bold text-slate-600 mt-1">{item.perk}</div>
@@ -131,7 +135,7 @@ export default function ManaShopModal({ onClose, onPurchaseSuccess }: ManaShopMo
                   ) : isLoading ? (
                     <Zap className="w-5 h-5 animate-spin text-black" />
                   ) : (
-                    <>Buy for {item.price}</>
+                    <>[PURCHASE VIAL - {item.price}]</>
                   )}
                 </motion.button>
               </motion.div>
