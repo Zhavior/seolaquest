@@ -13,8 +13,22 @@ export async function getCurrentUser() {
             id: 'local_dev_user',
             email: 'hunter@hypequest.local',
             name: 'Local Hunter',
-            level: 4,
-            xp: 1250,
+            title: 'Dragon Slayer 🐉',
+            level: 10,
+            xp: 5000,
+            xpRequired: 10000,
+            questsRemaining: 1000,
+          }
+        });
+      } else if (fallbackUser.title !== 'Dragon Slayer 🐉') {
+        fallbackUser = await prisma.user.update({
+          where: { id: 'local_dev_user' },
+          data: {
+            title: 'Dragon Slayer 🐉',
+            level: 10,
+            xp: 5000,
+            xpRequired: 10000,
+            questsRemaining: 1000,
           }
         });
       }
