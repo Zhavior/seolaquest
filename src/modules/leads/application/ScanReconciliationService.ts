@@ -2,6 +2,12 @@ import 'server-only'
 
 import prisma from '@/lib/prisma'
 import { logger } from '@/src/modules/core/infrastructure/logger'
+import {
+  incrementFailed,
+  incrementRefunded,
+  initialScanReconciliationSummary,
+  type ScanReconciliationSummary,
+} from '@/src/modules/leads/domain/reconciliation'
 import { ScanRunService } from './ScanRunService'
 
 const STALE_AFTER_MS = 30 * 60_000
@@ -9,10 +15,11 @@ const STALE_AFTER_MS = 30 * 60_000
 type Candidate = { id: string; errorCode: string }
 
 export class ScanReconciliationService {
-  static async reconcile(batchSize = 20) {
+  static async reconcile(batchSize = 20): Promise<ScanReconciliationSummary> {
     const boundedBatchSize = Number.isSafeInteger(batchSize)
       ? Math.min(50, Math.max(1, batchSize))
       : 20
+
     const candidates = await prisma.$queryRaw<Candidate[]>`
       SELECT
         run."id",
@@ -34,19 +41,45 @@ export class ScanReconciliationService {
       LIMIT ${boundedBatchSize}
     `
 
-    let refunded = 0
-    let failed = 0
+    const summary = initialScanReconciliationSummary()
+    summary.candidates = candidates.length
+
     for (const candidate of candidates) {
       try {
         const didRefund = await prisma.$transaction((tx) =>
           ScanRunService.refundScanInTransaction(tx, candidate.id, candidate.errorCode),
         )
-        if (didRefund) refunded += 1
+
+        if (didRefund) {
+          incrementRefunded(summary, {
+            runId: candidate.id,
+            errorCode: candidate.errorCode,
+            outcome: 'REFUND_SUCCEEDED',
+          })
+        } else {
+          incrementFailed(summary, {
+            runId: candidate.id,
+            errorCode: candidate.errorCode,
+            outcome: 'REFUND_SKIPPED',
+          })
+        }
       } catch {
-        failed += 1
-        logger.error({ outcomeCode: 'SCAN_RECONCILIATION_ITEM_FAILED' }, 'Scan reconciliation item failed')
+        incrementFailed(summary, {
+          runId: candidate.id,
+          errorCode: candidate.errorCode,
+          outcome: 'REFUND_FAILED',
+        })
+        logger.error(
+          {
+            outcomeCode: 'SCAN_RECONCILIATION_ITEM_FAILED',
+            runId: candidate.id,
+            errorCode: candidate.errorCode,
+          },
+          'Scan reconciliation item failed',
+        )
       }
     }
-    return { candidates: candidates.length, refunded, failed }
+
+    return summary
   }
 }
