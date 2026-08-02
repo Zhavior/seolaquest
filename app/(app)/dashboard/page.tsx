@@ -1,5 +1,2 @@
-import { redirect } from 'next/navigation'
-
-export default function DashboardPage() {
-  redirect('/')
-}
+export { metadata, dynamic } from '@/app/app/page'
+export { default } from '@/app/app/page'

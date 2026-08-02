@@ -22,7 +22,26 @@ function isMissingColumn(error: unknown, columnNames: string[]) {
 }
 
 function isMissingOnboardingColumn(error: unknown) {
-  return isMissingColumn(error, ['onboardingStep', 'onboardingComplete'])
+  return isMissingColumn(error, [
+    'onboardingStep',
+    'onboardingComplete',
+    'businessDescription',
+    'targetCustomer',
+    'firstKeyword',
+    'preferredSource',
+    'emailDigest',
+    'radarAlerts',
+    'crmWebhookUrl',
+    'questsRemaining',
+    'spellsCast',
+    'questsExported',
+    'maxCredits',
+    'xpMultiplier',
+    'level',
+    'xp',
+    'xpRequired',
+    'unlockedTheme',
+  ])
 }
 
 type CompatibleUserRow = {
@@ -95,22 +114,22 @@ async function findUserWithOnboardingFallback(userId: string): Promise<User | nu
         "email",
         "name",
         "title",
-        "businessDescription",
-        "targetCustomer",
-        "firstKeyword",
-        "preferredSource"::text as "preferredSource",
-        "emailDigest",
-        "radarAlerts",
-        "crmWebhookUrl",
-        "questsRemaining",
-        "spellsCast",
-        "questsExported",
-        "maxCredits",
-        "xpMultiplier",
-        "level",
-        "xp",
-        "xpRequired",
-        "unlockedTheme",
+        NULL::text as "businessDescription",
+        NULL::text as "targetCustomer",
+        NULL::text as "firstKeyword",
+        NULL::text as "preferredSource",
+        NULL::boolean as "emailDigest",
+        NULL::boolean as "radarAlerts",
+        NULL::text as "crmWebhookUrl",
+        NULL::integer as "questsRemaining",
+        NULL::integer as "spellsCast",
+        NULL::integer as "questsExported",
+        NULL::integer as "maxCredits",
+        NULL::double precision as "xpMultiplier",
+        NULL::integer as "level",
+        NULL::integer as "xp",
+        NULL::integer as "xpRequired",
+        NULL::text as "unlockedTheme",
         "createdAt",
         "updatedAt"
       FROM "User"

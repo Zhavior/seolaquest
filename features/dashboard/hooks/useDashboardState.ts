@@ -57,7 +57,7 @@ export function useDashboardState({
   const [isManaShopOpen, setIsManaShopOpen] = useState(false)
   const [remainingQuests, setRemainingQuests] = useState(dbUser.questsRemaining ?? 0)
   const [claimedCount, setClaimedCount] = useState(0)
-  const [particles, setParticles] = useState<{ id: number; x: number; y: number }[]>([])
+  const [particles] = useState<{ id: number; x: number; y: number }[]>([])
 
   const [activeQuickStrikeLead, setActiveQuickStrikeLead] = useState<DashboardLead | null>(null)
   const [recentLevelUp, setRecentLevelUp] = useState(false)
@@ -68,7 +68,6 @@ export function useDashboardState({
   const [scanOutcome, setScanOutcome] = useState<ScanOutcome>('waiting')
   const restoredScanRef = useRef<string | null>(null)
 
-  // URL state synchronization for platform filtering
   const filter = searchParams.get('platform') || 'ALL'
 
   const setFilter = useCallback(
@@ -107,116 +106,82 @@ export function useDashboardState({
       if (!result.keyword) return setNotice('Keyword saved, but the server did not return its ID. Refresh before deleting it.')
       setKeywords((current) => [result.keyword, ...current.filter((keyword) => keyword.id !== result.keyword.id)])
       setNewKeyword('')
-      setNotice(`Tracking "${phrase}". Run a scan to find matching social posts.`)
+      setNotice(result.message ?? 'Keyword added.')
     })
   }
 
   function handlePresetClick(phrase: string) {
-    setNewKeyword(phrase)
     sfx.playCoinDrop()
     startTransition(async () => {
       const result = await addKeywordAction(phrase)
       if (!result.ok) return setNotice(result.message ?? 'Could not add keyword.')
       if (!result.keyword) return setNotice('Keyword saved, but the server did not return its ID. Refresh before deleting it.')
       setKeywords((current) => [result.keyword, ...current.filter((keyword) => keyword.id !== result.keyword.id)])
-      setNewKeyword('')
-      setNotice(`Tracking "${phrase}". Run a scan to find matching social posts.`)
+      setNotice(result.message ?? 'Keyword added.')
     })
   }
 
   function removeKeyword(id: string) {
+    sfx.playHit()
     startTransition(async () => {
       const result = await removeKeywordAction(id)
       if (!result.ok) return setNotice(result.message ?? 'Could not remove keyword.')
       setKeywords((current) => current.filter((keyword) => keyword.id !== id))
+      setNotice(result.message ?? 'Keyword removed.')
     })
   }
 
-  function spawnParticles() {
-    const newParticles = Array.from({ length: 15 }).map((_, i) => ({
-      id: Date.now() + i,
-      x: (Math.random() - 0.5) * 300,
-      y: (Math.random() - 0.5) * 300,
-    }))
-    setParticles(newParticles)
-    setTimeout(() => setParticles([]), 800)
-  }
-
   function runMockScanner() {
-    sfx.playRadarBlip()
     setIsScannerModalOpen(true)
-    setAsyncStatus('scanning')
-    setScanLogs(['Starting authenticated scan request...'])
+    setScanLogs([
+      'Preparing durable scan request...',
+      'Saving query state...',
+      'Queueing provider work...',
+    ])
     setScanStep(1)
     setScanOutcome('waiting')
+    setAsyncStatus('scanning')
 
     startTransition(async () => {
       const result = await scanForLeadsAction()
-
-      if (!result.ok) {
-        const message = result.message ?? 'The scan could not be completed.'
-        setScanLogs((current) => [...current, `Scan failed: ${message}`])
-        setNotice(`Scan failed: ${message}`)
-        setScanStep(5)
+      if (!result.ok || !result.scanRunId) {
+        setScanLogs((current) => [...current, result.message ?? 'Scan could not be started.'])
+        setNotice(result.message ?? 'Could not start scan.')
         setScanOutcome('failed')
+        setScanStep(5)
         setAsyncStatus('idle')
         return
       }
 
-      const accepted = result.message || (result.queued
-        ? 'Scan queued. Results will appear after processing.'
-        : 'Scan request accepted.')
-      setScanLogs((current) => [
-        ...current,
-        accepted,
-        ...(result.runId ? [`Run reference: ${result.runId}`] : []),
-      ])
-      setNotice(accepted)
+      const scanRunId = result.scanRunId
+      setScanLogs((current) => [...current, `Scan queued with durable run ${scanRunId}.`])
       setScanStep(2)
 
-      if (!result.runId) {
-        setScanLogs((current) => [...current, 'No run reference was returned; status cannot be verified.'])
-        setScanOutcome('failed')
-        setScanStep(5)
-        setAsyncStatus('idle')
-        return
-      }
-
-      restoredScanRef.current = result.runId
-      const params = new URLSearchParams(searchParams.toString())
-      params.set('scanRunId', result.runId)
-      router.replace(`${pathname}?${params.toString()}`, { scroll: false })
-
       const deadline = Date.now() + SCAN_STATUS_TIMEOUT_MS
-      let lastStatus = ''
       while (Date.now() < deadline) {
         try {
-          const response = await fetch(`/api/v1/scans/${encodeURIComponent(result.runId)}`, {
-            method: 'GET',
-            headers: { Accept: 'application/json' },
-            cache: 'no-store',
-          })
+          const response = await fetch(`/api/v1/scans/${encodeURIComponent(scanRunId)}`, { cache: 'no-store' })
           if (!response.ok) throw new Error('SCAN_STATUS_UNAVAILABLE')
           const payload = await response.json() as {
             scan?: {
-              status?: string
+              status?: ScanStatus
               counts?: { leadsCreated?: number }
-              refunded?: boolean
-              balance?: number
               provider?: { status?: string }
+              balance?: number | null
             }
           }
           const scan = payload.scan
-          if (!scan?.status) throw new Error('SCAN_STATUS_MALFORMED')
+          if (!scan?.status) throw new Error('SCAN_STATUS_MISSING')
 
-          if (scan.status !== lastStatus) {
-            lastStatus = scan.status
-            setScanLogs((current) => [...current, `Server status: ${scan.status}`])
+          setScanLogs((current) => [...current, `Server status: ${scan.status}`])
+
+          if (scan.status === 'RUNNING') {
+            setScanStep(3)
           }
-          if (scan.status === 'RUNNING') setScanStep(3)
+
           if (scan.status === 'SUCCEEDED') {
-            const leadsCreated = Math.max(0, scan.counts?.leadsCreated ?? 0)
-            const providerStatus = scan.provider?.status ?? 'UNKNOWN'
+            const leadsCreated = scan.counts?.leadsCreated ?? 0
+            const providerStatus = scan.provider?.status ?? 'unknown'
             const completed = `Scan completed: ${leadsCreated} new source match${leadsCreated === 1 ? '' : 'es'}; provider status ${providerStatus}.`
             setScanLogs((current) => [...current, completed])
             setNotice(completed)
@@ -227,6 +192,7 @@ export function useDashboardState({
             router.refresh()
             return
           }
+
           if (scan.status === 'FAILED_REFUNDED') {
             const failed = 'Scan failed after provider retries. The scan credit was refunded.'
             setScanLogs((current) => [...current, failed])
@@ -237,6 +203,7 @@ export function useDashboardState({
             setAsyncStatus('idle')
             return
           }
+
           if (scan.status === 'DEAD' || scan.status === 'CANCELLED' || scan.status === 'UNKNOWN') {
             const failed = `Scan ended with status ${scan.status}. No successful result is being claimed.`
             setScanLogs((current) => [...current, failed])
@@ -321,37 +288,50 @@ export function useDashboardState({
     startTransition(async () => {
       const result = await claimQuestAction(leadId)
       setAsyncStatus('idle')
-      if (!result.ok) return setNotice(result.message ?? 'Could not update quest.')
-      const serverUser = result.user
-      if (serverUser) {
-        setUser((current) => ({
-          ...current,
-          xp: serverUser.xp,
-          level: serverUser.level,
-          xpRequired: serverUser.xpRequired,
-        }))
-        if (serverUser.level > user.level) {
-          setRecentLevelUp(true)
-          setTimeout(() => setRecentLevelUp(false), 3000)
+
+      if (result.ok) {
+        if (result.user) {
+          setUser((current) => ({
+            ...current,
+            xp: result.user.xp,
+            level: result.user.level,
+            xpRequired: result.user.xpRequired,
+          }))
+          setRecentLevelUp(result.user.didLevelUp)
+          if (result.user.didLevelUp) sfx.playLevelUp()
         }
+
+        if (typeof result.questsRemaining === 'number') {
+          setRemainingQuests(result.questsRemaining)
+        }
+
+        setClaimedCount((current) => current + 1)
+        setLeads((current) => current.filter((lead) => lead.id !== leadId))
+        setNotice(result.message ?? 'Quest claimed.')
+        return
       }
-      setLeads((current) => current.filter((lead) => lead.id !== leadId))
-      setClaimedCount((prev) => prev + 1)
-      spawnParticles()
-      setNotice('Quest marked as contacted. Server-confirmed progression has been applied.')
+
+      setNotice(result.message ?? 'Failed to claim quest.')
     })
   }
 
   function dismissLead(id: string) {
+    setNotice('Dismissing this lead from your feed...')
+    setAsyncStatus('claiming')
     startTransition(async () => {
       const result = await dismissLeadAction(id)
-      if (!result.ok) return setNotice(result.message ?? 'Could not dismiss quest.')
-      setLeads((current) => current.filter((lead) => lead.id !== id))
+      setAsyncStatus('idle')
+      if (result.ok) {
+        setLeads((current) => current.filter((lead) => lead.id !== id))
+        setNotice(result.message ?? 'Lead dismissed.')
+      } else {
+        setNotice(result.message ?? 'Failed to dismiss lead.')
+      }
     })
   }
 
   function generateAIReply(lead: DashboardLead) {
-    setNotice('Requesting an AI draft. Availability depends on your server entitlement and provider configuration.')
+    setNotice(`🤖 Generating AI reply for this ${lead.platform} lead...`)
     setAsyncStatus('replying')
     startTransition(async () => {
       const result = await generateAIReplyAction(lead.id)
@@ -388,7 +368,9 @@ export function useDashboardState({
 
   return {
     user,
+    setUser,
     keywords,
+    setKeywords,
     leads,
     setLeads,
     newKeyword,

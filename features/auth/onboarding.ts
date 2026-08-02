@@ -1,12 +1,40 @@
 import { z } from 'zod'
+import {
+  DEFAULT_PROFILE_ICON_KEY,
+  PROFILE_ICON_OPTIONS,
+  type ProfileIconKey,
+} from './profileIconOptions'
 
 export const LAST_ONBOARDING_STEP = 6
 
 export const preferredSources = ['REDDIT', 'X'] as const
 export type PreferredSource = (typeof preferredSources)[number]
 
+const profileIconKeys = PROFILE_ICON_OPTIONS.map((option) => option.key) as [
+  ProfileIconKey,
+  ...ProfileIconKey[],
+]
+
+export const displayNameSchema = z
+  .string()
+  .transform((value) => value.replace(/\s+/g, ' ').trim())
+  .pipe(
+    z
+      .string()
+      .min(1, 'Add a display name to continue.')
+      .max(60, 'Use 60 characters or fewer.'),
+  )
+
+export const profileIconKeySchema = z.enum(profileIconKeys)
+
+export const onboardingIdentitySchema = z.object({
+  displayName: displayNameSchema,
+  profileIconKey: profileIconKeySchema.default(DEFAULT_PROFILE_ICON_KEY),
+})
+
 export type OnboardingDraft = {
   displayName: string
+  profileIconKey: ProfileIconKey
   businessDescription: string
   targetCustomer: string
   firstKeyword: string
@@ -26,7 +54,7 @@ export const keywordPhraseSchema = z
 export const onboardingStepSchema = z.discriminatedUnion('step', [
   z.object({
     step: z.literal(1),
-    value: z.string().trim().min(1, 'Add a display name to continue.').max(60, 'Use 60 characters or fewer.'),
+    value: onboardingIdentitySchema,
   }),
   z.object({
     step: z.literal(2),

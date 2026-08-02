@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache'
 import prisma from '@/lib/prisma'
 import { getCurrentUser } from '@/lib/auth'
 import { MAX_ACTIVE_KEYWORDS_PER_TENANT } from '@/src/modules/keywords/application/KeywordService'
+import { DEFAULT_PROFILE_ICON_KEY } from './profileIconOptions'
 import {
   cleanOnboardingText,
   keywordPhraseSchema,
@@ -66,7 +67,10 @@ function validationFailure(message: string): ActionFailure {
 function stepData(input: SaveOnboardingStepInput) {
   switch (input.step) {
     case 1:
-      return { name: cleanOnboardingText(input.value, 60) }
+      return {
+        name: cleanOnboardingText(input.value.displayName, 60),
+        profileIconKey: input.value.profileIconKey,
+      }
     case 2:
       return { businessDescription: cleanOnboardingText(input.value, 500) }
     case 3:
@@ -105,7 +109,8 @@ export async function saveOnboardingStepAction(input: SaveOnboardingStepInput): 
     if (updated.count !== 1) return alreadyCompleteFailure()
     revalidatePath('/onboarding')
     return { ok: true, nextStep }
-  } catch {
+  } catch (error) {
+    console.error('saveOnboardingStepAction failed:', error)
     return validationFailure('This step could not be saved. Your earlier progress is still safe; try again.')
   }
 }
@@ -144,6 +149,7 @@ type LockedOnboardingUser = {
   onboardingComplete: boolean
   onboardingStep: number
   name: string | null
+  profileIconKey: string | null
   businessDescription: string | null
   targetCustomer: string | null
   firstKeyword: string | null
@@ -162,6 +168,7 @@ export async function completeOnboardingAction(): Promise<CompleteOnboardingResu
           "onboardingComplete",
           "onboardingStep",
           "name",
+          "profileIconKey",
           "businessDescription",
           "targetCustomer",
           "firstKeyword",
@@ -214,34 +221,49 @@ export async function completeOnboardingAction(): Promise<CompleteOnboardingResu
           return validationFailure(`This account already has ${MAX_ACTIVE_KEYWORDS_PER_TENANT} active keywords. Remove one before completing setup.`)
         }
         keyword = await tx.trackedKeyword.create({
-          data: { userId: currentUser.id, phrase },
+          data: {
+            userId: currentUser.id,
+            phrase,
+          },
           select: { id: true, phrase: true, active: true },
         })
       }
 
-      await tx.tenantScanSchedule.upsert({
-        where: { userId: currentUser.id },
-        create: { userId: currentUser.id, enabled: false },
-        update: { enabled: false },
-      })
       await tx.user.update({
         where: { id: currentUser.id },
         data: {
           onboardingComplete: true,
           onboardingStep: LAST_ONBOARDING_STEP,
-          firstKeyword: keyword.phrase,
+          profileIconKey: user.profileIconKey ?? DEFAULT_PROFILE_ICON_KEY,
         },
       })
 
-      return { ok: true as const, keyword: { id: keyword.id, phrase: keyword.phrase } }
+      await tx.tenantScanSchedule.upsert({
+        where: { userId: currentUser.id },
+        update: {
+          enabled: true,
+        },
+        create: {
+          userId: currentUser.id,
+          enabled: true,
+        },
+      })
+
+      return {
+        ok: true as const,
+        keyword: {
+          id: keyword.id,
+          phrase: keyword.phrase,
+        },
+      }
     })
 
-    if (result.ok) {
-      revalidatePath('/app')
-      revalidatePath('/onboarding')
-    }
+    if (!result.ok) return result
+    revalidatePath('/onboarding')
+    revalidatePath('/app')
     return result
-  } catch {
-    return validationFailure('Setup could not be completed. No scan or credit charge was started; try again.')
+  } catch (error) {
+    console.error('completeOnboardingAction failed:', error)
+    return validationFailure('Setup could not be completed right now. Your saved progress is still available.')
   }
 }

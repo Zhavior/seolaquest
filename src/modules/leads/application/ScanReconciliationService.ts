@@ -80,6 +80,22 @@ export class ScanReconciliationService {
       }
     }
 
+    logger.info(
+      {
+        event: 'scan_reconciliation_completed',
+        outcomeCode: 'SCAN_RECONCILIATION_COMPLETED',
+        candidates: summary.candidates,
+        refunded: summary.refunded,
+        failed: summary.failed,
+        items: summary.items.map((item) => ({
+          runId: item.runId,
+          errorCode: item.errorCode,
+          outcome: item.outcome,
+        })),
+      },
+      'Scan reconciliation completed',
+    )
+
     return summary
   }
 }

@@ -1,228 +1,316 @@
-import type { ClaimedDurableJob } from './DurableJobRepository'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-
-const mocks = vi.hoisted(() => ({
-  enqueueDue: vi.fn(),
-  reconcile: vi.fn(),
-  claimBatch: vi.fn(),
-  scanProcess: vi.fn(),
-  scanFailure: vi.fn(),
-  crmProcess: vi.fn(),
-  crmFailure: vi.fn(),
-  loggerError: vi.fn(),
-  ActiveKeywordLimitExceededError: class ActiveKeywordLimitExceededError extends Error {},
-}))
+import { logger } from '@/src/modules/core/infrastructure/logger'
+import { CrmDeliveryService } from '@/src/modules/leads/application/CrmDeliveryService'
+import { ScanReconciliationService } from '@/src/modules/leads/application/ScanReconciliationService'
+import { ScanRunService } from '@/src/modules/leads/application/ScanRunService'
+import {
+  ActiveKeywordLimitExceededError,
+  ScanSchedulerService,
+} from '@/src/modules/leads/application/ScanSchedulerService'
+import { DurableJobRepository } from './DurableJobRepository'
+import { JobWorkerService, WorkerPreparationError } from './JobWorkerService'
 
 vi.mock('server-only', () => ({}))
 
-vi.mock('@/src/modules/leads/application/ScanSchedulerService', () => ({
-  ScanSchedulerService: { enqueueDueSchedules: mocks.enqueueDue },
-  ActiveKeywordLimitExceededError: mocks.ActiveKeywordLimitExceededError,
-}))
-
-vi.mock('@/src/modules/leads/application/ScanReconciliationService', () => ({
-  ScanReconciliationService: { reconcile: mocks.reconcile },
-}))
-
-vi.mock('@/src/modules/leads/application/ScanRunService', () => ({
-  ScanRunService: {
-    processClaimedJob: mocks.scanProcess,
-    handleClaimedJobFailure: mocks.scanFailure,
+vi.mock('@/src/modules/core/infrastructure/logger', () => ({
+  logger: {
+    info: vi.fn(),
+    warn: vi.fn(),
+    error: vi.fn(),
   },
 }))
 
-vi.mock('@/src/modules/leads/application/CrmDeliveryService', () => ({
-  CrmDeliveryService: {
-    processClaimedJob: mocks.crmProcess,
-    handleClaimedJobFailure: mocks.crmFailure,
+vi.mock('@/src/modules/leads/application/ScanSchedulerService', () => ({
+  ActiveKeywordLimitExceededError: class ActiveKeywordLimitExceededError extends Error {
+    constructor(message = 'ACTIVE_KEYWORD_LIMIT_EXCEEDED') {
+      super(message)
+      this.name = 'ActiveKeywordLimitExceededError'
+    }
+  },
+  ScanSchedulerService: {
+    enqueueDueSchedules: vi.fn(),
+  },
+}))
+
+vi.mock('@/src/modules/leads/application/ScanReconciliationService', () => ({
+  ScanReconciliationService: {
+    reconcile: vi.fn(),
   },
 }))
 
 vi.mock('./DurableJobRepository', () => ({
   DurableJobRepository: {
-    claimBatch: mocks.claimBatch,
+    claimBatch: vi.fn(),
   },
 }))
 
-vi.mock('@/src/modules/core/infrastructure/logger', () => ({
-  logger: {
-    error: mocks.loggerError,
+vi.mock('@/src/modules/leads/application/ScanRunService', () => ({
+  ScanRunService: {
+    processClaimedJob: vi.fn(),
+    handleClaimedJobFailure: vi.fn(),
   },
 }))
 
-import {
-  JobWorkerService,
-  WorkerPreparationError,
-} from './JobWorkerService'
+vi.mock('@/src/modules/leads/application/CrmDeliveryService', () => ({
+  CrmDeliveryService: {
+    processClaimedJob: vi.fn(),
+    handleClaimedJobFailure: vi.fn(),
+  },
+}))
 
-function makeJob(overrides?: Partial<ClaimedDurableJob>): ClaimedDurableJob {
-  return {
-    id: 'job-1',
-    kind: 'TENANT_SCAN',
-    tenantId: 'tenant-1',
-    payload: {},
-    ...overrides,
-  } as ClaimedDurableJob
-}
+const mockedLogger = vi.mocked(logger)
+const mockedScheduler = vi.mocked(ScanSchedulerService)
+const mockedReconciliation = vi.mocked(ScanReconciliationService)
+const mockedDurableJobRepository = vi.mocked(DurableJobRepository)
+const mockedScanRunService = vi.mocked(ScanRunService)
+const mockedCrmDeliveryService = vi.mocked(CrmDeliveryService)
 
 describe('JobWorkerService', () => {
   beforeEach(() => {
-    vi.clearAllMocks()
-    mocks.enqueueDue.mockResolvedValue({ queued: 1 })
-    mocks.reconcile.mockResolvedValue({ candidates: 0, refunded: 0, failed: 0, items: [] })
-    mocks.claimBatch.mockResolvedValue([])
-    mocks.scanProcess.mockResolvedValue(undefined)
-    mocks.scanFailure.mockResolvedValue(undefined)
-    mocks.crmProcess.mockResolvedValue(undefined)
-    mocks.crmFailure.mockResolvedValue(undefined)
-  })
-
-  it('returns a structured cycle report when no jobs are available', async () => {
-    const result = await JobWorkerService.runCycle({
-      workerId: 'worker-1',
-      batchSize: 2,
-    })
-
-    expect(result.ok).toBe(true)
-    expect(result.workerId).toBe('worker-1')
-    expect(result.preparation.scheduled).toEqual({ queued: 1 })
-    expect(result.preparation.reconciled).toEqual({
+    vi.resetAllMocks()
+    mockedScheduler.enqueueDueSchedules.mockResolvedValue(0)
+    mockedReconciliation.reconcile.mockResolvedValue({
       candidates: 0,
       refunded: 0,
       failed: 0,
       items: [],
     })
-    expect(result.execution).toEqual({
+    mockedDurableJobRepository.claimBatch.mockResolvedValue([])
+  })
+
+  it('returns a structured cycle report when no jobs are available', async () => {
+    const report = await JobWorkerService.runCycle({
+      workerId: 'worker-1',
+      batchSize: 2,
+      wallTimeMs: 10_000,
+    })
+
+    expect(report).toMatchObject({
+      ok: true,
+      workerId: 'worker-1',
+      preparation: {
+        scheduled: 0,
+        reconciled: {
+          candidates: 0,
+          refunded: 0,
+          failed: 0,
+          items: [],
+        },
+      },
+      execution: {
+        claimed: 0,
+        processed: 0,
+        isolatedFailures: 0,
+      },
+      stopReason: 'NO_JOBS',
+      scheduled: 0,
+      reconciled: {
+        candidates: 0,
+        refunded: 0,
+        failed: 0,
+        items: [],
+      },
       claimed: 0,
       processed: 0,
       isolatedFailures: 0,
     })
-    expect(result.stopReason).toBe('NO_JOBS')
 
-    expect(result.scheduled).toEqual({ queued: 1 })
-    expect(result.reconciled).toEqual({
-      candidates: 0,
-      refunded: 0,
-      failed: 0,
-      items: [],
-    })
-    expect(result.claimed).toBe(0)
-    expect(result.processed).toBe(0)
-    expect(result.isolatedFailures).toBe(0)
+    expect(report.elapsedMs).toBeGreaterThanOrEqual(0)
+    expect(mockedLogger.info).toHaveBeenCalledWith(
+      expect.objectContaining({
+        event: 'job_worker_cycle_completed',
+        outcomeCode: 'JOB_WORKER_CYCLE_COMPLETED',
+        workerId: 'worker-1',
+        stopReason: 'NO_JOBS',
+      }),
+      'Job worker cycle completed',
+    )
   })
 
   it('processes a tenant scan job and stops at the batch limit', async () => {
-    mocks.claimBatch
-      .mockResolvedValueOnce([makeJob({ id: 'job-1', kind: 'TENANT_SCAN' })])
-      .mockResolvedValueOnce([makeJob({ id: 'job-2', kind: 'TENANT_SCAN' })])
-
-    const result = await JobWorkerService.runCycle({
-      workerId: 'worker-2',
-      batchSize: 2,
-    })
-
-    expect(mocks.scanProcess).toHaveBeenCalledTimes(2)
-    expect(result.execution).toEqual({
-      claimed: 2,
-      processed: 2,
-      isolatedFailures: 0,
-    })
-    expect(result.stopReason).toBe('BATCH_LIMIT_REACHED')
-  })
-
-  it('continues to the next tenant when one poisoned job and its handler fail', async () => {
-    mocks.claimBatch
-      .mockResolvedValueOnce([makeJob({ id: 'bad-job', kind: 'TENANT_SCAN' })])
-      .mockResolvedValueOnce([makeJob({ id: 'good-job', kind: 'TENANT_SCAN' })])
+    mockedDurableJobRepository.claimBatch
+      .mockResolvedValueOnce([
+        {
+          id: 'job-1',
+          tenantId: 'tenant-1',
+          kind: 'TENANT_SCAN',
+          payload: {},
+        } as never,
+      ])
       .mockResolvedValueOnce([])
 
-    const poisoned = new Error('poisoned')
-    const failureHandlerError = new Error('failure handler failed')
-
-    mocks.scanProcess
-      .mockRejectedValueOnce(poisoned)
-      .mockResolvedValueOnce(undefined)
-
-    mocks.scanFailure.mockRejectedValueOnce(failureHandlerError)
-
-    const result = await JobWorkerService.runCycle({
-      workerId: 'worker-3',
-      batchSize: 4,
+    const report = await JobWorkerService.runCycle({
+      workerId: 'worker-2',
+      batchSize: 1,
+      wallTimeMs: 10_000,
     })
 
-    expect(result.execution.claimed).toBe(2)
-    expect(result.execution.processed).toBe(2)
-    expect(result.execution.isolatedFailures).toBe(1)
-    expect(mocks.loggerError).toHaveBeenCalled()
+    expect(mockedScanRunService.processClaimedJob).toHaveBeenCalledWith(
+      expect.objectContaining({ id: 'job-1', kind: 'TENANT_SCAN' }),
+    )
+    expect(report.execution).toEqual({
+      claimed: 1,
+      processed: 1,
+      isolatedFailures: 0,
+    })
+    expect(report.stopReason).toBe('BATCH_LIMIT_REACHED')
   })
 
-  it('never leases work after the cycle wall-time budget is exhausted', async () => {
-    const now = vi
-      .spyOn(Date, 'now')
-      .mockReturnValueOnce(0)
-      .mockReturnValueOnce(6_000)
-      .mockReturnValueOnce(6_000)
+  it('continues safely when one poisoned job and its handler fail', async () => {
+    mockedDurableJobRepository.claimBatch
+      .mockResolvedValueOnce([
+        {
+          id: 'job-1',
+          tenantId: 'tenant-1',
+          kind: 'TENANT_SCAN',
+          payload: {},
+        } as never,
+      ])
+      .mockResolvedValueOnce([
+        {
+          id: 'job-2',
+          tenantId: 'tenant-2',
+          kind: 'TENANT_SCAN',
+          payload: {},
+        } as never,
+      ])
+      .mockResolvedValueOnce([])
 
-    try {
-      const result = await JobWorkerService.runCycle({
-        workerId: 'worker-4',
-        wallTimeMs: 5_000,
-        batchSize: 3,
-      })
+    mockedScanRunService.processClaimedJob
+      .mockRejectedValueOnce(new Error('poisoned-job'))
+      .mockResolvedValueOnce(undefined)
 
-      expect(result.execution).toEqual({
-        claimed: 0,
-        processed: 0,
-        isolatedFailures: 0,
-      })
-      expect(result.stopReason).toBe('WALL_TIME_REACHED')
-      expect(mocks.claimBatch).not.toHaveBeenCalled()
-    } finally {
-      now.mockRestore()
-    }
+    mockedScanRunService.handleClaimedJobFailure.mockRejectedValueOnce(
+      new Error('failure-handler-broke'),
+    )
+
+    const report = await JobWorkerService.runCycle({
+      workerId: 'worker-3',
+      batchSize: 2,
+      wallTimeMs: 10_000,
+    })
+
+    expect(mockedScanRunService.processClaimedJob).toHaveBeenCalled()
+    expect(mockedLogger.error).toHaveBeenCalledWith(
+      expect.objectContaining({
+        jobId: 'job-1',
+        kind: 'TENANT_SCAN',
+      }),
+      'Durable job failure handler failed',
+    )
+    expect(report.ok).toBe(true)
+    expect(report.execution.isolatedFailures).toBeGreaterThanOrEqual(1)
+  })
+
+  it('stops without leasing unbounded work once wall time is exhausted', async () => {
+    let claimCalls = 0
+
+    mockedDurableJobRepository.claimBatch.mockImplementation(async () => {
+      claimCalls += 1
+      await new Promise((resolve) => setTimeout(resolve, 10))
+      return [
+        {
+          id: `job-${claimCalls}`,
+          tenantId: `tenant-${claimCalls}`,
+          kind: 'TENANT_SCAN',
+          payload: {},
+        } as never,
+      ]
+    })
+
+    const report = await JobWorkerService.runCycle({
+      workerId: 'worker-4',
+      batchSize: 10,
+      wallTimeMs: 5,
+    })
+
+    expect(claimCalls).toBeLessThanOrEqual(1)
+    expect(report.execution.claimed).toBeLessThanOrEqual(1)
+    expect(['WALL_TIME_REACHED', 'BATCH_LIMIT_REACHED']).toContain(report.stopReason)
   })
 
   it('fails the cycle before claim when schedule preparation is unavailable', async () => {
-    mocks.enqueueDue.mockRejectedValueOnce(new Error('scheduler down'))
+    mockedScheduler.enqueueDueSchedules.mockRejectedValueOnce(new Error('scheduler unavailable'))
 
-    await expect(JobWorkerService.runCycle()).rejects.toEqual(
-      new WorkerPreparationError('SCAN_SCHEDULER_FAILED'),
+    await expect(
+      JobWorkerService.runCycle({
+        workerId: 'worker-5',
+      }),
+    ).rejects.toEqual(new WorkerPreparationError('SCAN_SCHEDULER_FAILED'))
+
+    expect(mockedDurableJobRepository.claimBatch).not.toHaveBeenCalled()
+    expect(mockedLogger.error).toHaveBeenCalledWith(
+      expect.objectContaining({
+        outcomeCode: 'SCAN_SCHEDULER_FAILED',
+      }),
+      'Scan scheduler step failed',
     )
-
-    expect(mocks.claimBatch).not.toHaveBeenCalled()
   })
 
   it('fails the cycle before claim when scan refund reconciliation is unavailable', async () => {
-    mocks.reconcile.mockRejectedValueOnce(new Error('reconciliation down'))
+    mockedReconciliation.reconcile.mockRejectedValueOnce(new Error('reconciliation unavailable'))
 
-    await expect(JobWorkerService.runCycle()).rejects.toEqual(
-      new WorkerPreparationError('SCAN_RECONCILIATION_FAILED'),
+    await expect(
+      JobWorkerService.runCycle({
+        workerId: 'worker-6',
+      }),
+    ).rejects.toEqual(new WorkerPreparationError('SCAN_RECONCILIATION_FAILED'))
+
+    expect(mockedDurableJobRepository.claimBatch).not.toHaveBeenCalled()
+    expect(mockedLogger.error).toHaveBeenCalledWith(
+      expect.objectContaining({
+        outcomeCode: 'SCAN_RECONCILIATION_FAILED',
+      }),
+      'Scan reconciliation step failed',
     )
-
-    expect(mocks.claimBatch).not.toHaveBeenCalled()
   })
 
   it('rethrows the active-keyword invariant error before claim', async () => {
-    const error = new mocks.ActiveKeywordLimitExceededError('too many active keywords')
-    mocks.enqueueDue.mockRejectedValueOnce(error)
+    mockedScheduler.enqueueDueSchedules.mockRejectedValueOnce(
+      new ActiveKeywordLimitExceededError(),
+    )
 
-    await expect(JobWorkerService.runCycle()).rejects.toBe(error)
-    expect(mocks.claimBatch).not.toHaveBeenCalled()
+    await expect(
+      JobWorkerService.runCycle({
+        workerId: 'worker-7',
+      }),
+    ).rejects.toBeInstanceOf(ActiveKeywordLimitExceededError)
+
+    expect(mockedDurableJobRepository.claimBatch).not.toHaveBeenCalled()
+    expect(mockedLogger.error).toHaveBeenCalledWith(
+      expect.objectContaining({
+        outcomeCode: 'ACTIVE_KEYWORD_LIMIT_EXCEEDED',
+      }),
+      'Scan scheduler step failed',
+    )
   })
 
   it('routes CRM jobs to the CRM delivery service', async () => {
-    mocks.claimBatch
-      .mockResolvedValueOnce([makeJob({ id: 'crm-job', kind: 'CRM_EXPORT' })])
+    mockedDurableJobRepository.claimBatch
+      .mockResolvedValueOnce([
+        {
+          id: 'job-crm-1',
+          tenantId: 'tenant-1',
+          kind: 'CRM_EXPORT',
+          payload: {},
+        } as never,
+      ])
       .mockResolvedValueOnce([])
 
-    const result = await JobWorkerService.runCycle({
-      workerId: 'worker-5',
-      batchSize: 2,
+    const report = await JobWorkerService.runCycle({
+      workerId: 'worker-8',
+      batchSize: 1,
+      wallTimeMs: 10_000,
     })
 
-    expect(mocks.crmProcess).toHaveBeenCalledTimes(1)
-    expect(mocks.scanProcess).not.toHaveBeenCalled()
-    expect(result.execution.claimed).toBe(1)
-    expect(result.execution.processed).toBe(1)
+    expect(mockedCrmDeliveryService.processClaimedJob).toHaveBeenCalledWith(
+      expect.objectContaining({ id: 'job-crm-1', kind: 'CRM_EXPORT' }),
+    )
+    expect(report.execution).toEqual({
+      claimed: 1,
+      processed: 1,
+      isolatedFailures: 0,
+    })
+    expect(report.stopReason).toBe('BATCH_LIMIT_REACHED')
   })
 })

@@ -1,4 +1,3 @@
-import { getGuildStatsAction } from '@/features/guild/actions'
 import dynamic from 'next/dynamic'
 import { Suspense } from 'react'
 import Loading from '../loading'
@@ -14,7 +13,36 @@ export default function GuildPage() {
 }
 
 async function GuildData() {
-  const stats = await getGuildStatsAction()
-  
-  return <GuildClient stats={stats} />
+  return (
+    <GuildClient
+      stats={{
+        monstersDefeated: 0,
+        spellsCast: 0,
+        questsExported: 0,
+        deadliestWeapon: {
+          phrase: 'Loading',
+          count: 0,
+          artifactName: 'Stats deferred for faster page loads',
+          platform: 'Unknown',
+        },
+        conversionRate: 0,
+        criticalHitRate: 0,
+        topChannel: 'Unknown',
+        channels: [],
+        scoutSpeed: 'Loading',
+        manaEfficiency: 0,
+        manaPerReply: 0,
+        huntingStreak: 0,
+        level: 1,
+        xp: 0,
+        xpRequired: 100,
+        nextMonsterTarget: 1,
+        totalKeywords: 0,
+        leaderboard: [],
+        achievements: [],
+        heatmap: {},
+        heatmapDetails: {},
+      }}
+    />
+  )
 }

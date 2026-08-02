@@ -53,6 +53,7 @@ function lockedUser(overrides: Record<string, unknown> = {}) {
     onboardingComplete: false,
     onboardingStep: 6,
     name: 'Boyd',
+    profileIconKey: 'target',
     businessDescription: 'Accessible websites',
     targetCustomer: 'Local service business',
     firstKeyword: 'need a website',
@@ -77,12 +78,12 @@ describe('Phase 2 onboarding actions', () => {
   })
 
   it('saves one normalized step durably and advances resume state', async () => {
-    const result = await saveOnboardingStepAction({ step: 1, value: '  Boyd   Santos ' })
+    const result = await saveOnboardingStepAction({ step: 1, value: { displayName: '  Boyd   Santos ', profileIconKey: 'target' } })
 
     expect(result).toEqual({ ok: true, nextStep: 2 })
     expect(mocks.updateMany).toHaveBeenCalledWith({
       where: { id: 'user_1', onboardingComplete: false },
-      data: { name: 'Boyd Santos', onboardingStep: 2 },
+      data: { name: 'Boyd Santos', profileIconKey: 'target', onboardingStep: 2 },
     })
   })
 
@@ -119,7 +120,7 @@ describe('Phase 2 onboarding actions', () => {
   it('excludes completed users from further onboarding mutations', async () => {
     mocks.getCurrentUser.mockResolvedValue(currentUser({ onboardingComplete: true, onboardingStep: 6 }))
 
-    await expect(saveOnboardingStepAction({ step: 1, value: 'Boyd' })).resolves.toMatchObject({
+    await expect(saveOnboardingStepAction({ step: 1, value: { displayName: 'Boyd', profileIconKey: 'target' } })).resolves.toMatchObject({
       ok: false,
       code: 'ALREADY_COMPLETE',
     })
@@ -144,15 +145,15 @@ describe('Phase 2 onboarding actions', () => {
     })
     expect(mocks.tx.tenantScanSchedule.upsert).toHaveBeenCalledWith({
       where: { userId: 'user_1' },
-      create: { userId: 'user_1', enabled: false },
-      update: { enabled: false },
+      create: { userId: 'user_1', enabled: true },
+      update: { enabled: true },
     })
     expect(mocks.tx.user.update).toHaveBeenCalledWith({
       where: { id: 'user_1' },
       data: {
         onboardingComplete: true,
         onboardingStep: 6,
-        firstKeyword: 'need a website',
+        profileIconKey: 'target',
       },
     })
   })

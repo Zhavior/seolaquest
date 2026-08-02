@@ -12,6 +12,7 @@ model User {
   id                  String            @id @default(uuid())
   email               String            @unique
   name                String?
+  profileIconKey      String?
   title               String?
   onboardingComplete  Boolean           @default(false)
   onboardingStep      Int               @default(1)

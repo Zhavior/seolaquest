@@ -8,7 +8,7 @@ import { toDeliveryView } from './deliveryView'
 import type { DeliveryListResult, DeliveryView } from './types'
 
 const deliveryIdSchema = z.string().uuid()
-const PAGE_SIZE = 100
+const PAGE_SIZE = 40
 
 const safeDeliverySelect = {
   id: true,
