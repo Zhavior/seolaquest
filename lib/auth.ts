@@ -1,12 +1,126 @@
 import 'server-only'
 
-import { Prisma } from '@prisma/client'
+import { Prisma, type OnboardingSource, type User } from '@prisma/client'
 import { currentUser, auth } from '@clerk/nextjs/server'
 import prisma from '@/lib/prisma'
 import { subjectDigestForUserId } from '@/src/modules/lifecycle/domain/accountDeletion'
 
 function isUniqueConflict(error: unknown) {
   return error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002'
+}
+
+function isMissingColumn(error: unknown, columnNames: string[]) {
+  return (
+    error instanceof Prisma.PrismaClientKnownRequestError &&
+    error.code === 'P2022' &&
+    typeof error.meta?.column === 'string' &&
+    columnNames.some(
+      (columnName) =>
+        error.meta?.column === columnName || String(error.meta?.column).endsWith(`.${columnName}`),
+    )
+  )
+}
+
+function isMissingOnboardingColumn(error: unknown) {
+  return isMissingColumn(error, ['onboardingStep', 'onboardingComplete'])
+}
+
+type CompatibleUserRow = {
+  id: string
+  email: string
+  name: string | null
+  title: string | null
+  businessDescription: string | null
+  targetCustomer: string | null
+  firstKeyword: string | null
+  preferredSource: string | null
+  emailDigest: boolean | null
+  radarAlerts: boolean | null
+  crmWebhookUrl: string | null
+  questsRemaining: number | null
+  spellsCast: number | null
+  questsExported: number | null
+  maxCredits: number | null
+  xpMultiplier: number | null
+  level: number | null
+  xp: number | null
+  xpRequired: number | null
+  unlockedTheme: string | null
+  createdAt: Date
+  updatedAt: Date
+}
+
+function normalizePreferredSource(value: string | null): OnboardingSource | null {
+  return value === 'REDDIT' || value === 'X' ? value : null
+}
+
+function toCompatibleUser(row: CompatibleUserRow): User {
+  return {
+    id: row.id,
+    email: row.email,
+    name: row.name,
+    title: row.title,
+    onboardingComplete: false,
+    onboardingStep: 1,
+    businessDescription: row.businessDescription,
+    targetCustomer: row.targetCustomer,
+    firstKeyword: row.firstKeyword,
+    preferredSource: normalizePreferredSource(row.preferredSource),
+    emailDigest: row.emailDigest ?? true,
+    radarAlerts: row.radarAlerts ?? true,
+    crmWebhookUrl: row.crmWebhookUrl,
+    questsRemaining: row.questsRemaining ?? 0,
+    spellsCast: row.spellsCast ?? 0,
+    questsExported: row.questsExported ?? 0,
+    maxCredits: row.maxCredits ?? 0,
+    xpMultiplier: row.xpMultiplier ?? 1,
+    level: row.level ?? 1,
+    xp: row.xp ?? 0,
+    xpRequired: row.xpRequired ?? 100,
+    unlockedTheme: row.unlockedTheme ?? 'PARCHMENT_WOOD',
+    createdAt: row.createdAt,
+    updatedAt: row.updatedAt,
+  }
+}
+
+async function findUserWithOnboardingFallback(userId: string): Promise<User | null> {
+  try {
+    return await prisma.user.findUnique({ where: { id: userId } })
+  } catch (error) {
+    if (!isMissingOnboardingColumn(error)) throw error
+
+    const rows = await prisma.$queryRaw<CompatibleUserRow[]>`
+      SELECT
+        "id",
+        "email",
+        "name",
+        "title",
+        "businessDescription",
+        "targetCustomer",
+        "firstKeyword",
+        "preferredSource"::text as "preferredSource",
+        "emailDigest",
+        "radarAlerts",
+        "crmWebhookUrl",
+        "questsRemaining",
+        "spellsCast",
+        "questsExported",
+        "maxCredits",
+        "xpMultiplier",
+        "level",
+        "xp",
+        "xpRequired",
+        "unlockedTheme",
+        "createdAt",
+        "updatedAt"
+      FROM "User"
+      WHERE "id" = ${userId}
+      LIMIT 1
+    `
+
+    const row = rows[0]
+    return row ? toCompatibleUser(row) : null
+  }
 }
 
 async function reconcileVerifiedEmailUser(db: Prisma.TransactionClient, userId: string, email: string) {
@@ -16,10 +130,6 @@ async function reconcileVerifiedEmailUser(db: Prisma.TransactionClient, userId: 
   if (!emailUser) return null
   if (emailUser.id === userId) return emailUser
 
-  // The legacy signup wrote an unrelated UUID. Production FKs use ON UPDATE CASCADE,
-  // so moving the verified owner to the Clerk ID retains their existing rows.
-  // Let unique violations abort the transaction; querying again inside an aborted
-  // PostgreSQL transaction would mask the original race with a second error.
   return db.user.update({
     where: { email: emailUser.email },
     data: { id: userId },
@@ -54,7 +164,7 @@ export async function getCurrentUser() {
     return null
   }
 
-  const existingUser = await prisma.user.findUnique({ where: { id: userId } })
+  const existingUser = await findUserWithOnboardingFallback(userId)
   if (existingUser) {
     if (await deletionStateExists(userId)) return null
     return existingUser
@@ -77,8 +187,6 @@ export async function getCurrentUser() {
     return await prisma.$transaction(async (tx) => {
       const subjectDigest = deletionDigest(userId, true)
       if (subjectDigest) {
-        // Intake takes the same transaction-scoped lock. Whichever side wins,
-        // provisioning cannot commit after a deletion request was accepted.
         await tx.$queryRaw`SELECT pg_advisory_xact_lock(hashtextextended(${subjectDigest}, 0))`
         const [request, audit] = await Promise.all([
           tx.accountDeletionRequest.findUnique({ where: { subjectDigest }, select: { id: true } }),
@@ -87,7 +195,6 @@ export async function getCurrentUser() {
         if (request || audit) return null
       }
 
-      // Serialize legacy email reconciliation as well as provider-ID creation.
       await tx.$queryRaw`SELECT pg_advisory_xact_lock(hashtextextended(${'email:' + email}, 0))`
       const concurrentUser = await tx.user.findUnique({ where: { id: userId } })
       if (concurrentUser) return concurrentUser
@@ -106,7 +213,7 @@ export async function getCurrentUser() {
   } catch (error) {
     if (!isUniqueConflict(error)) throw error
 
-    const concurrentUser = await prisma.user.findUnique({ where: { id: userId } })
+    const concurrentUser = await findUserWithOnboardingFallback(userId)
     if (concurrentUser && !(await deletionStateExists(userId))) return concurrentUser
     throw error
   }

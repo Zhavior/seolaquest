@@ -37,13 +37,14 @@ This is a local implementation score, not a production-readiness or accessibilit
 - iPhone 17 Simulator Safari rendered the acquisition page in portrait and landscape without horizontal clipping. The simulator content-size setting was exercised and restored.
 - A manual physical-device and screen-reader script is recorded in `docs/frontend/phase-4-5-manual-certification.md`.
 - No payment, migration, deployment, webhook, provider, or customer action was triggered.
+- Auth compatibility regression coverage now includes a dedicated `lib/auth.test.ts` case for the missing `User.onboardingStep` fallback path.
 
 ## Remaining certification blockers
 
 - Physical iPhone VoiceOver and Android TalkBack remain unverified. Apple does not provide iPhone VoiceOver in Simulator.
 - Real-touch, keyboard-only, and screen-reader completion of onboarding, scan review, billing, settings, navigation, and dialogs remains unverified.
 - Authenticated end-to-end browser testing remains blocked by the absence of a Clerk testing token and disposable test account/database flow.
-- Authenticated `/app` currently fails because `User.onboardingStep` is absent from the connected database. The two pending migrations are `20260801020000_provider_scan_truth` and `20260801150000_phase_2_onboarding`; neither was applied.
+- Authenticated `/app` no longer hard-fails locally when onboarding columns are absent from the connected database. A compatibility guard now allows the authenticated shell and route gating to resolve in partially migrated local environments, but the pending migrations `20260801020000_provider_scan_truth` and `20260801150000_phase_2_onboarding` still need to be applied for full schema parity.
 - Stripe and worker launch gates remain closed; the local Stripe environment is not safe for a test-payment replay.
 - The root checkout is still not packaged into a clean Git release state, so this checkpoint was not staged, committed, pushed, or deployed.
 - The local production dependency audit reports four production advisories (three high, one moderate) through the pinned Next.js dependency tree, with no automatic fix currently available.
