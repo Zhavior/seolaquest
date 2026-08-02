@@ -1,5 +1,12 @@
 # Phase 4–5 manual certification script
 
+### Status for Codex
+
+- This script has **not** been executed on physical devices yet in this branch.
+- Treat every row as pending until dated evidence is recorded.
+- Do not mark Phase 4–5 as fully passed without physical iOS + Android runs and a disposable migrated database.
+
+
 Use this checklist only in a disposable test environment. Do not use live Stripe credentials, production customers, or an unmigrated shared database.
 
 ## Required environment

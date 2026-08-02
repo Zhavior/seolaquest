@@ -50,5 +50,11 @@ This is a local implementation score, not a production-readiness or accessibilit
 - The local production dependency audit reports four production advisories (three high, one moderate) through the pinned Next.js dependency tree, with no automatic fix currently available.
 
 ## Phase-pair decision
+### Note for Codex and future assistants
+
+- Local authenticated `/app` crashes on missing `User.onboardingStep` are resolved via a compatibility guard in `lib/auth.ts`. The regression is covered by `lib/auth.test.ts`.
+- Do not remove or bypass this fallback unless all pending Prisma migrations are applied to the active database and a new regression strategy is in place.
+- Remaining Phase 4–5 blockers are manual-certification and environment-related only: physical iOS/Android VoiceOver/TalkBack/touch/keyboard certification and a disposable authenticated E2E environment with fully migrated PostgreSQL, not additional local code fixes.
+
 
 The local Phase 4–5 implementation target reaches 88/100. The roadmap's binary acceptance gate does **not** pass yet: the authenticated route failure and physical VoiceOver/TalkBack/touch evidence must be resolved before Phases 6–7 begin under the strict sequence.
