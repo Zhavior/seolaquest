@@ -1,0 +1,320 @@
+---
+title: "🧪 Mana & APIs: Designing High-Yield Micro-SaaS Endpoints"
+slug: "monetizing-saas-apis"
+description: "How to monetize developer endpoints using credit-based rate limits, usage metering, and gamified API keys in Next.js & Upstash."
+date: "2026-07-26"
+author: "Reinald Santos"
+authorRole: "Founder & Grandmaster Hunter (Commander Vex)"
+authorAvatar: "🧪"
+tag: "🧪 MANA & APIS"
+featured: false
+coverColor: "#00FFFF"
+readTimeMinutes: 7
+---
+
+# 🧪 Mana & APIs: Designing High-Yield Micro-SaaS Endpoints
+
+The old SaaS pricing playbook is broken. Flat-rate monthly tiers punish light users, subsidize power users, and create a binary cliff between "paying" and "churned." Meanwhile, the most profitable developer platforms in the world — Stripe, Twilio, OpenAI — all converge on the same model: **usage-based metered billing.**
+
+In CoQuest, we call this system **Mana (MP)**. Every API call consumes Mana. When your tank runs dry, you refill at the **Alchemist Shop**. This guide breaks down the full architecture: from unit economics to bearer token security to rate limiting with Upstash Redis.
+
+> "A well-crafted API endpoint is an alchemical apparatus — it transmutes raw compute cycles into gold." — *Archmage Cypher, Lead Systems Architect*
+
+---
+
+## 💰 The 90%+ Gross Margin Economics of Metered APIs
+
+### Why Credit-Based Models Print Money
+
+Let's do the math on a typical CoQuest API call — the `/api/v1/leads/scan` endpoint that uses an LLM to score social media posts for buying intent:
+
+```
+┌─────────────────────────────────────────────────┐
+│  UNIT ECONOMICS: /api/v1/leads/scan             │
+├─────────────────────────────────────────────────┤
+│  LLM Token Cost (GPT-4o-mini, ~500 tokens)      │
+│    → Input:  250 tokens × $0.15/1M  = $0.0000375│
+│    → Output: 250 tokens × $0.60/1M  = $0.0001500│
+│    → Total LLM cost per call:         $0.00019  │
+│                                                 │
+│  Upstash Redis (rate limit check):    $0.00002  │
+│  Vercel Serverless (50ms execution):  $0.00001  │
+│  ─────────────────────────────────────────────  │
+│  TOTAL COST PER CALL:                 $0.00022  │
+│                                                 │
+│  PRICE CHARGED (10 Mana × $0.002/MP): $0.02    │
+│  GROSS MARGIN:                        98.9% 🟢  │
+└─────────────────────────────────────────────────┘
+```
+
+At scale, this is absurdly profitable. A developer making **1,000 API calls/day** generates **$20/day in revenue** at a cost of **$0.22**. Monthly, that's **$600 revenue on $6.60 COGS** — a **98.9% gross margin**.
+
+### The Refill Compulsion Loop
+
+Unlike flat subscriptions where users pay once and forget, credit-based systems create a **natural re-engagement trigger.** When a developer's Mana tank hits zero mid-workflow, they experience an immediate friction point that drives them back to the purchase page. This is the same psychological mechanic that mobile games use to generate billions — except here, you're selling *real compute value*, not cosmetic gems.
+
+---
+
+## 🔐 Bearer Token Hashing & Rune Security
+
+### Never Store Raw API Keys
+
+This is non-negotiable security hygiene. If your database is breached and API keys are stored in plaintext, every customer's integration is instantly compromised. CoQuest uses **SHA-256 hashing** with a prefix system for key identification:
+
+```typescript
+import { createHash, randomBytes } from 'crypto'
+
+interface ApiRune {
+  id: string
+  userId: string
+  prefix: string        // First 8 chars, stored in plain for lookup
+  hashedKey: string      // SHA-256 hash of the full key
+  name: string           // User-friendly label, e.g. "Production Radar"
+  permissions: string[]  // e.g., ['leads:read', 'leads:scan']
+  manaLimit: number      // Max Mana per billing cycle
+  createdAt: Date
+  lastUsedAt: Date | null
+  isRevoked: boolean
+}
+
+/**
+ * Generate a new API Rune (key) with secure hashing
+ */
+function generateApiRune(userId: string, name: string): {
+  rune: ApiRune
+  rawKey: string  // Shown ONCE to the user, never stored
+} {
+  // Generate 32 bytes of cryptographic randomness
+  const rawSecret = randomBytes(32).toString('hex')
+  const prefix = `cq_${rawSecret.slice(0, 8)}`
+  const fullKey = `${prefix}_${rawSecret}`
+
+  // Hash the full key — only the hash is stored in the database
+  const hashedKey = createHash('sha256')
+    .update(fullKey)
+    .digest('hex')
+
+  const rune: ApiRune = {
+    id: randomBytes(16).toString('hex'),
+    userId,
+    prefix,
+    hashedKey,
+    name,
+    permissions: ['leads:read'],
+    manaLimit: 10000,
+    createdAt: new Date(),
+    lastUsedAt: null,
+    isRevoked: false,
+  }
+
+  return { rune, rawKey: fullKey }
+}
+
+/**
+ * Validate an incoming API key against stored hashes
+ */
+async function validateApiKey(rawKey: string): Promise<ApiRune | null> {
+  const prefix = rawKey.slice(0, 11) // "cq_" + 8 chars
+  const hash = createHash('sha256').update(rawKey).digest('hex')
+
+  // Look up by prefix first (fast index scan), then verify hash
+  const rune = await db.apiRunes.findFirst({
+    where: { prefix, hashedKey: hash, isRevoked: false },
+  })
+
+  if (rune) {
+    await db.apiRunes.update({
+      where: { id: rune.id },
+      data: { lastUsedAt: new Date() },
+    })
+  }
+
+  return rune
+}
+```
+
+### Security Best Practices for API Runes
+
+- **Show the raw key exactly once** after generation, with a copy-to-clipboard button and a warning banner.
+- **Prefix-based lookup** (`cq_xxxxxxxx`) allows fast database indexing without exposing the full key.
+- **Automatic revocation** after 90 days of inactivity — stale keys are attack surfaces.
+- **Play `sfx.playRuneForged()`** when a new key is created — the ritual reinforces the gravity of the action.
+
+---
+
+## 🏪 Designing the Alchemist Shop
+
+### Selling Consumable Credit Packs
+
+The Alchemist Shop is CoQuest's in-app credit store. Instead of traditional SaaS pricing pages with "Basic / Pro / Enterprise" columns, we sell **consumable Mana packs** styled as RPG potions:
+
+| Pack Name | Mana (MP) | Price | Cost/MP | Best For |
+|:---|:---:|:---:|:---:|:---|
+| 🧪 **Mana Vial** | 500 MP | $5 | $0.010 | Solo hunters testing the waters |
+| ⚗️ **Greater Elixir** | 2,500 MP | $19 | $0.0076 | Active prospectors (24% savings) |
+| 🏺 **Arcane Cauldron** | 10,000 MP | $59 | $0.0059 | Guild teams running daily radars (41% savings) |
+| 🐉 **Dragon's Hoard** | 50,000 MP | $199 | $0.00398 | Enterprise-scale API consumers (60% savings) |
+
+### The Psychology of Tiered Packs
+
+Notice the pricing follows a **volume discount curve** that incentivizes larger purchases:
+
+```
+Discount %
+  60% ─────────────────────────────────── 🐉 Dragon's Hoard
+  41% ─────────────────────── 🏺 Arcane Cauldron
+  24% ────────────── ⚗️ Greater Elixir
+   0% ──── 🧪 Mana Vial (baseline)
+       ────────────────────────────────────────→ Volume
+```
+
+**Key design principles:**
+
+1. **Anchor high, sell mid.** The Dragon's Hoard ($199) exists primarily to make the Arcane Cauldron ($59) feel like a steal.
+2. **Name everything.** "500 credits for $5" is forgettable. "Mana Vial" is memorable and shareable.
+3. **Show savings explicitly.** The "24% savings" badge creates loss aversion — *not* buying the bigger pack feels like leaving money on the table.
+4. **No subscriptions required.** Credits never expire. This removes the #1 objection to usage-based pricing: "What if I'm paying for credits I don't use?"
+
+---
+
+## ⚡ Rate Limiting with Upstash Redis
+
+### Enforcing Request Quotas at the Edge
+
+Even with Mana-based billing, you need hard rate limits to prevent abuse, accidental infinite loops, and DDoS-style key misuse. CoQuest uses **Upstash Redis** with a sliding-window algorithm for edge-fast enforcement:
+
+```typescript
+import { Ratelimit } from '@upstash/ratelimit'
+import { Redis } from '@upstash/redis'
+import { NextResponse } from 'next/server'
+
+// Initialize Upstash Redis rate limiter
+const redis = Redis.fromEnv()
+
+// Tier-based rate limit configurations
+const rateLimiters = {
+  free: new Ratelimit({
+    redis,
+    limiter: Ratelimit.slidingWindow(10, '60 s'),  // 10 req/min
+    prefix: 'rl:free',
+  }),
+  hunter: new Ratelimit({
+    redis,
+    limiter: Ratelimit.slidingWindow(60, '60 s'),   // 60 req/min
+    prefix: 'rl:hunter',
+  }),
+  arcane: new Ratelimit({
+    redis,
+    limiter: Ratelimit.slidingWindow(100, '1 s'),   // 100 req/sec 🔥
+    prefix: 'rl:arcane',
+  }),
+}
+
+export async function POST(req: Request) {
+  const apiKey = req.headers.get('x-coquest-key')
+  if (!apiKey) {
+    return NextResponse.json(
+      { error: 'MISSING_RUNE', message: 'Include x-coquest-key header' },
+      { status: 401 }
+    )
+  }
+
+  // Validate key & determine tier
+  const rune = await validateApiKey(apiKey)
+  if (!rune) {
+    return NextResponse.json(
+      { error: 'INVALID_RUNE', message: 'API Rune not recognized or revoked' },
+      { status: 403 }
+    )
+  }
+
+  // Check rate limit for the user's tier
+  const tier = rune.permissions.includes('arcane:speed') ? 'arcane' : 'hunter'
+  const { success, limit, remaining, reset } = await rateLimiters[tier].limit(
+    rune.id
+  )
+
+  if (!success) {
+    return NextResponse.json(
+      {
+        error: 'RATE_LIMITED',
+        message: 'Too many requests. Wait for your Mana to regenerate.',
+        retryAfter: Math.ceil((reset - Date.now()) / 1000),
+      },
+      {
+        status: 429,
+        headers: {
+          'X-RateLimit-Limit': limit.toString(),
+          'X-RateLimit-Remaining': remaining.toString(),
+          'X-RateLimit-Reset': reset.toString(),
+          'Retry-After': Math.ceil((reset - Date.now()) / 1000).toString(),
+        },
+      }
+    )
+  }
+
+  // Deduct Mana for the operation
+  const manaCost = 10
+  const { success: manaOk, currentBalance } = await deductUserMana(
+    rune.userId,
+    manaCost
+  )
+
+  if (!manaOk) {
+    return NextResponse.json(
+      {
+        error: 'OUT_OF_MANA',
+        message: 'Your Mana tank is empty. Visit the Alchemist Shop to refill.',
+        shopUrl: '/shop',
+      },
+      { status: 402 }
+    )
+  }
+
+  // Execute the actual endpoint logic...
+  const result = await executeLeadScan(req)
+
+  return NextResponse.json({
+    ...result,
+    _meta: {
+      manaUsed: manaCost,
+      manaRemaining: currentBalance,
+      rateLimitRemaining: remaining - 1,
+    },
+  })
+}
+```
+
+### Rate Limit Tiers at a Glance
+
+| Tier | Requests | Window | Use Case |
+|:---|:---:|:---:|:---|
+| 🆓 **Free** | 10 req | per minute | Sandbox testing & evaluation |
+| ⚔️ **Hunter** | 60 req | per minute | Active prospecting workflows |
+| 🐉 **Arcane Speed** | 100 req | per second | Enterprise bulk scanning & real-time pipelines |
+
+---
+
+## 📊 Monitoring & Observability
+
+A metered API without visibility is a liability. Track these metrics in your dashboard:
+
+- **Mana Burn Rate**: How fast are users consuming credits? A spike could indicate a runaway script.
+- **P95 Latency**: Keep endpoint response times under 200ms — slow APIs cause developers to batch fewer, larger requests (reducing revenue).
+- **Revenue per API Call**: Your north-star unit metric. If it drops below $0.015, investigate cost creep.
+- **Rune Churn Rate**: How many API keys go inactive per month? High churn means your API isn't sticky enough.
+
+---
+
+## 🚀 Ready to Forge Your First API Rune?
+
+The modern developer economy rewards platforms that charge for **value delivered**, not for seat licenses or feature gates. Mana-based metering aligns your revenue directly with customer success: the more value they extract, the more they pay — and the happier they are paying it.
+
+**🧪 Begin your alchemical journey:**
+
+1. **[Mint API Rune 🧪](/keys)** — Generate your first encrypted API Rune in 30 seconds.
+2. **[Refill Mana 🧪](/shop)** — Grab a Mana Vial and start making calls immediately.
+3. **[Read The API Docs →](/docs)** — Full endpoint reference with interactive examples.
+
+> *"Any sufficiently advanced API is indistinguishable from alchemy. The question isn't whether to charge for magic — it's how elegantly you meter it."*
+> — **Archmage Cypher, Lead Systems Architect**

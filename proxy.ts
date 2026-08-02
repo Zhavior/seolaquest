@@ -1,0 +1,57 @@
+import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'
+import { NextResponse } from 'next/server'
+
+export const PUBLIC_ROUTE_PATTERNS = [
+  '/',
+  '/pricing',
+  '/blog(.*)',
+  '/status',
+  '/login',
+  '/sign-in(.*)',
+  '/sign-up(.*)',
+  '/privacy',
+  '/terms',
+  '/api-terms',
+  // These machine endpoints authenticate themselves. Keep the exceptions exact.
+  '/api/v1/cron/jobs',
+  '/api/v1/health/live',
+  '/api/v1/health/ready',
+  '/api/v1/internal/dead-letters',
+  '/api/v1/webhooks/clerk',
+  '/api/v1/webhooks/stripe',
+]
+
+const isPublicRoute = createRouteMatcher(PUBLIC_ROUTE_PATTERNS)
+
+export default clerkMiddleware(async (auth, request) => {
+  const legacyRedirects: Record<string, string> = {
+    '/landing': '/',
+    '/dashboard': '/app',
+    '/dashboard/keywords': '/app/keywords',
+    '/billing': '/app/billing',
+    '/profile': '/app/profile',
+    '/guild': '/app/guild',
+    '/keys': '/app/keys',
+    '/settings': '/app/settings',
+    '/specs': '/status',
+  }
+  const destination = legacyRedirects[request.nextUrl.pathname]
+  if (destination) {
+    const redirectUrl = new URL(request.url)
+    redirectUrl.pathname = destination
+    return NextResponse.redirect(redirectUrl, 308)
+  }
+  if (!isPublicRoute(request)) {
+    await auth.protect()
+  }
+})
+
+export const config = {
+  matcher: [
+    // Skip Next.js internals and all static files, unless found in search params
+    '/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)',
+    // Always run for API routes
+    '/(api|trpc)(.*)',
+    '/__clerk/:path*',
+  ],
+}

@@ -1,0 +1,50 @@
+{
+  "schemaVersion": 1,
+  "routes": [
+    {
+      "path": "/",
+      "title": "CoQuest | Customer Research",
+      "requiredLandmarks": ["main"]
+    },
+    {
+      "path": "/pricing",
+      "title": "Pricing | CoQuest",
+      "requiredLandmarks": ["main"]
+    },
+    {
+      "path": "/blog",
+      "title": "CoQuest Blog & Content Engine | Arcade Playbooks & Guild Lore",
+      "requiredLandmarks": ["main"]
+    },
+    {
+      "path": "/status",
+      "title": "System Architecture Status | CoQuest",
+      "requiredLandmarks": ["main"]
+    },
+    {
+      "path": "/privacy",
+      "title": "Privacy & Data Handling | CoQuest",
+      "requiredLandmarks": ["main"]
+    },
+    {
+      "path": "/terms",
+      "title": "Terms | CoQuest",
+      "requiredLandmarks": ["main"]
+    },
+    {
+      "path": "/api-terms",
+      "title": "API Availability | CoQuest",
+      "requiredLandmarks": ["main"]
+    },
+    {
+      "path": "/sign-in",
+      "title": "Sign In | CoQuest",
+      "requiredLandmarks": ["main"]
+    },
+    {
+      "path": "/sign-up",
+      "title": "Create Account | CoQuest",
+      "requiredLandmarks": ["main"]
+    }
+  ]
+}

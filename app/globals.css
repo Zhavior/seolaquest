@@ -1,0 +1,229 @@
+@import "tailwindcss";
+
+@layer base {
+  html {
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-synthesis: none;
+    scroll-behavior: smooth;
+  }
+}
+
+/* Apple ProMotion 120 FPS Spring Motion & GPU Composition */
+:root {
+  --apple-ease-spring: cubic-bezier(0.16, 1, 0.3, 1);
+  --apple-ease-snappy: cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.apple-spring {
+  transition-timing-function: var(--apple-ease-spring);
+}
+
+.apple-snappy {
+  transition-timing-function: var(--apple-ease-snappy);
+}
+
+/* Off-screen Section Rendering Deferral for INP/LCP Optimization */
+.cv-auto {
+  content-visibility: auto;
+  contain-intrinsic-size: 1px 500px;
+}
+
+/* GPU Hardware Acceleration for Smooth 120 FPS Composite Animations */
+.gpu-accelerate {
+  will-change: transform, opacity;
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+@keyframes candy-stripe {
+  0% { background-position: 0 0; }
+  100% { background-position: 1rem 0; }
+}
+
+.animate-candy-stripe {
+  background-image: linear-gradient(
+    -45deg,
+    rgba(255, 255, 255, 0.4) 25%,
+    transparent 25%,
+    transparent 50%,
+    rgba(255, 255, 255, 0.4) 50%,
+    rgba(255, 255, 255, 0.4) 75%,
+    transparent 75%,
+    transparent
+  );
+  background-size: 1rem 1rem;
+  animation: candy-stripe 1s linear infinite;
+}
+
+.notebook-pattern {
+  background-color: #F4F0EA;
+  background-image: radial-[#000000] 1px, transparent 0;
+  background-size: 24px 24px;
+}
+
+/* ── Pixel Art Icon Rendering ───────────────────────────────────────── */
+.pixel-icon {
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
+/* ── Arcade Float: idle bob for potion / badge icons ──────────────── */
+@keyframes floating-item {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-4px); }
+}
+
+.animate-arcade-float {
+  animation: floating-item 2.5s ease-in-out infinite;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
+/* ── Rainbow border pulse for Dragon Cauldron "Best Value" card ────── */
+@keyframes rainbow-border {
+  0%   { border-color: #FF5722; box-shadow: 0 0 0 3px #FF5722, 6px 6px 0 0 #000; }
+  20%  { border-color: #F59E0B; box-shadow: 0 0 0 3px #F59E0B, 6px 6px 0 0 #000; }
+  40%  { border-color: #A3E635; box-shadow: 0 0 0 3px #A3E635, 6px 6px 0 0 #000; }
+  60%  { border-color: #06B6D4; box-shadow: 0 0 0 3px #06B6D4, 6px 6px 0 0 #000; }
+  80%  { border-color: #A855F7; box-shadow: 0 0 0 3px #A855F7, 6px 6px 0 0 #000; }
+  100% { border-color: #FF5722; box-shadow: 0 0 0 3px #FF5722, 6px 6px 0 0 #000; }
+}
+
+.animate-rainbow-border {
+  animation: rainbow-border 2s linear infinite;
+}
+
+/* ── Tier glow rings behind pixel art icon containers ─────────────── */
+.icon-glow-green  { background-color: #A3E635; box-shadow: inset 0 0 8px #86efac; }
+.icon-glow-lime   { background-color: #84cc16; box-shadow: inset 0 0 8px #a3e635; }
+.icon-glow-cyan   { background-color: #06B6D4; box-shadow: inset 0 0 8px #67e8f9; }
+.icon-glow-purple { background-color: #7c3aed; box-shadow: inset 0 0 10px #c084fc; }
+.icon-glow-red    { background-color: #7f1d1d; box-shadow: inset 0 0 12px #f97316, 0 0 8px #ef4444; }
+
+
+/* ── Arcade Grid Background Scroll (Card Hover Aura) ───────────────── */
+@keyframes grid-scroll {
+  0%   { background-position: 0 0; }
+  100% { background-position: 20px 20px; }
+}
+
+.arcade-grid-bg {
+  background-image:
+    linear-gradient(to right,  rgba(0,0,0,0.12) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0,0,0,0.12) 1px, transparent 1px);
+  background-size: 10px 10px;
+  animation: grid-scroll 2s linear infinite;
+  pointer-events: none;
+}
+
+/* ── Legendary Fire Border – Dragon Slayer / Dragon Cauldron ─────── */
+@keyframes legendary-fire {
+  0%   { box-shadow: 0 0 0 3px #FF4500, 10px 10px 0 0 rgba(0,0,0,1), 0 0 20px 4px #FF4500; border-color: #FF4500; }
+  25%  { box-shadow: 0 0 0 3px #F59E0B, 10px 10px 0 0 rgba(0,0,0,1), 0 0 24px 6px #F59E0B; border-color: #F59E0B; }
+  50%  { box-shadow: 0 0 0 3px #EF4444, 14px 14px 0 0 rgba(255,69,0,1), 0 0 30px 8px #EF4444; border-color: #EF4444; }
+  75%  { box-shadow: 0 0 0 3px #F59E0B, 10px 10px 0 0 rgba(0,0,0,1), 0 0 24px 6px #F59E0B; border-color: #F59E0B; }
+  100% { box-shadow: 0 0 0 3px #FF4500, 10px 10px 0 0 rgba(0,0,0,1), 0 0 20px 4px #FF4500; border-color: #FF4500; }
+}
+
+.legendary-fire-border {
+  animation: legendary-fire 1.8s ease-in-out infinite;
+}
+
+/* ── Low Mana Pulse (Red/Yellow neon blink) ──────────────────────── */
+@keyframes low-mana-pulse {
+  0%, 100% { opacity: 1; box-shadow: 0 0 8px 2px #EF4444; }
+  50%       { opacity: 0.55; box-shadow: 0 0 18px 6px #FFE600; }
+}
+
+.low-mana-bar {
+  background: linear-gradient(to right, #EF4444, #F59E0B, #FFE600);
+  animation: low-mana-pulse 0.9s ease-in-out infinite;
+}
+
+/* ── Floating Damage / Heal Text (RPG popup) ─────────────────────── */
+@keyframes damage-float {
+  0%   { transform: translateY(0)   scale(1);    opacity: 1; }
+  60%  { transform: translateY(-60px) scale(1.2); opacity: 1; }
+  100% { transform: translateY(-90px) scale(0.8); opacity: 0; }
+}
+
+.damage-text {
+  animation: damage-float 1.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* ── Typewriter caret blink ──────────────────────────────────────── */
+@keyframes caret-blink {
+  0%, 100% { border-color: transparent; }
+  50%       { border-color: currentColor; }
+}
+
+.typewriter-caret {
+  border-right: 3px solid;
+  animation: caret-blink 0.7s step-end infinite;
+  padding-right: 2px;
+}
+
+/* ── SFX Toggle Button ───────────────────────────────────────────── */
+.sfx-toggle {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.05em;
+}
+
+/* ── App-wide keyboard navigation ─────────────────────────────────── */
+.skip-link {
+  position: fixed;
+  top: 0.75rem;
+  left: 0.75rem;
+  z-index: 10000;
+  transform: translateY(calc(-100% - 1.5rem));
+  border: 3px solid #000;
+  background: #FFE600;
+  color: #000;
+  padding: 0.75rem 1rem;
+  font-weight: 900;
+  line-height: 1;
+  text-transform: uppercase;
+  box-shadow: 4px 4px 0 #000;
+}
+
+.skip-link:focus-visible {
+  transform: translateY(0);
+}
+
+:where(
+  a[href],
+  button,
+  input,
+  select,
+  textarea,
+  summary,
+  [contenteditable="true"],
+  [tabindex]:not([tabindex="-1"])
+):focus-visible {
+  outline: 3px solid #000;
+  outline-offset: 3px;
+  box-shadow: 0 0 0 6px #FFE600;
+}
+
+/* Keep motion optional while preserving final component state and content. */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-delay: 0s !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-delay: 0s !important;
+    transition-duration: 0.01ms !important;
+  }
+}

@@ -16,6 +16,7 @@
 # next.js
 /.next/
 /out/
+/hypequest-engine/
 
 # production
 /build
@@ -23,9 +24,6 @@
 # misc
 .DS_Store
 *.pem
-sqlite.db
-HyperQuestz
-hypequest
 
 # debug
 npm-debug.log*
@@ -35,6 +33,7 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+!.env.example
 
 # vercel
 .vercel
@@ -42,3 +41,12 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+/src/generated/prisma
+
+# clerk configuration (can include secrets)
+/.clerk/
+
+# local provider/runtime state
+/supabase/.temp/
+/prisma/*.db

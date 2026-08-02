@@ -1,0 +1,2 @@
+-- Retained for migration-history compatibility.
+-- passwordHash is included in the canonical initial production baseline.

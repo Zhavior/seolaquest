@@ -1,32 +1,56 @@
 {
-  "name": "hypequest",
+  "name": "coquest-engine",
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev -p 3500",
-    "build": "next build",
+    "dev": "next dev",
+    "build": "prisma generate && next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint app components lib features src prisma/seed.ts proxy.ts --ignore-pattern '**/* 2.*' --max-warnings=0",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:a11y": "bash scripts/phase-5-accessibility-gate.sh"
   },
   "dependencies": {
-    "better-sqlite3": "^13.0.1",
-    "drizzle-orm": "^0.45.2",
+    "@clerk/nextjs": "^7.6.2",
+    "@stripe/stripe-js": "^9.12.1",
+    "@upstash/ratelimit": "^2.0.8",
+    "@upstash/redis": "^1.38.0",
+    "canvas-confetti": "^1.9.4",
+    "clsx": "^2.1.1",
+    "framer-motion": "^12.42.2",
     "lucide-react": "^1.27.0",
     "next": "16.2.12",
+    "pino": "^9.0.0",
+    "pino-pretty": "^11.0.0",
     "react": "19.2.4",
-    "react-dom": "19.2.4"
+    "react-dom": "19.2.4",
+    "stripe": "^22.3.2",
+    "tailwind-merge": "^3.6.0",
+    "zod": "^3.23.8"
   },
   "devDependencies": {
-    "@tailwindcss/postcss": "^4",
-    "@types/better-sqlite3": "^7.6.13",
+    "@playwright/test": "^1.62.1",
+    "@prisma/client": "5.10.2",
+    "@tailwindcss/postcss": "^4.3.3",
+    "@testing-library/jest-dom": "^7.0.0",
+    "@testing-library/react": "^16.3.2",
+    "@testing-library/user-event": "^14.6.1",
+    "@types/canvas-confetti": "^1.9.0",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@vitejs/plugin-react": "^6.0.4",
+    "axe-core": "^4.12.1",
     "dotenv": "^17.4.2",
-    "drizzle-kit": "^0.31.10",
     "eslint": "^9",
     "eslint-config-next": "16.2.12",
-    "tailwindcss": "^4",
-    "typescript": "^5"
+    "jsdom": "^30.0.1",
+    "postcss": "^8.5.23",
+    "prisma": "5.10.2",
+    "tailwindcss": "^4.3.3",
+    "tsx": "^4.23.1",
+    "typescript": "^5",
+    "vitest": "^4.1.10"
   }
 }
