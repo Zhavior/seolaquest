@@ -26,6 +26,34 @@ export class WorkerPreparationError extends Error {
   }
 }
 
+export type JobWorkerStopReason =
+  | 'NO_JOBS'
+  | 'BATCH_LIMIT_REACHED'
+  | 'WALL_TIME_REACHED'
+
+export type JobWorkerCycleReport = {
+  ok: true
+  workerId: string
+  preparation: {
+    scheduled: Awaited<ReturnType<typeof ScanSchedulerService.enqueueDueSchedules>>
+    reconciled: Awaited<ReturnType<typeof ScanReconciliationService.reconcile>>
+  }
+  execution: {
+    claimed: number
+    processed: number
+    isolatedFailures: number
+  }
+  stopReason: JobWorkerStopReason
+  elapsedMs: number
+
+  // Backward-compatible fields for current callers.
+  scheduled: Awaited<ReturnType<typeof ScanSchedulerService.enqueueDueSchedules>>
+  reconciled: Awaited<ReturnType<typeof ScanReconciliationService.reconcile>>
+  claimed: number
+  processed: number
+  isolatedFailures: number
+}
+
 async function processOne(job: ClaimedDurableJob) {
   if (job.kind === 'TENANT_SCAN') {
     try {
@@ -45,13 +73,15 @@ async function processOne(job: ClaimedDurableJob) {
     return
   }
 
-  // Database constraints reject unknown kinds. Throwing keeps this fail-closed
-  // if an unsupported value is introduced without a worker implementation.
   throw new Error('Unsupported durable job kind')
 }
 
 export class JobWorkerService {
-  static async runCycle(options?: { batchSize?: number; wallTimeMs?: number; workerId?: string }) {
+  static async runCycle(options?: {
+    batchSize?: number
+    wallTimeMs?: number
+    workerId?: string
+  }): Promise<JobWorkerCycleReport> {
     const startedAt = Date.now()
     const wallTimeMs = Math.min(50_000, Math.max(5_000, options?.wallTimeMs ?? DEFAULT_WALL_TIME_MS))
     const workerId = options?.workerId ?? `vercel-${randomUUID()}`
@@ -60,26 +90,29 @@ export class JobWorkerService {
       ScanSchedulerService.enqueueDueSchedules(),
       ScanReconciliationService.reconcile(),
     ])
+
     if (scheduleResult.status === 'rejected') {
       const outcomeCode = scheduleResult.reason instanceof ActiveKeywordLimitExceededError
         ? 'ACTIVE_KEYWORD_LIMIT_EXCEEDED'
         : 'SCAN_SCHEDULER_FAILED'
       logger.error({ outcomeCode }, 'Scan scheduler step failed')
     }
+
     if (reconciliationResult.status === 'rejected') {
       logger.error({ outcomeCode: 'SCAN_RECONCILIATION_FAILED' }, 'Scan reconciliation step failed')
     }
-    // Preparation is part of the cycle's truth contract. A partial failure
-    // must reach the cron boundary so its heartbeat cannot be marked healthy.
+
     if (scheduleResult.status === 'rejected') {
       if (scheduleResult.reason instanceof ActiveKeywordLimitExceededError) {
         throw scheduleResult.reason
       }
       throw new WorkerPreparationError('SCAN_SCHEDULER_FAILED')
     }
+
     if (reconciliationResult.status === 'rejected') {
       throw new WorkerPreparationError('SCAN_RECONCILIATION_FAILED')
     }
+
     const scheduled = scheduleResult.value
     const reconciled = reconciliationResult.value
 
@@ -87,35 +120,65 @@ export class JobWorkerService {
     let claimed = 0
     let processed = 0
     let isolatedFailures = 0
+    let stopReason: JobWorkerStopReason = 'NO_JOBS'
+
     while (claimed < batchSize) {
-      if (Date.now() - startedAt >= wallTimeMs) break
-      // Claim only work that this invocation is ready to start. Claiming a
-      // whole batch before checking the wall-time budget can consume attempts
-      // for jobs that never execute when the serverless invocation ends.
+      if (Date.now() - startedAt >= wallTimeMs) {
+        stopReason = 'WALL_TIME_REACHED'
+        break
+      }
+
       const [job] = await DurableJobRepository.claimBatch({
         workerId,
         batchSize: 1,
       })
-      if (!job) break
+
+      if (!job) {
+        stopReason = claimed === 0 ? 'NO_JOBS' : 'BATCH_LIMIT_REACHED'
+        break
+      }
+
       claimed += 1
+
       try {
         await processOne(job)
       } catch (error) {
         isolatedFailures += 1
         logger.error({ err: error, jobId: job.id, kind: job.kind }, 'Durable job failure handler failed')
       }
+
       processed += 1
+
+      if (claimed >= batchSize) {
+        stopReason = 'BATCH_LIMIT_REACHED'
+      }
     }
 
-    return {
+    const execution = {
+      claimed,
+      processed,
+      isolatedFailures,
+    }
+
+    const report: JobWorkerCycleReport = {
       ok: true,
       workerId,
+      preparation: {
+        scheduled,
+        reconciled,
+      },
+      execution,
+      stopReason,
+      elapsedMs: Date.now() - startedAt,
+
+      // Backward-compatible shape.
       scheduled,
       reconciled,
       claimed,
       processed,
       isolatedFailures,
-      elapsedMs: Date.now() - startedAt,
     }
+
+    return report
   }
 }
