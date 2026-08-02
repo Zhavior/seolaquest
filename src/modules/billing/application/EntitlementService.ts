@@ -2,6 +2,7 @@ import 'server-only'
 
 import prisma from '@/lib/prisma'
 import { PLAN_CATALOG, isPlanCode, type PlanCode } from '@/src/modules/billing/domain/catalog'
+import { buildCapabilityDecision, type CapabilityDecision } from '@/src/modules/billing/domain/capabilities'
 import { isCurrentPaidSubscription } from '@/src/modules/billing/domain/entitlements'
 
 export type BillingEntitlements = {
@@ -13,6 +14,11 @@ export type BillingEntitlements = {
   canUsePaidScans: boolean
   canGenerateAIReplies: boolean
   canExportToCRM: boolean
+  capabilities: {
+    scanManual: CapabilityDecision
+    aiReplyGenerate: CapabilityDecision
+    crmExport: CapabilityDecision
+  }
 }
 
 export class EntitlementService {
@@ -21,34 +27,54 @@ export class EntitlementService {
     const storedPlan = subscription?.plan ?? 'FREE'
     const plan = isPlanCode(storedPlan) ? storedPlan : 'FREE'
     const definition = PLAN_CATALOG[plan]
-    const paid = subscription ? isCurrentPaidSubscription({
-      plan,
-      status: subscription.status,
-      currentPeriodEnd: subscription.currentPeriodEnd,
-    }) : false
+    const subscriptionStatus = subscription?.status ?? 'inactive'
 
-    if (!paid) {
-      return {
-        plan: 'FREE',
-        planName: PLAN_CATALOG.FREE.name,
-        subscriptionStatus: subscription?.status ?? 'inactive',
-        paid: false,
-        scanLimit: PLAN_CATALOG.FREE.scanLimit,
-        canUsePaidScans: false,
-        canGenerateAIReplies: false,
-        canExportToCRM: false,
-      }
-    }
+    const paid = subscription
+      ? isCurrentPaidSubscription({
+          plan,
+          status: subscription.status,
+          currentPeriodEnd: subscription.currentPeriodEnd,
+        })
+      : false
+
+    const scanManual = buildCapabilityDecision({
+      capability: 'SCAN_MANUAL',
+      plan,
+      subscriptionStatus,
+      paid,
+      remaining: null,
+    })
+
+    const aiReplyGenerate = buildCapabilityDecision({
+      capability: 'AI_REPLY_GENERATE',
+      plan,
+      subscriptionStatus,
+      paid,
+      remaining: null,
+    })
+
+    const crmExport = buildCapabilityDecision({
+      capability: 'CRM_EXPORT',
+      plan,
+      subscriptionStatus,
+      paid,
+      remaining: null,
+    })
 
     return {
-      plan,
-      planName: definition.name,
-      subscriptionStatus: subscription?.status ?? 'inactive',
-      paid: true,
-      scanLimit: definition.scanLimit,
-      canUsePaidScans: true,
-      canGenerateAIReplies: true,
-      canExportToCRM: true,
+      plan: paid ? plan : 'FREE',
+      planName: paid ? definition.name : PLAN_CATALOG.FREE.name,
+      subscriptionStatus,
+      paid,
+      scanLimit: paid ? definition.scanLimit : PLAN_CATALOG.FREE.scanLimit,
+      canUsePaidScans: scanManual.allowed,
+      canGenerateAIReplies: aiReplyGenerate.allowed,
+      canExportToCRM: crmExport.allowed,
+      capabilities: {
+        scanManual,
+        aiReplyGenerate,
+        crmExport,
+      },
     }
   }
 }
