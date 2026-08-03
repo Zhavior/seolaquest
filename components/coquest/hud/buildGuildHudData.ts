@@ -8,6 +8,8 @@ type CurrentUserLike = {
   mana?: number | null
   manaMax?: number | null
   plan?: string | null
+  guildRank?: string | null
+  activeQuests?: number | null
 }
 
 function pickString(value: string | null | undefined, fallback: string) {
@@ -44,5 +46,8 @@ export function buildGuildHudData(user: CurrentUserLike): GuildHudData {
     manaMax,
     planName: pickString(user.plan, 'Legend'),
     providers: buildProviders(),
+    guildRank: pickString(user.guildRank, 'Silver ⚔'),
+    onlineStatus: 'online',
+    activeQuests: pickNumber(user.activeQuests, 0),
   }
 }
