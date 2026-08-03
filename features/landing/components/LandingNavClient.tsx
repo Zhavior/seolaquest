@@ -6,36 +6,55 @@ import { useAuth, UserButton } from '@clerk/nextjs'
 export function LandingNavClient() {
   const { isLoaded, userId } = useAuth()
 
-  return (
-    <div className="flex min-w-0 items-center justify-end gap-1 sm:gap-4">
-      {isLoaded && userId ? (
-        <>
-          <Link
-            href="/dashboard"
-            className="inline-flex min-h-11 shrink-0 items-center px-1 text-xs font-bold uppercase tracking-wider underline-offset-4 decoration-4 hover:underline focus-visible:underline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-black sm:px-2 sm:text-sm"
-          >
-            Dashboard
-          </Link>
-          <div className="min-h-11 min-w-11 flex items-center justify-center">
-            <UserButton />
+  if (!isLoaded) {
+    return <div className="h-10 w-10 rounded-full border-[3px] border-black bg-white shadow-[3px_3px_0_0_#000] motion-safe:animate-pulse" />
+  }
+
+  if (userId) {
+    return (
+      <div className="flex items-center gap-2 sm:gap-3">
+        <Link
+          href="/dashboard"
+          className="hidden border-[3px] border-black bg-[#FFE600] px-3 py-2 font-black uppercase tracking-[0.14em] text-black shadow-[3px_3px_0_0_#000] transition-transform duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[1px_1px_0_0_#000] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none sm:inline-flex"
+        >
+          COMMAND CENTER
+        </Link>
+
+        <div className="relative pt-3">
+          <div className="absolute -top-1 right-0 hidden border-2 border-black bg-[#FFE600] px-1.5 py-0.5 font-mono text-[9px] font-black uppercase tracking-[0.12em] text-black shadow-[2px_2px_0_0_#000] sm:block">
+            LVL 01
           </div>
-        </>
-      ) : (
-        <>
-          <Link
-            href="/sign-in"
-            className="inline-flex min-h-11 shrink-0 items-center px-1 text-xs font-bold uppercase tracking-wider underline-offset-4 decoration-4 hover:underline focus-visible:underline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-black sm:px-2 sm:text-sm"
-          >
-            Sign in
-          </Link>
-          <Link
-            href="/sign-up"
-            className="inline-flex min-h-11 shrink-0 items-center border-3 border-black bg-[#ff4500] px-3 text-xs font-black uppercase tracking-wider text-white shadow-[3px_3px_0_0_rgba(0,0,0,1)] transition-all hover:bg-[#e03e00] active:translate-x-0.5 active:translate-y-0.5 focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-black sm:px-4 sm:text-sm"
-          >
-            Start free
-          </Link>
-        </>
-      )}
+
+          <div className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-full border-[3px] border-black bg-white shadow-[3px_3px_0_0_#000] sm:h-10 sm:w-10">
+            <UserButton
+              appearance={{
+                elements: {
+                  avatarBox: 'h-full w-full',
+                  userButtonAvatarBox: 'h-full w-full',
+                },
+              }}
+            />
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="flex items-center gap-2 sm:gap-3">
+      <Link
+        href="/sign-in"
+        className="inline-flex min-h-11 shrink-0 items-center px-2 text-xs font-bold uppercase tracking-wider underline-offset-4 decoration-4 hover:underline focus-visible:underline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-black sm:text-sm"
+      >
+        Sign in
+      </Link>
+
+      <Link
+        href="/sign-up"
+        className="inline-flex min-h-11 shrink-0 items-center border-[3px] border-black bg-[#ff5a36] px-3 py-2 font-black uppercase tracking-[0.14em] text-black shadow-[3px_3px_0_0_#000] transition-transform duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[1px_1px_0_0_#000] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none sm:px-4 sm:text-sm"
+      >
+        Start free
+      </Link>
     </div>
   )
 }
