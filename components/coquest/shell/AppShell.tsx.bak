@@ -1,4 +1,4 @@
-import { GuildHudBar }  from '@/components/coquest/navigation/GuildCommandBar'
+import { GuildHudBar }  from '@/components/coquest/hud/GuildHudBar'
 import { RoomMapStrip } from '@/components/coquest/nav/RoomMapStrip'
 import { RoomHeader }   from '@/components/coquest/room/RoomHeader'
 import type { GuildHudData }  from '@/components/coquest/hud/types'
