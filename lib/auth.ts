@@ -100,6 +100,8 @@ function toCompatibleUser(row: CompatibleUserRow): User {
     xp: row.xp ?? 0,
     xpRequired: row.xpRequired ?? 100,
     unlockedTheme: row.unlockedTheme ?? 'PARCHMENT_WOOD',
+    mana: 0,
+    manaMax: 100,
     createdAt: row.createdAt,
     updatedAt: row.updatedAt,
   }
