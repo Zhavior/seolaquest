@@ -1,0 +1,2 @@
+-- Retained migration identifier from the pre-baseline repository history.
+-- The canonical live structure is now defined by 00000000000000_live_baseline.

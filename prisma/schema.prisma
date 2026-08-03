@@ -1,0 +1,370 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id                  String            @id @default(uuid())
+  email               String            @unique
+  name                String?
+  profileIconKey      String?
+  title               String?
+  onboardingComplete  Boolean           @default(false)
+  onboardingStep      Int               @default(1)
+  businessDescription String?
+  targetCustomer      String?
+  firstKeyword        String?
+  preferredSource     OnboardingSource?
+  emailDigest         Boolean           @default(true)
+  radarAlerts         Boolean           @default(true)
+  crmWebhookUrl       String?
+  questsRemaining     Int               @default(0)
+  spellsCast          Int               @default(0)
+  questsExported      Int               @default(0)
+  maxCredits          Int               @default(0)
+  xpMultiplier        Float             @default(1.0)
+  level               Int               @default(1)
+  xp                  Int               @default(0)
+  xpRequired          Int               @default(100)
+  unlockedTheme       String            @default("PARCHMENT_WOOD")
+  createdAt           DateTime          @default(now())
+  updatedAt           DateTime          @updatedAt
+
+  keywords               TrackedKeyword[]
+  leads                  Lead[]
+  posts                  Post[]
+  billingSubscription    BillingSubscription?
+  checkoutIntents        CheckoutIntent[]
+  creditLedger           CreditLedgerEntry[]
+  durableJobs            DurableJob[]
+  scanSchedule           TenantScanSchedule?
+  scanRuns               ScanRun[]
+  crmDeliveries          CrmExportDelivery[]
+  accountDeletionRequest AccountDeletionRequest?
+
+  @@index([createdAt])
+}
+
+enum OnboardingSource {
+  REDDIT
+  X
+}
+
+model TrackedKeyword {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  phrase    String
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  leads            Lead[]
+  providerAttempts ProviderScanAttempt[]
+  leadMatches      LeadMatch[]
+
+  @@unique([userId, phrase])
+  @@index([userId, active])
+}
+
+enum LeadStatus {
+  NEW
+  VIEWED
+  CONTACTED
+  DISMISSED
+}
+
+model Lead {
+  id              String             @id @default(uuid())
+  userId          String
+  user            User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  keywordId       String
+  keyword         TrackedKeyword     @relation(fields: [keywordId], references: [id], onDelete: Cascade)
+  platform        String
+  externalPostId  String
+  author          String
+  content         String
+  matched         String
+  url             String
+  sourceCreatedAt DateTime?
+  observedAt      DateTime           @default(now())
+  status          LeadStatus         @default(NEW)
+  claimedAt       DateTime?
+  contactedAt     DateTime?
+  dismissedAt     DateTime?
+  crmExportedAt   DateTime?
+  createdAt       DateTime           @default(now())
+  crmDelivery     CrmExportDelivery?
+  matches         LeadMatch[]
+
+  @@unique([userId, externalPostId])
+  @@index([userId, status, createdAt])
+  @@index([keywordId])
+}
+
+model Post {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  content   String
+  createdAt DateTime @default(now())
+
+  @@index([userId, createdAt])
+}
+
+model BillingSubscription {
+  id                         String    @id @default(uuid())
+  userId                     String    @unique
+  user                       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  stripeCustomerId           String    @unique
+  stripeSubscriptionId       String?   @unique
+  stripePriceId              String?
+  plan                       String    @default("FREE")
+  status                     String    @default("inactive")
+  currentPeriodEnd           DateTime?
+  cancelAtPeriodEnd          Boolean   @default(false)
+  latestStripeEventCreatedAt DateTime?
+  createdAt                  DateTime  @default(now())
+  updatedAt                  DateTime  @updatedAt
+
+  @@index([status])
+}
+
+model CheckoutIntent {
+  id                      String   @id @default(uuid())
+  userId                  String
+  user                    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  kind                    String
+  sku                     String
+  expectedAmount          Int?
+  currency                String   @default("usd")
+  status                  String   @default("PENDING")
+  activeKey               String?  @unique
+  stripeCheckoutSessionId String?  @unique
+  stripeCheckoutUrl       String?
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
+
+  @@index([userId, createdAt])
+}
+
+model StripeWebhookEvent {
+  id              String    @id @default(uuid())
+  eventId         String    @unique
+  eventType       String
+  objectId        String?
+  livemode        Boolean
+  stripeCreatedAt DateTime
+  status          String    @default("PROCESSING")
+  attempts        Int       @default(1)
+  error           String?
+  processedAt     DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@index([status, createdAt])
+  @@map("ProcessedWebhook")
+}
+
+model CreditLedgerEntry {
+  id         String   @id @default(uuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  delta      Int
+  reason     String
+  sourceType String
+  sourceId   String
+  createdAt  DateTime @default(now())
+
+  @@unique([sourceType, sourceId])
+  @@index([userId, createdAt])
+}
+
+model DurableJob {
+  id              String             @id @default(uuid())
+  userId          String
+  user            User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  kind            String
+  status          String             @default("PENDING")
+  dedupeKey       String             @unique
+  scanRunId       String?            @unique
+  scanRun         ScanRun?           @relation(fields: [scanRunId], references: [id], onDelete: Cascade)
+  crmDeliveryId   String?            @unique
+  crmDelivery     CrmExportDelivery? @relation(fields: [crmDeliveryId], references: [id], onDelete: Cascade)
+  attempts        Int                @default(0)
+  maxAttempts     Int                @default(5)
+  nextAttemptAt   DateTime           @default(now())
+  leaseOwner      String?
+  leaseGeneration Int                @default(0)
+  leaseExpiresAt  DateTime?
+  lastErrorCode   String?
+  completedAt     DateTime?
+  deadAt          DateTime?
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+
+  @@index([status, nextAttemptAt, createdAt])
+  @@index([userId, status, nextAttemptAt])
+  @@index([leaseExpiresAt])
+}
+
+model TenantScanSchedule {
+  userId          String    @id
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  enabled         Boolean   @default(false)
+  nextDueAt       DateTime  @default(now())
+  lastEnqueuedAt  DateTime?
+  lastCompletedAt DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@index([enabled, nextDueAt, userId])
+}
+
+model ScanRun {
+  id                String                @id @default(uuid())
+  userId            String
+  user              User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  trigger           String
+  windowStartedAt   DateTime
+  activeKey         String?               @unique
+  status            String                @default("QUEUED")
+  providerSucceeded Boolean?
+  leadsCreated      Int                   @default(0)
+  lastErrorCode     String?
+  completedAt       DateTime?
+  createdAt         DateTime              @default(now())
+  updatedAt         DateTime              @updatedAt
+  durableJob        DurableJob?
+  providerAttempts  ProviderScanAttempt[]
+  leadMatches       LeadMatch[]
+
+  @@index([userId, createdAt])
+  @@index([status, createdAt])
+}
+
+model ProviderScanAttempt {
+  id               String          @id @default(uuid())
+  scanRunId        String
+  scanRun          ScanRun         @relation(fields: [scanRunId], references: [id], onDelete: Cascade)
+  keywordId        String?
+  keyword          TrackedKeyword? @relation(fields: [keywordId], references: [id], onDelete: SetNull)
+  keywordSnapshot  String
+  provider         String
+  requestedAt      DateTime
+  completedAt      DateTime?
+  outcome          String          @default("IN_PROGRESS")
+  httpStatusClass  Int?
+  resultCount      Int             @default(0)
+  insertedCount    Int             @default(0)
+  rateLimitResetAt DateTime?
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+  leadMatches      LeadMatch[]
+
+  @@unique([scanRunId, provider, keywordSnapshot])
+  @@index([scanRunId, provider, outcome])
+  @@index([keywordId])
+}
+
+model LeadMatch {
+  id                    String              @id @default(uuid())
+  leadId                String
+  lead                  Lead                @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  scanRunId             String
+  scanRun               ScanRun             @relation(fields: [scanRunId], references: [id], onDelete: Cascade)
+  providerScanAttemptId String
+  providerScanAttempt   ProviderScanAttempt @relation(fields: [providerScanAttemptId], references: [id], onDelete: Cascade)
+  keywordId             String?
+  keyword               TrackedKeyword?     @relation(fields: [keywordId], references: [id], onDelete: SetNull)
+  keywordSnapshot       String
+  matchedAt             DateTime            @default(now())
+
+  @@unique([leadId, providerScanAttemptId])
+  @@index([scanRunId, matchedAt])
+  @@index([keywordId])
+}
+
+model CrmExportDelivery {
+  id                     String      @id @default(uuid())
+  userId                 String
+  user                   User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  leadId                 String      @unique
+  lead                   Lead        @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  status                 String      @default("QUEUED")
+  payload                Json
+  destinationFingerprint String
+  responseStatus         Int?
+  deliveredAt            DateTime?
+  lastErrorCode          String?
+  createdAt              DateTime    @default(now())
+  updatedAt              DateTime    @updatedAt
+  durableJob             DurableJob?
+
+  @@index([userId, createdAt])
+  @@index([status, createdAt])
+}
+
+model ClerkWebhookEvent {
+  id        String   @id @default(uuid())
+  eventId   String   @unique
+  eventType String
+  createdAt DateTime @default(now())
+}
+
+model AccountDeletionRequest {
+  id                   String    @id @default(uuid())
+  subjectDigest        String    @unique
+  userId               String?   @unique
+  user                 User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+  source               String
+  status               String    @default("PENDING")
+  stripeCustomerId     String?
+  stripeSubscriptionId String?
+  attempts             Int       @default(0)
+  maxAttempts          Int       @default(8)
+  availableAt          DateTime  @default(now())
+  leaseToken           String?
+  leaseExpiresAt       DateTime?
+  lastErrorCode        String?
+  completedAt          DateTime?
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+
+  @@index([status, availableAt])
+  @@index([leaseExpiresAt])
+  @@index([stripeCustomerId])
+}
+
+model AccountDeletionAudit {
+  id                     String   @id @default(uuid())
+  requestId              String   @unique
+  subjectDigest          String   @unique
+  stripeCustomerDigest   String?  @unique
+  source                 String
+  resultCode             String
+  userRowsDeleted        Int
+  keywordRowsDeleted     Int
+  leadRowsDeleted        Int
+  postRowsDeleted        Int
+  checkoutRowsDeleted    Int
+  ledgerRowsDeleted      Int
+  billingRowsDeleted     Int      @default(0)
+  durableJobRowsDeleted  Int      @default(0)
+  scanRunRowsDeleted     Int      @default(0)
+  crmDeliveryRowsDeleted Int      @default(0)
+  completedAt            DateTime
+  createdAt              DateTime @default(now())
+}
+
+model OperationalHeartbeat {
+  id              String    @id
+  lastStartedAt   DateTime
+  lastSucceededAt DateTime?
+  lastErrorCode   String?
+  updatedAt       DateTime  @updatedAt
+}

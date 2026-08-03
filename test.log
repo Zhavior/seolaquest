@@ -1,0 +1,2397 @@
+
+[1m[30m[46m RUN [49m[39m[22m [36mv4.1.10 [39m[90m/Users/boydsantos/Desktop/hypequest[39m
+
+ [31m❯[39m features/deliveries/__tests__/queries.test.ts [2m([22m[2m3 tests[22m[2m | [22m[31m1 failed[39m[2m)[22m[32m 26[2mms[22m[39m
+[31m     [31m×[31m lists only the current tenant and selects only customer-safe fields[39m[32m 17[2mms[22m[39m
+     [32m✓[39m loads detail through both delivery ID and current tenant[32m 2[2mms[22m[39m
+     [32m✓[39m authenticates before rejecting an invalid delivery ID[32m 2[2mms[22m[39m
+ [31m❯[39m features/scans/__tests__/queries.test.ts [2m([22m[2m4 tests[22m[2m | [22m[31m1 failed[39m[2m)[22m[32m 24[2mms[22m[39m
+[31m     [31m×[31m lists only the current tenant and selects only customer-safe scan fields[39m[32m 14[2mms[22m[39m
+     [32m✓[39m loads detail through the tenant-scoped ScanRunService contract and metadata lookup[32m 6[2mms[22m[39m
+     [32m✓[39m authenticates before rejecting an invalid run ID[32m 1[2mms[22m[39m
+     [32m✓[39m returns the same null result for a missing or other-tenant run[32m 1[2mms[22m[39m
+ [31m❯[39m features/dashboard/hooks/__tests__/useDashboardState.test.ts [2m([22m[2m6 tests[22m[2m | [22m[31m1 failed[39m[2m)[22m[32m 88[2mms[22m[39m
+     [32m✓[39m initializes with provided user and leads[32m 25[2mms[22m[39m
+     [32m✓[39m filters leads by platform[32m 6[2mms[22m[39m
+     [32m✓[39m keeps an empty tenant dashboard empty[32m 7[2mms[22m[39m
+     [32m✓[39m handles bounty claiming and updates XP[32m 10[2mms[22m[39m
+     [32m✓[39m uses the persisted keyword ID so a new keyword can be deleted immediately[32m 14[2mms[22m[39m
+[31m     [31m×[31m reports only the server-confirmed scanner outcome[39m[32m 24[2mms[22m[39m
+ [31m❯[39m components/SkipLink.test.tsx [2m([22m[2m2 tests[22m[2m | [22m[31m1 failed[39m[2m)[22m[33m 431[2mms[22m[39m
+     [33m[2m✓[22m[39m is the first keyboard stop and targets the shared content container [33m 406[2mms[22m[39m
+[31m     [31m×[31m passes the user reduced-motion preference to Framer Motion descendants[39m[32m 20[2mms[22m[39m
+ [31m❯[39m features/landing/components/LandingNav.test.tsx [2m([22m[2m3 tests[22m[2m | [22m[31m3 failed[39m[2m)[22m[33m 688[2mms[22m[39m
+[31m     [31m×[31m keeps visitor authentication actions present with 44px targets below 640px[39m[33m 479[2mms[22m[39m
+[31m     [31m×[31m gives the sound control a non-hover interaction and explicit state[39m[32m 95[2mms[22m[39m
+[31m     [31m×[31m keeps authenticated actions touch-sized too[39m[32m 82[2mms[22m[39m
+ [31m❯[39m app/app/layout.test.tsx [2m([22m[2m2 tests[22m[2m | [22m[31m2 failed[39m[2m)[22m[32m 52[2mms[22m[39m
+[31m     [31m×[31m owns exactly one sidebar shell and one main landmark[39m[32m 38[2mms[22m[39m
+[31m     [31m×[31m keeps document scrolling as the single page scroll owner and offsets the safe-area header[39m[32m 8[2mms[22m[39m
+ [31m❯[39m app/(app)/onboarding/OnboardingForm.test.tsx [2m([22m[2m4 tests[22m[2m | [22m[31m4 failed[39m[2m)[22m[33m 3927[2mms[22m[39m
+[31m     [31m×[31m shows obvious account controls and saves before moving forward[39m[33m 1750[2mms[22m[39m
+[31m     [31m×[31m offers skip only on optional context and supports back navigation[39m[33m 800[2mms[22m[39m
+[31m     [31m×[31m states the exact cost boundary and navigates with the returned database ID[39m[32m 66[2mms[22m[39m
+[31m     [31m×[31m offers a safe sign-in return link if the session expires[39m[33m 1306[2mms[22m[39m
+ [32m✓[39m features/profile/components/ProfileCodex.test.tsx [2m([22m[2m2 tests[22m[2m)[22m[33m 1026[2mms[22m[39m
+     [33m[2m✓[22m[39m gives every action a target at least 44 CSS pixels high [33m 855[2mms[22m[39m
+ [32m✓[39m features/settings/__tests__/DangerZoneCard.test.tsx [2m([22m[2m3 tests[22m[2m)[22m[33m 1470[2mms[22m[39m
+     [33m[2m✓[22m[39m opens an accessible confirmation, initially focuses the phrase, and restores the opener [33m 829[2mms[22m[39m
+     [33m[2m✓[22m[39m requires and submits the exact destructive phrase [33m 451[2mms[22m[39m
+ [32m✓[39m components/AccessibleDialog.test.tsx [2m([22m[2m4 tests[22m[2m)[22m[33m 1909[2mms[22m[39m
+     [33m[2m✓[22m[39m applies dialog semantics, initial focus, a focus trap, and body scroll containment [33m 877[2mms[22m[39m
+     [33m[2m✓[22m[39m closes from the backdrop only when the consumer marks that action safe [33m 703[2mms[22m[39m
+ [32m✓[39m components/Sidebar.test.tsx [2m([22m[2m6 tests[22m[2m)[22m[33m 2927[2mms[22m[39m
+     [33m[2m✓[22m[39m does not mount the mobile drawer while closed and exposes explicit control state [33m 785[2mms[22m[39m
+     [33m[2m✓[22m[39m moves focus into the drawer and contains Tab focus at both boundaries [33m 323[2mms[22m[39m
+     [33m[2m✓[22m[39m closes for route selection and backdrop activation [33m 974[2mms[22m[39m
+ [32m✓[39m features/settings/__tests__/SettingsClient.test.tsx [2m([22m[2m3 tests[22m[2m)[22m[33m 2063[2mms[22m[39m
+     [33m[2m✓[22m[39m renders settings fields with initial values [33m 311[2mms[22m[39m
+     [33m[2m✓[22m[39m allows updating input values [33m 692[2mms[22m[39m
+     [33m[2m✓[22m[39m opens Guild Laws modal when clicking FAQ button [33m 1056[2mms[22m[39m
+ [32m✓[39m components/QuickStrikeReplyModal.test.tsx [2m([22m[2m1 test[22m[2m)[22m[33m 912[2mms[22m[39m
+     [33m[2m✓[22m[39m makes clear that confirming does not send a reply [33m 907[2mms[22m[39m
+ [32m✓[39m features/billing/components/BillingPageClient.test.tsx [2m([22m[2m2 tests[22m[2m)[22m[33m 4140[2mms[22m[39m
+     [33m[2m✓[22m[39m renders gamified UI with provided server model data [33m 3883[2mms[22m[39m
+ [32m✓[39m components/BountyCard.test.tsx [2m([22m[2m3 tests[22m[2m)[22m[33m 766[2mms[22m[39m
+     [33m[2m✓[22m[39m labels the record as a source match without derived intent, engagement, rewards, or qualification [33m 527[2mms[22m[39m
+ [32m✓[39m features/settings/components/GuildLawsModal.test.tsx [2m([22m[2m1 test[22m[2m)[22m[33m 792[2mms[22m[39m
+     [33m[2m✓[22m[39m keeps closed laws out of the DOM and exposes labelled terms when open [33m 789[2mms[22m[39m
+ [32m✓[39m features/deliveries/__tests__/DeliveryDetail.test.tsx [2m([22m[2m2 tests[22m[2m)[22m[33m 1039[2mms[22m[39m
+     [33m[2m✓[22m[39m does not render retry while a delivery is queued [33m 348[2mms[22m[39m
+     [33m[2m✓[22m[39m renders retry only for a backend-retryable dead delivery [33m 686[2mms[22m[39m
+ [32m✓[39m components/ManaShopModal.test.tsx [2m([22m[2m1 test[22m[2m)[22m[33m 932[2mms[22m[39m
+     [33m[2m✓[22m[39m exposes the verified shop status as an accessible dialog [33m 930[2mms[22m[39m
+ [32m✓[39m features/profile/components/ProfileInventory.test.tsx [2m([22m[2m1 test[22m[2m)[22m[33m 1629[2mms[22m[39m
+     [33m[2m✓[22m[39m presents inventory as truthful noninteractive list items [33m 1626[2mms[22m[39m
+ [32m✓[39m app/sign-in/[[...sign-in]]/page.test.tsx [2m([22m[2m1 test[22m[2m)[22m[33m 1662[2mms[22m[39m
+     [33m[2m✓[22m[39m uses CoQuest branding and a safe onboarding fallback [33m 1636[2mms[22m[39m
+ [32m✓[39m features/dashboard/components/DashboardScannerModal.test.tsx [2m([22m[2m1 test[22m[2m)[22m[33m 1384[2mms[22m[39m
+     [33m[2m✓[22m[39m labels queued scan status and focuses its close control [33m 1346[2mms[22m[39m
+ [32m✓[39m features/settings/components/FeedbackScrollModal.test.tsx [2m([22m[2m1 test[22m[2m)[22m[33m 1233[2mms[22m[39m
+     [33m[2m✓[22m[39m has no hidden controls and truthfully describes the unavailable destination when open [33m 1224[2mms[22m[39m
+ [32m✓[39m features/guild/components/HunterStatModal.test.tsx [2m([22m[2m1 test[22m[2m)[22m[33m 1246[2mms[22m[39m
+     [33m[2m✓[22m[39m is absent without a hunter and exposes full dialog behavior when mounted [33m 1236[2mms[22m[39m
+ [32m✓[39m features/profile/components/ProfileQuestBoard.test.tsx [2m([22m[2m1 test[22m[2m)[22m[33m 1240[2mms[22m[39m
+     [33m[2m✓[22m[39m uses named controls and a keyboard-operable task toggle [33m 1236[2mms[22m[39m
+ [32m✓[39m app/sign-up/[[...sign-up]]/page.test.tsx [2m([22m[2m1 test[22m[2m)[22m[33m 882[2mms[22m[39m
+     [33m[2m✓[22m[39m uses CoQuest branding and sends new accounts to onboarding [33m 863[2mms[22m[39m
+ [32m✓[39m components/__tests__/LowManaToast.test.tsx [2m([22m[2m5 tests[22m[2m)[22m[33m 1594[2mms[22m[39m
+     [33m[2m✓[22m[39m renders critical mana warning when credits are low (<= 15%) [33m 343[2mms[22m[39m
+     [33m[2m✓[22m[39m calls onOpenShop when Refill button is clicked [33m 807[2mms[22m[39m
+ [32m✓[39m features/keys/components/MintKeyModal.test.tsx [2m([22m[2m1 test[22m[2m)[22m[33m 2982[2mms[22m[39m
+     [33m[2m✓[22m[39m renders no focusable content while closed and describes the unavailable state when open [33m 2933[2mms[22m[39m
+ [32m✓[39m features/settings/components/BugReportModal.test.tsx [2m([22m[2m1 test[22m[2m)[22m[33m 2201[2mms[22m[39m
+     [33m[2m✓[22m[39m has no hidden controls and truthfully describes the unavailable destination when open [33m 2129[2mms[22m[39m
+ [32m✓[39m app/(app)/billing/page.test.tsx [2m([22m[2m2 tests[22m[2m)[22m[33m 491[2mms[22m[39m
+     [33m[2m✓[22m[39m passes checkout return parameters to the server-owned view model [33m 407[2mms[22m[39m
+ [32m✓[39m features/dashboard/components/DashboardKeywords.test.tsx [2m([22m[2m1 test[22m[2m)[22m[33m 2659[2mms[22m[39m
+     [33m[2m✓[22m[39m names keyword controls and exposes removal without hover [33m 2624[2mms[22m[39m
+ [32m✓[39m features/profile/hooks/__tests__/useSettingsForm.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 155[2mms[22m[39m
+ [32m✓[39m app/(app)/layout.test.tsx [2m([22m[2m1 test[22m[2m)[22m[33m 908[2mms[22m[39m
+     [33m[2m✓[22m[39m does not add a duplicate shell or main landmark [33m 901[2mms[22m[39m
+ [32m✓[39m features/scans/__tests__/ScanStatusBadge.test.tsx [2m([22m[2m8 tests[22m[2m)[22m[33m 799[2mms[22m[39m
+ [32m✓[39m src/modules/core/security/AiUsageLimiter.test.ts [2m([22m[2m3 tests[22m[2m)[22m[33m 557[2mms[22m[39m
+     [33m[2m✓[22m[39m fails closed when distributed limiter configuration is incomplete [33m 446[2mms[22m[39m
+ [32m✓[39m src/modules/core/infrastructure/logger.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 4[2mms[22m[39m
+ [32m✓[39m src/modules/lifecycle/application/AccountDeletionWorker.test.ts [2m([22m[2m11 tests[22m[2m)[22m[32m 45[2mms[22m[39m
+ [32m✓[39m src/modules/lifecycle/application/DeletionBillingBarrier.test.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 35[2mms[22m[39m
+ [32m✓[39m features/dashboard/components/DashboardLeaderboard.test.tsx [2m([22m[2m1 test[22m[2m)[22m[32m 244[2mms[22m[39m
+ [32m✓[39m features/guild/hooks/__tests__/useGuildState.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 85[2mms[22m[39m
+ [32m✓[39m features/guild/hooks/__tests__/useFeedbackForm.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 106[2mms[22m[39m
+ [32m✓[39m app/api/v1/cron/jobs/route.test.ts [2m([22m[2m13 tests[22m[2m)[22m[32m 170[2mms[22m[39m
+ [32m✓[39m src/modules/billing/application/WebhookService.test.ts [2m([22m[2m15 tests[22m[2m)[22m[32m 69[2mms[22m[39m
+ [32m✓[39m app/api/v1/scan/route.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 21[2mms[22m[39m
+ [32m✓[39m app/api/v1/webhooks/clerk/route.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 38[2mms[22m[39m
+ [32m✓[39m app/api/v1/scans/[id]/route.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 142[2mms[22m[39m
+ [32m✓[39m features/scans/__tests__/scanView.test.ts [2m([22m[2m12 tests[22m[2m)[22m[32m 114[2mms[22m[39m
+ [32m✓[39m app/api/v1/crm-deliveries/[id]/route.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 31[2mms[22m[39m
+ [32m✓[39m src/modules/core/security/crmWebhookRequest.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 44[2mms[22m[39m
+ [32m✓[39m features/billing/viewModel.test.ts [2m([22m[2m12 tests[22m[2m)[22m[32m 68[2mms[22m[39m
+ [32m✓[39m src/modules/keywords/application/KeywordService.test.ts [2m([22m[2m9 tests[22m[2m)[22m[32m 37[2mms[22m[39m
+ [32m✓[39m src/modules/leads/application/LeadService.test.ts [2m([22m[2m13 tests[22m[2m)[22m[32m 159[2mms[22m[39m
+ [32m✓[39m app/api/v1/webhooks/stripe/route.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 62[2mms[22m[39m
+ [32m✓[39m src/modules/core/jobs/JobWorkerService.test.ts [2m([22m[2m15 tests[22m[2m)[22m[32m 48[2mms[22m[39m
+ [32m✓[39m features/deliveries/__tests__/deliveryView.test.ts [2m([22m[2m10 tests[22m[2m)[22m[32m 117[2mms[22m[39m
+ [32m✓[39m src/modules/leads/application/ScanProviderService.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 149[2mms[22m[39m
+ [32m✓[39m src/modules/lifecycle/domain/accountDeletion.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 177[2mms[22m[39m
+ [32m✓[39m features/dashboard/actions.test.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 10[2mms[22m[39m
+ [32m✓[39m app/api/v1/health/ready/route.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 4[2mms[22m[39m
+ [32m✓[39m src/modules/leads/application/CrmDeliveryService.test.ts [2m([22m[2m8 tests[22m[2m)[22m[32m 115[2mms[22m[39m
+ [32m✓[39m src/modules/lifecycle/application/AccountDeletionService.test.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 24[2mms[22m[39m
+ [32m✓[39m features/profile/actions.test.ts [2m([22m[2m11 tests[22m[2m)[22m[32m 31[2mms[22m[39m
+ [32m✓[39m features/billing/actions.test.ts [2m([22m[2m15 tests[22m[2m)[22m[32m 19[2mms[22m[39m
+ [32m✓[39m src/modules/core/infrastructure/api-handler.test.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 18[2mms[22m[39m
+ [32m✓[39m features/auth/actions.test.ts [2m([22m[2m9 tests[22m[2m)[22m[32m 62[2mms[22m[39m
+ [32m✓[39m src/modules/operations/application/OperationalHealthService.test.ts [2m([22m[2m11 tests[22m[2m)[22m[32m 72[2mms[22m[39m
+ [32m✓[39m src/modules/core/security/crmWebhookUrl.test.ts [2m([22m[2m19 tests[22m[2m)[22m[32m 116[2mms[22m[39m
+ [32m✓[39m src/modules/leads/application/ScanRunService.test.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 72[2mms[22m[39m
+ [32m✓[39m app/api/v1/blog/generate/route.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 84[2mms[22m[39m
+ [32m✓[39m proxy.test.ts [2m([22m[2m39 tests[22m[2m)[22m[32m 140[2mms[22m[39m
+ [32m✓[39m src/modules/users/application/UserService.test.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 56[2mms[22m[39m
+ [32m✓[39m src/modules/operations/application/OperationalHeartbeatService.test.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 22[2mms[22m[39m
+ [32m✓[39m src/modules/billing/infrastructure/stripeEnvironment.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 6[2mms[22m[39m
+ [32m✓[39m src/modules/billing/domain/catalog.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 46[2mms[22m[39m
+ [32m✓[39m src/modules/analytics/application/AnalyticsService.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 19[2mms[22m[39m
+ [32m✓[39m src/modules/billing/domain/webhookValidation.test.ts [2m([22m[2m19 tests[22m[2m)[22m[32m 15[2mms[22m[39m
+ [32m✓[39m src/modules/leads/application/ScanSchedulerService.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 30[2mms[22m[39m
+ [32m✓[39m lib/auth.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 31[2mms[22m[39m
+ [32m✓[39m src/modules/leads/domain/providerTruth.test.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 103[2mms[22m[39m
+ [32m✓[39m features/auth/onboarding.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 9[2mms[22m[39m
+ [32m✓[39m src/modules/billing/application/CreditService.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 13[2mms[22m[39m
+ [32m✓[39m src/modules/billing/domain/entitlements.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 14[2mms[22m[39m
+ [32m✓[39m features/deliveries/__tests__/actions.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 108[2mms[22m[39m
+ [32m✓[39m src/modules/core/jobs/DurableJobRepository.test.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 11[2mms[22m[39m
+ [32m✓[39m app/api/v1/user/me/route.test.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 48[2mms[22m[39m
+ [32m✓[39m src/modules/leads/application/ScanReconciliationService.test.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 12[2mms[22m[39m
+ [32m✓[39m src/modules/core/jobs/databaseClock.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 8[2mms[22m[39m
+ [32m✓[39m src/modules/feedback/application/FeedbackService.test.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 9[2mms[22m[39m
+ [32m✓[39m app/(app)/onboarding/page.test.tsx [2m([22m[2m3 tests[22m[2m)[22m[32m 9[2mms[22m[39m
+ [32m✓[39m src/modules/billing/application/BillingService.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 34[2mms[22m[39m
+ [32m✓[39m src/modules/core/security/machineBearer.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 27[2mms[22m[39m
+ [2m[90m↓[39m[22m src/modules/lifecycle/application/DeletionBillingRace.integration.test.ts [2m([22m[2m3 tests[22m[2m | [22m[33m3 skipped[39m[2m)[22m
+ [2m[90m↓[39m[22m src/modules/billing/application/CreditService.integration.test.ts [2m([22m[2m4 tests[22m[2m | [22m[33m4 skipped[39m[2m)[22m
+ [2m[90m↓[39m[22m src/modules/operations/application/Phase45.integration.test.ts [2m([22m[2m6 tests[22m[2m | [22m[33m6 skipped[39m[2m)[22m
+
+[31m⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 13 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m components/SkipLink.test.tsx[2m > [22mSkipLink[2m > [22mpasses the user reduced-motion preference to Framer Motion descendants
+[31m[1mError[22m: Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: undefined. You likely forgot to export your component from the file it's defined in, or you might have mixed up default and named imports.[39m
+[90m [2m❯[22m createFiberFromTypeAndProps node_modules/react-dom/cjs/react-dom-client.development.js:[2m5021:28[22m[39m
+[90m [2m❯[22m createFiberFromElement node_modules/react-dom/cjs/react-dom-client.development.js:[2m5035:14[22m[39m
+[90m [2m❯[22m reconcileChildFibersImpl node_modules/react-dom/cjs/react-dom-client.development.js:[2m6920:31[22m[39m
+[90m [2m❯[22m node_modules/react-dom/cjs/react-dom-client.development.js:[2m7098:33[22m[39m
+[90m [2m❯[22m reconcileChildren node_modules/react-dom/cjs/react-dom-client.development.js:[2m9702:13[22m[39m
+[90m [2m❯[22m beginWork node_modules/react-dom/cjs/react-dom-client.development.js:[2m11899:15[22m[39m
+[90m [2m❯[22m runWithFiberInDEV node_modules/react-dom/cjs/react-dom-client.development.js:[2m874:13[22m[39m
+[90m [2m❯[22m performUnitOfWork node_modules/react-dom/cjs/react-dom-client.development.js:[2m17641:22[22m[39m
+[90m [2m❯[22m workLoopSync node_modules/react-dom/cjs/react-dom-client.development.js:[2m17469:41[22m[39m
+[90m [2m❯[22m renderRootSync node_modules/react-dom/cjs/react-dom-client.development.js:[2m17450:11[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/13]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m app/app/layout.test.tsx[2m > [22mauthenticated app layout on mobile[2m > [22mowns exactly one sidebar shell and one main landmark
+[41m[1m FAIL [22m[49m app/app/layout.test.tsx[2m > [22mauthenticated app layout on mobile[2m > [22mkeeps document scrolling as the single page scroll owner and offsets the safe-area header
+[31m[1mError[22m: [vitest] No "useRouter" export is defined on the "next/navigation" mock. Did you forget to return it from "vi.mock"?
+If you need to partially mock a module, you can use "importOriginal" helper inside:
+[39m
+vi.mock(import("next/navigation"), async (importOriginal) => {
+  const actual = await importOriginal()
+  return {
+    ...actual,
+    // your mocked methods
+  }
+})
+
+[90m [2m❯[22m NextClientClerkProvider node_modules/@clerk/nextjs/src/app-router/client/ClerkProvider.tsx:[2m29:18[22m[39m
+[90m [2m❯[22m Object.react_stack_bottom_frame node_modules/react-dom/cjs/react-dom-client.development.js:[2m25904:20[22m[39m
+[90m [2m❯[22m renderWithHooks node_modules/react-dom/cjs/react-dom-client.development.js:[2m7662:22[22m[39m
+[90m [2m❯[22m updateFunctionComponent node_modules/react-dom/cjs/react-dom-client.development.js:[2m10166:19[22m[39m
+[90m [2m❯[22m beginWork node_modules/react-dom/cjs/react-dom-client.development.js:[2m11778:18[22m[39m
+[90m [2m❯[22m runWithFiberInDEV node_modules/react-dom/cjs/react-dom-client.development.js:[2m874:13[22m[39m
+[90m [2m❯[22m performUnitOfWork node_modules/react-dom/cjs/react-dom-client.development.js:[2m17641:22[22m[39m
+[90m [2m❯[22m workLoopSync node_modules/react-dom/cjs/react-dom-client.development.js:[2m17469:41[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/13]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m app/(app)/onboarding/OnboardingForm.test.tsx[2m > [22mOnboardingForm[2m > [22mshows obvious account controls and saves before moving forward
+[31m[1mTestingLibraryElementError[22m[39m: Unable to find role="heading" and name `/who or what are you hunting for/i`
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"min-h-screen bg-[#F4F0EA] px-4 py-6 sm:px-6 sm:py-10"[39m
+    [36m>[39m
+      [36m<header[39m
+        [33mclass[39m=[32m"mx-auto mb-6 flex w-full max-w-3xl items-center justify-between gap-4"[39m
+      [36m>[39m
+        [36m<a[39m
+          [33mclass[39m=[32m"inline-flex min-h-11 items-center text-xl font-black uppercase tracking-widest underline-offset-4 hover:underline focus-visible:outline-4 focus-visible:outline-offset-4"[39m
+          [33mhref[39m=[32m"/"[39m
+        [36m>[39m
+          [0mCoQuest[0m
+        [36m</a>[39m
+        [36m<button[39m
+          [33mclass[39m=[32m"min-h-11 border-3 border-black bg-white px-3 py-2 text-sm font-black uppercase shadow-[3px_3px_0_0_#000] focus-visible:outline-4 focus-visible:outline-offset-4"[39m
+          [33mtype[39m=[32m"button"[39m
+        [36m>[39m
+          [0mSign out[0m
+        [36m</button>[39m
+      [36m</header>[39m
+      [36m<main[39m
+        [33mclass[39m=[32m"mx-auto w-full max-w-3xl border-4 border-black bg-white p-5 shadow-[8px_8px_0_0_#000] sm:p-8"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"inline-flex items-center gap-2 border-3 border-black bg-[#A3E635] px-3 py-2 text-sm font-black uppercase"[39m
+        [36m>[39m
+          [36m<svg[39m
+            [33maria-hidden[39m=[32m"true"[39m
+            [33mclass[39m=[32m"lucide lucide-sparkles"[39m
+            [33mfill[39m=[32m"none"[39m
+            [33mheight[39m=[32m"18"[39m
+            [33mstroke[39m=[32m"currentColor"[39m
+            [33mstroke-linecap[39m=[32m"round"[39m
+            [33mstroke-linejoin[39m=[32m"round"[39m
+            [33mstroke-width[39m=[32m"2"[39m
+            [33mviewBox[39m=[32m"0 0 24 24"[39m
+            [33mwidth[39m=[32m"18"[39m
+            [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+          [36m>[39m
+            [36m<path[39m
+              [33md[39m=[32m"M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z"[39m
+            [36m/>[39m
+            [36m<path[39m
+              [33md[39m=[32m"M20 2v4"[39m
+            [36m/>[39m
+            [36m<path[39m
+              [33md[39m=[32m"M22 4h-4"[39m
+            [36m/>[39m
+            [36m<circle[39m
+              [33mcx[39m=[32m"4"[39m
+              [33mcy[39m=[32m"20"[39m
+              [33mr[39m=[32m"2"[39m
+            [36m/>[39m
+          [36m</svg>[39m
+          [0m First-value setup[0m
+        [36m</div>[39m
+        [36m<h1[39m
+          [33mclass[39m=[32m"mt-5 text-3xl font-black uppercase sm:text-4xl"[39m
+        [36m>[39m
+          [0mSet up your first real hunt[0m
+        [36m</h1>[39m
+        [36m<p[39m
+          [33mclass[39m=[32m"mt-2 max-w-2xl font-bold text-gray-700"[39m
+        [36m>[39m
+          [0mEach completed step is saved to your account. You can close this page and resume later.[0m
+        [36m</p>[39m
+        [36m<ol[39m
+          [33maria-label[39m=[32m"Onboarding progress"[39m
+          [33mclass[39m=[32m"mt-6 grid grid-cols-3 gap-2 sm:grid-cols-6"[39m
+        [36m>[39m
+          [36m<li[39m
+            [33mclass[39m=[32m"border-3 p-2 text-center text-xs font-black uppercase border-black bg-[#A3E635]"[39m
+          [36m>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"block"[39m
+            [36m>[39m
+              [0m1[0m
+            [36m</span>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"block truncate"[39m
+            [36m>[39m
+              [0mIdentity[0m
+            [36m</span>[39m
+          [36m</li>[39m
+          [36m<li[39m
+            [33mclass[39m=[32m"border-3 p-2 text-center text-xs font-black uppercase border-black bg-[#FDE68A]"[39m
+          [36m>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"block"[39m
+            [36m>[39m
+              [0m2[0m
+            [36m</span>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"block truncate"[39m
+            [36m>[39m
+              [0mBusiness[0m
+            [36m</span>[39m
+          [36m</li>[39m
+          [36m<li[39m
+            [33mclass[39m=[32m"border-3 p-2 text-center text-xs font-black uppercase border-black bg-[#F4F0EA]"[39m
+          [36m>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"block"[39m
+            [36m>[39m
+              [0m3[0m
+            [36m</span>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"block truncate"[39m
+            [36m>[39m
+              [0mCustomer[0m
+            [36m</span>[39m
+          [36m</li>[39m
+          [36m<li[39m
+            [33mclass[39m=[32m"border-3 p-2 text-center text-xs font-black uppercase border-black bg-[#F4F0EA]"[39m
+          [36m>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"block"[39m
+            [36m>[39m
+              [0m4[0m
+            [36m</span>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"block truncate"[39m
+            [36m>[39m
+              [0mKeyword[0m
+            [36m</span>[39m
+          [36m</li>[39m
+          [36m<li[39m
+            [33mclass[39m=[32m"border-3 p-2 text-center text-xs font-black uppercase border-black bg-[#F4F0EA]"[39m
+          [36m>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"block"[39m
+            [36m>[39m
+              [0m5[0m
+            [36m</span>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"block truncate"[39m
+            [36m>[39m
+              [0mSource[0m
+            [36m</span>[39m
+          [36m</li>[39m
+          [36m<li[39m
+            [33mclass[39m=[32m"border-3 p-2 text-center text-xs font-black uppercase border-black bg-[#F4F0EA]"[39m
+          [36m>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"block"[39m
+            [36m>[39m
+              [0m6[0m
+            [36m</span>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"block truncate"[39m
+            [36m>[39m
+              [0mReview[0m
+            [36m</span>[39m
+          [36m</li>[39m
+        [36m</ol>[39m
+        [36m<form[39m
+          [33mclass[39m=[32m"mt-6"[39m
+        [36m>[39m
+          [36m<section[39m
+            [33mclass[39m=[32m"border-3 border-black bg-white p-4 sm:p-5"[39m
+          [36m>[39m
+            [36m<h2[39m
+              [33mclass[39m=[32m"text-2xl font-black uppercase focus:outline-none"[39m
+              [33mtabindex[39m=[32m"-1"[39m
+            [36m>[39m
+              [0mWhat do you sell or help with?[0m
+            [36m</h2>[39m
+            [36m<p[39m
+              [33mclass[39m=[32m"mt-2 max-w-2xl font-bold text-gray-700"[39m
+            [36m>[39m
+              [0mKeep it plain. One short paragraph is enough to personalize the hunt.[0m
+            [36m</p>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"mt-5"[39m
+            [36m>[39m
+              [36m<label[39m
+                [33mclass[39m=[32m"block font-black uppercase"[39m
+                [33mfor[39m=[32m"business-description"[39m
+              [36m>[39m
+                [0mBusiness or product[0m
+              [36m</label>[39m
+              [36m<textarea[39m
+                [33maria-invalid[39m=[32m"false"[39m
+                [33mclass[39m=[32m"mt-2 w-full border-3 border-black bg-[#F4F0EA] p-3 text-base font-bold focus-visible:outline-4 focus-visible:outline-offset-2"[39m
+                [33mid[39m=[32m"business-description"[39m
+                [33mmaxlength[39m=[32m"500"[39m
+                [33mname[39m=[32m"businessDescription"[39m
+                [33mrows[39m=[32m"5"[39m
+              [36m>[39m
+                [0mAccessible websites[0m
+              [36m</textarea>[39m
+              [36m<button[39m
+                [33mclass[39m=[32m"mt-3 text-sm font-black uppercase underline underline-offset-4"[39m
+                [33mtype[39m=[32m"button"[39m
+              [36m>[39m
+                [0mSkip for now[0m
+              [36m</button>[39m
+            [36m</div>[39m
+          [36m</section>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"[39m
+          [36m>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"inline-flex min-h-11 items-center justify-center gap-2 border-3 border-black bg-white px-4 py-2 font-black uppercase shadow-[4px_4px_0_0_#000] disabled:cursor-not-allowed disabled:opacity-50"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33maria-hidden[39m=[32m"true"[39m
+                [33mclass[39m=[32m"lucide lucide-arrow-left"[39m
+                [33mfill[39m=[32m"none"[39m
+                [33mheight[39m=[32m"18"[39m
+                [33mstroke[39m=[32m"currentColor"[39m
+                [33mstroke-linecap[39m=[32m"round"[39m
+                [33mstroke-linejoin[39m=[32m"round"[39m
+                [33mstroke-width[39m=[32m"2"[39m
+                [33mviewBox[39m=[32m"0 0 24 24"[39m
+                [33mwidth[39m=[32m"18"[39m
+                [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+              [36m>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"m12 19-7-7 7-7"[39m
+                [36m/>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"M19 12H5"[39m
+                [36m/>[39m
+              [36m</svg>[39m
+              [0m Back[0m
+            [36m</button>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"inline-flex min-h-11 items-center justify-center gap-2 border-3 border-black bg-[#FDE68A] px-4 py-2 font-black uppercase shadow-[4px_4px_0_0_#000] disabled:cursor-not-allowed disabled:opacity-50"[39m
+              [33mtype[39m=[32m"submit"[39m
+            [36m>[39m
+              [0mContinue [0m
+              [36m<svg[39m
+                [33maria-hidden[39m=[32m"true"[39m
+                [33mclass[39m=[32m"lucide lucide-arrow-right"[39m
+                [33mfill[39m=[32m"none"[39m
+                [33mheight[39m=[32m"18"[39m
+                [33mstroke[39m=[32m"currentColor"[39m
+                [33mstroke-linecap[39m=[32m"round"[39m
+                [33mstroke-linejoin[39m=[32m"round"[39m
+                [33mstroke-width[39m=[32m"2"[39m
+                [33mviewBox[39m=[32m"0 0 24 24"[39m
+                [33mwidth[39m=[32m"18"[39m
+                [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+              [36m>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"M5 12h14"[39m
+                [36m/>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"m12 5 7 7-7 7"[39m
+                [36m/>[39m
+              [36m</svg>[39m
+            [36m</button>[39m
+          [36m</div>[39m
+        [36m</form>[39m
+      [36m</main>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"min-h-screen bg-[#F4F0EA] px-4 py-6 sm:px-6 sm:py-10"[39m
+    [36m>[39m
+      [36m<header[39m
+        [33mclass[39m=[32m"mx-auto mb-6 flex w-full max-w-3xl items-center justify-between gap-4"[39m
+      [36m>[39m
+        [36m<a[39m
+          [33mclass[39m=[32m"inline-flex min-h-11 items-center text-xl font-black uppercase tracking-widest underline-offset-4 hover:underline focus-visible:outline-4 focus-visible:outline-offset-4"[39m
+          [33mhref[39m=[32m"/"[39m
+        [36m>[39m
+          [0mCoQuest[0m
+        [36m</a>[39m
+        [36m<button[39m
+          [33mclass[39m=[32m"min-h-11 border-3 border-black bg-white px-3 py-2 text-sm font-black uppercase shadow-[3px_3px_0_0_#000] focus-visible:outline-4 focus-visible:outline-offset-4"[39m
+          [33mtype[39m=[32m"button"[39m
+        [36m>[39m
+          [0mSign out[0m
+        [36m</button>[39m
+      [36m</header>[39m
+      [36m<main[39m
+        [33mclass[39m=[32m"mx-auto w-full max-w-3xl border-4 border-black bg-white p-5 shadow-[8px_8px_0_0_#000] sm:p-8"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"inline-flex items-center gap-2 border-3 border-black bg-[#A3E635] px-3 py-2 text-sm font-black uppercase"[39m
+        [36m>[39m
+          [36m<svg[39m
+            [33maria-hidden[39m=[32m"true"[39m
+            [33mclass[39m=[32m"lucide lucide-sparkles"[39m
+            [33mfill[39m=[32m"none"[39m
+            [33mheight[39m=[32m"18"[39m
+            [33mstroke[39m=[32m"currentColor"[39m
+            [33mstroke-linecap[39m=[32m"round"[39m
+            [33mstroke-linejoin[39m=[32m"round"[39m
+            [33mstroke-width[39m=[32m"2"[39m
+            [33mviewBox[39m=[32m"0 0 24 24"[39m
+            [33mwidth[39m=[32m"18"[39m
+            [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+          [36m>[39m
+            [36m<path[39m
+              [33md[39m=[32m"M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z"[39m
+            [36m/>[39m
+            [36m<path[39m
+              [33md[39m=[32m"M20 2v4"[39m
+            [36m/>[39m
+            [36m<path[39m
+              [33md[39m=[32m"M22 4h-4"[39m
+            [36m/>[39m
+            [36m<circle[39m
+              [33mcx[39m=[32m"4"[39m
+              [33mcy[39m=[32m"20"[39m
+              [33mr[39m=[32m"2"[39m
+            [36m/>[39m
+          [36m</svg>[39m
+          [0m First-value setup[0m
+        [36m</div>[39m
+        [36m<h1[39m
+          [33mclass[39m=[32m"mt-5 text-3xl font-black uppercase sm:text-4xl"[39m
+        [36m>[39m
+          [0mSet up your first real hunt[0m
+        [36m</h1>[39m
+        [36m<p[39m
+          [33mclass[39m=[32m"mt-2 max-w-2xl font-bold text-gray-700"[39m
+        [36m>[39m
+          [0mEach completed step is saved to your account. You can close this page and resume later.[0m
+        [36m</p>[39m
+        [36m<ol[39m
+          [33maria-label[39m=[32m"Onboarding progress"[39m
+          [33mclass[39m=[32m"mt-6 grid grid-cols-3 gap-2 sm:grid-cols-6"[39m
+        [36m>[39m
+          [36m<li[39m
+            [33mclass[39m=[32m"border-3 p-2 text-center text-xs font-black uppercase border-black bg-[#A3E635]"[39m
+          [36m>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"block"[39m
+            [36m>[39m
+              [0m1[0m
+            [36m</span>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"block truncate"[39m
+            [36m>[39m
+              [0mIdentity[0m
+            [36m</span>[39m
+          [36m</li>[39m
+          [36m<li[39m
+            [33mclass[39m=[32m"border-3 p-2 text-center text-xs font-black uppercase border-black bg-[#FDE68A]"[39m
+          [36m>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"block"[39m
+            [36m>[39m
+              [0m2[0m
+            [36m</span>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"block truncate"[39m
+            [36m>[39m
+              [0mBusiness[0m
+            [36m</span>[39m
+          [36m</li>[39m
+          [36m<li[39m
+            [33mclass[39m=[32m"border-3 p-2 text-center text-xs font-black uppercase border-black bg-[#F4F0EA]"[39m
+          [36m>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"block"[39m
+            [36m>[39m
+              [0m3[0m
+            [36m</span>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"block truncate"[39m
+            [36m>[39m
+              [0mCustomer[0m
+            [36m</span>[39m
+          [36m</li>[39m
+          [36m<li[39m
+            [33mclass[39m=[32m"border-3 p-2 text-center text-xs font-black uppercase border-black bg-[#F4F0EA]"[39m
+          [36m>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"block"[39m
+            [36m>[39m
+              [0m4[0m
+            [36m</span>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"block truncate"[39m
+            [36m>[39m
+              [0mKeyword[0m
+            [36m</span>[39m
+          [36m</li>[39m
+          [36m<li[39m
+            [33mclass[39m=[32m"border-3 p-2 text-center text-xs font-black uppercase border-black bg-[#F4F0EA]"[39m
+          [36m>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"block"[39m
+            [36m>[39m
+              [0m5[0m
+            [36m</span>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"block truncate"[39m
+            [36m>[39m
+              [0mSource[0m
+            [36m</span>[39m
+          [36m</li>[39m
+          [36m<li[39m
+            [33mclass[39m=[32m"border-3 p-2 text-center text-xs font-black uppercase border-black bg-[#F4F0EA]"[39m
+          [36m>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"block"[39m
+            [36m>[39m
+              [0m6[0m
+            [36m</span>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"block truncate"[39m
+            [36m>[39m
+              [0mReview[0m
+            [36m</span>[39m
+          [36m</li>[39m
+        [36m</ol>[39m
+        [36m<form[39m
+          [33mclass[39m=[32m"mt-6"[39m
+        [36m>[39m
+          [36m<section[39m
+            [33mclass[39m=[32m"border-3 border-black bg-white p-4 sm:p-5"[39m
+          [36m>[39m
+            [36m<h2[39m
+              [33mclass[39m=[32m"text-2xl font-black uppercase focus:outline-none"[39m
+              [33mtabindex[39m=[32m"-1"[39m
+            [36m>[39m
+              [0mWhat do you sell or help with?[0m
+            [36m</h2>[39m
+            [36m<p[39m
+              [33mclass[39m=[32m"mt-2 max-w-2xl font-bold text-gray-700"[39m
+            [36m>[39m
+              [0mKeep it plain. One short paragraph is enough to personalize the hunt.[0m
+            [36m</p>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"mt-5"[39m
+            [36m>[39m
+              [36m<label[39m
+                [33mclass[39m=[32m"block font-black uppercase"[39m
+                [33mfor[39m=[32m"business-description"[39m
+              [36m>[39m
+                [0mBusiness or product[0m
+              [36m</label>[39m
+              [36m<textarea[39m
+                [33maria-invalid[39m=[32m"false"[39m
+                [33mclass[39m=[32m"mt-2 w-full border-3 border-black bg-[#F4F0EA] p-3 text-base font-bold focus-visible:outline-4 focus-visible:outline-offset-2"[39m
+                [33mid[39m=[32m"business-description"[39m
+                [33mmaxlength[39m=[32m"500"[39m
+                [33mname[39m=[32m"businessDescription"[39m
+                [33mrows[39m=[32m"5"[39m
+              [36m>[39m
+                [0mAccessible websites[0m
+              [36m</textarea>[39m
+              [36m<button[39m
+                [33mclass[39m=[32m"mt-3 text-sm font-black uppercase underline underline-offset-4"[39m
+                [33mtype[39m=[32m"button"[39m
+              [36m>[39m
+                [0mSkip for now[0m
+              [36m</button>[39m
+            [36m</div>[39m
+          [36m</section>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"[39m
+          [36m>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"inline-flex min-h-11 items-center justify-center gap-2 border-3 border-black bg-white px-4 py-2 font-black uppercase shadow-[4px_4px_0_0_#000] disabled:cursor-not-allowed disabled:opacity-50"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33maria-hidden[39m=[32m"true"[39m
+                [33mclass[39m=[32m"lucide lucide-arrow-left"[39m
+                [33mfill[39m=[32m"none"[39m
+                [33mheight[39m=[32m"18"[39m
+                [33mstroke[39m=[32m"currentColor"[39m
+                [33mstroke-linecap[39m=[32m"round"[39m
+                [33mstroke-linejoin[39m=[32m"round"[39m
+                [33mstroke-width[39m=[32m"2"[39m
+                [33mviewBox[39m=[32m"0 0 24 24"[39m
+                [33mwidth[39m=[32m"18"[39m
+                [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+              [36m>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"m12 19-7-7 7-7"[39m
+                [36m/>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"M19 12H5"[39m
+                [36m/>[39m
+              [36m</svg>[39m
+              [0m Back[0m
+            [36m</button>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"inline-flex min-h-11 items-center justify-center gap-2 border-3 border-black bg-[#FDE68A] px-4 py-2 font-black uppercase shadow-[4px_4px_0_0_#000] disabled:cursor-not-allowed disabled:opacity-50"[39m
+              [33mtype[39m=[32m"submit"[39m
+            [36m>[39m
+              [0mContinue [0m
+              [36m<svg[39m
+                [33maria-hidden[39m=[32m"true"[39m
+                [33mclass[39m=[32m"lucide lucide-arrow-right"[39m
+                [33mfill[39m=[32m"none"[39m
+                [33mheight[39m=[32m"18"[39m
+                [33mstroke[39m=[32m"currentColor"[39m
+                [33mstroke-linecap[39m=[32m"round"[39m
+                [33mstroke-linejoin[39m=[32m"round"[39m
+                [33mstroke-width[39m=[32m"2"[39m
+                [33mviewBox[39m=[32m"0 0 24 24"[39m
+                [33mwidth[39m=[32m"18"[39m
+                [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+              [36m>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"M5 12h14"[39m
+                [36m/>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"m12 5 7 7-7 7"[39m
+                [36m/>[39m
+              [36m</svg>[39m
+            [36m</button>[39m
+          [36m</div>[39m
+        [36m</form>[39m
+      [36m</main>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+[90m [2m❯[22m waitForWrapper node_modules/@testing-library/dom/dist/wait-for.js:[2m163:27[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/dom/dist/query-helpers.js:[2m86:33[22m[39m
+[36m [2m❯[22m app/(app)/onboarding/OnboardingForm.test.tsx:[2m64:40[22m[39m
+    [90m 62|[39m
+    [90m 63|[39m     [35mawait[39m user[33m.[39m[34mclick[39m(screen[33m.[39m[34mgetByRole[39m([32m'button'[39m[33m,[39m { name[33m:[39m [36m/continue/i[39m }))
+    [90m 64|[39m     const secondHeading = await screen.findByRole('heading', { name: /…
+    [90m   |[39m                                        [31m^[39m
+    [90m 65|[39m     [34mexpect[39m(secondHeading)[33m.[39m[34mtoHaveFocus[39m()
+    [90m 66|[39m     expect(screen.getByRole('textbox', { name: /business description/i…
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/13]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m app/(app)/onboarding/OnboardingForm.test.tsx[2m > [22mOnboardingForm[2m > [22moffers skip only on optional context and supports back navigation
+[31m[1mTestingLibraryElementError[22m[39m: Unable to find an accessible element with the role "heading" and name `/who or what are you hunting for/i`
+
+Here are the accessible roles:
+
+  banner:
+
+  Name "":
+  [36m<header[39m
+    [33mclass[39m=[32m"mx-auto mb-6 flex w-full max-w-3xl items-center justify-between gap-4"[39m
+  [36m/>[39m
+
+  --------------------------------------------------
+  link:
+
+  Name "CoQuest":
+  [36m<a[39m
+    [33mclass[39m=[32m"inline-flex min-h-11 items-center text-xl font-black uppercase tracking-widest underline-offset-4 hover:underline focus-visible:outline-4 focus-visible:outline-offset-4"[39m
+    [33mhref[39m=[32m"/"[39m
+  [36m/>[39m
+
+  --------------------------------------------------
+  button:
+
+  Name "Sign out":
+  [36m<button[39m
+    [33mclass[39m=[32m"min-h-11 border-3 border-black bg-white px-3 py-2 text-sm font-black uppercase shadow-[3px_3px_0_0_#000] focus-visible:outline-4 focus-visible:outline-offset-4"[39m
+    [33mtype[39m=[32m"button"[39m
+  [36m/>[39m
+
+  Name "Skip for now":
+  [36m<button[39m
+    [33mclass[39m=[32m"mt-3 text-sm font-black uppercase underline underline-offset-4"[39m
+    [33mtype[39m=[32m"button"[39m
+  [36m/>[39m
+
+  Name "Back":
+  [36m<button[39m
+    [33mclass[39m=[32m"inline-flex min-h-11 items-center justify-center gap-2 border-3 border-black bg-white px-4 py-2 font-black uppercase shadow-[4px_4px_0_0_#000] disabled:cursor-not-allowed disabled:opacity-50"[39m
+    [33mtype[39m=[32m"button"[39m
+  [36m/>[39m
+
+  Name "Continue":
+  [36m<button[39m
+    [33mclass[39m=[32m"inline-flex min-h-11 items-center justify-center gap-2 border-3 border-black bg-[#FDE68A] px-4 py-2 font-black uppercase shadow-[4px_4px_0_0_#000] disabled:cursor-not-allowed disabled:opacity-50"[39m
+    [33mtype[39m=[32m"submit"[39m
+  [36m/>[39m
+
+  --------------------------------------------------
+  main:
+
+  Name "":
+  [36m<main[39m
+    [33mclass[39m=[32m"mx-auto w-full max-w-3xl border-4 border-black bg-white p-5 shadow-[8px_8px_0_0_#000] sm:p-8"[39m
+  [36m/>[39m
+
+  --------------------------------------------------
+  heading:
+
+  Name "Set up your first real hunt":
+  [36m<h1[39m
+    [33mclass[39m=[32m"mt-5 text-3xl font-black uppercase sm:text-4xl"[39m
+  [36m/>[39m
+
+  Name "What do you sell or help with?":
+  [36m<h2[39m
+    [33mclass[39m=[32m"text-2xl font-black uppercase focus:outline-none"[39m
+    [33mtabindex[39m=[32m"-1"[39m
+  [36m/>[39m
+
+  --------------------------------------------------
+  paragraph:
+
+  Name "":
+  [36m<p[39m
+    [33mclass[39m=[32m"mt-2 max-w-2xl font-bold text-gray-700"[39m
+  [36m/>[39m
+
+  Name "":
+  [36m<p[39m
+    [33mclass[39m=[32m"mt-2 max-w-2xl font-bold text-gray-700"[39m
+  [36m/>[39m
+
+  --------------------------------------------------
+  list:
+
+  Name "Onboarding progress":
+  [36m<ol[39m
+    [33maria-label[39m=[32m"Onboarding progress"[39m
+    [33mclass[39m=[32m"mt-6 grid grid-cols-3 gap-2 sm:grid-cols-6"[39m
+  [36m/>[39m
+
+  --------------------------------------------------
+  listitem:
+
+  Name "":
+  [36m<li[39m
+    [33mclass[39m=[32m"border-3 p-2 text-center text-xs font-black uppercase border-black bg-[#A3E635]"[39m
+  [36m/>[39m
+
+  Name "":
+  [36m<li[39m
+    [33mclass[39m=[32m"border-3 p-2 text-center text-xs font-black uppercase border-black bg-[#FDE68A]"[39m
+  [36m/>[39m
+
+  Name "":
+  [36m<li[39m
+    [33mclass[39m=[32m"border-3 p-2 text-center text-xs font-black uppercase border-black bg-[#F4F0EA]"[39m
+  [36m/>[39m
+
+  Name "":
+  [36m<li[39m
+    [33mclass[39m=[32m"border-3 p-2 text-center text-xs font-black uppercase border-black bg-[#F4F0EA]"[39m
+  [36m/>[39m
+
+  Name "":
+  [36m<li[39m
+    [33mclass[39m=[32m"border-3 p-2 text-center text-xs font-black uppercase border-black bg-[#F4F0EA]"[39m
+  [36m/>[39m
+
+  Name "":
+  [36m<li[39m
+    [33mclass[39m=[32m"border-3 p-2 text-center text-xs font-black uppercase border-black bg-[#F4F0EA]"[39m
+  [36m/>[39m
+
+  --------------------------------------------------
+  textbox:
+
+  Name "Business or product":
+  [36m<textarea[39m
+    [33maria-invalid[39m=[32m"false"[39m
+    [33mclass[39m=[32m"mt-2 w-full border-3 border-black bg-[#F4F0EA] p-3 text-base font-bold focus-visible:outline-4 focus-visible:outline-offset-2"[39m
+    [33mid[39m=[32m"business-description"[39m
+    [33mmaxlength[39m=[32m"500"[39m
+    [33mname[39m=[32m"businessDescription"[39m
+    [33mrows[39m=[32m"5"[39m
+  [36m/>[39m
+
+  --------------------------------------------------
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"min-h-screen bg-[#F4F0EA] px-4 py-6 sm:px-6 sm:py-10"[39m
+    [36m>[39m
+      [36m<header[39m
+        [33mclass[39m=[32m"mx-auto mb-6 flex w-full max-w-3xl items-center justify-between gap-4"[39m
+      [36m>[39m
+        [36m<a[39m
+          [33mclass[39m=[32m"inline-flex min-h-11 items-center text-xl font-black uppercase tracking-widest underline-offset-4 hover:underline focus-visible:outline-4 focus-visible:outline-offset-4"[39m
+          [33mhref[39m=[32m"/"[39m
+        [36m>[39m
+          [0mCoQuest[0m
+        [36m</a>[39m
+        [36m<button[39m
+          [33mclass[39m=[32m"min-h-11 border-3 border-black bg-white px-3 py-2 text-sm font-black uppercase shadow-[3px_3px_0_0_#000] focus-visible:outline-4 focus-visible:outline-offset-4"[39m
+          [33mtype[39m=[32m"button"[39m
+        [36m>[39m
+          [0mSign out[0m
+        [36m</button>[39m
+      [36m</header>[39m
+      [36m<main[39m
+        [33mclass[39m=[32m"mx-auto w-full max-w-3xl border-4 border-black bg-white p-5 shadow-[8px_8px_0_0_#000] sm:p-8"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"inline-flex items-center gap-2 border-3 border-black bg-[#A3E635] px-3 py-2 text-sm font-black uppercase"[39m
+        [36m>[39m
+          [36m<svg[39m
+            [33maria-hidden[39m=[32m"true"[39m
+            [33mclass[39m=[32m"lucide lucide-sparkles"[39m
+            [33mfill[39m=[32m"none"[39m
+            [33mheight[39m=[32m"18"[39m
+            [33mstroke[39m=[32m"currentColor"[39m
+            [33mstroke-linecap[39m=[32m"round"[39m
+            [33mstroke-linejoin[39m=[32m"round"[39m
+            [33mstroke-width[39m=[32m"2"[39m
+            [33mviewBox[39m=[32m"0 0 24 24"[39m
+            [33mwidth[39m=[32m"18"[39m
+            [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+          [36m>[39m
+            [36m<path[39m
+              [33md[39m=[32m"M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z"[39m
+            [36m/>[39m
+            [36m<path[39m
+              [33md[39m=[32m"M20 2v4"[39m
+            [36m/>[39m
+            [36m<path[39m
+              [33md[39m=[32m"M22 4h-4"[39m
+            [36m/>[39m
+            [36m<circle[39m
+              [33mcx[39m=[32m"4"[39m
+              [33mcy[39m=[32m"20"[39m
+              [33mr[39m=[32m"2"[39m
+            [36m/>[39m
+          [36m</svg>[39m
+          [0m First-value setup[0m
+        [36m</div>[39m
+        [36m<h1[39m
+          [33mclass[39m=[32m"mt-5 text-3xl font-black uppercase sm:text-4xl"[39m
+        [36m>[39m
+          [0mSet up your first real hunt[0m
+        [36m</h1>[39m
+        [36m<p[39m
+          [33mclass[39m=[32m"mt-2 max-w-2xl font-bold text-gray-700"[39m
+        [36m>[39m
+          [0mEach completed step is saved to your account. You can close this page and resume later.[0m
+        [36m</p>[39m
+        [36m<ol[39m
+          [33maria-label[39m=[32m"Onboarding progress"[39m
+          [33mclass[39m=[32m"mt-6 grid grid-cols-3 gap-2 sm:grid-cols-6"[39m
+        [36m>[39m
+          [36m<li[39m
+            [33mclass[39m=[32m"border-3 p-2 text-center text-xs font-black uppercase border-black bg-[#A3E635]"[39m
+          [36m>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"block"[39m
+            [36m>[39m
+              [0m1[0m
+            [36m</span>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"block truncate"[39m
+            [36m>[39m
+              [0mIdentity[0m
+            [36m</span>[39m
+          [36m</li>[39m
+          [36m<li[39m
+            [33mclass[39m=[32m"border-3 p-2 text-center text-xs font-black uppercase border-black bg-[#FDE68A]"[39m
+          [36m>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"block"[39m
+            [36m>[39m
+              [0m2[0m
+            [36m</span>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"block truncate"[39m
+            [36m>[39m
+              [0mBusiness[0m
+            [36m</span>[39m
+          [36m</li>[39m
+          [36m<li[39m
+            [33mclass[39m=[32m"border-3 p-2 text-center text-xs font-black uppercase border-black bg-[#F4F0EA]"[39m
+          [36m>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"block"[39m
+            [36m>[39m
+              [0m3[0m
+            [36m</span>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"block truncate"[39m
+            [36m>[39m
+              [0mCustomer[0m
+            [36m</span>[39m
+          [36m</li>[39m
+          [36m<li[39m
+            [33mclass[39m=[32m"border-3 p-2 text-center text-xs font-black uppercase border-black bg-[#F4F0EA]"[39m
+          [36m>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"block"[39m
+            [36m>[39m
+              [0m4[0m
+            [36m</span>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"block truncate"[39m
+            [36m>[39m
+              [0mKeyword[0m
+            [36m</span>[39m
+          [36m</li>[39m
+          [36m<li[39m
+            [33mclass[39m=[32m"border-3 p-2 text-center text-xs font-black uppercase border-black bg-[#F4F0EA]"[39m
+          [36m>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"block"[39m
+            [36m>[39m
+              [0m5[0m
+            [36m</span>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"block truncate"[39m
+            [36m>[39m
+              [0mSource[0m
+            [36m</span>[39m
+          [36m</li>[39m
+          [36m<li[39m
+            [33mclass[39m=[32m"border-3 p-2 text-center text-xs font-black uppercase border-black bg-[#F4F0EA]"[39m
+          [36m>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"block"[39m
+            [36m>[39m
+              [0m6[0m
+            [36m</span>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"block truncate"[39m
+            [36m>[39m
+              [0mReview[0m
+            [36m</span>[39m
+          [36m</li>[39m
+        [36m</ol>[39m
+        [36m<form[39m
+          [33mclass[39m=[32m"mt-6"[39m
+        [36m>[39m
+          [36m<section[39m
+            [33mclass[39m=[32m"border-3 border-black bg-white p-4 sm:p-5"[39m
+          [36m>[39m
+            [36m<h2[39m
+              [33mclass[39m=[32m"text-2xl font-black uppercase focus:outline-none"[39m
+              [33mtabindex[39m=[32m"-1"[39m
+            [36m>[39m
+              [0mWhat do you sell or help with?[0m
+            [36m</h2>[39m
+            [36m<p[39m
+              [33mclass[39m=[32m"mt-2 max-w-2xl font-bold text-gray-700"[39m
+            [36m>[39m
+              [0mKeep it plain. One short paragraph is enough to personalize the hunt.[0m
+            [36m</p>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"mt-5"[39m
+            [36m>[39m
+              [36m<label[39m
+                [33mclass[39m=[32m"block font-black uppercase"[39m
+                [33mfor[39m=[32m"business-description"[39m
+              [36m>[39m
+                [0mBusiness or product[0m
+              [36m</label>[39m
+              [36m<textarea[39m
+                [33maria-invalid[39m=[32m"false"[39m
+                [33mclass[39m=[32m"mt-2 w-full border-3 border-black bg-[#F4F0EA] p-3 text-base font-bold focus-visible:outline-4 focus-visible:outline-offset-2"[39m
+                [33mid[39m=[32m"business-description"[39m
+                [33mmaxlength[39m=[32m"500"[39m
+                [33mname[39m=[32m"businessDescription"[39m
+                [33mrows[39m=[32m"5"[39m
+              [36m/>[39m
+              [36m<button[39m
+                [33mclass[39m=[32m"mt-3 text-sm font-black uppercase underline underline-offset-4"[39m
+                [33mtype[39m=[32m"button"[39m
+              [36m>[39m
+                [0mSkip for now[0m
+              [36m</button>[39m
+            [36m</div>[39m
+          [36m</section>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"[39m
+          [36m>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"inline-flex min-h-11 items-center justify-center gap-2 border-3 border-black bg-white px-4 py-2 font-black uppercase shadow-[4px_4px_0_0_#000] disabled:cursor-not-allowed disabled:opacity-50"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33maria-hidden[39m=[32m"true"[39m
+                [33mclass[39m=[32m"lucide lucide-arrow-left"[39m
+                [33mfill[39m=[32m"none"[39m
+                [33mheight[39m=[32m"18"[39m
+                [33mstroke[39m=[32m"currentColor"[39m
+                [33mstroke-linecap[39m=[32m"round"[39m
+                [33mstroke-linejoin[39m=[32m"round"[39m
+                [33mstroke-width[39m=[32m"2"[39m
+                [33mviewBox[39m=[32m"0 0 24 24"[39m
+                [33mwidth[39m=[32m"18"[39m
+                [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+              [36m>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"m12 19-7-7 7-7"[39m
+                [36m/>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"M19 12H5"[39m
+                [36m/>[39m
+              [36m</svg>[39m
+              [0m Back[0m
+            [36m</button>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"inline-flex min-h-11 items-center justify-center gap-2 border-3 border-black bg-[#FDE68A] px-4 py-2 font-black uppercase shadow-[4px_4px_0_0_#000] disabled:cursor-not-allowed disabled:opacity-50"[39m
+              [33mtype[39m=[32m"submit"[39m
+            [36m>[39m
+              [0mContinue [0m
+              [36m<svg[39m
+                [33maria-hidden[39m=[32m"true"[39m
+                [33mclass[39m=[32m"lucide lucide-arrow-right"[39m
+                [33mfill[39m=[32m"none"[39m
+                [33mheight[39m=[32m"18"[39m
+                [33mstroke[39m=[32m"currentColor"[39m
+                [33mstroke-linecap[39m=[32m"round"[39m
+                [33mstroke-linejoin[39m=[32m"round"[39m
+                [33mstroke-width[39m=[32m"2"[39m
+                [33mviewBox[39m=[32m"0 0 24 24"[39m
+                [33mwidth[39m=[32m"18"[39m
+                [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+              [36m>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"M5 12h14"[39m
+                [36m/>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"m12 5 7 7-7 7"[39m
+                [36m/>[39m
+              [36m</svg>[39m
+            [36m</button>[39m
+          [36m</div>[39m
+        [36m</form>[39m
+      [36m</main>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+[90m [2m❯[22m Object.getElementError node_modules/@testing-library/dom/dist/config.js:[2m37:19[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/dom/dist/query-helpers.js:[2m76:38[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/dom/dist/query-helpers.js:[2m52:17[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/dom/dist/query-helpers.js:[2m95:19[22m[39m
+[36m [2m❯[22m app/(app)/onboarding/OnboardingForm.test.tsx:[2m79:19[22m[39m
+    [90m 77|[39m
+    [90m 78|[39m     [35mawait[39m user[33m.[39m[34mclick[39m(screen[33m.[39m[34mgetByRole[39m([32m'button'[39m[33m,[39m { name[33m:[39m [36m/back/i[39m }))
+    [90m 79|[39m     expect(screen.getByRole('heading', { name: /who or what are you hu…
+    [90m   |[39m                   [31m^[39m
+    [90m 80|[39m   })
+    [90m 81|[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/13]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m app/(app)/onboarding/OnboardingForm.test.tsx[2m > [22mOnboardingForm[2m > [22mstates the exact cost boundary and navigates with the returned database ID
+[31m[1mTestingLibraryElementError[22m[39m: Unable to find an element with the text: /saving this setup costs 0 scan credits/i. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"min-h-screen bg-[#F4F0EA] px-4 py-6 sm:px-6 sm:py-10"[39m
+    [36m>[39m
+      [36m<header[39m
+        [33mclass[39m=[32m"mx-auto mb-6 flex w-full max-w-3xl items-center justify-between gap-4"[39m
+      [36m>[39m
+        [36m<a[39m
+          [33mclass[39m=[32m"inline-flex min-h-11 items-center text-xl font-black uppercase tracking-widest underline-offset-4 hover:underline focus-visible:outline-4 focus-visible:outline-offset-4"[39m
+          [33mhref[39m=[32m"/"[39m
+        [36m>[39m
+          [0mCoQuest[0m
+        [36m</a>[39m
+        [36m<button[39m
+          [33mclass[39m=[32m"min-h-11 border-3 border-black bg-white px-3 py-2 text-sm font-black uppercase shadow-[3px_3px_0_0_#000] focus-visible:outline-4 focus-visible:outline-offset-4"[39m
+          [33mtype[39m=[32m"button"[39m
+        [36m>[39m
+          [0mSign out[0m
+        [36m</button>[39m
+      [36m</header>[39m
+      [36m<main[39m
+        [33mclass[39m=[32m"mx-auto w-full max-w-3xl border-4 border-black bg-white p-5 shadow-[8px_8px_0_0_#000] sm:p-8"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"inline-flex items-center gap-2 border-3 border-black bg-[#A3E635] px-3 py-2 text-sm font-black uppercase"[39m
+        [36m>[39m
+          [36m<svg[39m
+            [33maria-hidden[39m=[32m"true"[39m
+            [33mclass[39m=[32m"lucide lucide-sparkles"[39m
+            [33mfill[39m=[32m"none"[39m
+            [33mheight[39m=[32m"18"[39m
+            [33mstroke[39m=[32m"currentColor"[39m
+            [33mstroke-linecap[39m=[32m"round"[39m
+            [33mstroke-linejoin[39m=[32m"round"[39m
+            [33mstroke-width[39m=[32m"2"[39m
+            [33mviewBox[39m=[32m"0 0 24 24"[39m
+            [33mwidth[39m=[32m"18"[39m
+            [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+          [36m>[39m
+            [36m<path[39m
+              [33md[39m=[32m"M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z"[39m
+            [36m/>[39m
+            [36m<path[39m
+              [33md[39m=[32m"M20 2v4"[39m
+            [36m/>[39m
+            [36m<path[39m
+              [33md[39m=[32m"M22 4h-4"[39m
+            [36m/>[39m
+            [36m<circle[39m
+              [33mcx[39m=[32m"4"[39m
+              [33mcy[39m=[32m"20"[39m
+              [33mr[39m=[32m"2"[39m
+            [36m/>[39m
+          [36m</svg>[39m
+          [0m First-value setup[0m
+        [36m</div>[39m
+        [36m<h1[39m
+          [33mclass[39m=[32m"mt-5 text-3xl font-black uppercase sm:text-4xl"[39m
+        [36m>[39m
+          [0mSet up your first real hunt[0m
+        [36m</h1>[39m
+        [36m<p[39m
+          [33mclass[39m=[32m"mt-2 max-w-2xl font-bold text-gray-700"[39m
+        [36m>[39m
+          [0mEach completed step is saved to your account. You can close this page and resume later.[0m
+        [36m</p>[39m
+        [36m<ol[39m
+          [33maria-label[39m=[32m"Onboarding progress"[39m
+          [33mclass[39m=[32m"mt-6 grid grid-cols-3 gap-2 sm:grid-cols-6"[39m
+        [36m>[39m
+          [36m<li[39m
+            [33mclass[39m=[32m"border-3 p-2 text-center text-xs font-black uppercase border-black bg-[#A3E635]"[39m
+          [36m>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"block"[39m
+            [36m>[39m
+              [0m1[0m
+            [36m</span>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"block truncate"[39m
+            [36m>[39m
+              [0mIdentity[0m
+            [36m</span>[39m
+          [36m</li>[39m
+          [36m<li[39m
+            [33mclass[39m=[32m"border-3 p-2 text-center text-xs font-black uppercase border-black bg-[#A3E635]"[39m
+          [36m>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"block"[39m
+            [36m>[39m
+              [0m2[0m
+            [36m</span>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"block truncate"[39m
+            [36m>[39m
+              [0mBusiness[0m
+            [36m</span>[39m
+          [36m</li>[39m
+          [36m<li[39m
+            [33mclass[39m=[32m"border-3 p-2 text-center text-xs font-black uppercase border-black bg-[#A3E635]"[39m
+          [36m>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"block"[39m
+            [36m>[39m
+              [0m3[0m
+            [36m</span>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"block truncate"[39m
+            [36m>[39m
+              [0mCustomer[0m
+            [36m</span>[39m
+          [36m</li>[39m
+          [36m<li[39m
+            [33mclass[39m=[32m"border-3 p-2 text-center text-xs font-black uppercase border-black bg-[#A3E635]"[39m
+          [36m>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"block"[39m
+            [36m>[39m
+              [0m4[0m
+            [36m</span>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"block truncate"[39m
+            [36m>[39m
+              [0mKeyword[0m
+            [36m</span>[39m
+          [36m</li>[39m
+          [36m<li[39m
+            [33mclass[39m=[32m"border-3 p-2 text-center text-xs font-black uppercase border-black bg-[#A3E635]"[39m
+          [36m>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"block"[39m
+            [36m>[39m
+              [0m5[0m
+            [36m</span>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"block truncate"[39m
+            [36m>[39m
+              [0mSource[0m
+            [36m</span>[39m
+          [36m</li>[39m
+          [36m<li[39m
+            [33mclass[39m=[32m"border-3 p-2 text-center text-xs font-black uppercase border-black bg-[#FDE68A]"[39m
+          [36m>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"block"[39m
+            [36m>[39m
+              [0m6[0m
+            [36m</span>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"block truncate"[39m
+            [36m>[39m
+              [0mReview[0m
+            [36m</span>[39m
+          [36m</li>[39m
+        [36m</ol>[39m
+        [36m<form[39m
+          [33mclass[39m=[32m"mt-6"[39m
+        [36m>[39m
+          [36m<section[39m
+            [33mclass[39m=[32m"border-3 border-black bg-white p-4 sm:p-5"[39m
+          [36m>[39m
+            [36m<h2[39m
+              [33mclass[39m=[32m"text-2xl font-black uppercase focus:outline-none"[39m
+              [33mtabindex[39m=[32m"-1"[39m
+            [36m>[39m
+              [0mReview before saving[0m
+            [36m</h2>[39m
+            [36m<p[39m
+              [33mclass[39m=[32m"mt-2 max-w-2xl font-bold text-gray-700"[39m
+            [36m>[39m
+              [0mYour setup is persisted. Completing it creates the keyword; it does not run a scan.[0m
+            [36m</p>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"mt-5"[39m
+            [36m>[39m
+              [36m<p[39m
+                [33mclass[39m=[32m"mb-3 text-xs font-black uppercase"[39m
+              [36m>[39m
+                [0mPreview — saved setup, not live results[0m
+              [36m</p>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"mb-3 flex items-center gap-3 border-3 border-black bg-[#F4F0EA] p-3"[39m
+              [36m>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"flex h-12 w-12 items-center justify-center border-3 border-black bg-white text-2xl"[39m
+                [36m>[39m
+                  [0m🎯[0m
+                [36m</div>[39m
+                [36m<div>[39m
+                  [36m<p[39m
+                    [33mclass[39m=[32m"text-xs font-black uppercase text-gray-600"[39m
+                  [36m>[39m
+                    [0mIdentity[0m
+                  [36m</p>[39m
+                  [36m<p[39m
+                    [33mclass[39m=[32m"break-words font-bold"[39m
+                  [36m>[39m
+                    [0mBoyd[0m
+                  [36m</p>[39m
+                [36m</div>[39m
+              [36m</div>[39m
+              [36m<dl[39m
+                [33mclass[39m=[32m"grid gap-3 sm:grid-cols-2"[39m
+              [36m>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"border-2 border-black bg-[#F4F0EA] p-3"[39m
+                [36m>[39m
+                  [36m<dt[39m
+                    [33mclass[39m=[32m"text-xs font-black uppercase text-gray-600"[39m
+                  [36m>[39m
+                    [0mIcon[0m
+                  [36m</dt>[39m
+                  [36m<dd[39m
+                    [33mclass[39m=[32m"mt-1 break-words font-bold"[39m
+                  [36m>[39m
+                    [0mTarget[0m
+                  [36m</dd>[39m
+                [36m</div>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"border-2 border-black bg-[#F4F0EA] p-3"[39m
+                [36m>[39m
+                  [36m<dt[39m
+                    [33mclass[39m=[32m"text-xs font-black uppercase text-gray-600"[39m
+                  [36m>[39m
+                    [0mBusiness[0m
+                  [36m</dt>[39m
+                  [36m<dd[39m
+                    [33mclass[39m=[32m"mt-1 break-words font-bold"[39m
+                  [36m>[39m
+                    [0mAccessible websites[0m
+                  [36m</dd>[39m
+                [36m</div>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"border-2 border-black bg-[#F4F0EA] p-3"[39m
+                [36m>[39m
+                  [36m<dt[39m
+                    [33mclass[39m=[32m"text-xs font-black uppercase text-gray-600"[39m
+                  [36m>[39m
+                    [0mTarget customer[0m
+                  [36m</dt>[39m
+                  [36m<dd[39m
+                    [33mclass[39m=[32m"mt-1 break-words font-bold"[39m
+                  [36m>[39m
+                    [0mLocal service businesses[0m
+                  [36m</dd>[39m
+                [36m</div>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"border-2 border-black bg-[#F4F0EA] p-3"[39m
+                [36m>[39m
+                  [36m<dt[39m
+                    [33mclass[39m=[32m"text-xs font-black uppercase text-gray-600"[39m
+                  [36m>[39m
+                    [0mPreferred source[0m
+                  [36m</dt>[39m
+                  [36m<dd[39m
+                    [33mclass[39m=[32m"mt-1 break-words font-bold"[39m
+                  [36m>[39m
+                    [0mReddit[0m
+                  [36m</dd>[39m
+                [36m</div>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"sm:col-span-2"[39m
+                [36m>[39m
+                  [36m<div[39m
+                    [33mclass[39m=[32m"border-2 border-black bg-[#F4F0EA] p-3"[39m
+                  [36m>[39m
+                    [36m<dt[39m
+                      [33mclass[39m=[32m"text-xs font-black uppercase text-gray-600"[39m
+                    [36m>[39m
+                      [0mFirst keyword[0m
+                    [36m</dt>[39m
+                    [36m<dd[39m
+                      [33mclass[39m=[32m"mt-1 break-words font-bold"[39m
+                    [36m>[39m
+                      [0mneed a website[0m
+                    [36m</dd>[39m
+                  [36m</div>[39m
+                [36m</div>[39m
+              [36m</dl>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"mt-4 flex items-start gap-3 border-3 border-black bg-[#ECFCCB] p-3"[39m
+              [36m>[39m
+                [36m<svg[39m
+                  [33maria-hidden[39m=[32m"true"[39m
+                  [33mclass[39m=[32m"lucide lucide-shield-check mt-0.5 shrink-0"[39m
+                  [33mfill[39m=[32m"none"[39m
+                  [33mheight[39m=[32m"24"[39m
+                  [33mstroke[39m=[32m"currentColor"[39m
+                  [33mstroke-linecap[39m=[32m"round"[39m
+                  [33mstroke-linejoin[39m=[32m"round"[39m
+                  [33mstroke-width[39m=[32m"2"[39m
+                  [33mviewBox[39m=[32m"0 0 24 24"[39m
+                  [33mwidth[39m=[32m"24"[39m
+                  [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+                [36m>[39m
+                  [36m<path[39m
+                    [33md[39m=[32m"M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"[39m
+                  [36m/>[39m
+                  [36m<path[39m
+                    [33md[39m=[32m"m9 12 2 2 4-4"[39m
+                  [36m/>[39m
+                [36m</svg>[39m
+                [36m<p[39m
+                  [33mclass[39m=[32m"font-bold"[39m
+                [36m>[39m
+                  [0mCompleting setup creates your first tracked keyword and turns on your schedule. It does not send messages, post content, or import old leads.[0m
+                [36m</p>[39m
+              [36m</div>[39m
+            [36m</div>[39m
+          [36m</section>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"[39m
+          [36m>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"inline-flex min-h-11 items-center justify-center gap-2 border-3 border-black bg-white px-4 py-2 font-black uppercase shadow-[4px_4px_0_0_#000] disabled:cursor-not-allowed disabled:opacity-50"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33maria-hidden[39m=[32m"true"[39m
+                [33mclass[39m=[32m"lucide lucide-arrow-left"[39m
+                [33mfill[39m=[32m"none"[39m
+                [33mheight[39m=[32m"18"[39m
+                [33mstroke[39m=[32m"currentColor"[39m
+                [33mstroke-linecap[39m=[32m"round"[39m
+                [33mstroke-linejoin[39m=[32m"round"[39m
+                [33mstroke-width[39m=[32m"2"[39m
+                [33mviewBox[39m=[32m"0 0 24 24"[39m
+                [33mwidth[39m=[32m"18"[39m
+                [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+              [36m>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"m12 19-7-7 7-7"[39m
+                [36m/>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"M19 12H5"[39m
+                [36m/>[39m
+              [36m</svg>[39m
+              [0m Back[0m
+            [36m</button>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"inline-flex min-h-11 items-center justify-center gap-2 border-3 border-black bg-[#A3E635] px-4 py-2 font-black uppercase shadow-[4px_4px_0_0_#000] disabled:cursor-not-allowed disabled:opacity-50"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33maria-hidden[39m=[32m"true"[39m
+                [33mclass[39m=[32m"lucide lucide-check"[39m
+                [33mfill[39m=[32m"none"[39m
+                [33mheight[39m=[32m"18"[39m
+                [33mstroke[39m=[32m"currentColor"[39m
+                [33mstroke-linecap[39m=[32m"round"[39m
+                [33mstroke-linejoin[39m=[32m"round"[39m
+                [33mstroke-width[39m=[32m"2"[39m
+                [33mviewBox[39m=[32m"0 0 24 24"[39m
+                [33mwidth[39m=[32m"18"[39m
+                [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+              [36m>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"M20 6 9 17l-5-5"[39m
+                [36m/>[39m
+              [36m</svg>[39m
+              [0m Complete setup[0m
+            [36m</button>[39m
+          [36m</div>[39m
+        [36m</form>[39m
+      [36m</main>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+[90m [2m❯[22m Object.getElementError node_modules/@testing-library/dom/dist/config.js:[2m37:19[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/dom/dist/query-helpers.js:[2m76:38[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/dom/dist/query-helpers.js:[2m52:17[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/dom/dist/query-helpers.js:[2m95:19[22m[39m
+[36m [2m❯[22m app/(app)/onboarding/OnboardingForm.test.tsx:[2m86:19[22m[39m
+    [90m 84|[39m     render(<OnboardingForm initialDraft={draft({ onboardingStep: 6 })}…
+    [90m 85|[39m
+    [90m 86|[39m     expect(screen.getByText(/saving this setup costs 0 scan credits/i)…
+    [90m   |[39m                   [31m^[39m
+    [90m 87|[39m     expect(screen.getByText(/a manual scan costs 1 scan credit/i)).toB…
+    [90m 88|[39m     expect(screen.getByText(/preview saved setup, not live results/i))…
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/13]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m app/(app)/onboarding/OnboardingForm.test.tsx[2m > [22mOnboardingForm[2m > [22moffers a safe sign-in return link if the session expires
+[31m[1mTestingLibraryElementError[22m[39m: Unable to find role="link" and name `/sign in to resume/i`
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"min-h-screen bg-[#F4F0EA] px-4 py-6 sm:px-6 sm:py-10"[39m
+    [36m>[39m
+      [36m<header[39m
+        [33mclass[39m=[32m"mx-auto mb-6 flex w-full max-w-3xl items-center justify-between gap-4"[39m
+      [36m>[39m
+        [36m<a[39m
+          [33mclass[39m=[32m"inline-flex min-h-11 items-center text-xl font-black uppercase tracking-widest underline-offset-4 hover:underline focus-visible:outline-4 focus-visible:outline-offset-4"[39m
+          [33mhref[39m=[32m"/"[39m
+        [36m>[39m
+          [0mCoQuest[0m
+        [36m</a>[39m
+        [36m<button[39m
+          [33mclass[39m=[32m"min-h-11 border-3 border-black bg-white px-3 py-2 text-sm font-black uppercase shadow-[3px_3px_0_0_#000] focus-visible:outline-4 focus-visible:outline-offset-4"[39m
+          [33mtype[39m=[32m"button"[39m
+        [36m>[39m
+          [0mSign out[0m
+        [36m</button>[39m
+      [36m</header>[39m
+      [36m<main[39m
+        [33mclass[39m=[32m"mx-auto w-full max-w-3xl border-4 border-black bg-white p-5 shadow-[8px_8px_0_0_#000] sm:p-8"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"inline-flex items-center gap-2 border-3 border-black bg-[#A3E635] px-3 py-2 text-sm font-black uppercase"[39m
+        [36m>[39m
+          [36m<svg[39m
+            [33maria-hidden[39m=[32m"true"[39m
+            [33mclass[39m=[32m"lucide lucide-sparkles"[39m
+            [33mfill[39m=[32m"none"[39m
+            [33mheight[39m=[32m"18"[39m
+            [33mstroke[39m=[32m"currentColor"[39m
+            [33mstroke-linecap[39m=[32m"round"[39m
+            [33mstroke-linejoin[39m=[32m"round"[39m
+            [33mstroke-width[39m=[32m"2"[39m
+            [33mviewBox[39m=[32m"0 0 24 24"[39m
+            [33mwidth[39m=[32m"18"[39m
+            [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+          [36m>[39m
+            [36m<path[39m
+              [33md[39m=[32m"M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z"[39m
+            [36m/>[39m
+            [36m<path[39m
+              [33md[39m=[32m"M20 2v4"[39m
+            [36m/>[39m
+            [36m<path[39m
+              [33md[39m=[32m"M22 4h-4"[39m
+            [36m/>[39m
+            [36m<circle[39m
+              [33mcx[39m=[32m"4"[39m
+              [33mcy[39m=[32m"20"[39m
+              [33mr[39m=[32m"2"[39m
+            [36m/>[39m
+          [36m</svg>[39m
+          [0m First-value setup[0m
+        [36m</div>[39m
+        [36m<h1[39m
+          [33mclass[39m=[32m"mt-5 text-3xl font-black uppercase sm:text-4xl"[39m
+        [36m>[39m
+          [0mSet up your first real hunt[0m
+        [36m</h1>[39m
+        [36m<p[39m
+          [33mclass[39m=[32m"mt-2 max-w-2xl font-bold text-gray-700"[39m
+        [36m>[39m
+          [0mEach completed step is saved to your account. You can close this page and resume later.[0m
+        [36m</p>[39m
+        [36m<ol[39m
+          [33maria-label[39m=[32m"Onboarding progress"[39m
+          [33mclass[39m=[32m"mt-6 grid grid-cols-3 gap-2 sm:grid-cols-6"[39m
+        [36m>[39m
+          [36m<li[39m
+            [33mclass[39m=[32m"border-3 p-2 text-center text-xs font-black uppercase border-black bg-[#FDE68A]"[39m
+          [36m>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"block"[39m
+            [36m>[39m
+              [0m1[0m
+            [36m</span>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"block truncate"[39m
+            [36m>[39m
+              [0mIdentity[0m
+            [36m</span>[39m
+          [36m</li>[39m
+          [36m<li[39m
+            [33mclass[39m=[32m"border-3 p-2 text-center text-xs font-black uppercase border-black bg-[#F4F0EA]"[39m
+          [36m>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"block"[39m
+            [36m>[39m
+              [0m2[0m
+            [36m</span>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"block truncate"[39m
+            [36m>[39m
+              [0mBusiness[0m
+            [36m</span>[39m
+          [36m</li>[39m
+          [36m<li[39m
+            [33mclass[39m=[32m"border-3 p-2 text-center text-xs font-black uppercase border-black bg-[#F4F0EA]"[39m
+          [36m>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"block"[39m
+            [36m>[39m
+              [0m3[0m
+            [36m</span>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"block truncate"[39m
+            [36m>[39m
+              [0mCustomer[0m
+            [36m</span>[39m
+          [36m</li>[39m
+          [36m<li[39m
+            [33mclass[39m=[32m"border-3 p-2 text-center text-xs font-black uppercase border-black bg-[#F4F0EA]"[39m
+          [36m>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"block"[39m
+            [36m>[39m
+              [0m4[0m
+            [36m</span>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"block truncate"[39m
+            [36m>[39m
+              [0mKeyword[0m
+            [36m</span>[39m
+          [36m</li>[39m
+          [36m<li[39m
+            [33mclass[39m=[32m"border-3 p-2 text-center text-xs font-black uppercase border-black bg-[#F4F0EA]"[39m
+          [36m>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"block"[39m
+            [36m>[39m
+              [0m5[0m
+            [36m</span>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"block truncate"[39m
+            [36m>[39m
+              [0mSource[0m
+            [36m</span>[39m
+          [36m</li>[39m
+          [36m<li[39m
+            [33mclass[39m=[32m"border-3 p-2 text-center text-xs font-black uppercase border-black bg-[#F4F0EA]"[39m
+          [36m>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"block"[39m
+            [36m>[39m
+              [0m6[0m
+            [36m</span>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"block truncate"[39m
+            [36m>[39m
+              [0mReview[0m
+            [36m</span>[39m
+          [36m</li>[39m
+        [36m</ol>[39m
+        [36m<form[39m
+          [33mclass[39m=[32m"mt-6"[39m
+        [36m>[39m
+          [36m<p[39m
+            [33mclass[39m=[32m"mb-4 border-3 border-black bg-[#FCA5A5] p-3 font-black"[39m
+            [33mid[39m=[32m"onboarding-error"[39m
+            [33mrole[39m=[32m"alert"[39m
+          [36m>[39m
+            [0mYour session ended. Sign in again to resume your saved setup.[0m
+          [36m</p>[39m
+          [...
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"min-h-screen bg-[#F4F0EA] px-4 py-6 sm:px-6 sm:py-10"[39m
+    [36m>[39m
+      [36m<header[39m
+        [33mclass[39m=[32m"mx-auto mb-6 flex w-full max-w-3xl items-center justify-between gap-4"[39m
+      [36m>[39m
+        [36m<a[39m
+          [33mclass[39m=[32m"inline-flex min-h-11 items-center text-xl font-black uppercase tracking-widest underline-offset-4 hover:underline focus-visible:outline-4 focus-visible:outline-offset-4"[39m
+          [33mhref[39m=[32m"/"[39m
+        [36m>[39m
+          [0mCoQuest[0m
+        [36m</a>[39m
+        [36m<button[39m
+          [33mclass[39m=[32m"min-h-11 border-3 border-black bg-white px-3 py-2 text-sm font-black uppercase shadow-[3px_3px_0_0_#000] focus-visible:outline-4 focus-visible:outline-offset-4"[39m
+          [33mtype[39m=[32m"button"[39m
+        [36m>[39m
+          [0mSign out[0m
+        [36m</button>[39m
+      [36m</header>[39m
+      [36m<main[39m
+        [33mclass[39m=[32m"mx-auto w-full max-w-3xl border-4 border-black bg-white p-5 shadow-[8px_8px_0_0_#000] sm:p-8"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"inline-flex items-center gap-2 border-3 border-black bg-[#A3E635] px-3 py-2 text-sm font-black uppercase"[39m
+        [36m>[39m
+          [36m<svg[39m
+            [33maria-hidden[39m=[32m"true"[39m
+            [33mclass[39m=[32m"lucide lucide-sparkles"[39m
+            [33mfill[39m=[32m"none"[39m
+            [33mheight[39m=[32m"18"[39m
+            [33mstroke[39m=[32m"currentColor"[39m
+            [33mstroke-linecap[39m=[32m"round"[39m
+            [33mstroke-linejoin[39m=[32m"round"[39m
+            [33mstroke-width[39m=[32m"2"[39m
+            [33mviewBox[39m=[32m"0 0 24 24"[39m
+            [33mwidth[39m=[32m"18"[39m
+            [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+          [36m>[39m
+            [36m<path[39m
+              [33md[39m=[32m"M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z"[39m
+            [36m/>[39m
+            [36m<path[39m
+              [33md[39m=[32m"M20 2v4"[39m
+            [36m/>[39m
+            [36m<path[39m
+              [33md[39m=[32m"M22 4h-4"[39m
+            [36m/>[39m
+            [36m<circle[39m
+              [33mcx[39m=[32m"4"[39m
+              [33mcy[39m=[32m"20"[39m
+              [33mr[39m=[32m"2"[39m
+            [36m/>[39m
+          [36m</svg>[39m
+          [0m First-value setup[0m
+        [36m</div>[39m
+        [36m<h1[39m
+          [33mclass[39m=[32m"mt-5 text-3xl font-black uppercase sm:text-4xl"[39m
+        [36m>[39m
+          [0mSet up your first real hunt[0m
+        [36m</h1>[39m
+        [36m<p[39m
+          [33mclass[39m=[32m"mt-2 max-w-2xl font-bold text-gray-700"[39m
+        [36m>[39m
+          [0mEach completed step is saved to your account. You can close this page and resume later.[0m
+        [36m</p>[39m
+        [36m<ol[39m
+          [33maria-label[39m=[32m"Onboarding progress"[39m
+          [33mclass[39m=[32m"mt-6 grid grid-cols-3 gap-2 sm:grid-cols-6"[39m
+        [36m>[39m
+          [36m<li[39m
+            [33mclass[39m=[32m"border-3 p-2 text-center text-xs font-black uppercase border-black bg-[#FDE68A]"[39m
+          [36m>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"block"[39m
+            [36m>[39m
+              [0m1[0m
+            [36m</span>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"block truncate"[39m
+            [36m>[39m
+              [0mIdentity[0m
+            [36m</span>[39m
+          [36m</li>[39m
+          [36m<li[39m
+            [33mclass[39m=[32m"border-3 p-2 text-center text-xs font-black uppercase border-black bg-[#F4F0EA]"[39m
+          [36m>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"block"[39m
+            [36m>[39m
+              [0m2[0m
+            [36m</span>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"block truncate"[39m
+            [36m>[39m
+              [0mBusiness[0m
+            [36m</span>[39m
+          [36m</li>[39m
+          [36m<li[39m
+            [33mclass[39m=[32m"border-3 p-2 text-center text-xs font-black uppercase border-black bg-[#F4F0EA]"[39m
+          [36m>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"block"[39m
+            [36m>[39m
+              [0m3[0m
+            [36m</span>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"block truncate"[39m
+            [36m>[39m
+              [0mCustomer[0m
+            [36m</span>[39m
+          [36m</li>[39m
+          [36m<li[39m
+            [33mclass[39m=[32m"border-3 p-2 text-center text-xs font-black uppercase border-black bg-[#F4F0EA]"[39m
+          [36m>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"block"[39m
+            [36m>[39m
+              [0m4[0m
+            [36m</span>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"block truncate"[39m
+            [36m>[39m
+              [0mKeyword[0m
+            [36m</span>[39m
+          [36m</li>[39m
+          [36m<li[39m
+            [33mclass[39m=[32m"border-3 p-2 text-center text-xs font-black uppercase border-black bg-[#F4F0EA]"[39m
+          [36m>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"block"[39m
+            [36m>[39m
+              [0m5[0m
+            [36m</span>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"block truncate"[39m
+            [36m>[39m
+              [0mSource[0m
+            [36m</span>[39m
+          [36m</li>[39m
+          [36m<li[39m
+            [33mclass[39m=[32m"border-3 p-2 text-center text-xs font-black uppercase border-black bg-[#F4F0EA]"[39m
+          [36m>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"block"[39m
+            [36m>[39m
+              [0m6[0m
+            [36m</span>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"block truncate"[39m
+            [36m>[39m
+              [0mReview[0m
+            [36m</span>[39m
+          [36m</li>[39m
+        [36m</ol>[39m
+        [36m<form[39m
+          [33mclass[39m=[32m"mt-6"[39m
+        [36m>[39m
+          [36m<p[39m
+            [33mclass[39m=[32m"mb-4 border-3 border-black bg-[#FCA5A5] p-3 font-black"[39m
+            [33mid[39m=[32m"onboarding-error"[39m
+            [33mrole[39m=[32m"alert"[39m
+          [36m>[39m
+            [0mYour session ended. Sign in again to resume your saved setup.[0m
+          [36m</p>[39m
+          [...
+[90m [2m❯[22m waitForWrapper node_modules/@testing-library/dom/dist/wait-for.js:[2m163:27[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/dom/dist/query-helpers.js:[2m86:33[22m[39m
+[36m [2m❯[22m app/(app)/onboarding/OnboardingForm.test.tsx:[2m104:25[22m[39m
+    [90m102|[39m
+    [90m103|[39m     [35mawait[39m user[33m.[39m[34mclick[39m(screen[33m.[39m[34mgetByRole[39m([32m'button'[39m[33m,[39m { name[33m:[39m [36m/continue/i[39m }))
+    [90m104|[39m     expect(await screen.findByRole('link', { name: /sign in to resume/…
+    [90m   |[39m                         [31m^[39m
+    [90m105|[39m       [32m'href'[39m[33m,[39m
+    [90m106|[39m       [32m'/sign-in?redirect_url=%2Fonboarding'[39m[33m,[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/13]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m features/deliveries/__tests__/queries.test.ts[2m > [22mdelivery queries[2m > [22mlists only the current tenant and selects only customer-safe fields
+[31m[1mAssertionError[22m: expected "vi.fn()" to be called with arguments: [ ObjectContaining{…} ][90m
+
+Received:
+
+[1m  1st vi.fn() call:
+
+[22m[2m  [[22m
+[32m-   ObjectContaining {[90m
+[32m-     "take": 101,[90m
+[31m+   {[90m
+[31m+     "orderBy": [[90m
+[31m+       {[90m
+[31m+         "updatedAt": "desc",[90m
+[31m+       },[90m
+[31m+       {[90m
+[31m+         "id": "desc",[90m
+[31m+       },[90m
+[31m+     ],[90m
+[31m+     "select": {[90m
+[31m+       "createdAt": true,[90m
+[31m+       "deliveredAt": true,[90m
+[31m+       "durableJob": {[90m
+[31m+         "select": {[90m
+[31m+           "attempts": true,[90m
+[31m+           "maxAttempts": true,[90m
+[31m+           "status": true,[90m
+[31m+         },[90m
+[31m+       },[90m
+[31m+       "id": true,[90m
+[31m+       "leadId": true,[90m
+[31m+       "status": true,[90m
+[31m+       "updatedAt": true,[90m
+[31m+     },[90m
+[31m+     "take": 21,[90m
+[2m      "where": {[22m
+[2m        "userId": "tenant-1",[22m
+[2m      },[22m
+[2m    },[22m
+[2m  ][22m
+[31m[90m
+
+Number of calls: [1m1[22m
+[31m[39m
+[36m [2m❯[22m features/deliveries/__tests__/queries.test.ts:[2m49:28[22m[39m
+    [90m 47|[39m     [34mexpect[39m(result[33m.[39mdeliveries)[33m.[39m[34mtoHaveLength[39m([34m1[39m)
+    [90m 48|[39m     expect(result.deliveries[0]).toMatchObject({ status: 'DEAD', attem…
+    [90m 49|[39m     expect(mocks.findMany).toHaveBeenCalledWith(expect.objectContainin…
+    [90m   |[39m                            [31m^[39m
+    [90m 50|[39m       where[33m:[39m { userId[33m:[39m [32m'tenant-1'[39m }[33m,[39m
+    [90m 51|[39m       take[33m:[39m [34m101[39m[33m,[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/13]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m features/scans/__tests__/queries.test.ts[2m > [22mscan queries[2m > [22mlists only the current tenant and selects only customer-safe scan fields
+[31m[1mAssertionError[22m: expected "vi.fn()" to be called with arguments: [ ObjectContaining{…} ][90m
+
+Received:
+
+[1m  1st vi.fn() call:
+
+[22m[2m  [[22m
+[32m-   ObjectContaining {[90m
+[32m-     "take": 101,[90m
+[31m+   {[90m
+[31m+     "orderBy": [[90m
+[31m+       {[90m
+[31m+         "updatedAt": "desc",[90m
+[31m+       },[90m
+[31m+       {[90m
+[31m+         "id": "desc",[90m
+[31m+       },[90m
+[31m+     ],[90m
+[31m+     "select": {[90m
+[31m+       "completedAt": true,[90m
+[31m+       "createdAt": true,[90m
+[31m+       "id": true,[90m
+[31m+       "leadsCreated": true,[90m
+[31m+       "providerAttempts": {[90m
+[31m+         "select": {[90m
+[31m+           "insertedCount": true,[90m
+[31m+           "outcome": true,[90m
+[31m+           "provider": true,[90m
+[31m+           "rateLimitResetAt": true,[90m
+[31m+           "resultCount": true,[90m
+[31m+         },[90m
+[31m+       },[90m
+[31m+       "status": true,[90m
+[31m+       "trigger": true,[90m
+[31m+       "updatedAt": true,[90m
+[31m+     },[90m
+[31m+     "take": 21,[90m
+[2m      "where": {[22m
+[2m        "userId": "tenant-1",[22m
+[2m      },[22m
+[2m    },[22m
+[2m  ][22m
+[31m[90m
+
+Number of calls: [1m1[22m
+[31m[39m
+[36m [2m❯[22m features/scans/__tests__/queries.test.ts:[2m78:28[22m[39m
+    [90m 76|[39m       counts: { leadsCreated: 2, providerAttempts: 1, providerResults:…
+    [90m 77|[39m     })
+    [90m 78|[39m     expect(mocks.findMany).toHaveBeenCalledWith(expect.objectContainin…
+    [90m   |[39m                            [31m^[39m
+    [90m 79|[39m       where[33m:[39m { userId[33m:[39m [32m'tenant-1'[39m }[33m,[39m
+    [90m 80|[39m       take[33m:[39m [34m101[39m[33m,[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/13]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m features/landing/components/LandingNav.test.tsx[2m > [22mLandingNav mobile usability[2m > [22mkeeps visitor authentication actions present with 44px targets below 640px
+[31m[1mTestingLibraryElementError[22m[39m: Unable to find an accessible element with the role "link" and name "Create account"
+
+Here are the accessible roles:
+
+  navigation:
+
+  Name "Landing navigation":
+  [36m<nav[39m
+    [33maria-label[39m=[32m"Landing navigation"[39m
+    [33mclass[39m=[32m"fixed inset-x-0 top-0 z-50 border-b-4 border-black bg-[#f4ebd8]/95 pt-[env(safe-area-inset-top)] backdrop-blur-md"[39m
+  [36m/>[39m
+
+  --------------------------------------------------
+  link:
+
+  Name "Sign in":
+  [36m<a[39m
+    [33mclass[39m=[32m"inline-flex min-h-11 shrink-0 items-center px-1 text-xs font-bold uppercase tracking-wider underline-offset-4 decoration-4 hover:underline focus-visible:underline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-black sm:px-2 sm:text-sm"[39m
+    [33mhref[39m=[32m"/sign-in"[39m
+  [36m/>[39m
+
+  Name "Start free":
+  [36m<a[39m
+    [33mclass[39m=[32m"inline-flex min-h-11 shrink-0 items-center border-3 border-black bg-[#ff4500] px-3 text-xs font-black uppercase tracking-wider text-white shadow-[3px_3px_0_0_rgba(0,0,0,1)] transition-all hover:bg-[#e03e00] active:translate-x-0.5 active:translate-y-0.5 focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-black sm:px-4 sm:text-sm"[39m
+    [33mhref[39m=[32m"/sign-up"[39m
+  [36m/>[39m
+
+  --------------------------------------------------
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<nav[39m
+      [33maria-label[39m=[32m"Landing navigation"[39m
+      [33mclass[39m=[32m"fixed inset-x-0 top-0 z-50 border-b-4 border-black bg-[#f4ebd8]/95 pt-[env(safe-area-inset-top)] backdrop-blur-md"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"relative z-10 mx-auto flex h-16 max-w-7xl items-center justify-between gap-2 pl-[max(0.5rem,env(safe-area-inset-left))] pr-[max(0.5rem,env(safe-area-inset-right))] sm:h-20 sm:gap-4 sm:px-6"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"flex min-w-0 shrink-0 items-center gap-2 sm:gap-3"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"flex h-8 w-8 shrink-0 -rotate-6 transform items-center justify-center border-3 border-black bg-[#ffd700] shadow-[3px_3px_0_0_rgba(0,0,0,1)] sm:h-10 sm:w-10 sm:border-4"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33maria-hidden[39m=[32m"true"[39m
+              [33mclass[39m=[32m"lucide lucide-sword text-black sm:h-5 sm:w-5"[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"18"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"3"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"18"[39m
+              [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+            [36m>[39m
+              [36m<path[39m
+                [33md[39m=[32m"m11 19-6-6"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"m5 21-2-2"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"m8 16-4 4"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M9.5 17.5 21 6V3h-3L6.5 14.5"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"hidden flex-col min-[400px]:flex"[39m
+          [36m>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"text-xl sm:text-3xl font-black tracking-widest uppercase leading-none"[39m
+            [36m>[39m
+              [0mCoQuest[0m
+            [36m</span>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"text-[9px] sm:text-[10px] font-black uppercase tracking-wider text-gray-700"[39m
+            [36m>[39m
+              [0mby CoQuest[0m
+            [36m</span>[39m
+          [36m</div>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"flex min-w-0 items-center justify-end gap-1 sm:gap-4"[39m
+        [36m>[39m
+          [36m<a[39m
+            [33mclass[39m=[32m"inline-flex min-h-11 shrink-0 items-center px-1 text-xs font-bold uppercase tracking-wider underline-offset-4 decoration-4 hover:underline focus-visible:underline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-black sm:px-2 sm:text-sm"[39m
+            [33mhref[39m=[32m"/sign-in"[39m
+          [36m>[39m
+            [0mSign in[0m
+          [36m</a>[39m
+          [36m<a[39m
+            [33mclass[39m=[32m"inline-flex min-h-11 shrink-0 items-center border-3 border-black bg-[#ff4500] px-3 text-xs font-black uppercase tracking-wider text-white shadow-[3px_3px_0_0_rgba(0,0,0,1)] transition-all hover:bg-[#e03e00] active:translate-x-0.5 active:translate-y-0.5 focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-black sm:px-4 sm:text-sm"[39m
+            [33mhref[39m=[32m"/sign-up"[39m
+          [36m>[39m
+            [0mStart free[0m
+          [36m</a>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+    [36m</nav>[39m
+  [36m</div>[39m
+[36m</body>[39m
+[90m [2m❯[22m Object.getElementError node_modules/@testing-library/dom/dist/config.js:[2m37:19[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/dom/dist/query-helpers.js:[2m76:38[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/dom/dist/query-helpers.js:[2m52:17[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/dom/dist/query-helpers.js:[2m95:19[22m[39m
+[36m [2m❯[22m features/landing/components/LandingNav.test.tsx:[2m46:34[22m[39m
+    [90m 44|[39m     const nav = screen.getByRole('navigation', { name: 'Landing naviga…
+    [90m 45|[39m     [35mconst[39m signIn [33m=[39m screen[33m.[39m[34mgetByRole[39m([32m'link'[39m[33m,[39m { name[33m:[39m [32m'Sign in'[39m })
+    [90m 46|[39m     const createAccount = screen.getByRole('link', { name: 'Create acc…
+    [90m   |[39m                                  [31m^[39m
+    [90m 47|[39m     const soundToggle = screen.getByRole('button', { name: 'Turn sound…
+    [90m 48|[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/13]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m features/landing/components/LandingNav.test.tsx[2m > [22mLandingNav mobile usability[2m > [22mgives the sound control a non-hover interaction and explicit state
+[31m[1mTestingLibraryElementError[22m[39m: Unable to find an accessible element with the role "button" and name "Turn sound effects off"
+
+Here are the accessible roles:
+
+  navigation:
+
+  Name "Landing navigation":
+  [36m<nav[39m
+    [33maria-label[39m=[32m"Landing navigation"[39m
+    [33mclass[39m=[32m"fixed inset-x-0 top-0 z-50 border-b-4 border-black bg-[#f4ebd8]/95 pt-[env(safe-area-inset-top)] backdrop-blur-md"[39m
+  [36m/>[39m
+
+  --------------------------------------------------
+  link:
+
+  Name "Sign in":
+  [36m<a[39m
+    [33mclass[39m=[32m"inline-flex min-h-11 shrink-0 items-center px-1 text-xs font-bold uppercase tracking-wider underline-offset-4 decoration-4 hover:underline focus-visible:underline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-black sm:px-2 sm:text-sm"[39m
+    [33mhref[39m=[32m"/sign-in"[39m
+  [36m/>[39m
+
+  Name "Start free":
+  [36m<a[39m
+    [33mclass[39m=[32m"inline-flex min-h-11 shrink-0 items-center border-3 border-black bg-[#ff4500] px-3 text-xs font-black uppercase tracking-wider text-white shadow-[3px_3px_0_0_rgba(0,0,0,1)] transition-all hover:bg-[#e03e00] active:translate-x-0.5 active:translate-y-0.5 focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-black sm:px-4 sm:text-sm"[39m
+    [33mhref[39m=[32m"/sign-up"[39m
+  [36m/>[39m
+
+  --------------------------------------------------
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<nav[39m
+      [33maria-label[39m=[32m"Landing navigation"[39m
+      [33mclass[39m=[32m"fixed inset-x-0 top-0 z-50 border-b-4 border-black bg-[#f4ebd8]/95 pt-[env(safe-area-inset-top)] backdrop-blur-md"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"relative z-10 mx-auto flex h-16 max-w-7xl items-center justify-between gap-2 pl-[max(0.5rem,env(safe-area-inset-left))] pr-[max(0.5rem,env(safe-area-inset-right))] sm:h-20 sm:gap-4 sm:px-6"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"flex min-w-0 shrink-0 items-center gap-2 sm:gap-3"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"flex h-8 w-8 shrink-0 -rotate-6 transform items-center justify-center border-3 border-black bg-[#ffd700] shadow-[3px_3px_0_0_rgba(0,0,0,1)] sm:h-10 sm:w-10 sm:border-4"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33maria-hidden[39m=[32m"true"[39m
+              [33mclass[39m=[32m"lucide lucide-sword text-black sm:h-5 sm:w-5"[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"18"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"3"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"18"[39m
+              [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+            [36m>[39m
+              [36m<path[39m
+                [33md[39m=[32m"m11 19-6-6"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"m5 21-2-2"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"m8 16-4 4"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M9.5 17.5 21 6V3h-3L6.5 14.5"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"hidden flex-col min-[400px]:flex"[39m
+          [36m>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"text-xl sm:text-3xl font-black tracking-widest uppercase leading-none"[39m
+            [36m>[39m
+              [0mCoQuest[0m
+            [36m</span>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"text-[9px] sm:text-[10px] font-black uppercase tracking-wider text-gray-700"[39m
+            [36m>[39m
+              [0mby CoQuest[0m
+            [36m</span>[39m
+          [36m</div>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"flex min-w-0 items-center justify-end gap-1 sm:gap-4"[39m
+        [36m>[39m
+          [36m<a[39m
+            [33mclass[39m=[32m"inline-flex min-h-11 shrink-0 items-center px-1 text-xs font-bold uppercase tracking-wider underline-offset-4 decoration-4 hover:underline focus-visible:underline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-black sm:px-2 sm:text-sm"[39m
+            [33mhref[39m=[32m"/sign-in"[39m
+          [36m>[39m
+            [0mSign in[0m
+          [36m</a>[39m
+          [36m<a[39m
+            [33mclass[39m=[32m"inline-flex min-h-11 shrink-0 items-center border-3 border-black bg-[#ff4500] px-3 text-xs font-black uppercase tracking-wider text-white shadow-[3px_3px_0_0_rgba(0,0,0,1)] transition-all hover:bg-[#e03e00] active:translate-x-0.5 active:translate-y-0.5 focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-black sm:px-4 sm:text-sm"[39m
+            [33mhref[39m=[32m"/sign-up"[39m
+          [36m>[39m
+            [0mStart free[0m
+          [36m</a>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+    [36m</nav>[39m
+  [36m</div>[39m
+[36m</body>[39m
+[90m [2m❯[22m Object.getElementError node_modules/@testing-library/dom/dist/config.js:[2m37:19[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/dom/dist/query-helpers.js:[2m76:38[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/dom/dist/query-helpers.js:[2m52:17[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/dom/dist/query-helpers.js:[2m95:19[22m[39m
+[36m [2m❯[22m features/landing/components/LandingNav.test.tsx:[2m64:32[22m[39m
+    [90m 62|[39m     [34mrender[39m([33m<[39m[33mLandingNav[39m [33m/[39m[33m>[39m)
+    [90m 63|[39m
+    [90m 64|[39m     const soundToggle = screen.getByRole('button', { name: 'Turn sound…
+    [90m   |[39m                                [31m^[39m
+    [90m 65|[39m     [34mexpect[39m(soundToggle)[33m.[39m[34mtoHaveAttribute[39m([32m'aria-pressed'[39m[33m,[39m [32m'true'[39m)
+    [90m 66|[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[10/13]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m features/landing/components/LandingNav.test.tsx[2m > [22mLandingNav mobile usability[2m > [22mkeeps authenticated actions touch-sized too
+[31m[1mTestingLibraryElementError[22m[39m: Unable to find an accessible element with the role "link" and name "Dashboard"
+
+Here are the accessible roles:
+
+  navigation:
+
+  Name "Landing navigation":
+  [36m<nav[39m
+    [33maria-label[39m=[32m"Landing navigation"[39m
+    [33mclass[39m=[32m"fixed inset-x-0 top-0 z-50 border-b-4 border-black bg-[#f4ebd8]/95 pt-[env(safe-area-inset-top)] backdrop-blur-md"[39m
+  [36m/>[39m
+
+  --------------------------------------------------
+  link:
+
+  Name "Sign in":
+  [36m<a[39m
+    [33mclass[39m=[32m"inline-flex min-h-11 shrink-0 items-center px-1 text-xs font-bold uppercase tracking-wider underline-offset-4 decoration-4 hover:underline focus-visible:underline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-black sm:px-2 sm:text-sm"[39m
+    [33mhref[39m=[32m"/sign-in"[39m
+  [36m/>[39m
+
+  Name "Start free":
+  [36m<a[39m
+    [33mclass[39m=[32m"inline-flex min-h-11 shrink-0 items-center border-3 border-black bg-[#ff4500] px-3 text-xs font-black uppercase tracking-wider text-white shadow-[3px_3px_0_0_rgba(0,0,0,1)] transition-all hover:bg-[#e03e00] active:translate-x-0.5 active:translate-y-0.5 focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-black sm:px-4 sm:text-sm"[39m
+    [33mhref[39m=[32m"/sign-up"[39m
+  [36m/>[39m
+
+  --------------------------------------------------
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<nav[39m
+      [33maria-label[39m=[32m"Landing navigation"[39m
+      [33mclass[39m=[32m"fixed inset-x-0 top-0 z-50 border-b-4 border-black bg-[#f4ebd8]/95 pt-[env(safe-area-inset-top)] backdrop-blur-md"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"relative z-10 mx-auto flex h-16 max-w-7xl items-center justify-between gap-2 pl-[max(0.5rem,env(safe-area-inset-left))] pr-[max(0.5rem,env(safe-area-inset-right))] sm:h-20 sm:gap-4 sm:px-6"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"flex min-w-0 shrink-0 items-center gap-2 sm:gap-3"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"flex h-8 w-8 shrink-0 -rotate-6 transform items-center justify-center border-3 border-black bg-[#ffd700] shadow-[3px_3px_0_0_rgba(0,0,0,1)] sm:h-10 sm:w-10 sm:border-4"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33maria-hidden[39m=[32m"true"[39m
+              [33mclass[39m=[32m"lucide lucide-sword text-black sm:h-5 sm:w-5"[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"18"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"3"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"18"[39m
+              [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+            [36m>[39m
+              [36m<path[39m
+                [33md[39m=[32m"m11 19-6-6"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"m5 21-2-2"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"m8 16-4 4"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M9.5 17.5 21 6V3h-3L6.5 14.5"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"hidden flex-col min-[400px]:flex"[39m
+          [36m>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"text-xl sm:text-3xl font-black tracking-widest uppercase leading-none"[39m
+            [36m>[39m
+              [0mCoQuest[0m
+            [36m</span>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"text-[9px] sm:text-[10px] font-black uppercase tracking-wider text-gray-700"[39m
+            [36m>[39m
+              [0mby CoQuest[0m
+            [36m</span>[39m
+          [36m</div>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"flex min-w-0 items-center justify-end gap-1 sm:gap-4"[39m
+        [36m>[39m
+          [36m<a[39m
+            [33mclass[39m=[32m"inline-flex min-h-11 shrink-0 items-center px-1 text-xs font-bold uppercase tracking-wider underline-offset-4 decoration-4 hover:underline focus-visible:underline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-black sm:px-2 sm:text-sm"[39m
+            [33mhref[39m=[32m"/sign-in"[39m
+          [36m>[39m
+            [0mSign in[0m
+          [36m</a>[39m
+          [36m<a[39m
+            [33mclass[39m=[32m"inline-flex min-h-11 shrink-0 items-center border-3 border-black bg-[#ff4500] px-3 text-xs font-black uppercase tracking-wider text-white shadow-[3px_3px_0_0_rgba(0,0,0,1)] transition-all hover:bg-[#e03e00] active:translate-x-0.5 active:translate-y-0.5 focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-black sm:px-4 sm:text-sm"[39m
+            [33mhref[39m=[32m"/sign-up"[39m
+          [36m>[39m
+            [0mStart free[0m
+          [36m</a>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+    [36m</nav>[39m
+  [36m</div>[39m
+[36m</body>[39m
+[90m [2m❯[22m Object.getElementError node_modules/@testing-library/dom/dist/config.js:[2m37:19[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/dom/dist/query-helpers.js:[2m76:38[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/dom/dist/query-helpers.js:[2m52:17[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/dom/dist/query-helpers.js:[2m95:19[22m[39m
+[36m [2m❯[22m features/landing/components/LandingNav.test.tsx:[2m77:19[22m[39m
+    [90m 75|[39m     [34mrender[39m([33m<[39m[33mLandingNav[39m [33m/[39m[33m>[39m)
+    [90m 76|[39m
+    [90m 77|[39m     expect(screen.getByRole('link', { name: 'Dashboard' })).toHaveClas…
+    [90m   |[39m                   [31m^[39m
+    [90m 78|[39m     expect(screen.getByRole('button', { name: 'User account' }).parent…
+    [90m 79|[39m   })
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[11/13]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m features/dashboard/hooks/__tests__/useDashboardState.test.ts[2m > [22museDashboardState[2m > [22mreports only the server-confirmed scanner outcome
+[31m[1mAssertionError[22m: expected [ …(6) ] to deeply equal [ …(4) ][39m
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[2m  [[22m
+[2m    "Preparing durable scan request...",[22m
+[2m    "Saving query state...",[22m
+[2m    "Queueing provider work...",[22m
+[32m-   "Scan queued. Results will appear after processing.",[39m
+[31m+   "Scan queued with durable run scan-run-1.",[39m
+[31m+   "Server status: SUCCEEDED",[39m
+[31m+   "Scan completed: 2 new source matches; provider status AVAILABLE.",[39m
+[2m  ][22m
+
+[36m [2m❯[22m features/dashboard/hooks/__tests__/useDashboardState.test.ts:[2m200:37[22m[39m
+    [90m198|[39m     [34mexpect[39m(result[33m.[39mcurrent[33m.[39masyncStatus)[33m.[39m[34mtoBe[39m([32m'idle'[39m)
+    [90m199|[39m     [34mexpect[39m(result[33m.[39mcurrent[33m.[39misScannerModalOpen)[33m.[39m[34mtoBe[39m([35mtrue[39m)
+    [90m200|[39m     [34mexpect[39m(result[33m.[39mcurrent[33m.[39mscanLogs)[33m.[39m[34mtoEqual[39m([
+    [90m   |[39m                                     [31m^[39m
+    [90m201|[39m       [32m'Preparing durable scan request...'[39m[33m,[39m
+    [90m202|[39m       [32m'Saving query state...'[39m[33m,[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[12/13]⎯[22m[39m
+
+
+[2m Test Files [22m [1m[31m7 failed[39m[22m[2m | [22m[1m[32m83 passed[39m[22m[2m | [22m[33m3 skipped[39m[90m (93)[39m
+[2m      Tests [22m [1m[31m13 failed[39m[22m[2m | [22m[1m[32m469 passed[39m[22m[2m | [22m[33m13 skipped[39m[90m (495)[39m
+[2m   Start at [22m 00:28:07
+[2m   Duration [22m 80.14s[2m (transform 12.98s, setup 63.90s, import 53.04s, tests 48.20s, environment 331.82s)[22m
+

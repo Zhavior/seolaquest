@@ -1,0 +1,28 @@
+
+import { render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+
+import { describe, expect, it } from 'vitest'
+import { SkipLink } from './SkipLink'
+
+describe('SkipLink', () => {
+  it('is the first keyboard stop and targets the shared content container', async () => {
+    const user = userEvent.setup()
+
+    render(
+      <>
+        <SkipLink />
+        <button type="button">Next control</button>
+        <div id="main-content" tabIndex={-1}>Page content</div>
+      </>,
+    )
+
+    await user.tab()
+
+    const skipLink = screen.getByRole('link', { name: 'Skip to main content' })
+    expect(skipLink).toHaveFocus()
+    expect(skipLink).toHaveAttribute('href', '#main-content')
+    expect(document.querySelector(skipLink.getAttribute('href')!)).toHaveAttribute('tabindex', '-1')
+  })
+
+})

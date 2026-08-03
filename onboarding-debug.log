@@ -1,0 +1,205 @@
+
+> coquest-engine@0.1.0 dev
+> next dev
+
+⚠ Port 3000 is in use by process 16589, using available port 3001 instead.
+▲ Next.js 16.2.12 (Turbopack)
+- Local:         http://localhost:3001
+- Network:       http://172.16.35.207:3001
+- Environments: .env
+✓ Ready in 419ms
+- Experiments (use with caution):
+  · optimizePackageImports
+
+Clerk - DEPRECATION WARNING: "createRouteMatcher" is deprecated and will be removed in the next major release.
+Use resource-based auth checks instead. Move auth checks into each page, layout, API route, or Server Function that accesses protected data. Middleware-based auth checks rely on path matching, which can diverge from how Next.js routes requests and leave protected resources reachable. For a migration guide, see: https://clerk.com/docs/guides/development/upgrading/upgrade-guides/migrate-from-create-route-matcher
+Attention: Clerk collects telemetry data from its SDKs when connected to development instances.
+The data collected is used to inform Clerk's product roadmap.
+To learn more, including how to opt-out from the telemetry program, visit: https://clerk.com/docs/telemetry.
+
+[browser] Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview (https://probable-wahoo-98.clerk.accounts.dev/npm/@clerk/clerk-js@6/dist/clerk.browser.js:12:6133)
+ GET /onboarding?returnTo=%2Fapp 200 in 3.1s (next.js: 78ms, proxy.ts: 525ms, application-code: 2.4s)
+completeOnboardingAction failed: Error [PrismaClientValidationError]: 
+Invalid `tx.tenantScanSchedule.upsert()` invocation in
+/Users/boydsantos/Desktop/hypequest/.next/dev/server/chunks/ssr/[root-of-the-server]__1ygxxg3._.js:998:41
+
+  995         profileIconKey: user.profileIconKey ?? __TURBOPACK__imported__module__$5b$project$5d2f$features$2f$auth$2f$profileIconOptions$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["DEFAULT_PROFILE_ICON_KEY"]
+  996     }
+  997 });
+→ 998 await tx.tenantScanSchedule.upsert({
+        where: {
+          userId: "user_3H9aPVWH65QNxR17rTQg0b7ySjG"
+        },
+        update: {
+          preferredSource: "X",
+          enabled: true
+        },
+        create: {
+          userId: "user_3H9aPVWH65QNxR17rTQg0b7ySjG",
+          preferredSource: "X",
+          ~~~~~~~~~~~~~~~
+          enabled: true,
+      ?   nextDueAt?: DateTime,
+      ?   lastEnqueuedAt?: DateTime | Null,
+      ?   lastCompletedAt?: DateTime | Null,
+      ?   createdAt?: DateTime,
+      ?   updatedAt?: DateTime
+        }
+      })
+
+Unknown argument `preferredSource`. Available options are marked with ?.
+    at <unknown> (features/auth/actions.ts:241:35)
+    at async (features/auth/actions.ts:241:7)
+    at async completeOnboardingAction (features/auth/actions.ts:165:20)
+  239 |       })
+  240 |
+> 241 |       await tx.tenantScanSchedule.upsert({
+      |                                   ^
+  242 |         where: { userId: currentUser.id },
+  243 |         update: {
+  244 |           preferredSource: user.preferredSource, {
+  clientVersion: '5.10.2'
+}
+ POST /onboarding?returnTo=%2Fapp 200 in 4.0s (next.js: 6ms, proxy.ts: 21ms, application-code: 4.0s)
+  └─ ƒ completeOnboardingAction() in 3948ms features/auth/actions.ts
+[browser] Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview (https://probable-wahoo-98.clerk.accounts.dev/npm/@clerk/clerk-js@6/dist/clerk.browser.js:12:6133)
+ GET /onboarding?returnTo=%2Fapp 200 in 1590ms (next.js: 5ms, proxy.ts: 16ms, application-code: 1568ms)
+completeOnboardingAction failed: Error [PrismaClientValidationError]: 
+Invalid `tx.tenantScanSchedule.upsert()` invocation in
+/Users/boydsantos/Desktop/hypequest/.next/dev/server/chunks/ssr/[root-of-the-server]__1ygxxg3._.js:998:41
+
+  995         profileIconKey: user.profileIconKey ?? __TURBOPACK__imported__module__$5b$project$5d2f$features$2f$auth$2f$profileIconOptions$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["DEFAULT_PROFILE_ICON_KEY"]
+  996     }
+  997 });
+→ 998 await tx.tenantScanSchedule.upsert({
+        where: {
+          userId: "user_3H9aPVWH65QNxR17rTQg0b7ySjG"
+        },
+        update: {
+          preferredSource: "X",
+          enabled: true
+        },
+        create: {
+          userId: "user_3H9aPVWH65QNxR17rTQg0b7ySjG",
+          preferredSource: "X",
+          ~~~~~~~~~~~~~~~
+          enabled: true,
+      ?   nextDueAt?: DateTime,
+      ?   lastEnqueuedAt?: DateTime | Null,
+      ?   lastCompletedAt?: DateTime | Null,
+      ?   createdAt?: DateTime,
+      ?   updatedAt?: DateTime
+        }
+      })
+
+Unknown argument `preferredSource`. Available options are marked with ?.
+    at <unknown> (features/auth/actions.ts:241:35)
+    at async (features/auth/actions.ts:241:7)
+    at async completeOnboardingAction (features/auth/actions.ts:165:20)
+  239 |       })
+  240 |
+> 241 |       await tx.tenantScanSchedule.upsert({
+      |                                   ^
+  242 |         where: { userId: currentUser.id },
+  243 |         update: {
+  244 |           preferredSource: user.preferredSource, {
+  clientVersion: '5.10.2'
+}
+ POST /onboarding?returnTo=%2Fapp 200 in 2.9s (next.js: 4ms, proxy.ts: 22ms, application-code: 2.8s)
+  └─ ƒ completeOnboardingAction() in 2818ms features/auth/actions.ts
+[browser] Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview (https://probable-wahoo-98.clerk.accounts.dev/npm/@clerk/clerk-js@6/dist/clerk.browser.js:12:6133)
+ GET /onboarding?returnTo=%2Fapp 200 in 1057ms (next.js: 10ms, proxy.ts: 34ms, application-code: 1014ms)
+completeOnboardingAction failed: Error [PrismaClientValidationError]: 
+Invalid `tx.tenantScanSchedule.upsert()` invocation in
+/Users/boydsantos/Desktop/hypequest/.next/dev/server/chunks/ssr/[root-of-the-server]__1ygxxg3._.js:998:41
+
+  995         profileIconKey: user.profileIconKey ?? __TURBOPACK__imported__module__$5b$project$5d2f$features$2f$auth$2f$profileIconOptions$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["DEFAULT_PROFILE_ICON_KEY"]
+  996     }
+  997 });
+→ 998 await tx.tenantScanSchedule.upsert({
+        where: {
+          userId: "user_3H9aPVWH65QNxR17rTQg0b7ySjG"
+        },
+        update: {
+          preferredSource: "X",
+          enabled: true
+        },
+        create: {
+          userId: "user_3H9aPVWH65QNxR17rTQg0b7ySjG",
+          preferredSource: "X",
+          ~~~~~~~~~~~~~~~
+          enabled: true,
+      ?   nextDueAt?: DateTime,
+      ?   lastEnqueuedAt?: DateTime | Null,
+      ?   lastCompletedAt?: DateTime | Null,
+      ?   createdAt?: DateTime,
+      ?   updatedAt?: DateTime
+        }
+      })
+
+Unknown argument `preferredSource`. Available options are marked with ?.
+    at <unknown> (features/auth/actions.ts:241:35)
+    at async (features/auth/actions.ts:241:7)
+    at async completeOnboardingAction (features/auth/actions.ts:165:20)
+  239 |       })
+  240 |
+> 241 |       await tx.tenantScanSchedule.upsert({
+      |                                   ^
+  242 |         where: { userId: currentUser.id },
+  243 |         update: {
+  244 |           preferredSource: user.preferredSource, {
+  clientVersion: '5.10.2'
+}
+ POST /onboarding?returnTo=%2Fapp 200 in 3.0s (next.js: 4ms, proxy.ts: 11ms, application-code: 3.0s)
+  └─ ƒ completeOnboardingAction() in 2966ms features/auth/actions.ts
+completeOnboardingAction failed: Error [PrismaClientValidationError]: 
+Invalid `tx.tenantScanSchedule.upsert()` invocation in
+/Users/boydsantos/Desktop/hypequest/.next/dev/server/chunks/ssr/[root-of-the-server]__1ygxxg3._.js:998:41
+
+  995         profileIconKey: user.profileIconKey ?? __TURBOPACK__imported__module__$5b$project$5d2f$features$2f$auth$2f$profileIconOptions$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["DEFAULT_PROFILE_ICON_KEY"]
+  996     }
+  997 });
+→ 998 await tx.tenantScanSchedule.upsert({
+        where: {
+          userId: "user_3H9aPVWH65QNxR17rTQg0b7ySjG"
+        },
+        update: {
+          preferredSource: "X",
+          enabled: true
+        },
+        create: {
+          userId: "user_3H9aPVWH65QNxR17rTQg0b7ySjG",
+          preferredSource: "X",
+          ~~~~~~~~~~~~~~~
+          enabled: true,
+      ?   nextDueAt?: DateTime,
+      ?   lastEnqueuedAt?: DateTime | Null,
+      ?   lastCompletedAt?: DateTime | Null,
+      ?   createdAt?: DateTime,
+      ?   updatedAt?: DateTime
+        }
+      })
+
+Unknown argument `preferredSource`. Available options are marked with ?.
+    at <unknown> (features/auth/actions.ts:241:35)
+    at async (features/auth/actions.ts:241:7)
+    at async completeOnboardingAction (features/auth/actions.ts:165:20)
+  239 |       })
+  240 |
+> 241 |       await tx.tenantScanSchedule.upsert({
+      |                                   ^
+  242 |         where: { userId: currentUser.id },
+  243 |         update: {
+  244 |           preferredSource: user.preferredSource, {
+  clientVersion: '5.10.2'
+}
+ POST /onboarding?returnTo=%2Fapp 200 in 4.1s (next.js: 7ms, proxy.ts: 19ms, application-code: 4.1s)
+  └─ ƒ completeOnboardingAction() in 4094ms features/auth/actions.ts
+Clerk - DEPRECATION WARNING: "createRouteMatcher" is deprecated and will be removed in the next major release.
+Use resource-based auth checks instead. Move auth checks into each page, layout, API route, or Server Function that accesses protected data. Middleware-based auth checks rely on path matching, which can diverge from how Next.js routes requests and leave protected resources reachable. For a migration guide, see: https://clerk.com/docs/guides/development/upgrading/upgrade-guides/migrate-from-create-route-matcher
+✓ Compiled in 1318ms
+ GET /onboarding?returnTo=%2Fapp 200 in 1871ms (next.js: 140ms, proxy.ts: 640ms, application-code: 1091ms)
+ GET /onboarding?returnTo=%2Fapp 200 in 2.1s (next.js: 3ms, proxy.ts: 10ms, application-code: 2.1s)
+ GET /onboarding?returnTo=%2Fapp 200 in 2.2s (next.js: 5ms, proxy.ts: 29ms, application-code: 2.2s)
+ GET /onboarding?returnTo=%2Fapp 200 in 2.2s (next.js: 3ms, proxy.ts: 9ms, application-code: 2.2s)
+[?25h
