@@ -123,6 +123,23 @@ describe('getCurrentUser compatibility fallback', () => {
     })
   })
 
+  it('findUserWithOnboardingFallback maps profileIconKey correctly when the column exists', async () => {
+    mocks.prisma.user.findUnique.mockResolvedValueOnce({
+      id: 'user_3',
+      email: 'user3@example.com',
+      profileIconKey: 'sword',
+    })
+
+    const user = await findUserWithOnboardingFallback('user_3')
+
+    expect(mocks.prisma.user.findUnique).toHaveBeenCalledWith({ where: { id: 'user_3' } })
+    expect(mocks.prisma.$queryRaw).not.toHaveBeenCalled()
+    expect(user).toMatchObject({
+      id: 'user_3',
+      profileIconKey: 'sword',
+    })
+  })
+
   it('returns null when auth has no current user id', async () => {
     mocks.auth.mockResolvedValueOnce({ userId: null })
 

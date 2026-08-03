@@ -87,6 +87,8 @@ export async function loadMoreDeliveriesAction(cursor: string) {
 }
 
 export async function pollPendingDeliveriesAction(deliveryIds: string[]) {
+  if (!Array.isArray(deliveryIds)) return []
+  const cappedIds = deliveryIds.slice(0, 50)
   await requireCurrentUser()
-  return getDeliveriesStatus(deliveryIds)
+  return getDeliveriesStatus(cappedIds)
 }

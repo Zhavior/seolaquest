@@ -63,6 +63,7 @@ export async function getDeliveriesStatus(deliveryIds: string[]) {
   const rows = await prisma.crmExportDelivery.findMany({
     where: { id: { in: validIds }, userId: user.id },
     select: safeDeliverySelect,
+    take: 50,
   })
 
   return rows.map(toDeliveryView)

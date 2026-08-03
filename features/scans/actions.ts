@@ -9,6 +9,8 @@ export async function loadMoreScanRunsAction(cursor: string) {
 }
 
 export async function pollPendingScanRunsAction(runIds: string[]) {
+  if (!Array.isArray(runIds)) return []
+  const cappedIds = runIds.slice(0, 50)
   await requireCurrentUser()
-  return getScanRunsStatus(runIds)
+  return getScanRunsStatus(cappedIds)
 }

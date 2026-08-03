@@ -113,6 +113,7 @@ export async function getScanRunsStatus(runIds: string[]) {
   const rows = await prisma.scanRun.findMany({
     where: { id: { in: validIds }, userId: user.id },
     select: safeScanListSelect,
+    take: 50,
   })
 
   return rows.map(row => {
