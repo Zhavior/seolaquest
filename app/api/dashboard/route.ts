@@ -1,13 +1,16 @@
 import { NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
-import { requireCurrentUser } from '@/lib/auth'
+import { getCurrentUser } from '@/lib/auth'
 import type { DashboardKeyword, DashboardLead, DashboardUser } from '@/features/dashboard/types'
 
 export const dynamic = 'force-dynamic'
 
 export async function GET() {
   try {
-    const user = await requireCurrentUser()
+    const user = await getCurrentUser()
+    if (!user) {
+      return NextResponse.json({ ok: false, message: 'Unauthorized' }, { status: 401 })
+    }
 
     const [keywords, leads, billingSubscription] = await Promise.all([
       prisma.trackedKeyword.findMany({

@@ -48,57 +48,8 @@ export default function DashboardClient({
     dbLeaderboard,
   })
 
-  const hydratedRef = useRef(false)
-
-  useEffect(() => {
-    if (hydratedRef.current) return
-    hydratedRef.current = true
-
-    const shouldHydrate =
-      dbUser.name === 'Hunter' &&
-      dbUser.title === 'Lead Hunter' &&
-      dbUser.xp === 0 &&
-      dbUser.level === 1 &&
-      dbKeywords.length === 0 &&
-      dbLeads.length === 0
-
-    if (!shouldHydrate) return
-
-    let cancelled = false
-
-    async function hydrateDashboard() {
-      try {
-        const response = await fetch('/api/dashboard', {
-          method: 'GET',
-          credentials: 'same-origin',
-          cache: 'no-store',
-        })
-
-        const payload = (await response.json()) as DashboardHydrationResponse
-        if (cancelled) return
-
-        if (!response.ok || !payload.ok || !payload.user || !payload.keywords || !payload.leads) {
-          state.setNotice(payload.message ?? 'Could not load dashboard data.')
-          return
-        }
-
-        state.setUser(payload.user)
-        state.setKeywords(payload.keywords)
-        state.setLeads(payload.leads)
-        state.setRemainingQuests(payload.user.questsRemaining ?? 0)
-      } catch {
-        if (!cancelled) {
-          state.setNotice('Could not load dashboard data.')
-        }
-      }
-    }
-
-    void hydrateDashboard()
-
-    return () => {
-      cancelled = true
-    }
-  }, [dbKeywords.length, dbLeads.length, dbUser.level, dbUser.name, dbUser.title, dbUser.xp, state])
+  // Hydration is now handled entirely on the server by the parent Server Component.
+  // We no longer need to fetch `/api/dashboard` client-side.
 
   const container = {
     hidden: { opacity: 0 },
@@ -197,12 +148,14 @@ export default function DashboardClient({
             addKeyword={state.addKeyword}
             removeKeyword={state.removeKeyword}
             PRESET_KEYWORDS={state.PRESET_KEYWORDS}
+            handlePresetClick={state.handlePresetClick}
             isPending={state.isPending}
           />
 
           <DashboardLeaderboard
             item={item}
-            claimedCount={state.claimedCount}
+            dbLeaderboard={dbLeaderboard}
+            dbAnalytics={dbAnalytics}
           />
         </div>
 
@@ -213,13 +166,11 @@ export default function DashboardClient({
           setFilter={state.setFilter}
           platforms={state.platforms}
           dismissLead={state.dismissLead}
-          claimQuest={state.claimQuest}
           isPending={state.isPending}
-          asyncStatus={state.asyncStatus}
-          activeQuickStrikeLead={state.activeQuickStrikeLead}
-          setActiveQuickStrikeLead={state.setActiveQuickStrikeLead}
-          handleQuickStrike={state.handleQuickStrike}
+          handleClaimBounty={state.handleClaimBounty}
+          generateAIReply={state.generateAIReply}
           exportToCRM={state.exportToCRM}
+          handlePresetClick={state.handlePresetClick}
         />
       </motion.div>
     </div>

@@ -122,7 +122,7 @@ export function useDashboardState({
   }
 
   function removeKeyword(id: string) {
-    sfx.playHit()
+    sfx.playSwordSlash()
     startTransition(async () => {
       const result = await removeKeywordAction(id)
       if (!result.ok) return setNotice(result.message ?? 'Could not remove keyword.')
@@ -144,7 +144,7 @@ export function useDashboardState({
 
     startTransition(async () => {
       const result = await scanForLeadsAction()
-      if (!result.ok || !result.scanRunId) {
+      if (!result.ok || !result.runId) {
         setScanLogs((current) => [...current, result.message ?? 'Scan could not be started.'])
         setNotice(result.message ?? 'Could not start scan.')
         setScanOutcome('failed')
@@ -153,7 +153,7 @@ export function useDashboardState({
         return
       }
 
-      const scanRunId = result.scanRunId
+      const scanRunId = result.runId
       setScanLogs((current) => [...current, `Scan queued with durable run ${scanRunId}.`])
       setScanStep(2)
 
@@ -290,15 +290,16 @@ export function useDashboardState({
       setAsyncStatus('idle')
 
       if (result.ok) {
-        if (result.user) {
+        const returnedUser = result.user
+        if (returnedUser) {
           setUser((current) => ({
             ...current,
-            xp: result.user.xp,
-            level: result.user.level,
-            xpRequired: result.user.xpRequired,
+            xp: returnedUser.xp,
+            level: returnedUser.level,
+            xpRequired: returnedUser.xpRequired,
           }))
-          setRecentLevelUp(result.user.didLevelUp)
-          if (result.user.didLevelUp) sfx.playLevelUp()
+          setRecentLevelUp(returnedUser.didLevelUp ?? false)
+          if (returnedUser.didLevelUp) sfx.playLevelUp()
         }
 
         if (typeof result.questsRemaining === 'number') {

@@ -8,7 +8,7 @@ import { toDeliveryView } from './deliveryView'
 import type { DeliveryListResult, DeliveryView } from './types'
 
 const deliveryIdSchema = z.string().uuid()
-const PAGE_SIZE = 40
+const PAGE_SIZE = 20
 
 const safeDeliverySelect = {
   id: true,
@@ -26,13 +26,14 @@ const safeDeliverySelect = {
   },
 } satisfies Prisma.CrmExportDeliverySelect
 
-export async function listCurrentUserDeliveries(): Promise<DeliveryListResult> {
+export async function listCurrentUserDeliveries(cursor?: string): Promise<DeliveryListResult> {
   const user = await requireCurrentUser()
   const rows = await prisma.crmExportDelivery.findMany({
     where: { userId: user.id },
     select: safeDeliverySelect,
     orderBy: [{ updatedAt: 'desc' }, { id: 'desc' }],
     take: PAGE_SIZE + 1,
+    ...(cursor ? { skip: 1, cursor: { id: cursor } } : {}),
   })
 
   return {
@@ -52,4 +53,17 @@ export async function getCurrentUserDelivery(deliveryId: string): Promise<Delive
   })
 
   return row ? toDeliveryView(row) : null
+}
+
+export async function getDeliveriesStatus(deliveryIds: string[]) {
+  const user = await requireCurrentUser()
+  const validIds = deliveryIds.filter(id => deliveryIdSchema.safeParse(id).success)
+  if (validIds.length === 0) return []
+
+  const rows = await prisma.crmExportDelivery.findMany({
+    where: { id: { in: validIds }, userId: user.id },
+    select: safeDeliverySelect,
+  })
+
+  return rows.map(toDeliveryView)
 }

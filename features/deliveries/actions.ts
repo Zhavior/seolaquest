@@ -11,6 +11,7 @@ import {
 } from '@/src/modules/core/security/crmWebhookUrl'
 import { CrmDeliveryService } from '@/src/modules/leads/application/CrmDeliveryService'
 import type { RetryDeliveryState } from './types'
+import { listCurrentUserDeliveries, getDeliveriesStatus } from './queries'
 
 const deliveryIdSchema = z.string().uuid()
 
@@ -78,4 +79,14 @@ export async function retryDeliveryAction(
     )
     return errorState('Retry is temporarily unavailable. Please try again later.')
   }
+}
+
+export async function loadMoreDeliveriesAction(cursor: string) {
+  await requireCurrentUser()
+  return listCurrentUserDeliveries(cursor)
+}
+
+export async function pollPendingDeliveriesAction(deliveryIds: string[]) {
+  await requireCurrentUser()
+  return getDeliveriesStatus(deliveryIds)
 }

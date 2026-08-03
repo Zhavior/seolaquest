@@ -1,6 +1,5 @@
 'use client'
 
-import { motion } from 'framer-motion'
 import { sfx } from '@/lib/sfx'
 
 export const BLOG_TAGS = [
@@ -22,11 +21,9 @@ export function BlogTagFilter({ activeTag, onSelectTag }: BlogTagFilterProps) {
       {BLOG_TAGS.map((tag) => {
         const isActive = activeTag === tag
         return (
-          <motion.button
+          <button
             key={tag}
             type="button"
-            whileHover={{ scale: 1.03 }}
-            whileTap={{ scale: 0.97 }}
             onMouseEnter={() => sfx.playHoverBlip()}
             onClick={() => {
               sfx.playCoinDrop()
@@ -39,7 +36,7 @@ export function BlogTagFilter({ activeTag, onSelectTag }: BlogTagFilterProps) {
             }`}
           >
             {tag}
-          </motion.button>
+          </button>
         )
       })}
     </div>

@@ -1,7 +1,6 @@
 'use client'
 
 import Link from 'next/link'
-import { motion } from 'framer-motion'
 import { Clock, ArrowUpRight } from 'lucide-react'
 import { Post } from '@/lib/blog-types'
 import { sfx } from '@/lib/sfx'
@@ -13,13 +12,9 @@ interface BlogPostCardProps {
 
 export function BlogPostCard({ post, index = 0 }: BlogPostCardProps) {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3, delay: index * 0.05 }}
-      whileHover={{ y: -4 }}
+    <div
       onMouseEnter={() => sfx.playHoverBlip()}
-      className="group flex flex-col justify-between border-4 border-black bg-white shadow-[6px_6px_0_0_#000] hover:shadow-[10px_10px_0_0_#000] transition-all h-full cursor-pointer"
+      className="group flex flex-col justify-between border-4 border-black bg-white shadow-[6px_6px_0_0_#000] hover:shadow-[10px_10px_0_0_#000] transition-all duration-300 hover:-translate-y-1 h-full cursor-pointer"
     >
       {/* Top Banner Accent */}
       <div
@@ -79,6 +74,6 @@ export function BlogPostCard({ post, index = 0 }: BlogPostCardProps) {
           </Link>
         </div>
       </div>
-    </motion.div>
+    </div>
   )
 }

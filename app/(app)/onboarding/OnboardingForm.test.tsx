@@ -54,17 +54,17 @@ describe('OnboardingForm', () => {
     render(<OnboardingForm initialDraft={draft()} />)
 
     expect(screen.getByRole('button', { name: /sign out/i })).toHaveClass('min-h-11')
-    const firstHeading = screen.getByRole('heading', { name: /what should we call you/i })
+    const firstHeading = screen.getByRole('heading', { name: /choose your hunter identity/i })
     const displayNameInput = screen.getByRole('textbox', { name: /display name/i })
     expect(firstHeading).toHaveFocus()
     expect(displayNameInput).toHaveValue('Boyd')
     expect(displayNameInput).not.toHaveAttribute('autofocus')
 
-    await user.click(screen.getByRole('button', { name: /save and continue/i }))
-    const secondHeading = await screen.findByRole('heading', { name: /what do you sell or build/i })
+    await user.click(screen.getByRole('button', { name: /continue/i }))
+    const secondHeading = await screen.findByRole('heading', { name: /what do you sell or help with/i })
     expect(secondHeading).toHaveFocus()
-    expect(screen.getByRole('textbox', { name: /business or product description/i })).not.toHaveAttribute('autofocus')
-    expect(mocks.save).toHaveBeenCalledWith({ step: 1, value: 'Boyd' })
+    expect(screen.getByRole('textbox', { name: /business or product/i })).not.toHaveAttribute('autofocus')
+    expect(mocks.save).toHaveBeenCalledWith({ step: 1, value: { displayName: 'Boyd', profileIconKey: 'target' } })
   })
 
   it('offers skip only on optional context and supports back navigation', async () => {
@@ -72,22 +72,20 @@ describe('OnboardingForm', () => {
     render(<OnboardingForm initialDraft={draft({ onboardingStep: 2 })} />)
 
     await user.click(screen.getByRole('button', { name: /skip for now/i }))
-    expect(await screen.findByRole('heading', { name: /who is the target customer/i })).toBeVisible()
+    expect(await screen.findByRole('heading', { name: /who are you trying to find/i })).toBeVisible()
     expect(mocks.skip).toHaveBeenCalledWith(2)
 
     await user.click(screen.getByRole('button', { name: /back/i }))
-    expect(screen.getByRole('heading', { name: /what do you sell or build/i })).toBeVisible()
+    expect(screen.getByRole('heading', { name: /what do you sell or help with/i })).toBeVisible()
   })
 
   it('states the exact cost boundary and navigates with the returned database ID', async () => {
     const user = userEvent.setup()
     render(<OnboardingForm initialDraft={draft({ onboardingStep: 6 })} />)
 
-    expect(screen.getByText(/saving this setup costs 0 scan credits/i)).toBeVisible()
-    expect(screen.getByText(/a manual scan costs 1 scan credit/i)).toBeVisible()
-    expect(screen.getByText(/saved setup, not live results/i)).toBeVisible()
+    expect(screen.getByText(/preview — saved setup, not live results/i)).toBeVisible()
 
-    await user.click(screen.getByRole('button', { name: /create keyword and open dashboard/i }))
+    await user.click(screen.getByRole('button', { name: /complete setup/i }))
     await waitFor(() => expect(mocks.push).toHaveBeenCalledWith('/app?keywordId=kw%2Fid%20stable'))
   })
 
@@ -100,7 +98,7 @@ describe('OnboardingForm', () => {
     })
     render(<OnboardingForm initialDraft={draft()} />)
 
-    await user.click(screen.getByRole('button', { name: /save and continue/i }))
+    await user.click(screen.getByRole('button', { name: /continue/i }))
     expect(await screen.findByRole('link', { name: /sign in to resume/i })).toHaveAttribute(
       'href',
       '/sign-in?redirect_url=%2Fonboarding',

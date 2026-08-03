@@ -21,20 +21,54 @@ export default function AppHomePage() {
   )
 }
 
+import { requireCurrentUser } from '@/lib/auth'
+import prisma from '@/lib/prisma'
+
 async function DashboardShellData() {
+  const user = await requireCurrentUser()
+
+  const [keywords, leads, billingSubscription] = await Promise.all([
+    prisma.trackedKeyword.findMany({
+      where: { userId: user.id },
+      orderBy: { createdAt: 'desc' },
+      select: { id: true, phrase: true, active: true },
+    }),
+    prisma.lead.findMany({
+      where: { userId: user.id, status: { in: ['NEW', 'VIEWED'] } },
+      orderBy: [{ sourceCreatedAt: 'desc' }, { createdAt: 'desc' }],
+      take: 24,
+      select: {
+        id: true,
+        platform: true,
+        author: true,
+        content: true,
+        matched: true,
+        url: true,
+        sourceCreatedAt: true,
+      },
+    }),
+    prisma.billingSubscription.findUnique({
+      where: { userId: user.id },
+      select: { plan: true, status: true },
+    }),
+  ])
+
   const dashboardUser: DashboardUser = {
-    name: 'Hunter',
-    title: 'Lead Hunter',
-    xp: 0,
-    level: 1,
-    xpRequired: 100,
-    questsRemaining: 0,
-    maxCredits: 0,
-    planLabel: 'LOADING PLAN',
+    name: user.name ?? user.email?.split('@')[0] ?? 'Hunter',
+    title: user.title ?? 'Lead Hunter',
+    xp: user.xp,
+    level: user.level,
+    xpRequired: user.xpRequired,
+    questsRemaining: user.questsRemaining,
+    maxCredits: user.maxCredits,
+    planLabel: billingSubscription ? `${billingSubscription.plan} / ${billingSubscription.status}` : 'NO ACTIVE PLAN',
   }
 
-  const dashboardKeywords: DashboardKeyword[] = []
-  const dashboardLeads: DashboardLead[] = []
+  const dashboardKeywords: DashboardKeyword[] = keywords
+  const dashboardLeads: DashboardLead[] = leads.map((lead) => ({
+    ...lead,
+    sourceCreatedAt: lead.sourceCreatedAt?.toISOString() ?? null,
+  }))
 
   return (
     <DashboardClient

@@ -1,6 +1,8 @@
 import { getAllPosts, getFeaturedPost } from '@/lib/blog'
 import BlogIndexClient from './BlogIndexClient'
 
+export const revalidate = 3600 // 1 hour caching for blog
+
 export const metadata = {
   title: 'CoQuest Blog & Content Engine | Arcade Playbooks & Guild Lore',
   description:

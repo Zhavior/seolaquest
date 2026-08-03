@@ -15,6 +15,17 @@ const actionMocks = vi.hoisted(() => ({
 
 vi.mock('../../actions', () => actionMocks)
 
+vi.mock('@/lib/sfx', () => ({
+  sfx: {
+    playCoinDrop: vi.fn(),
+    playHit: vi.fn(),
+    playBountyUnlock: vi.fn(),
+    playSwordSlash: vi.fn(),
+    playElixirDrink: vi.fn(),
+    playHoverBlip: vi.fn(),
+  },
+}))
+
 const keywordDto = { id: 'database-keyword-id', phrase: 'CRM', active: true }
 
 function resetActionMocks() {
@@ -146,7 +157,7 @@ describe('useDashboardState', () => {
 
     expect(result.current.claimedCount).toBe(1)
     expect(result.current.user.xp).toBe(1400)
-    expect(result.current.notice).toBe('Quest marked as contacted. Server-confirmed progression has been applied.')
+    expect(result.current.notice).toBe('Quest claimed.')
   })
 
   it('uses the persisted keyword ID so a new keyword can be deleted immediately', async () => {
@@ -187,9 +198,10 @@ describe('useDashboardState', () => {
     expect(result.current.asyncStatus).toBe('idle')
     expect(result.current.isScannerModalOpen).toBe(true)
     expect(result.current.scanLogs).toEqual([
-      'Starting authenticated scan request...',
-      'Scan queued. Results will appear after processing.',
-      'Run reference: scan-run-1',
+      'Preparing durable scan request...',
+      'Saving query state...',
+      'Queueing provider work...',
+      'Scan queued with durable run scan-run-1.',
       'Server status: SUCCEEDED',
       'Scan completed: 2 new source matches; provider status AVAILABLE.',
     ])

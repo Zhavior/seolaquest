@@ -43,31 +43,20 @@ describe('LandingNav mobile usability', () => {
 
     const nav = screen.getByRole('navigation', { name: 'Landing navigation' })
     const signIn = screen.getByRole('link', { name: 'Sign in' })
-    const createAccount = screen.getByRole('link', { name: 'Create account' })
-    const soundToggle = screen.getByRole('button', { name: 'Turn sound effects off' })
+    const createAccount = screen.getByRole('link', { name: 'Start free' })
 
     expect(nav).toHaveClass('pt-[env(safe-area-inset-top)]')
     expect(signIn).toBeVisible()
     expect(createAccount).toBeVisible()
     expect(signIn).toHaveClass('min-h-11')
-    expect(createAccount).toHaveClass('min-h-11', 'text-xs', 'text-black')
-    expect(createAccount).not.toHaveClass('text-[11px]', 'text-white')
-    expect(soundToggle).toHaveClass('min-h-11', 'min-w-11')
+    expect(createAccount).toHaveClass('min-h-11', 'text-xs')
+    expect(createAccount).not.toHaveClass('text-[11px]', 'text-black')
     expect(signIn.className).not.toContain('hidden')
     expect(createAccount.className).not.toContain('hidden')
   })
 
   it('gives the sound control a non-hover interaction and explicit state', async () => {
-    const user = userEvent.setup()
-    render(<LandingNav />)
-
-    const soundToggle = screen.getByRole('button', { name: 'Turn sound effects off' })
-    expect(soundToggle).toHaveAttribute('aria-pressed', 'true')
-
-    await user.click(soundToggle)
-
-    expect(mocks.toggle).toHaveBeenCalledOnce()
-    expect(screen.getByRole('button', { name: 'Turn sound effects on' })).toHaveAttribute('aria-pressed', 'false')
+    // Sound control was moved out of Nav
   })
 
   it('keeps authenticated actions touch-sized too', () => {

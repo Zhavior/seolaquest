@@ -1,7 +1,6 @@
 'use client'
 
 import Link from 'next/link'
-import { motion } from 'framer-motion'
 import { ArrowRight, Clock, Calendar, Flame } from 'lucide-react'
 import { Post } from '@/lib/blog-types'
 import { sfx } from '@/lib/sfx'
@@ -12,11 +11,8 @@ interface BlogHeroCardProps {
 
 export function BlogHeroCard({ post }: BlogHeroCardProps) {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4 }}
-      className="group relative overflow-hidden border-4 border-black bg-white shadow-[8px_8px_0_0_#000] hover:shadow-[12px_12px_0_0_#000] transition-all"
+    <div
+      className="group relative overflow-hidden border-4 border-black bg-white shadow-[8px_8px_0_0_#000] hover:shadow-[12px_12px_0_0_#000] transition-all duration-300"
     >
       {/* Neo-Brutalist Top Accent Bar */}
       <div 
@@ -88,6 +84,6 @@ export function BlogHeroCard({ post }: BlogHeroCardProps) {
           </Link>
         </div>
       </div>
-    </motion.div>
+    </div>
   )
 }

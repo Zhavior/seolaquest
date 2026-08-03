@@ -25,7 +25,7 @@ export async function removeKeywordAction(keywordId: string) {
   }
 }
 
-export async function claimQuestAction(leadId: string): Promise<ActionResult & { user?: { xp: number; level: number; xpRequired: number } }> {
+export async function claimQuestAction(leadId: string): Promise<ActionResult & { user?: { xp: number; level: number; xpRequired: number; didLevelUp?: boolean }; questsRemaining?: number }> {
   const { LeadService } = await import('@/src/modules/leads/application/LeadService')
   return LeadService.claimQuest(leadId)
 }

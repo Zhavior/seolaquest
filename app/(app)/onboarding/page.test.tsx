@@ -33,6 +33,7 @@ describe('onboarding server boundary', () => {
       onboardingComplete: false,
       onboardingStep: 4,
       name: 'Boyd',
+      profileIconKey: 'target',
       businessDescription: 'Websites',
       targetCustomer: 'Contractors',
       firstKeyword: 'need a website',
@@ -42,6 +43,7 @@ describe('onboarding server boundary', () => {
     const element = await OnboardingPage()
     expect(element.props.initialDraft).toEqual({
       displayName: 'Boyd',
+      profileIconKey: 'target',
       businessDescription: 'Websites',
       targetCustomer: 'Contractors',
       firstKeyword: 'need a website',

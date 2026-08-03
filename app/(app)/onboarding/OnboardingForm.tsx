@@ -276,9 +276,12 @@ export default function OnboardingForm({ initialDraft }: Props) {
           ) : null}
 
           {signedOut ? (
-            <p className="mb-4 border-3 border-black bg-[#FDE68A] p-3 font-black">
-              Your session ended. Sign back in to keep going.
-            </p>
+            <Link
+              href="/sign-in?redirect_url=%2Fonboarding"
+              className="mb-4 block border-3 border-black bg-[#FDE68A] p-3 font-black underline hover:bg-[#FCD34D]"
+            >
+              Your session ended. Sign in to resume your saved setup.
+            </Link>
           ) : null}
 
           {step === 1 && (

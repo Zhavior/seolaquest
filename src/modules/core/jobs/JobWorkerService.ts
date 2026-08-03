@@ -17,8 +17,8 @@ import {
 const DEFAULT_WALL_TIME_MS = 40_000
 const DEFAULT_BATCH_SIZE = 4
 
-function boundedBatchSize(value: number | undefined): number {
-  if (!Number.isSafeInteger(value)) {
+export function boundedBatchSize(value: number | undefined): number {
+  if (typeof value !== 'number' || !Number.isSafeInteger(value)) {
     return DEFAULT_BATCH_SIZE
   }
 
@@ -77,6 +77,7 @@ async function processOne(job: ClaimedDurableJob): Promise<void> {
     try {
       await ScanRunService.processClaimedJob(job)
     } catch (error) {
+      logger.error({ err: error, jobId: job.id, kind: job.kind }, 'Job processing failed, invoking failure handler')
       await ScanRunService.handleClaimedJobFailure(job, error)
     }
 
@@ -87,6 +88,7 @@ async function processOne(job: ClaimedDurableJob): Promise<void> {
     try {
       await CrmDeliveryService.processClaimedJob(job)
     } catch (error) {
+      logger.error({ err: error, jobId: job.id, kind: job.kind }, 'Job processing failed, invoking failure handler')
       await CrmDeliveryService.handleClaimedJobFailure(job, error)
     }
 

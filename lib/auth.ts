@@ -41,6 +41,7 @@ function isMissingOnboardingColumn(error: unknown) {
     'xp',
     'xpRequired',
     'unlockedTheme',
+    'profileIconKey',
   ])
 }
 
@@ -48,6 +49,7 @@ type CompatibleUserRow = {
   id: string
   email: string
   name: string | null
+  profileIconKey: string | null
   title: string | null
   businessDescription: string | null
   targetCustomer: string | null
@@ -78,6 +80,7 @@ function toCompatibleUser(row: CompatibleUserRow): User {
     id: row.id,
     email: row.email,
     name: row.name,
+    profileIconKey: row.profileIconKey,
     title: row.title,
     onboardingComplete: false,
     onboardingStep: 1,
@@ -102,7 +105,7 @@ function toCompatibleUser(row: CompatibleUserRow): User {
   }
 }
 
-async function findUserWithOnboardingFallback(userId: string): Promise<User | null> {
+export async function findUserWithOnboardingFallback(userId: string): Promise<User | null> {
   try {
     return await prisma.user.findUnique({ where: { id: userId } })
   } catch (error) {
@@ -114,6 +117,7 @@ async function findUserWithOnboardingFallback(userId: string): Promise<User | nu
         "email",
         "name",
         "title",
+        NULL::text as "profileIconKey",
         NULL::text as "businessDescription",
         NULL::text as "targetCustomer",
         NULL::text as "firstKeyword",

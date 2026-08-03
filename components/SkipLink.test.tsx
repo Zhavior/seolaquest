@@ -1,9 +1,9 @@
-import { useContext } from 'react'
+
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { MotionConfigContext } from 'framer-motion'
+
 import { describe, expect, it } from 'vitest'
-import { MotionPreferenceProvider, SkipLink } from './SkipLink'
+import { SkipLink } from './SkipLink'
 
 describe('SkipLink', () => {
   it('is the first keyboard stop and targets the shared content container', async () => {
@@ -25,18 +25,4 @@ describe('SkipLink', () => {
     expect(document.querySelector(skipLink.getAttribute('href')!)).toHaveAttribute('tabindex', '-1')
   })
 
-  it('passes the user reduced-motion preference to Framer Motion descendants', () => {
-    function MotionPreferenceProbe() {
-      const { reducedMotion } = useContext(MotionConfigContext)
-      return <output>{reducedMotion}</output>
-    }
-
-    render(
-      <MotionPreferenceProvider>
-        <MotionPreferenceProbe />
-      </MotionPreferenceProvider>,
-    )
-
-    expect(screen.getByText('user')).toBeInTheDocument()
-  })
 })

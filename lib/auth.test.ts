@@ -39,7 +39,7 @@ vi.mock('@/src/modules/lifecycle/domain/accountDeletion', () => ({
   subjectDigestForUserId: vi.fn(() => 'digest-user-1'),
 }))
 
-import { getCurrentUser } from '@/lib/auth'
+import { getCurrentUser, findUserWithOnboardingFallback } from '@/lib/auth'
 
 function missingColumnError(column: string) {
   return new Prisma.PrismaClientKnownRequestError(
@@ -101,6 +101,25 @@ describe('getCurrentUser compatibility fallback', () => {
       level: 2,
       questsRemaining: 3,
       maxCredits: 10,
+    })
+  })
+
+  it('findUserWithOnboardingFallback returns profileIconKey: null without throwing', async () => {
+    mocks.prisma.user.findUnique.mockRejectedValueOnce(missingColumnError('User.profileIconKey'))
+    mocks.prisma.$queryRaw.mockResolvedValueOnce([
+      {
+        id: 'user_2',
+        email: 'user2@example.com',
+        profileIconKey: null,
+      },
+    ])
+
+    const user = await findUserWithOnboardingFallback('user_2')
+
+    expect(mocks.prisma.$queryRaw).toHaveBeenCalledTimes(1)
+    expect(user).toMatchObject({
+      id: 'user_2',
+      profileIconKey: null,
     })
   })
 

@@ -8,7 +8,31 @@ import {
   ScanSchedulerService,
 } from '@/src/modules/leads/application/ScanSchedulerService'
 import { DurableJobRepository } from './DurableJobRepository'
-import { JobWorkerService, WorkerPreparationError } from './JobWorkerService'
+import { JobWorkerService, WorkerPreparationError, boundedBatchSize } from './JobWorkerService'
+
+describe('boundedBatchSize', () => {
+  it('returns default batch size for undefined', () => {
+    expect(boundedBatchSize(undefined)).toBe(4)
+  })
+  it('returns default batch size for NaN', () => {
+    expect(boundedBatchSize(NaN)).toBe(4)
+  })
+  it('returns default batch size for non-integer float', () => {
+    expect(boundedBatchSize(3.14)).toBe(4)
+  })
+  it('bounds negative numbers to 1', () => {
+    expect(boundedBatchSize(-5)).toBe(1)
+  })
+  it('bounds 0 to 1', () => {
+    expect(boundedBatchSize(0)).toBe(1)
+  })
+  it('returns a valid safe integer within bounds', () => {
+    expect(boundedBatchSize(10)).toBe(10)
+  })
+  it('bounds large numbers to 25', () => {
+    expect(boundedBatchSize(100)).toBe(25)
+  })
+})
 
 vi.mock('server-only', () => ({}))
 

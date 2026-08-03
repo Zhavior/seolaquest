@@ -6,6 +6,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   const user = await getCurrentUser()
   if (!user) redirect('/sign-in?redirect_url=%2Fapp')
   if (!user.onboardingComplete) redirect('/onboarding?returnTo=%2Fapp')
+
   return (
     <div className="flex min-h-dvh text-black">
       <Sidebar />

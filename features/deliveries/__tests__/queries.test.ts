@@ -48,7 +48,7 @@ describe('delivery queries', () => {
     expect(result.deliveries[0]).toMatchObject({ status: 'DEAD', attempts: 5, canRetry: true })
     expect(mocks.findMany).toHaveBeenCalledWith(expect.objectContaining({
       where: { userId: 'tenant-1' },
-      take: 101,
+      take: 21,
     }))
 
     const select = mocks.findMany.mock.calls[0][0].select

@@ -11,6 +11,7 @@ vi.mock('@/lib/auth', () => ({
 
 vi.mock('next/navigation', () => ({
   redirect: vi.fn(),
+  useRouter: vi.fn(() => ({})),
 }))
 
 import AppLayout from './layout'

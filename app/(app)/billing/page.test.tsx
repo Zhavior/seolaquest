@@ -19,11 +19,19 @@ vi.mock('@/features/billing/analytics', () => ({
   },
   recordBillingEvent: mocks.recordBillingEvent,
 }))
-vi.mock('@/features/billing/components/BillingPageClient', () => ({
-  BillingPageClient: ({ model }: { model: { status: string; checkoutReturn?: { state: string } } }) => (
-    <div data-testid="billing-client">{model.status}:{model.checkoutReturn?.state ?? 'none'}</div>
-  ),
-}))
+vi.mock('@/features/billing/components/BillingPageClient', () => {
+  const { useState, useEffect } = require('react')
+  return {
+    BillingPageClient: ({ modelPromise }: { modelPromise: Promise<any> }) => {
+      const [model, setModel] = useState<any>(null)
+      useEffect(() => {
+        modelPromise.then(setModel)
+      }, [modelPromise])
+      if (!model) return <div data-testid="billing-client">loading</div>
+      return <div data-testid="billing-client">{model.status}:{model.checkoutReturn?.state ?? 'none'}</div>
+    },
+  }
+})
 
 import BillingPage from './page'
 
@@ -48,7 +56,7 @@ describe('Billing page server boundary', () => {
       checkout: 'verifying',
       sessionId: 'cs_test_1',
     })
-    expect(screen.getByTestId('billing-client')).toHaveTextContent('free:pending')
+    expect(await screen.findByText('free:pending')).toBeInTheDocument()
     expect(mocks.recordBillingEvent).toHaveBeenCalledWith(expect.objectContaining({
       name: 'billing_checkout_return_pending',
       outcome: 'pending',
@@ -60,7 +68,7 @@ describe('Billing page server boundary', () => {
 
     render(await BillingPage({ searchParams: Promise.resolve({}) }))
 
-    expect(screen.getByTestId('billing-client')).toHaveTextContent('unavailable:none')
+    expect(await screen.findByText('unavailable:none')).toBeInTheDocument()
     expect(mocks.recordBillingEvent).toHaveBeenCalledWith(expect.objectContaining({
       name: 'billing_account_viewed',
       accountState: 'unavailable',

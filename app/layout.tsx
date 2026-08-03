@@ -1,7 +1,15 @@
 import './globals.css'
 import { ClerkProvider } from '@clerk/nextjs'
 import type { Metadata } from 'next'
-import { MotionPreferenceProvider, SkipLink } from '@/components/SkipLink'
+import { Inter } from 'next/font/google'
+import { SkipLink } from '@/components/SkipLink'
+
+const inter = Inter({
+  subsets: ['latin'],
+  display: 'swap',
+  adjustFontFallback: true,
+  variable: '--font-inter',
+})
 
 export const metadata: Metadata = {
   applicationName: 'CoQuest',
@@ -15,8 +23,8 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en">
-      <body 
+    <html lang="en" className={inter.variable}>
+      <body
         className="font-sans min-h-screen text-black antialiased"
         style={{
           backgroundColor: '#F4F0EA',
@@ -26,12 +34,10 @@ export default function RootLayout({
         }}
       >
         <ClerkProvider>
-          <MotionPreferenceProvider>
-            <SkipLink />
-            <div id="main-content" tabIndex={-1}>
-              {children}
-            </div>
-          </MotionPreferenceProvider>
+          <SkipLink />
+          <div id="main-content" tabIndex={-1}>
+            {children}
+          </div>
         </ClerkProvider>
       </body>
     </html>

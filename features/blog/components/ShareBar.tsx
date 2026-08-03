@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
 import { Share2, Link as LinkIcon, Check, Sparkles } from 'lucide-react'
 import { sfx } from '@/lib/sfx'
 
@@ -51,23 +50,19 @@ export function ShareBar({ title, url }: ShareBarProps) {
 
         <div className="flex items-center gap-2">
           {/* Share on X */}
-          <motion.button
-            whileHover={{ scale: 1.04 }}
-            whileTap={{ scale: 0.96 }}
+          <button
             onMouseEnter={() => sfx.playHoverBlip()}
             onClick={handleShareX}
-            className="flex items-center gap-1.5 border-3 border-black bg-black px-4 py-2 text-xs font-black uppercase text-white shadow-[3px_3px_0_0_#000] hover:bg-[#8A2BE2] transition-colors"
+            className="flex items-center gap-1.5 border-3 border-black bg-black px-4 py-2 text-xs font-black uppercase text-white shadow-[3px_3px_0_0_#000] hover:bg-[#8A2BE2] transition-colors hover:scale-105 active:scale-95"
           >
             <span>𝕏 Share on X</span>
-          </motion.button>
+          </button>
 
           {/* Copy Link */}
-          <motion.button
-            whileHover={{ scale: 1.04 }}
-            whileTap={{ scale: 0.96 }}
+          <button
             onMouseEnter={() => sfx.playHoverBlip()}
             onClick={handleCopyLink}
-            className="flex items-center gap-1.5 border-3 border-black bg-white px-4 py-2 text-xs font-black uppercase text-black shadow-[3px_3px_0_0_#000] hover:bg-[#00FFFF] transition-colors"
+            className="flex items-center gap-1.5 border-3 border-black bg-white px-4 py-2 text-xs font-black uppercase text-black shadow-[3px_3px_0_0_#000] hover:bg-[#00FFFF] transition-colors hover:scale-105 active:scale-95"
           >
             {copied ? (
               <>
@@ -78,24 +73,19 @@ export function ShareBar({ title, url }: ShareBarProps) {
                 <LinkIcon size={14} strokeWidth={3} /> COPY LINK
               </>
             )}
-          </motion.button>
+          </button>
         </div>
       </div>
 
       {/* Floating High-Contrast Retro Toast Notification */}
-      <AnimatePresence>
-        {toastMessage && (
-          <motion.div
-            initial={{ opacity: 0, y: 10, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -10, scale: 0.95 }}
-            className="fixed bottom-6 right-6 z-50 flex items-center gap-2 border-4 border-black bg-[#A3E635] px-5 py-3 font-black uppercase text-black text-xs shadow-[6px_6px_0_0_#000]"
+      {toastMessage && (
+          <div
+            className="fixed bottom-6 right-6 z-50 flex items-center gap-2 border-4 border-black bg-[#A3E635] px-5 py-3 font-black uppercase text-black text-xs shadow-[6px_6px_0_0_#000] animate-bounce"
           >
             <Sparkles size={16} className="text-black" />
             {toastMessage}
-          </motion.div>
-        )}
-      </AnimatePresence>
+          </div>
+      )}
     </div>
   )
 }

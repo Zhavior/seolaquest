@@ -77,7 +77,7 @@ describe('scan queries', () => {
     })
     expect(mocks.findMany).toHaveBeenCalledWith(expect.objectContaining({
       where: { userId: 'tenant-1' },
-      take: 101,
+      take: 21,
     }))
 
     const select = mocks.findMany.mock.calls[0][0].select
