@@ -1,4 +1,4 @@
-import { ElementType } from 'react'
+import type { LucideIcon } from 'lucide-react'
 
 export type ProfilePost = {
   id: string
@@ -18,7 +18,7 @@ export type QuestItem = {
 export type InventorySlot = {
   id: number
   name: string
-  icon: ElementType | null
+  icon: LucideIcon | null
   color: string
   rarity: 'LEGENDARY' | 'EPIC' | 'RARE' | 'COMMON' | 'EMPTY'
   stat: string
