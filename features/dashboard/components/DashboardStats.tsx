@@ -1,7 +1,105 @@
 import { motion, Variants } from 'framer-motion'
-import { Share2, Crown } from 'lucide-react'
+import { Share2, Sparkles, Radar, ScrollText, Zap } from 'lucide-react'
 import HeroCrest from '@/components/HeroCrest'
 import { DashboardUser, DashboardLead } from '@/features/dashboard/types'
+
+function ProviderStatusStrip() {
+  const providers = [
+    {
+      label: 'Reddit',
+      state: 'ACTIVE',
+      detail: 'Signal feed live',
+      tone: 'bg-[#A3E635]',
+      dotTone: 'bg-[#2F5A00]',
+    },
+    {
+      label: 'X',
+      state: 'WARNING',
+      detail: 'Rate limit watch',
+      tone: 'bg-[#F7D046]',
+      dotTone: 'bg-[#7A5200]',
+    },
+    {
+      label: 'LinkedIn',
+      state: 'INACTIVE',
+      detail: 'Auth needed',
+      tone: 'bg-white',
+      dotTone: 'bg-black',
+    },
+  ]
+
+  return (
+    <div className="flex flex-wrap items-center gap-2">
+      {providers.map((provider) => (
+        <button
+          key={provider.label}
+          type="button"
+          title={`${provider.label}: ${provider.state} — ${provider.detail}`}
+          className={`inline-flex min-w-0 max-w-full items-center gap-2 border-2 border-black px-3 py-1 text-[11px] font-black uppercase tracking-[0.14em] shadow-[2px_2px_0_0_#000] ${provider.tone}`}
+        >
+          <span className={`inline-block h-2.5 w-2.5 shrink-0 rounded-full border border-black ${provider.dotTone}`} />
+          <span className="truncate">
+            {provider.label} {provider.state}
+          </span>
+        </button>
+      ))}
+    </div>
+  )
+}
+
+function DailyQuestCard({
+  questsRemaining,
+  leadsCount,
+}: {
+  questsRemaining: number
+  leadsCount: number
+}) {
+  const completedQuestCount = Math.max(0, 3 - questsRemaining)
+
+  const questRows = [
+    {
+      label: 'Quest streak progress',
+      progressLabel: `${completedQuestCount} / 3`,
+      done: questsRemaining <= 0,
+    },
+    {
+      label: 'Review 1 lead today',
+      progressLabel: `${Math.min(leadsCount, 1)} / 1`,
+      done: leadsCount >= 1,
+    },
+  ]
+
+  return (
+    <div className="min-w-0 border-4 border-black bg-white p-4 shadow-[4px_4px_0_0_#000]">
+      <div className="flex flex-wrap items-start justify-between gap-3 border-b-2 border-black pb-3">
+        <div className="min-w-0 flex-1">
+          <p className="text-[11px] font-black uppercase tracking-[0.16em] text-black/60">Daily quest log</p>
+          <h3 className="text-lg font-black uppercase">XP Objectives</h3>
+        </div>
+        <span className="inline-flex shrink-0 items-center gap-2 whitespace-nowrap border-2 border-black bg-[#FFE600] px-2 py-1 text-[10px] font-black uppercase shadow-[2px_2px_0_0_#000]">
+          <Zap className="h-3.5 w-3.5 shrink-0" />
+          +100 XP
+        </span>
+      </div>
+
+      <div className="mt-3 space-y-2">
+        {questRows.map((quest) => (
+          <div
+            key={quest.label}
+            className={`flex min-w-0 flex-wrap items-center justify-between gap-2 border-2 border-black px-3 py-2 text-[11px] font-black uppercase tracking-[0.12em] ${
+              quest.done ? 'bg-[#A3E635]' : 'bg-[#F4F0EA]'
+            }`}
+          >
+            <span className="min-w-0 flex-1 break-words">
+              {quest.done ? '[x]' : '[ ]'} {quest.label}
+            </span>
+            <span className="shrink-0 whitespace-nowrap">{quest.progressLabel}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
 
 type DashboardStatsProps = {
   item: Variants
@@ -22,45 +120,142 @@ export function DashboardStats({
   recentLevelUp,
   xpPercent,
   leads,
-  shareStats
+  shareStats,
 }: DashboardStatsProps) {
+  const questsRemaining = user.questsRemaining ?? 3
+  const hasLeadData = leads.length > 0
+
   return (
-    <motion.div variants={item} className="xl:col-span-8 bg-[#FFE600] border-4 border-black p-8 md:p-10 shadow-[8px_8px_0_0_#000] flex flex-col justify-between relative group overflow-hidden">
-      <div className="relative z-10 flex flex-col md:flex-row justify-between gap-8">
-        <div className="flex-1">
-          <div className="mb-6">
-            <HeroCrest
-              heroName={user.name}
-              heroTitle={characterTitle}
-              level={user.level}
-              isScanning={isScanning}
-              recentLevelUp={recentLevelUp}
-            />
-          </div>
-          
-          <div className="bg-white border-4 border-black p-4 shadow-[4px_4px_0_0_#000]">
-            <div className="flex justify-between font-black uppercase text-sm mb-2">
-              <span>XP Progress</span>
-              <span>{user.xp} / {user.xpRequired} XP</span>
-            </div>
-            <div className="w-full h-8 bg-[#F4F0EA] border-4 border-black overflow-hidden relative">
-              <motion.div className="h-full bg-[#A3E635] border-r-4 border-black" style={{ backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(0,0,0,0.1) 10px, rgba(0,0,0,0.1) 20px)' }} initial={{ width: '0%' }} animate={{ width: `${xpPercent}%` }} transition={{ type: 'spring', stiffness: 100 }} />
-            </div>
-          </div>
-        </div>
-        
-        <div className="flex flex-col gap-4">
-          <div className="bg-[#06B6D4] border-4 border-black p-6 shadow-[4px_4px_0_0_#000] rotate-2">
-            <span className="bg-black text-[#06B6D4] font-black text-[10px] uppercase px-2 py-0.5 border border-white">OPEN LEADS</span>
-            <p className="text-3xl md:text-4xl font-black mt-2 text-white" style={{ WebkitTextStroke: '1px black' }}>{leads.length.toLocaleString()}</p>
-            <p className="text-[11px] font-black text-black uppercase mt-2 border-t-2 border-black/20 pt-2 tracking-tight">Stored tenant records awaiting action</p>
-          </div>
-          <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={shareStats} className="bg-black text-white hover:bg-zinc-800 font-black text-lg uppercase py-4 border-4 border-white shadow-[4px_4px_0_0_#fff] flex items-center justify-center gap-3">
-            <Share2 size={20} /> Share measured counts
-          </motion.button>
+    <motion.div
+      variants={item}
+      className="min-w-0 overflow-hidden border-4 border-black bg-[#FFE600] p-6 shadow-[8px_8px_0_0_#000] md:p-8 xl:p-10"
+    >
+      <div className="mb-6 flex flex-col gap-3">
+        <ProviderStatusStrip />
+        <div className="flex flex-wrap items-center gap-2 text-[11px] font-black uppercase tracking-[0.14em] text-black/70">
+          <span className="inline-flex items-center gap-2 border-2 border-black bg-white px-3 py-1 shadow-[2px_2px_0_0_#000]">
+            <Sparkles className="h-3.5 w-3.5 shrink-0" />
+            Sync pulse stable
+          </span>
+          <span>Last synced: 4m ago</span>
+          <span className="hidden text-black/40 sm:inline">•</span>
+          <span>Next auto-run: 26m</span>
         </div>
       </div>
-      <Crown className="absolute -bottom-10 -left-10 w-64 h-64 text-black opacity-10 group-hover:scale-110 transition-transform duration-500" />
+
+      <div className="grid min-w-0 grid-cols-1 gap-4 md:grid-cols-3">
+        <div className="min-w-0 space-y-4">
+          <HeroCrest
+            heroName={user.name}
+            heroTitle={characterTitle}
+            level={user.level}
+            isScanning={isScanning}
+            recentLevelUp={recentLevelUp}
+          />
+
+          <div className="min-w-0 border-4 border-black bg-white p-4 shadow-[4px_4px_0_0_#000]">
+            <div className="flex flex-wrap items-center justify-between gap-3 border-b-2 border-black pb-3">
+              <div className="min-w-0 flex-1">
+                <p className="text-[11px] font-black uppercase tracking-[0.16em] text-black/60">Level progress</p>
+                <h3 className="text-lg font-black uppercase">Quest XP</h3>
+              </div>
+              <span className="inline-flex items-center gap-2 whitespace-nowrap border-2 border-black bg-[#67E8F9] px-2 py-1 text-[10px] font-black uppercase shadow-[2px_2px_0_0_#000]">
+                <Radar className="h-3.5 w-3.5 shrink-0" />
+                {Math.round(xpPercent)}%
+              </span>
+            </div>
+
+            <div className="mt-4">
+              <div className="flex items-center justify-between text-[11px] font-black uppercase tracking-[0.14em]">
+                <span>
+                  {user.xp} / {user.xpRequired} XP
+                </span>
+                <span>Lvl {user.level}</span>
+              </div>
+
+              <div className="mt-2 h-5 border-2 border-black bg-[#F4F0EA] p-[2px] shadow-[2px_2px_0_0_#000]">
+                <div
+                  className="h-full border border-black bg-[#06B6D4] transition-[width] duration-500"
+                  style={{ width: `${xpPercent}%` }}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="min-w-0 space-y-4">
+          <DailyQuestCard questsRemaining={questsRemaining} leadsCount={leads.length} />
+
+          <div className="min-w-0 border-4 border-black bg-white p-4 shadow-[4px_4px_0_0_#000]">
+            <div className="flex flex-wrap items-start justify-between gap-3 border-b-2 border-black pb-3">
+              <div className="min-w-0 flex-1">
+                <p className="text-[11px] font-black uppercase tracking-[0.16em] text-black/60">Hunter pressure</p>
+                <h3 className="text-lg font-black uppercase">Lead posture</h3>
+              </div>
+              <span className="inline-flex shrink-0 items-center gap-2 whitespace-nowrap border-2 border-black bg-[#A3E635] px-2 py-1 text-[10px] font-black uppercase shadow-[2px_2px_0_0_#000]">
+                <ScrollText className="h-3.5 w-3.5 shrink-0" />
+                {leads.length} tracked
+              </span>
+            </div>
+
+            <div className="mt-3 space-y-2 text-[11px] font-black uppercase tracking-[0.12em]">
+              <div className="flex items-center justify-between border-2 border-black bg-[#F4F0EA] px-3 py-2">
+                <span>Fresh matches</span>
+                <span>{leads.length}</span>
+              </div>
+              <div className="flex items-center justify-between border-2 border-black bg-[#F4F0EA] px-3 py-2">
+                <span>Scanner mode</span>
+                <span>{isScanning ? 'Patrolling' : 'Idle'}</span>
+              </div>
+              <div className="flex items-center justify-between border-2 border-black bg-[#F4F0EA] px-3 py-2">
+                <span>Lead board</span>
+                <span>{hasLeadData ? 'Live' : 'Awaiting matches'}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="min-w-0 space-y-4">
+          <div className="min-w-0 border-4 border-black bg-white p-4 shadow-[4px_4px_0_0_#000]">
+            <div className="flex flex-wrap items-start justify-between gap-3 border-b-2 border-black pb-3">
+              <div className="min-w-0 flex-1">
+                <p className="text-[11px] font-black uppercase tracking-[0.16em] text-black/60">Share your guild state</p>
+                <h3 className="text-lg font-black uppercase">Broadcast snapshot</h3>
+              </div>
+              <button
+                type="button"
+                onClick={shareStats}
+                className="inline-flex shrink-0 items-center gap-2 whitespace-nowrap border-2 border-black bg-[#FFE600] px-3 py-2 text-[10px] font-black uppercase shadow-[2px_2px_0_0_#000] transition-all hover:-translate-y-0.5 hover:translate-x-0.5"
+              >
+                <Share2 className="h-3.5 w-3.5 shrink-0" />
+                Copy report
+              </button>
+            </div>
+
+            <div className="mt-3 space-y-2 text-[11px] font-black uppercase tracking-[0.12em]">
+              <div className="border-2 border-black bg-[#F4F0EA] px-3 py-3">
+                Guild rank report updates with your tracked lead volume and quest completion pace.
+              </div>
+              <div className="border-2 border-black bg-[#F4F0EA] px-3 py-3">
+                Use this to share operating momentum with your team without opening billing or settings panels.
+              </div>
+            </div>
+          </div>
+
+          <div className="min-w-0 border-4 border-black bg-white p-4 shadow-[4px_4px_0_0_#000]">
+            <div className="flex flex-wrap items-start justify-between gap-3 border-b-2 border-black pb-3">
+              <div className="min-w-0 flex-1">
+                <p className="text-[11px] font-black uppercase tracking-[0.16em] text-black/60">Command note</p>
+                <h3 className="text-lg font-black uppercase">Guild Hall brief</h3>
+              </div>
+            </div>
+
+            <div className="mt-3 border-2 border-black bg-[#F4F0EA] px-3 py-3 text-[11px] font-black uppercase tracking-[0.12em]">
+              This room now focuses on scouting momentum, XP objectives, and lead operations. Mana and plan state live in the persistent HUD above.
+            </div>
+          </div>
+        </div>
+      </div>
     </motion.div>
   )
 }
