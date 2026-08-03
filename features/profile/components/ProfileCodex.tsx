@@ -1,7 +1,7 @@
 import { motion, AnimatePresence } from 'framer-motion'
 import { Scroll, MessageSquare, Flame, Send, Award, Pin, Trash2, Swords, MessageCircle, Sparkles } from 'lucide-react'
 import { ProfilePost } from '@/features/profile/types'
-import { ElementType } from 'react'
+import type { LucideIcon } from 'lucide-react'
 
 type ProfileCodexProps = {
   posts: ProfilePost[]
@@ -31,7 +31,7 @@ type ProfileCodexProps = {
     id: string
     tag: string
     label: string
-    icon: ElementType
+    icon: LucideIcon
     bgColor: string
     textColor: string
     desc: string
