@@ -1,10 +1,18 @@
-export default function AppLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
-  // Canonical authenticated product pages own their shell under /app. This
-  // route group remains only for /onboarding; legacy siblings redirect in
-  // proxy.ts and must not add a second navigation or main landmark.
-  return children
+import { redirect } from 'next/navigation'
+import { getCurrentUser } from '@/lib/auth'
+import { AppShell } from '@/components/coquest/shell/AppShell'
+import { buildGuildHudData } from '@/components/coquest/hud/buildGuildHudData'
+import { roomRouteMetaByPath } from '@/components/coquest/nav/room-route-meta'
+
+export const dynamic = 'force-dynamic'
+
+export default async function AppLayout({ children }: { children: React.ReactNode }) {
+  const user = await getCurrentUser()
+  if (!user) redirect('/sign-in?redirect_url=%2Fapp')
+  if (!user.onboardingComplete) redirect('/onboarding?returnTo=%2Fapp')
+
+  const hud = buildGuildHudData(user)
+  const room = roomRouteMetaByPath['/app']
+
+  return <AppShell hud={hud} room={room}>{children}</AppShell>
 }
