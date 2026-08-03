@@ -3,14 +3,16 @@ import type { Metadata } from 'next'
 import { Suspense } from 'react'
 import Loading from '../(app)/loading'
 import { type DashboardKeyword, type DashboardLead, type DashboardUser } from '@/features/dashboard/types'
+import { requireCurrentUser } from '@/lib/auth'
+import prisma from '@/lib/prisma'
 
 const DashboardClient = nextDynamic(() => import('@/features/dashboard/components/DashboardClient'))
 
 export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
-  title: 'Dashboard | CoQuest',
-  description: 'Review saved keywords, durable scan state, and stored source matches.',
+  title: 'Guild Hall | HypeQuest',
+  description: 'Command the headquarters, review saved keywords, and inspect active lead pressure.',
 }
 
 export default function AppHomePage() {
@@ -20,9 +22,6 @@ export default function AppHomePage() {
     </Suspense>
   )
 }
-
-import { requireCurrentUser } from '@/lib/auth'
-import prisma from '@/lib/prisma'
 
 async function DashboardShellData() {
   const user = await requireCurrentUser()

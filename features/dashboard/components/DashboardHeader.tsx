@@ -1,7 +1,6 @@
-import { motion, Variants } from 'framer-motion'
-import AudioNavbarToggle from '@/components/AudioNavbarToggle'
-import ManaLiquidMeter from '@/components/ManaLiquidMeter'
-import { DashboardUser } from '@/features/dashboard/types'
+import { motion, type Variants } from 'framer-motion'
+import { Crosshair, Sparkles } from 'lucide-react'
+import type { DashboardUser } from '@/features/dashboard/types'
 
 type DashboardHeaderProps = {
   item: Variants
@@ -19,31 +18,67 @@ export function DashboardHeader({
   characterTitle,
   user,
   remainingQuests,
-  maxCredits,
-  setIsManaShopOpen
 }: DashboardHeaderProps) {
   return (
-    <motion.div variants={item} className="space-y-4">
-      <div className="bg-black text-white border-4 border-black p-4 flex flex-wrap items-center justify-between gap-4 shadow-[6px_6px_0px_0px_rgba(255,230,0,1)]">
-        <div className="flex items-center gap-4">
-          <span className="bg-[#FF5722] text-white font-black text-sm uppercase px-3 py-1 border-2 border-white shadow-[2px_2px_0_0_#fff]">
-            {subscriptionTier}
-          </span>
-          <span className="font-black text-base uppercase">
-            <span className="text-[#06B6D4]">{characterTitle}</span> ({user.name})
-          </span>
+    <motion.section
+      variants={item}
+      initial="hidden"
+      animate="show"
+      className="border-4 border-black bg-[#FFE600] p-5 shadow-[6px_6px_0_0_#000] md:p-6"
+    >
+      <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
+        <div className="min-w-0">
+          <p className="text-[11px] font-black uppercase tracking-[0.18em] text-black/60">
+            Guild Hall command
+          </p>
+          <h2 className="mt-2 text-2xl font-black uppercase tracking-[0.04em] text-black md:text-3xl">
+            Hunt high-intent signals before they go cold
+          </h2>
+          <p className="mt-3 max-w-3xl text-sm font-bold uppercase tracking-[0.04em] text-black/75">
+            Operate your headquarters, dispatch scans, and convert live matches into active opportunities.
+          </p>
         </div>
-        
-        <div className="flex items-center gap-3">
-          <AudioNavbarToggle />
+
+        <div className="grid gap-3 sm:grid-cols-2">
+          <div className="border-4 border-black bg-white px-4 py-3 shadow-[4px_4px_0_0_#000]">
+            <p className="text-[10px] font-black uppercase tracking-[0.18em] text-black/60">
+              Current title
+            </p>
+            <p className="mt-2 text-sm font-black uppercase tracking-[0.08em] text-black">
+              {characterTitle}
+            </p>
+          </div>
+
+          <div className="border-4 border-black bg-white px-4 py-3 shadow-[4px_4px_0_0_#000]">
+            <p className="text-[10px] font-black uppercase tracking-[0.18em] text-black/60">
+              Quest load
+            </p>
+            <p className="mt-2 text-sm font-black uppercase tracking-[0.08em] text-black">
+              {remainingQuests} open objectives
+            </p>
+          </div>
+
+          <div className="border-4 border-black bg-white px-4 py-3 shadow-[4px_4px_0_0_#000]">
+            <p className="text-[10px] font-black uppercase tracking-[0.18em] text-black/60">
+              Signal mode
+            </p>
+            <p className="mt-2 flex items-center gap-2 text-sm font-black uppercase tracking-[0.08em] text-black">
+              <Crosshair className="h-4 w-4" />
+              Live patrol
+            </p>
+          </div>
+
+          <div className="border-4 border-black bg-white px-4 py-3 shadow-[4px_4px_0_0_#000]">
+            <p className="text-[10px] font-black uppercase tracking-[0.18em] text-black/60">
+              Guild state
+            </p>
+            <p className="mt-2 flex items-center gap-2 text-sm font-black uppercase tracking-[0.08em] text-black">
+              <Sparkles className="h-4 w-4" />
+              {subscriptionTier}
+            </p>
+          </div>
         </div>
       </div>
-
-      <ManaLiquidMeter
-        currentMana={remainingQuests}
-        maxMana={Math.max(1, maxCredits)}
-        onOpenShop={() => setIsManaShopOpen(true)}
-      />
-    </motion.div>
+    </motion.section>
   )
 }

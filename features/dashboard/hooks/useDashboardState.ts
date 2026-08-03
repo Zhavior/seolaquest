@@ -70,6 +70,28 @@ export function useDashboardState({
 
   const filter = searchParams.get('platform') || 'ALL'
 
+  const leadsHydratedRef = useRef(false)
+  useEffect(() => {
+    if (leadsHydratedRef.current) return
+    leadsHydratedRef.current = true
+    let cancelled = false
+    void (async () => {
+      try {
+        const response = await fetch('/api/dashboard/leads', { cache: 'no-store' })
+        if (!response.ok) return
+        const payload = await response.json() as { ok?: boolean; leads?: DashboardLead[] }
+        if (!cancelled && payload.ok && Array.isArray(payload.leads)) {
+          setLeads(payload.leads)
+        }
+      } catch {
+        // Server shell leads remain authoritative until the next successful refresh.
+      }
+    })()
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
   const setFilter = useCallback(
     (newFilter: string) => {
       const params = new URLSearchParams(searchParams.toString())
