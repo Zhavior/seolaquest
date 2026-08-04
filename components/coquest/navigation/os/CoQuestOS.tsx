@@ -1,20 +1,18 @@
-import type { ReactNode } from 'react'
+'use client'
 
+import Header from './header/Header'
 import NavigationRail from './rail/NavigationRail'
 
-interface CoQuestOSProps {
-  children: ReactNode
-}
-
-export default function CoQuestOS({ children }: CoQuestOSProps) {
+export default function CoQuestOS({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen bg-[#F4EFE6] text-black">
-      <div className="flex min-h-screen">
-        <NavigationRail />
-        <main className="min-w-0 flex-1 bg-[#F4EFE6]">
+    <div className="flex h-screen w-screen overflow-hidden bg-[#F8F5EF]">
+      <NavigationRail />
+      <section className="flex flex-1 flex-col min-w-0">
+        <Header />
+        <main className="flex-1 overflow-auto p-6 md:p-10">
           {children}
         </main>
-      </div>
+      </section>
     </div>
   )
 }
