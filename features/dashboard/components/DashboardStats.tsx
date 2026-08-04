@@ -264,7 +264,6 @@ export function DashboardStats({
               level={user.level}
               isScanning={isScanning}
               recentLevelUp={recentLevelUp}
-              xpPercent={xpPercent}
             />
           </div>
 
