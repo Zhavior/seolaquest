@@ -1,13 +1,20 @@
-import CoQuestOS from '@/components/coquest/navigation/os/CoQuestOS'
-
 export default function OSPreviewPage() {
   return (
-    <CoQuestOS>
-      <div className="flex h-full items-center justify-center">
+    <main className="flex min-h-screen items-center justify-center bg-[#F4EFE6]">
+      <div className="border-4 border-black bg-[#FFF8D6] p-12 shadow-[8px_8px_0_0_#000]">
+        <p className="mb-2 text-xs font-black uppercase tracking-[0.25em] text-black/60">
+          CoQuest OS Preview
+        </p>
+
         <h1 className="text-5xl font-black tracking-tight">
-          COQUEST OS
+          Battle Area Shell
         </h1>
+
+        <p className="mt-4 max-w-xl text-lg font-semibold text-black/70">
+          The authenticated shell now requires a real signed-in user. This preview
+          page intentionally renders outside that shell.
+        </p>
       </div>
-    </CoQuestOS>
+    </main>
   )
 }

@@ -14,7 +14,7 @@ export function LandingNavClient() {
     return (
       <div className="flex items-center gap-2 sm:gap-3">
         <Link
-          href="/dashboard"
+          href="/app"
           className="hidden border-[3px] border-black bg-[#FFE600] px-3 py-2 font-black uppercase tracking-[0.14em] text-black shadow-[3px_3px_0_0_#000] transition-transform duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[1px_1px_0_0_#000] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none sm:inline-flex"
         >
           COMMAND CENTER

@@ -221,7 +221,7 @@ export async function completeOnboarding(formData: FormData): Promise<never> {
 
   revalidateTag('profile', 'max')
   revalidateTag('tracked-keywords', 'max')
-  revalidatePath('/dashboard', 'layout')
-  revalidatePath('/dashboard')
-  redirect('/dashboard')
+  revalidatePath('/app', 'layout')
+  revalidatePath('/app')
+  redirect('/app')
 }

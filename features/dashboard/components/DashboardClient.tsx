@@ -109,14 +109,9 @@ export default function DashboardClient({
 
         <DashboardHeader
           item={sectionReveal}
-          subscriptionTier={state.subscriptionTier}
-          characterTitle={state.characterTitle}
           user={state.user}
           remainingQuests={state.remainingQuests}
           maxCredits={state.maxCredits}
-          setIsManaShopOpen={(open) => {
-            if (open) window.location.assign('/app/billing')
-          }}
         />
 
         <AnimatePresence initial={false}>
@@ -176,7 +171,7 @@ export default function DashboardClient({
           </button>
         </div>
 
-        <div className={`${isOverview ? 'grid' : 'hidden'} grid-cols-1 gap-8 sm:grid`}>
+        <div className={`${isOverview ? 'grid' : 'hidden'} grid-cols-1 gap-4 sm:gap-6 xl:gap-8 sm:grid`}>
           <DashboardStats
             item={sectionReveal}
             user={state.user}
@@ -199,7 +194,7 @@ export default function DashboardClient({
           />
         </div>
 
-        <div className={`${isOverview ? 'grid' : 'hidden'} grid-cols-1 items-stretch gap-8 sm:grid xl:grid-cols-2`}>
+        <div className={`${isOverview ? 'grid' : 'hidden'} grid-cols-1 items-stretch gap-4 sm:gap-6 xl:gap-8 2xl:grid-cols-2`}>
           <DashboardKeywords
             item={sectionReveal}
             keywords={state.keywords}

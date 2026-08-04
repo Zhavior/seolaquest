@@ -17,7 +17,7 @@ export interface NavigationItem {
 }
 
 export const navigation: NavigationItem[] = [
-  { label: 'Battlestation', href: '/app', icon: LayoutDashboard },
+  { label: 'Battle Area', href: '/app', icon: LayoutDashboard },
   { label: 'Guild Hall', href: '/app/guild', icon: Castle },
   { label: 'Scan Runs', href: '/app/runs', icon: History },
   { label: 'Deliveries', href: '/app/deliveries', icon: Send },

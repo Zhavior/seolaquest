@@ -71,12 +71,12 @@ function DailyQuestCard({
 
   return (
     <div className="min-w-0 border-4 border-black bg-white p-4 shadow-[4px_4px_0_0_#000]">
-      <div className="flex flex-wrap items-start justify-between gap-3 border-b-2 border-black pb-3">
+      <div className="flex flex-col gap-3 border-b-2 border-black pb-3 sm:flex-row sm:items-start sm:justify-between">
         <div className="min-w-0 flex-1">
           <p className="text-[11px] font-black uppercase tracking-[0.16em] text-black/60">Daily quest log</p>
           <h3 className="text-lg font-black uppercase">XP Objectives</h3>
         </div>
-        <span className="inline-flex shrink-0 items-center gap-2 whitespace-nowrap border-2 border-black bg-[#FFE600] px-2 py-1 text-[10px] font-black uppercase shadow-[2px_2px_0_0_#000]">
+        <span className="inline-flex w-full justify-center sm:w-auto shrink-0 items-center gap-2 whitespace-nowrap border-2 border-black bg-[#FFE600] px-2 py-1 text-[10px] font-black uppercase shadow-[2px_2px_0_0_#000]">
           <Zap className="h-3.5 w-3.5 shrink-0" />
           +100 XP
         </span>
@@ -128,7 +128,7 @@ export function DashboardStats({
   return (
     <motion.div
       variants={item}
-      className="min-w-0 overflow-hidden border-4 border-black bg-[#13D7C2] p-6 shadow-[8px_8px_0_0_#000] md:p-8 xl:p-10"
+      className="w-full min-w-0 max-w-full overflow-hidden border-4 border-black bg-[#13D7C2] p-4 shadow-[8px_8px_0_0_#000] sm:p-6 md:p-8 xl:p-10"
     >
       <div className="mb-6 flex flex-col gap-3">
         <ProviderStatusStrip />
@@ -143,7 +143,7 @@ export function DashboardStats({
         </div>
       </div>
 
-      <div className="grid min-w-0 grid-cols-1 gap-4 md:grid-cols-[1.15fr_1fr_0.95fr]">
+      <div className="grid min-w-0 grid-cols-1 gap-4 lg:grid-cols-[1.15fr_1fr] 2xl:grid-cols-[1.15fr_1fr_0.95fr]">
         <div className="min-w-0 space-y-4">
           <HeroCrest
             heroName={user.name}
@@ -166,7 +166,7 @@ export function DashboardStats({
             </div>
 
             <div className="mt-4">
-              <div className="flex items-center justify-between text-[11px] font-black uppercase tracking-[0.14em]">
+              <div className="flex flex-col gap-2 text-[11px] font-black uppercase tracking-[0.14em] sm:flex-row sm:items-center sm:justify-between">
                 <span>
                   {user.xp} / {user.xpRequired} XP
                 </span>
@@ -187,27 +187,27 @@ export function DashboardStats({
           <DailyQuestCard questsRemaining={questsRemaining} leadsCount={leads.length} />
 
           <div className="min-w-0 border-4 border-black bg-white p-4 shadow-[4px_4px_0_0_#000]">
-            <div className="flex flex-wrap items-start justify-between gap-3 border-b-2 border-black pb-3">
+            <div className="flex flex-col gap-3 border-b-2 border-black pb-3 sm:flex-row sm:items-start sm:justify-between">
               <div className="min-w-0 flex-1">
                 <p className="text-[11px] font-black uppercase tracking-[0.16em] text-black/60">Hunter pressure</p>
                 <h3 className="text-lg font-black uppercase">Lead posture</h3>
               </div>
-              <span className="inline-flex shrink-0 items-center gap-2 whitespace-nowrap border-2 border-black bg-[#A3E635] px-2 py-1 text-[10px] font-black uppercase shadow-[2px_2px_0_0_#000]">
+              <span className="inline-flex w-full justify-center sm:w-auto shrink-0 items-center gap-2 whitespace-nowrap border-2 border-black bg-[#A3E635] px-2 py-1 text-[10px] font-black uppercase shadow-[2px_2px_0_0_#000]">
                 <ScrollText className="h-3.5 w-3.5 shrink-0" />
                 {leads.length} tracked
               </span>
             </div>
 
             <div className="mt-3 space-y-2 text-[11px] font-black uppercase tracking-[0.12em]">
-              <div className="flex items-center justify-between border-2 border-black bg-[#F4F0EA] px-3 py-2">
+              <div className="flex flex-wrap items-center justify-between gap-2 border-2 border-black bg-[#F4F0EA] px-3 py-2">
                 <span>Fresh matches</span>
                 <span>{leads.length}</span>
               </div>
-              <div className="flex items-center justify-between border-2 border-black bg-[#F4F0EA] px-3 py-2">
+              <div className="flex flex-wrap items-center justify-between gap-2 border-2 border-black bg-[#F4F0EA] px-3 py-2">
                 <span>Scanner mode</span>
                 <span>{isScanning ? 'Patrolling' : 'Idle'}</span>
               </div>
-              <div className="flex items-center justify-between border-2 border-black bg-[#F4F0EA] px-3 py-2">
+              <div className="flex flex-wrap items-center justify-between gap-2 border-2 border-black bg-[#F4F0EA] px-3 py-2">
                 <span>Lead board</span>
                 <span>{hasLeadData ? 'Live' : 'Awaiting matches'}</span>
               </div>
@@ -217,7 +217,7 @@ export function DashboardStats({
 
         <div className="min-w-0 space-y-4">
           <div className="min-w-0 border-4 border-black bg-white p-4 shadow-[4px_4px_0_0_#000]">
-            <div className="flex flex-wrap items-start justify-between gap-3 border-b-2 border-black pb-3">
+            <div className="flex flex-col gap-3 border-b-2 border-black pb-3 sm:flex-row sm:items-start sm:justify-between">
               <div className="min-w-0 flex-1">
                 <p className="text-[11px] font-black uppercase tracking-[0.16em] text-black/60">Share your command state</p>
                 <h3 className="text-lg font-black uppercase">Broadcast snapshot</h3>
@@ -225,7 +225,7 @@ export function DashboardStats({
               <button
                 type="button"
                 onClick={shareStats}
-                className="inline-flex shrink-0 items-center gap-2 whitespace-nowrap border-2 border-black bg-[#FFE600] px-3 py-2 text-[10px] font-black uppercase shadow-[2px_2px_0_0_#000] transition-all hover:-translate-y-0.5 hover:translate-x-0.5"
+                className="inline-flex w-full justify-center sm:w-auto shrink-0 items-center gap-2 whitespace-nowrap border-2 border-black bg-[#FFE600] px-3 py-2 text-[10px] font-black uppercase shadow-[2px_2px_0_0_#000] transition-all hover:-translate-y-0.5 hover:translate-x-0.5"
               >
                 <Share2 className="h-3.5 w-3.5 shrink-0" />
                 Copy report
@@ -243,12 +243,12 @@ export function DashboardStats({
           </div>
 
           <div className="min-w-0 border-4 border-black bg-white p-4 shadow-[4px_4px_0_0_#000]">
-            <div className="flex flex-wrap items-start justify-between gap-3 border-b-2 border-black pb-3">
+            <div className="flex flex-col gap-3 border-b-2 border-black pb-3 sm:flex-row sm:items-start sm:justify-between">
               <div className="min-w-0 flex-1">
                 <p className="text-[11px] font-black uppercase tracking-[0.16em] text-black/60">Battlestation brief</p>
                 <h3 className="text-lg font-black uppercase">Command doctrine</h3>
               </div>
-              <span className="inline-flex shrink-0 items-center gap-2 whitespace-nowrap border-2 border-black bg-[#D9F99D] px-2 py-1 text-[10px] font-black uppercase shadow-[2px_2px_0_0_#000]">
+              <span className="inline-flex w-full justify-center sm:w-auto shrink-0 items-center gap-2 whitespace-nowrap border-2 border-black bg-[#D9F99D] px-2 py-1 text-[10px] font-black uppercase shadow-[2px_2px_0_0_#000]">
                 <Crosshair className="h-3.5 w-3.5 shrink-0" />
                 Live tactics
               </span>
@@ -265,12 +265,12 @@ export function DashboardStats({
           </div>
 
           <div className="min-w-0 border-4 border-black bg-[#FFF7CC] p-4 shadow-[4px_4px_0_0_#000]">
-            <div className="flex flex-wrap items-start justify-between gap-3 border-b-2 border-black pb-3">
+            <div className="flex flex-col gap-3 border-b-2 border-black pb-3 sm:flex-row sm:items-start sm:justify-between">
               <div className="min-w-0 flex-1">
                 <p className="text-[11px] font-black uppercase tracking-[0.16em] text-black/60">Signal pressure</p>
                 <h3 className="text-lg font-black uppercase">Live command cue</h3>
               </div>
-              <span className="inline-flex shrink-0 items-center gap-2 whitespace-nowrap border-2 border-black bg-white px-2 py-1 text-[10px] font-black uppercase shadow-[2px_2px_0_0_#000]">
+              <span className="inline-flex w-full justify-center sm:w-auto shrink-0 items-center gap-2 whitespace-nowrap border-2 border-black bg-white px-2 py-1 text-[10px] font-black uppercase shadow-[2px_2px_0_0_#000]">
                 <ShieldAlert className="h-3.5 w-3.5 shrink-0" />
                 Stay sharp
               </span>

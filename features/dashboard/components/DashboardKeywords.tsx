@@ -156,10 +156,10 @@ export function DashboardKeywords({
                 >
                   <div className="min-w-0">
                     <p className="truncate text-sm font-black uppercase tracking-[0.05em] text-black">
-                      {keyword.keyword}
+                      {keyword.phrase}
                     </p>
                     <p className="mt-1 text-[10px] font-black uppercase tracking-[0.14em] text-black/55">
-                      {keyword.heroClass || 'Unassigned class'}
+                      {keyword.active ? 'ACTIVE' : 'INACTIVE'}
                     </p>
                   </div>
 
@@ -168,7 +168,7 @@ export function DashboardKeywords({
                     onClick={() => removeKeyword(keyword.id)}
                     disabled={isPending}
                     className="flex h-10 w-10 shrink-0 items-center justify-center border-4 border-black bg-[#FF8C69] text-black shadow-[3px_3px_0_0_#000] transition-all hover:-translate-y-0.5 hover:translate-x-0.5 disabled:opacity-50"
-                    aria-label={`Remove ${keyword.keyword}`}
+                    aria-label={`Remove ${keyword.phrase}`}
                   >
                     <X aria-hidden="true" className="h-4 w-4 stroke-[3px]" />
                   </button>

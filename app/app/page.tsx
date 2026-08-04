@@ -11,8 +11,8 @@ const DashboardClient = nextDynamic(() => import('@/features/dashboard/component
 export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
-  title: 'Guild Hall | HypeQuest',
-  description: 'Command the headquarters, review saved keywords, and inspect active lead pressure.',
+  title: 'Battle Area | HypeQuest',
+  description: 'Command your Battle Area, manage keyword campaigns, and review active lead intelligence.',
 }
 
 export default function AppHomePage() {
