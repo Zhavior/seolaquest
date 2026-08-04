@@ -3,11 +3,11 @@
 import { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Command, LogOut, Menu, Sparkles, X } from 'lucide-react'
+import { LogOut, Menu, X } from 'lucide-react'
 import { SignOutButton, useUser } from '@clerk/nextjs'
 
-import RailLogo from './RailLogo'
 import { navigation } from '../shared/navigation'
+import { PlayerStatusCard } from './PlayerStatusCard'
 
 export default function NavigationRail() {
   const pathname = usePathname()
@@ -77,47 +77,19 @@ export default function NavigationRail() {
         collapsed ? 'opacity-95' : 'opacity-100',
       ].join(' ')}
     >
-      <div className="border-b border-amber-900/20 bg-gradient-to-b from-[#FFF7E6] to-[#F7E6B5] px-5 py-5">
-        <div
-          className={[
-            'overflow-hidden rounded-2xl border border-amber-900/20 bg-white shadow-lg transition-all duration-200 ease-out',
-            collapsed
-              ? 'flex min-h-[88px] items-center justify-center px-2 py-3'
-              : 'flex min-h-[88px] items-center gap-3 px-3 py-3',
-          ].join(' ')}
-        >
-          <div className="shrink-0">
-            <RailLogo compact={collapsed} />
-          </div>
+      
+<div className="border-b-2 border-black bg-[#F7E6B5] p-4">
+  <PlayerStatusCard
+    collapsed={collapsed}
+    name={displayName}
+    level={14}
+    title="Apprentice Builder"
+    quest="Launch Public Beta"
+    progress={73}
+  />
+</div>
 
-          {!collapsed && (
-            <div className="min-w-0">
-              <p className="truncate text-sm font-black uppercase tracking-[0.16em] text-black">
-                CoQuest OS
-              </p>
-              <div className="mt-1 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.14em] text-black/70">
-                <Sparkles className="h-3.5 w-3.5 shrink-0" />
-                <span className="truncate">Command Rail</span>
-              </div>
-              <Link
-                href="/app"
-                aria-label="Quick Search"
-                title="Quick Search"
-                onClick={() => setMobileOpen(false)}
-                className="mt-3 inline-flex items-center gap-2 rounded-xl border border-stone-200 bg-white px-2.5 py-1 text-[11px] font-black uppercase tracking-[0.14em] text-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all duration-200 ease-out hover:-translate-y-[1px] hover:bg-[#FFF1A8]"
-              >
-                <Command className="h-3.5 w-3.5" />
-                <span>Quick Search</span>
-                <span className="inline-flex items-center border border-black bg-[#FFD54F] px-1.5 py-0.5 text-[10px] font-black leading-none text-black">
-                  ⌘K
-                </span>
-              </Link>
-            </div>
-          )}
-        </div>
-      </div>
-
-      <nav className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 py-5">
+<nav className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 py-5">
         {groupedNavigation.map((group) => (
           <div key={group.key} className="space-y-3">
             {!collapsed ? (
