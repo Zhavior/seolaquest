@@ -1,7 +1,6 @@
 'use client'
 
 import type { ReactNode } from 'react'
-import clsx from 'clsx'
 
 interface ShellLayoutProps {
   collapsed?: boolean
@@ -11,33 +10,19 @@ interface ShellLayoutProps {
 }
 
 export default function ShellLayout({
-  collapsed = false,
   sidebar,
   statusBar,
   children,
 }: ShellLayoutProps) {
   return (
-    <div
-      className={clsx(
-        "grid min-h-screen bg-[#F4EFE6] transition-[grid-template-columns] duration-300 ease-in-out",
-        collapsed
-          ? "lg:grid-cols-[88px_1fr]"
-          : "lg:grid-cols-[320px_1fr]"
-      )}
-    >
-      <aside className="border-r-[3px] border-black bg-[#FFF3C4]">
+    <div className="min-h-screen bg-[#FAF7F2] text-black flex flex-col font-sans selection:bg-yellow-400 selection:text-black">
+      {statusBar}
+      <div className="flex flex-1">
         {sidebar}
-      </aside>
-
-      <section className="flex min-w-0 flex-col">
-        <header className="border-b-[3px] border-black bg-[#FFF8D6]">
-          {statusBar}
-        </header>
-
-        <main className="min-h-0 flex-1 overflow-auto">
+        <div className="flex-1 min-w-0 p-4 md:p-6">
           {children}
-        </main>
-      </section>
+        </div>
+      </div>
     </div>
   )
 }
