@@ -74,7 +74,7 @@ import { Suspense } from 'react'
 describe('BillingPageClient rendering', () => {
   it('shows the neutral server loading state without a free plan or balance', async () => {
     const promise = Promise.resolve({
-      status: 'loading',
+      status: 'loading' as const,
       title: 'Checking your billing account…',
       message: 'No plan, balance, or paid access is shown until the server confirms it.',
     })

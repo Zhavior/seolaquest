@@ -49,11 +49,12 @@ function BillingApp({ model }: { model: BillingReadyViewModel }) {
   const [userCredits, setUserCredits] = useState(model.credits.balance)
   
   const [purchasingPotion, setPurchasedPotion] = useState<string | null>(null)
+  const [, setBrewStatus] = useState<'idle' | 'brewing' | 'redirecting'>('idle')
   const [potionSuccess, setPotionSuccess] = useState<string | null>(null)
   const [refillNotification, setRefillNotification] = useState<number | null>(null)
   const [isRefilling, setIsRefilling] = useState(false)
   const [damageTexts, setDamageTexts] = useState<DamageEntry[]>([])
-  const [purchasingPlan, setPurchasingPlan] = useState<string | null>(null)
+  const [purchasingPlan, setPurchasingPlan] = useState<PlanCode | null>(null)
   const damageIdRef = useRef(0)
 
   const { sfxEnabled, setSfxEnabled, sfxBlip, sfxCoin } = useBillingSfx()

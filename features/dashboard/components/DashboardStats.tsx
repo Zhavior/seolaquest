@@ -1,11 +1,9 @@
+'use client'
+
 import { motion, Variants } from 'framer-motion'
 import {
-  Share2,
-  Sparkles,
   Radar,
-  ScrollText,
   Zap,
-  ShieldAlert,
   Crosshair,
   Crown,
   Coins,
@@ -37,7 +35,7 @@ function ProviderStatusStrip() {
       label: 'LinkedIn',
       state: 'LOCKED',
       detail: 'Auth needed',
-      tone: 'bg-[#F4F0EA]',
+      tone: 'bg-white',
       dotTone: 'bg-black',
     },
   ]
@@ -49,9 +47,9 @@ function ProviderStatusStrip() {
           key={provider.label}
           type="button"
           title={`${provider.label}: ${provider.state} — ${provider.detail}`}
-          className={`inline-flex min-h-11 min-w-0 items-center gap-2 px-3 py-2 text-[11px] font-black uppercase tracking-[0.14em] shadow-[2px_2px_0_#000] border-2 border-black ${provider.tone}`}
+          className={`inline-flex min-h-11 min-w-0 items-center gap-2 px-3 py-2 text-xs font-black uppercase tracking-wider shadow-[3px_3px_0_0_#000] border-2 border-black ${provider.tone}`}
         >
-          <span className={`inline-block h-2.5 w-2.5 shrink-0 rounded-full border border-black ${provider.dotTone}`} />
+          <span className={`inline-block h-3 w-3 shrink-0 rounded-full border-2 border-black ${provider.dotTone}`} />
           <span className="truncate">
             {provider.label} {provider.state}
           </span>
@@ -116,16 +114,16 @@ function TelemetryCard({
   tone?: string
 }) {
   return (
-    <div className={`p-6 flex flex-col h-full ${tone}`}>
+    <div className={`p-6 flex flex-col h-full border-4 border-black shadow-[6px_6px_0_0_#000] ${tone}`}>
       <div className="flex items-start justify-between gap-3 mb-6">
-        <p className="text-[10px] font-black uppercase tracking-[0.18em] text-black/60">{label}</p>
+        <p className="text-xs font-black uppercase tracking-widest text-black">{label}</p>
         <div className="bg-[#FFF4BF] p-2 border-2 border-black shadow-[2px_2px_0_#000]">
           {icon}
         </div>
       </div>
       <div className="mt-auto">
-        <p className="text-[clamp(1.5rem,2.5vw,2rem)] font-black uppercase text-black leading-none">{value}</p>
-        <p className="mt-3 text-[11px] font-bold uppercase leading-relaxed text-black/70">{detail}</p>
+        <p className="text-3xl md:text-4xl font-black uppercase text-black leading-none">{value}</p>
+        <p className="mt-3 text-xs font-bold uppercase leading-relaxed text-black/80">{detail}</p>
       </div>
     </div>
   )
@@ -164,23 +162,23 @@ function DailyQuestCard({
   ]
 
   return (
-    <div className="bg-[#FFF9EC] p-6 h-full flex flex-col">
+    <div className="bg-[#FFF9EC] p-6 border-4 border-black shadow-[6px_6px_0_0_#000] flex flex-col">
       <div className="flex flex-col gap-3 pb-4 sm:flex-row sm:items-start sm:justify-between">
         <div className="min-w-0 flex-1">
-          <p className="text-[10px] font-black uppercase tracking-[0.18em] text-black/60">Quest board</p>
-          <h3 className="mt-1 text-xl font-black uppercase text-black">Daily objectives</h3>
+          <p className="text-xs font-black uppercase tracking-widest text-black/60">Quest board</p>
+          <h3 className="mt-1 text-2xl font-black uppercase text-black">Daily objectives</h3>
         </div>
-        <span className="inline-flex shrink-0 items-center gap-2 border-2 border-black bg-[#FFE600] px-3 py-1.5 text-[10px] font-black uppercase shadow-[2px_2px_0_#000]">
-          <Zap className="h-3.5 w-3.5 shrink-0" />
+        <span className="inline-flex shrink-0 items-center gap-2 border-2 border-black bg-[#FFE600] px-3 py-1.5 text-xs font-black uppercase shadow-[3px_3px_0_#000]">
+          <Zap className="h-4 w-4 shrink-0" />
           +100 XP
         </span>
       </div>
 
-      <div className="mt-4 flex flex-col gap-[2px] bg-black border-2 border-black flex-1">
+      <div className="mt-4 flex flex-col gap-2 flex-1">
         {questRows.map((quest) => (
           <div
             key={quest.label}
-            className={`flex min-w-0 flex-wrap items-center justify-between gap-2 px-4 py-3 text-[11px] font-black uppercase tracking-[0.12em] ${quest.done ? quest.tone : 'bg-white'}`}
+            className={`flex min-w-0 flex-wrap items-center justify-between gap-2 px-4 py-3 text-xs font-black uppercase tracking-wider border-3 border-black shadow-[3px_3px_0_0_#000] ${quest.done ? quest.tone : 'bg-white'}`}
           >
             <span className="min-w-0 flex-1 break-words">
               {quest.done ? '[x]' : '[ ]'} {quest.label}
@@ -210,9 +208,7 @@ export function DashboardStats({
   characterTitle,
   isScanning,
   recentLevelUp,
-  xpPercent,
   leads,
-  shareStats,
 }: DashboardStatsProps) {
   const questsRemaining = user.questsRemaining ?? 3
   const hasLeadData = leads.length > 0
@@ -221,40 +217,48 @@ export function DashboardStats({
   return (
     <motion.div
       variants={item}
-      className="w-full min-w-0 max-w-full overflow-hidden border-2 border-black bg-black gap-[2px] flex flex-col shadow-[4px_4px_0_#000]"
+      className="w-full min-w-0 max-w-full flex flex-col gap-6"
     >
-      <div className="relative overflow-hidden bg-[#FFF9EC] p-6 md:p-8">
-        <div className="pointer-events-none absolute inset-0 opacity-20 [background-image:linear-gradient(to_right,#00000012_1px,transparent_1px),linear-gradient(to_bottom,#00000012_1px,transparent_1px)] [background-size:22px_22px]" />
-
-        <div className="relative flex flex-col gap-5">
+      {/* Provider Status Header Strip */}
+      <div className="border-4 border-black bg-[#FFF8D9] p-6 shadow-[6px_6px_0_0_#000]">
+        <div className="flex flex-col gap-4">
+          <div className="flex items-center justify-between">
+            <span className="bg-black text-[#FFE600] text-xs font-black uppercase tracking-widest px-3 py-1 border-2 border-black -rotate-1">
+              RADAR INTEGRATIONS & PROVIDERS
+            </span>
+          </div>
           <ProviderStatusStrip />
 
-          <div className="flex flex-wrap items-center gap-2 text-[11px] font-black uppercase tracking-[0.14em] text-black/75">
-            <span className="inline-flex items-center gap-2 border-2 border-black bg-white px-3 py-2 shadow-[2px_2px_0_#000]">
-              <Radar className="h-3.5 w-3.5 shrink-0" />
+          <div className="flex flex-wrap items-center gap-3 text-xs font-black uppercase tracking-wider">
+            <span className="inline-flex items-center gap-2 border-2 border-black bg-white px-3 py-2 shadow-[3px_3px_0_#000]">
+              <Radar className="h-4 w-4 shrink-0" />
               Command pulse stable
             </span>
-            <span className="inline-flex items-center gap-2 border-2 border-black bg-[#FFE082] px-3 py-2 shadow-[2px_2px_0_#000]">
-              <TimerReset className="h-3.5 w-3.5 shrink-0" />
+            <span className="inline-flex items-center gap-2 border-2 border-black bg-[#FFE082] px-3 py-2 shadow-[3px_3px_0_#000]">
+              <TimerReset className="h-4 w-4 shrink-0" />
               Next auto-run 26m
             </span>
-            <span className="inline-flex items-center gap-2 border-2 border-black bg-[#C7FFF3] px-3 py-2 shadow-[2px_2px_0_#000]">
-              <Activity className="h-3.5 w-3.5 shrink-0" />
+            <span className="inline-flex items-center gap-2 border-2 border-black bg-[#06B6D4] px-3 py-2 shadow-[3px_3px_0_#000]">
+              <Activity className="h-4 w-4 shrink-0" />
               Last synced 4m ago
             </span>
           </div>
         </div>
       </div>
 
-      <div className="grid min-w-0 grid-cols-1 xl:grid-cols-[1.2fr_0.95fr] gap-[2px] bg-black">
-        <div className="flex flex-col min-w-0 gap-[2px] bg-black">
-          <div className="overflow-hidden bg-[#F7F1DD] p-6 shadow-none">
-            <div className="mb-6 flex flex-wrap items-center gap-3">
-              <span className="border-2 border-black bg-black px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.18em] text-[#FFE600] shadow-[2px_2px_0_#000]">
-                Commander profile
-              </span>
-              <span className="border-2 border-black bg-white px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.18em] text-black shadow-[2px_2px_0_#000]">
-                Rank telemetry
+      <div className="grid min-w-0 grid-cols-1 xl:grid-cols-[1.2fr_0.95fr] gap-6">
+        <div className="flex flex-col min-w-0 gap-6">
+          {/* Commander Profile Hero Badge */}
+          <div className="border-4 border-black bg-[#FFF8D9] p-6 shadow-[6px_6px_0_0_#000]">
+            <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+              <div className="flex items-center gap-2">
+                <Crown className="w-6 h-6 text-[#FF5722]" />
+                <span className="border-2 border-black bg-black px-3 py-1 text-xs font-black uppercase tracking-widest text-[#FFE600] shadow-[2px_2px_0_#000]">
+                  COMMANDER PROFILE
+                </span>
+              </div>
+              <span className="border-2 border-black bg-white px-3 py-1 text-xs font-black uppercase tracking-widest text-black shadow-[2px_2px_0_#000]">
+                RANK & TELEMETRY
               </span>
             </div>
 
@@ -267,9 +271,9 @@ export function DashboardStats({
             />
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-[2px] bg-black flex-1">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 flex-1">
             <TelemetryCard
-              icon={<Crosshair className="h-5 w-5 text-black" />}
+              icon={<Crosshair className="h-6 w-6 text-black" />}
               label="Hottest lead"
               value={hasLeadData ? `${hottestLeadScore}%` : '--'}
               detail={
@@ -280,7 +284,7 @@ export function DashboardStats({
               tone="bg-[#FFE082]"
             />
             <TelemetryCard
-              icon={<Coins className="h-5 w-5 text-black" />}
+              icon={<Coins className="h-6 w-6 text-black" />}
               label="Projected ARR"
               value={hasLeadData ? `$${projectedArr.toLocaleString()}` : '--'}
               detail={
@@ -288,17 +292,17 @@ export function DashboardStats({
                   ? 'Rough opportunity stack based on current signal quality.'
                   : 'Appears after your queue starts filling with leads.'
               }
-              tone="bg-[#C7FFF3]"
+              tone="bg-[#06B6D4]"
             />
             <TelemetryCard
-              icon={<Swords className="h-5 w-5 text-black" />}
+              icon={<Swords className="h-6 w-6 text-black" />}
               label="Active queue"
               value={`${leads.length}`}
               detail="Total live signals ready for triage, reply, or CRM export."
               tone="bg-white"
             />
             <TelemetryCard
-              icon={<Crown className="h-5 w-5 text-black" />}
+              icon={<Crown className="h-6 w-6 text-black" />}
               label="High-intent"
               value={`${highIntentCount}`}
               detail="Signals above the fast-action threshold and worth immediate review."
@@ -307,25 +311,25 @@ export function DashboardStats({
           </div>
         </div>
 
-        <div className="flex flex-col min-w-0 gap-[2px] bg-black">
+        <div className="flex flex-col min-w-0 gap-6">
           <DailyQuestCard
             questsRemaining={questsRemaining}
             leadsCount={leads.length}
             highIntentCount={highIntentCount}
           />
 
-          <div className="bg-white p-6">
+          <div className="border-4 border-black bg-white p-6 shadow-[6px_6px_0_0_#000]">
             <div className="flex items-start justify-between gap-3 pb-4">
               <div>
-                <p className="text-[10px] font-black uppercase tracking-[0.18em] text-black/60">Command perks</p>
-                <h3 className="mt-1 text-xl font-black uppercase text-black">Unlock track</h3>
+                <p className="text-xs font-black uppercase tracking-widest text-black/60">Command perks</p>
+                <h3 className="mt-1 text-2xl font-black uppercase text-black">Unlock track</h3>
               </div>
               <div className="bg-[#FFF4BF] p-2 border-2 border-black shadow-[2px_2px_0_#000]">
-                <Shield className="h-5 w-5 text-black" />
+                <Shield className="h-6 w-6 text-black" />
               </div>
             </div>
 
-            <div className="mt-4 flex flex-col gap-[2px] bg-black border-2 border-black">
+            <div className="mt-4 flex flex-col gap-3">
               {[
                 {
                   title: 'Instant reply combos',
@@ -345,69 +349,19 @@ export function DashboardStats({
               ].map((perk) => (
                 <div
                   key={perk.title}
-                  className={`p-4 ${perk.unlocked ? 'bg-[#A3E635]' : 'bg-[#F4F0EA]'}`}
+                  className={`p-4 border-3 border-black shadow-[3px_3px_0_0_#000] ${perk.unlocked ? 'bg-[#A3E635]' : 'bg-[#FFF8D9]'}`}
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div>
-                      <p className="text-xs font-black uppercase text-black">{perk.title}</p>
-                      <p className="mt-1 text-[11px] font-bold uppercase leading-5 text-black/65">
-                        {perk.detail}
-                      </p>
+                      <p className="text-sm font-black uppercase text-black">{perk.title}</p>
+                      <p className="mt-1 text-xs font-bold text-black/75">{perk.detail}</p>
                     </div>
-                    <span className="shrink-0 border-2 border-black bg-white px-2 py-1 text-[10px] font-black uppercase">
-                      {perk.unlocked ? 'Unlocked' : 'Locked'}
+                    <span className="border-2 border-black bg-black px-2 py-0.5 text-[10px] font-black uppercase text-[#FFE600]">
+                      {perk.unlocked ? 'UNLOCKED' : 'LOCKED'}
                     </span>
                   </div>
                 </div>
               ))}
-            </div>
-          </div>
-
-          <div className="bg-[#FFF9EC] p-6">
-            <div className="flex items-start justify-between gap-3 pb-4">
-              <div>
-                <p className="text-[10px] font-black uppercase tracking-[0.18em] text-black/60">Combat actions</p>
-                <h3 className="mt-1 text-xl font-black uppercase text-black">Quick ops</h3>
-              </div>
-              <div className="bg-[#FFE082] p-2 border-2 border-black shadow-[2px_2px_0_#000]">
-                <Sparkles className="h-5 w-5 text-black" />
-              </div>
-            </div>
-
-            <div className="mt-4 grid grid-cols-1 gap-3">
-              <button
-                type="button"
-                onClick={shareStats}
-                className="inline-flex min-h-[44px] items-center justify-between gap-3 border-2 border-black bg-[#FFE600] px-4 py-3 text-left text-xs font-black uppercase shadow-[4px_4px_0_#000] transition active:translate-x-[2px] active:translate-y-[2px] active:shadow-[2px_2px_0_#000] hover:bg-[#FFD54F]"
-              >
-                <span className="inline-flex items-center gap-2">
-                  <Share2 className="h-4 w-4" />
-                  Share commander stats
-                </span>
-                <span>↗</span>
-              </button>
-
-              <button
-                type="button"
-                className="inline-flex min-h-[44px] items-center justify-between gap-3 border-2 border-black bg-white px-4 py-3 text-left text-xs font-black uppercase shadow-[4px_4px_0_#000] transition active:translate-x-[2px] active:translate-y-[2px] active:shadow-[2px_2px_0_#000] hover:bg-[#FFF1BE]"
-              >
-                <span className="inline-flex items-center gap-2">
-                  <ScrollText className="h-4 w-4" />
-                  Open battle report
-                </span>
-                <span className="text-black/55">Soon</span>
-              </button>
-
-              <button
-                type="button"
-                className="inline-flex min-h-[44px] items-center justify-between gap-3 border-2 border-black bg-[#FBE4E4] px-4 py-3 text-left text-xs font-black uppercase shadow-[4px_4px_0_#000] transition active:translate-x-[2px] active:translate-y-[2px] active:shadow-[2px_2px_0_#000] hover:bg-[#F7C7C7]"
-              >
-                <span className="inline-flex items-center gap-2">
-                  <ShieldAlert className="h-4 w-4" />
-                  Threat watch
-                </span>
-                <span>{hasLeadData ? 'Monitoring' : 'Idle'}</span>
-              </button>
             </div>
           </div>
         </div>
@@ -415,5 +369,3 @@ export function DashboardStats({
     </motion.div>
   )
 }
-
-export default DashboardStats
