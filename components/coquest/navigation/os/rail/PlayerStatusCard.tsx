@@ -1,25 +1,27 @@
 'use client'
 
 import { getLevelInfo } from '../shared/progression'
+import { quests } from '../shared/quests'
 
 interface PlayerStatusCardProps {
   collapsed: boolean
   name: string
-  level: number
+  xp: number
   title: string
   quest: string
-  progress: number
 }
 
 export function PlayerStatusCard({
   collapsed,
   name,
-  level,
+  xp,
   title,
   quest,
-  progress,
 }: PlayerStatusCardProps) {
-  const info = getLevelInfo(level * 250)
+  const info = getLevelInfo(xp)
+
+  const activeQuest =
+    quests.find((q) => q.id === quest) ?? quests[0]
 
   if (collapsed) {
     return (
@@ -51,13 +53,13 @@ export function PlayerStatusCard({
       <div className="mb-4">
         <div className="mb-1 flex justify-between text-[10px] font-black uppercase">
           <span>Level {info.level}</span>
-          <span>{info.progress}%</span>
+          <span>{activeQuest.progress}%</span>
         </div>
 
         <div className="h-3 border-2 border-black bg-white">
           <div
             className="h-full bg-[#FFD54F] transition-all duration-300"
-            style={{ width: `${info.progress}%` }}
+            style={{ width: `${activeQuest.progress}%` }}
           />
         </div>
       </div>
@@ -68,7 +70,7 @@ export function PlayerStatusCard({
         </p>
 
         <p className="mt-2 text-sm font-black leading-tight">
-          {quest}
+          {activeQuest.title}
         </p>
       </div>
     </div>

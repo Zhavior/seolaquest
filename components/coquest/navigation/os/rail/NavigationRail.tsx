@@ -83,10 +83,9 @@ export default function NavigationRail() {
   <PlayerStatusCard
     collapsed={collapsed}
     name={displayName}
-    level={player.level}
+    xp={player.xp}
     title={player.title}
-    quest={player.activeQuest}
-    progress={player.questProgress}
+    quest={player.activeQuestId}
   />
 </div>
 
