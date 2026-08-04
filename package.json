@@ -16,6 +16,7 @@
     "@react-three/drei": "^10.7.7",
     "@react-three/fiber": "^9.7.0",
     "@stripe/stripe-js": "^9.12.1",
+    "@supabase/ssr": "^0.12.4",
     "@upstash/ratelimit": "^2.0.8",
     "@upstash/redis": "^1.38.0",
     "canvas-confetti": "^1.9.4",
