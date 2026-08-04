@@ -93,3 +93,5 @@ export function DashboardHeader({
     </motion.section>
   )
 }
+
+export default DashboardHeader

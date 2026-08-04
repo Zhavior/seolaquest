@@ -95,3 +95,5 @@ export function DashboardRadar({
     </motion.div>
   )
 }
+
+export default DashboardRadar

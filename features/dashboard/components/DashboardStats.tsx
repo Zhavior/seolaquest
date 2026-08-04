@@ -415,3 +415,5 @@ export function DashboardStats({
     </motion.div>
   )
 }
+
+export default DashboardStats
