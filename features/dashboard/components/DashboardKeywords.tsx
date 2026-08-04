@@ -158,7 +158,7 @@ export function DashboardKeywords({
           <AnimatePresence initial={false}>
             {keywords.length ? (
               keywords.map((keyword) => {
-                const label = keyword.phrase || keyword.keyword || ''
+                const label = keyword.phrase || ''
 
                 return (
                   <motion.div
