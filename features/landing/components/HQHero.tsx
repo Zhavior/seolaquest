@@ -68,7 +68,7 @@ export function HQHero() {
             </h1>
 
             <p className="mt-6 text-lg sm:text-xl font-bold leading-snug max-w-xl mx-auto lg:mx-0 text-black/80">
-              HypeQuest deploys AI adventurers across Reddit, X, and the web —
+              SEO la Quest deploys AI adventurers across Reddit, X, and the web —
               hunting keyword-matched leads and delivering them straight to your
               War Room.
             </p>

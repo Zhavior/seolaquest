@@ -60,7 +60,7 @@ function readyModel(): BillingReadyViewModel {
       message: 'Returning from Stripe is not proof of payment. Access remains unchanged until the signed webhook is processed.',
     },
     support: {
-      email: 'support@coquest.ai',
+      email: 'support@seolaquest.com',
       receiptCopy: 'Available receipts are in Stripe billing management.',
       refundCopy: 'Contact support for refund requests.',
     },

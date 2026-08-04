@@ -199,7 +199,7 @@ export default function SettingsClient({ initial }: { initial: { name: string; t
 
               {/* Contact Guild Masters */}
               <a
-                href="mailto:support@coquest.ai?subject=Guild%20Master%20Dispatch"
+                href="mailto:support@seolaquest.com?subject=Guild%20Master%20Dispatch"
                 onClick={() => sfx.playHoverBlip()}
                 className="w-full flex items-center justify-center gap-2 border-3 border-black bg-white px-4 py-3 font-black uppercase text-black shadow-[3px_3px_0_0_#000] hover:bg-gray-100 hover:translate-x-0.5 hover:translate-y-0.5 active:translate-x-1 active:translate-y-1 active:shadow-none transition-all"
               >

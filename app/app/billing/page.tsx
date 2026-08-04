@@ -7,8 +7,8 @@ import { buildBillingViewModel } from '@/features/billing/viewModel'
 import BillingLoading from './loading'
 
 export const metadata: Metadata = {
-  title: 'Billing | CoQuest',
-  description: 'Server-verified CoQuest subscription, credits, scan eligibility, and billing availability.',
+  title: 'Billing | SEO la Quest',
+  description: 'Server-verified SEO la Quest subscription, credits, scan eligibility, and billing availability.',
 }
 
 type BillingPageProps = {

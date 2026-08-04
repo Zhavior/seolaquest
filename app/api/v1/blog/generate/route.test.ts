@@ -13,7 +13,7 @@ vi.mock('@/lib/aiBlogger', () => ({
 import { POST } from './route'
 
 function request(body: unknown) {
-  return new Request('https://coquest.test/api/v1/blog/generate', {
+  return new Request('https://seolaquest.test/api/v1/blog/generate', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),

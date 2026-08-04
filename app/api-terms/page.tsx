@@ -2,8 +2,8 @@ import Link from 'next/link'
 import { Ban, CheckCircle2, KeyRound, Lock, RadioTower } from 'lucide-react'
 
 export const metadata = {
-  title: 'API Availability | CoQuest',
-  description: 'The current, fail-closed status of CoQuest API access and automation.',
+  title: 'API Availability | SEO la Quest',
+  description: 'The current, fail-closed status of SEO la Quest API access and automation.',
 }
 
 export default function ApiTermsPage() {
@@ -16,7 +16,7 @@ export default function ApiTermsPage() {
           </span>
           <h1 className="mt-4 text-4xl font-black uppercase leading-none tracking-tight sm:text-6xl">Public API access is unavailable</h1>
           <p className="mt-4 max-w-3xl text-sm font-bold leading-relaxed text-zinc-700 sm:text-base">
-            CoQuest does not currently issue working bearer keys or offer a supported third-party REST API. There are no
+            SEO la Quest does not currently issue working bearer keys or offer a supported third-party REST API. There are no
             published request quotas, API tiers, webhook-delivery SLAs, or enterprise capacity guarantees.
           </p>
         </header>

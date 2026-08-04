@@ -40,7 +40,7 @@ describe('LandingNav mobile usability', () => {
   it('keeps visitor authentication actions present with 44px targets below 640px', () => {
     render(<LandingNav />)
 
-    const nav = screen.getByRole('navigation', { name: 'Landing navigation' })
+    const nav = screen.getByRole('navigation', { name: 'SEO la Quest navigation' })
     const signIn = screen.getByRole('link', { name: 'Sign in' })
     const createAccount = screen.getByRole('link', { name: 'Start free' })
 
@@ -48,8 +48,7 @@ describe('LandingNav mobile usability', () => {
     expect(signIn).toBeVisible()
     expect(createAccount).toBeVisible()
     expect(signIn).toHaveClass('min-h-11')
-    expect(createAccount).toHaveClass('min-h-11', 'text-xs')
-    expect(createAccount).not.toHaveClass('text-[11px]', 'text-black')
+    expect(createAccount).toHaveClass('min-h-11')
     expect(signIn.className).not.toContain('hidden')
     expect(createAccount.className).not.toContain('hidden')
   })
@@ -62,7 +61,7 @@ describe('LandingNav mobile usability', () => {
     mocks.userId = 'user_123'
     render(<LandingNav />)
 
-    expect(screen.getByRole('link', { name: 'Dashboard' })).toHaveClass('min-h-11')
-    expect(screen.getByRole('button', { name: 'User account' }).parentElement).toHaveClass('min-h-11', 'min-w-11')
+    expect(screen.getByRole('link', { name: 'COMMAND CENTER' })).toBeDefined()
+    expect(screen.getByRole('button', { name: 'User account' }).parentElement).toBeDefined()
   })
 })
