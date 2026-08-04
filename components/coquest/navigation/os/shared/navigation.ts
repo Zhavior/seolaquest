@@ -1,4 +1,5 @@
 import {
+  Castle,
   LayoutDashboard,
   History,
   Send,
@@ -17,7 +18,7 @@ export interface NavigationItem {
 
 export const navigation: NavigationItem[] = [
   { label: 'Battlestation', href: '/app', icon: LayoutDashboard },
-  { label: 'Guild Hall', href: '/app/guild', icon: LayoutDashboard },
+  { label: 'Guild Hall', href: '/app/guild', icon: Castle },
   { label: 'Scan Runs', href: '/app/runs', icon: History },
   { label: 'Deliveries', href: '/app/deliveries', icon: Send },
   { label: 'Keywords', href: '/app/keywords', icon: Swords },

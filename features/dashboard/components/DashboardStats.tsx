@@ -1,5 +1,5 @@
 import { motion, Variants } from 'framer-motion'
-import { Share2, Sparkles, Radar, ScrollText, Zap } from 'lucide-react'
+import { Share2, Sparkles, Radar, ScrollText, Zap, ShieldAlert, Crosshair } from 'lucide-react'
 import HeroCrest from '@/components/HeroCrest'
 import { DashboardUser, DashboardLead } from '@/features/dashboard/types'
 
@@ -128,14 +128,14 @@ export function DashboardStats({
   return (
     <motion.div
       variants={item}
-      className="min-w-0 overflow-hidden border-4 border-black bg-[#FFE600] p-6 shadow-[8px_8px_0_0_#000] md:p-8 xl:p-10"
+      className="min-w-0 overflow-hidden border-4 border-black bg-[#13D7C2] p-6 shadow-[8px_8px_0_0_#000] md:p-8 xl:p-10"
     >
       <div className="mb-6 flex flex-col gap-3">
         <ProviderStatusStrip />
-        <div className="flex flex-wrap items-center gap-2 text-[11px] font-black uppercase tracking-[0.14em] text-black/70">
+        <div className="flex flex-wrap items-center gap-2 text-[11px] font-black uppercase tracking-[0.14em] text-black/75">
           <span className="inline-flex items-center gap-2 border-2 border-black bg-white px-3 py-1 shadow-[2px_2px_0_0_#000]">
-            <Sparkles className="h-3.5 w-3.5 shrink-0" />
-            Sync pulse stable
+            <Radar className="h-3.5 w-3.5 shrink-0" />
+            Command pulse stable
           </span>
           <span>Last synced: 4m ago</span>
           <span className="hidden text-black/40 sm:inline">•</span>
@@ -143,7 +143,7 @@ export function DashboardStats({
         </div>
       </div>
 
-      <div className="grid min-w-0 grid-cols-1 gap-4 md:grid-cols-3">
+      <div className="grid min-w-0 grid-cols-1 gap-4 md:grid-cols-[1.15fr_1fr_0.95fr]">
         <div className="min-w-0 space-y-4">
           <HeroCrest
             heroName={user.name}
@@ -219,7 +219,7 @@ export function DashboardStats({
           <div className="min-w-0 border-4 border-black bg-white p-4 shadow-[4px_4px_0_0_#000]">
             <div className="flex flex-wrap items-start justify-between gap-3 border-b-2 border-black pb-3">
               <div className="min-w-0 flex-1">
-                <p className="text-[11px] font-black uppercase tracking-[0.16em] text-black/60">Share your guild state</p>
+                <p className="text-[11px] font-black uppercase tracking-[0.16em] text-black/60">Share your command state</p>
                 <h3 className="text-lg font-black uppercase">Broadcast snapshot</h3>
               </div>
               <button
@@ -234,10 +234,10 @@ export function DashboardStats({
 
             <div className="mt-3 space-y-2 text-[11px] font-black uppercase tracking-[0.12em]">
               <div className="border-2 border-black bg-[#F4F0EA] px-3 py-3">
-                Guild rank report updates with your tracked lead volume and quest completion pace.
+                Broadcast live hunt posture, quest pace, and tracked momentum without leaving the battlestation.
               </div>
               <div className="border-2 border-black bg-[#F4F0EA] px-3 py-3">
-                Use this to share operating momentum with your team without opening billing or settings panels.
+                Use this snapshot when you need fast alignment across your guild, ops, or client workflow.
               </div>
             </div>
           </div>
@@ -245,13 +245,39 @@ export function DashboardStats({
           <div className="min-w-0 border-4 border-black bg-white p-4 shadow-[4px_4px_0_0_#000]">
             <div className="flex flex-wrap items-start justify-between gap-3 border-b-2 border-black pb-3">
               <div className="min-w-0 flex-1">
-                <p className="text-[11px] font-black uppercase tracking-[0.16em] text-black/60">Command note</p>
-                <h3 className="text-lg font-black uppercase">Guild Hall brief</h3>
+                <p className="text-[11px] font-black uppercase tracking-[0.16em] text-black/60">Battlestation brief</p>
+                <h3 className="text-lg font-black uppercase">Command doctrine</h3>
               </div>
+              <span className="inline-flex shrink-0 items-center gap-2 whitespace-nowrap border-2 border-black bg-[#D9F99D] px-2 py-1 text-[10px] font-black uppercase shadow-[2px_2px_0_0_#000]">
+                <Crosshair className="h-3.5 w-3.5 shrink-0" />
+                Live tactics
+              </span>
             </div>
 
-            <div className="mt-3 border-2 border-black bg-[#F4F0EA] px-3 py-3 text-[11px] font-black uppercase tracking-[0.12em]">
-              This room now focuses on scouting momentum, XP objectives, and lead operations. Mana and plan state live in the persistent HUD above.
+            <div className="mt-3 space-y-2 text-[11px] font-black uppercase tracking-[0.12em]">
+              <div className="border-2 border-black bg-[#F4F0EA] px-3 py-3">
+                This room is built for scanning momentum, XP pressure, and fast response windows while signals are still hot.
+              </div>
+              <div className="border-2 border-black bg-[#F4F0EA] px-3 py-3">
+                Billing handles mana and plan strategy. Battlestation handles live pursuit, lead readiness, and tactical timing.
+              </div>
+            </div>
+          </div>
+
+          <div className="min-w-0 border-4 border-black bg-[#FFF7CC] p-4 shadow-[4px_4px_0_0_#000]">
+            <div className="flex flex-wrap items-start justify-between gap-3 border-b-2 border-black pb-3">
+              <div className="min-w-0 flex-1">
+                <p className="text-[11px] font-black uppercase tracking-[0.16em] text-black/60">Signal pressure</p>
+                <h3 className="text-lg font-black uppercase">Live command cue</h3>
+              </div>
+              <span className="inline-flex shrink-0 items-center gap-2 whitespace-nowrap border-2 border-black bg-white px-2 py-1 text-[10px] font-black uppercase shadow-[2px_2px_0_0_#000]">
+                <ShieldAlert className="h-3.5 w-3.5 shrink-0" />
+                Stay sharp
+              </span>
+            </div>
+
+            <div className="mt-3 border-2 border-black bg-white px-3 py-3 text-[11px] font-black uppercase tracking-[0.12em]">
+              Fresh signals lose value fast. Keep your scan loop tight, clear stale noise early, and act on high-intent movement first.
             </div>
           </div>
         </div>
