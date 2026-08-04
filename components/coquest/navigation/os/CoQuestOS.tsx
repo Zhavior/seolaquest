@@ -1,3 +1,4 @@
+import { LayoutProvider } from './layout/LayoutContext'
 import type { ReactNode } from 'react'
 
 import CommandHUD from './hud/CommandHUD'
@@ -24,6 +25,7 @@ interface CoQuestOSProps {
 
 export default function CoQuestOS({ user, children }: CoQuestOSProps) {
   return (
+    <LayoutProvider>
     <div className="min-h-screen bg-[#F4EFE6] text-black">
       <CommandPalette />
 
@@ -39,5 +41,6 @@ export default function CoQuestOS({ user, children }: CoQuestOSProps) {
         </div>
       </div>
     </div>
+    </LayoutProvider>
   )
 }
