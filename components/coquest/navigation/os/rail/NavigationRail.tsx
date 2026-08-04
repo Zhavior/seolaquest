@@ -77,10 +77,10 @@ export default function NavigationRail() {
         collapsed ? 'opacity-95' : 'opacity-100',
       ].join(' ')}
     >
-      <div className="border-b-2 border-black bg-[#F97316] p-3">
+      <div className="border-b border-amber-900/20 bg-gradient-to-b from-[#FFF7E6] to-[#F7E6B5] px-5 py-5">
         <div
           className={[
-            'overflow-hidden border-2 border-black bg-[#FFD54F] shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all duration-200',
+            'overflow-hidden rounded-2xl border border-amber-900/20 bg-white shadow-lg transition-all duration-200 ease-out',
             collapsed
               ? 'flex min-h-[88px] items-center justify-center px-2 py-3'
               : 'flex min-h-[88px] items-center gap-3 px-3 py-3',
@@ -104,7 +104,7 @@ export default function NavigationRail() {
                 aria-label="Quick Search"
                 title="Quick Search"
                 onClick={() => setMobileOpen(false)}
-                className="mt-3 inline-flex items-center gap-2 border-2 border-black bg-white px-2.5 py-1 text-[11px] font-black uppercase tracking-[0.14em] text-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all duration-200 hover:-translate-y-[1px] hover:bg-[#FFF1A8]"
+                className="mt-3 inline-flex items-center gap-2 rounded-xl border border-stone-200 bg-white px-2.5 py-1 text-[11px] font-black uppercase tracking-[0.14em] text-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all duration-200 ease-out hover:-translate-y-[1px] hover:bg-[#FFF1A8]"
               >
                 <Command className="h-3.5 w-3.5" />
                 <span>Quick Search</span>
@@ -117,9 +117,9 @@ export default function NavigationRail() {
         </div>
       </div>
 
-      <nav className="flex-1 space-y-4 p-3">
+      <nav className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 py-5">
         {groupedNavigation.map((group) => (
-          <div key={group.key} className="space-y-2">
+          <div key={group.key} className="space-y-3">
             {!collapsed ? (
               <div className="px-1">
                 <p className="text-[10px] font-black uppercase tracking-[0.22em] text-black/55">
@@ -132,7 +132,7 @@ export default function NavigationRail() {
               </div>
             )}
 
-            <div className="space-y-2">
+            <div className="space-y-3">
               {group.items.map((item) => {
                 const active = pathname === item.href || pathname.startsWith(`${item.href}/`)
 
@@ -142,10 +142,10 @@ export default function NavigationRail() {
                     href={item.href}
                     onClick={() => setMobileOpen(false)}
                     className={[
-                      'group flex items-center gap-3 border-2 border-black px-3 py-3 text-black transition-all duration-200',
+                      'group flex items-center gap-3 rounded-2xl border-2 border-black px-4 py-3 text-black transition-all duration-200 ease-out',
                       active
-                        ? 'bg-[#FFE600] shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]'
-                        : 'bg-white hover:-translate-y-[1px] hover:bg-[#FFF1A8]',
+                        ? 'bg-[#FFE066] shadow-[4px_4px_0px_0px_rgba(0,0,0,0.85)]'
+                        : 'bg-white hover:-translate-y-1 hover:scale-[1.02] hover:bg-[#FFF8D6]',
                       collapsed ? 'justify-center' : '',
                     ].join(' ')}
                   >
@@ -170,16 +170,16 @@ export default function NavigationRail() {
         ))}
       </nav>
 
-      <div className="border-t-2 border-black p-3">
+      <div className="mt-auto border-t-2 border-black bg-[#FFF8D6] p-3">
         <button
           type="button"
           onClick={() => setDesktopExpanded((value) => !value)}
-          className="mb-3 flex w-full items-center justify-center gap-2 border-2 border-black bg-white px-3 py-2 text-[11px] font-black uppercase tracking-[0.12em] text-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all duration-200 hover:-translate-y-[1px] hover:bg-[#FFF1A8]"
+          className="mb-3 flex w-full items-center justify-center gap-2 rounded-xl border border-stone-200 bg-white px-3 py-2 text-[11px] font-black uppercase tracking-[0.12em] text-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all duration-200 ease-out hover:-translate-y-[1px] hover:bg-[#FFF1A8]"
         >
           {collapsed ? 'Expand Rail' : 'Collapse Rail'}
         </button>
 
-        <div className="mb-3 border-2 border-black bg-[#FFF1A8] px-3 py-3 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+        <div className="mb-3 rounded-2xl border border-amber-200 bg-gradient-to-br from-[#FFF9D9] to-[#FFEFB0] px-3 py-3 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
           <p className="truncate text-xs font-black uppercase tracking-[0.12em] text-black">
             {collapsed ? 'CQ' : displayName}
           </p>
@@ -193,7 +193,7 @@ export default function NavigationRail() {
         <SignOutButton>
           <button
             type="button"
-            className="flex w-full items-center justify-center gap-2 border-2 border-black bg-[#FFEDD5] px-3 py-2 text-[11px] font-black uppercase tracking-[0.12em] text-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all duration-200 hover:-translate-y-[1px] hover:bg-[#FED7AA]"
+            className="flex w-full items-center justify-center gap-2 rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-[11px] font-black uppercase tracking-[0.12em] text-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all duration-200 ease-out hover:-translate-y-[1px] hover:bg-[#FED7AA]"
           >
             <LogOut className="h-4 w-4" />
             {!collapsed && <span>Sign Out</span>}
@@ -209,13 +209,13 @@ export default function NavigationRail() {
         type="button"
         aria-label="Toggle navigation"
         onClick={() => setMobileOpen((value) => !value)}
-        className="fixed left-4 top-4 z-50 flex h-11 w-11 items-center justify-center border-2 border-black bg-[#FFE600] shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] lg:hidden"
+        className="fixed left-4 top-4 z-50 flex h-11 w-11 items-center justify-center border-2 border-black bg-[#FFE066] shadow-[4px_4px_0px_0px_rgba(0,0,0,0.85)] lg:hidden"
       >
         {mobileOpen ? <X className="h-5 w-5 text-black" /> : <Menu className="h-5 w-5 text-black" />}
       </button>
 
       <div className="hidden lg:fixed lg:inset-y-0 lg:left-0 lg:z-40 lg:block">
-        <div className={`${collapsed ? 'w-[92px]' : 'w-[288px]'} h-full`}>{railInner}</div>
+        <div className={`${collapsed ? 'w-24' : 'w-80'} h-full`}>{railInner}</div>
       </div>
 
       {mobileOpen && (
@@ -226,7 +226,9 @@ export default function NavigationRail() {
             onClick={() => setMobileOpen(false)}
             className="fixed inset-0 z-40 bg-black/45 lg:hidden"
           />
-          <div className="fixed inset-y-0 left-0 z-50 w-[288px] max-w-[86vw] lg:hidden">{railInner}</div>
+          <div className="fixed inset-y-0 left-0 z-50 flex h-dvh w-[88vw] max-w-sm flex-col overflow-hidden bg-[#FFF8D6] lg:hidden">
+            {railInner}
+          </div>
         </>
       )}
     </>
