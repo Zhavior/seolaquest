@@ -24,7 +24,7 @@ export function DashboardRadar({
       variants={item}
       className="xl:col-span-4 min-w-0 overflow-hidden border-4 border-black bg-white p-6 shadow-[8px_8px_0_0_#000] md:p-8"
     >
-      <div className="relative flex min-h-[420px] flex-col items-center justify-center overflow-hidden">
+      <div className="relative flex min-h-[320px] flex-col items-center justify-center overflow-hidden">
         <AnimatePresence>
           {particles.map((p) => (
             <motion.div
@@ -54,7 +54,7 @@ export function DashboardRadar({
           </span>
         </div>
 
-        <div className="relative flex w-full max-w-[300px] items-center justify-center">
+        <div className="relative flex w-full max-w-[240px] items-center justify-center">
           {hasKeywords && (
             <>
               <div className="pointer-events-none absolute inset-0 z-0 rounded-full bg-[#EF4444]/30 animate-ping" />
@@ -70,7 +70,7 @@ export function DashboardRadar({
             transition={{ repeat: isPending ? Infinity : 0, duration: 0.2 }}
             onClick={runMockScanner}
             disabled={isPending}
-            className="relative z-10 flex aspect-square w-full max-w-[300px] cursor-crosshair flex-col items-center justify-center gap-4 rounded-full border-[10px] border-black bg-[#EF4444] shadow-[10px_18px_0px_0px_rgba(0,0,0,1)] disabled:opacity-50"
+            className="relative z-10 flex aspect-square w-full max-w-[240px] cursor-crosshair flex-col items-center justify-center gap-4 rounded-full border-8 border-black bg-[#EF4444] shadow-[8px_16px_0px_0px_rgba(0,0,0,1)] disabled:opacity-50"
             style={{ background: 'radial-gradient(circle at 30% 30%, #ff7373, #EF4444)' }}
           >
             <Radar className="h-20 w-20 text-white" />

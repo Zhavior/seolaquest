@@ -70,11 +70,11 @@ function DailyQuestCard({
   ]
 
   return (
-    <div className="min-w-0 border-4 border-black bg-white p-5 shadow-[4px_4px_0_0_#000]">
+    <div className="min-w-0 border-4 border-black bg-white p-4 shadow-[4px_4px_0_0_#000]">
       <div className="flex flex-col gap-3 border-b-2 border-black pb-3 sm:flex-row sm:items-start sm:justify-between">
         <div className="min-w-0 flex-1">
           <p className="text-[11px] font-black uppercase tracking-[0.16em] text-black/60">Daily quest log</p>
-          <h3 className="text-xl font-black uppercase">XP Objectives</h3>
+          <h3 className="text-lg font-black uppercase">XP Objectives</h3>
         </div>
         <span className="inline-flex w-full justify-center sm:w-auto shrink-0 items-center gap-2 whitespace-nowrap border-2 border-black bg-[#FFE600] px-2 py-1 text-[10px] font-black uppercase shadow-[2px_2px_0_0_#000]">
           <Zap className="h-3.5 w-3.5 shrink-0" />
@@ -130,7 +130,7 @@ export function DashboardStats({
       variants={item}
       className="w-full min-w-0 max-w-full overflow-hidden border-4 border-black bg-[#13D7C2] p-4 shadow-[8px_8px_0_0_#000] sm:p-6 md:p-8 xl:p-10"
     >
-      <div className="mb-8 flex flex-col gap-3">
+      <div className="mb-6 flex flex-col gap-3">
         <ProviderStatusStrip />
         <div className="flex flex-wrap items-center gap-2 text-[11px] font-black uppercase tracking-[0.14em] text-black/75">
           <span className="inline-flex items-center gap-2 border-2 border-black bg-white px-3 py-1 shadow-[2px_2px_0_0_#000]">
@@ -143,8 +143,8 @@ export function DashboardStats({
         </div>
       </div>
 
-      <div className="grid min-w-0 grid-cols-1 gap-6 lg:grid-cols-[1.15fr_1fr] 2xl:grid-cols-[1.15fr_1fr_0.95fr]">
-        <div className="min-w-0 space-y-6">
+      <div className="grid min-w-0 grid-cols-1 gap-4 lg:grid-cols-[1.15fr_1fr] 2xl:grid-cols-[1.15fr_1fr_0.95fr]">
+        <div className="min-w-0 space-y-4">
           <HeroCrest
             heroName={user.name}
             heroTitle={characterTitle}
@@ -153,11 +153,11 @@ export function DashboardStats({
             recentLevelUp={recentLevelUp}
           />
 
-          <div className="min-w-0 border-4 border-black bg-white p-5 shadow-[4px_4px_0_0_#000]">
+          <div className="min-w-0 border-4 border-black bg-white p-4 shadow-[4px_4px_0_0_#000]">
             <div className="flex flex-wrap items-center justify-between gap-3 border-b-2 border-black pb-3">
               <div className="min-w-0 flex-1">
                 <p className="text-[11px] font-black uppercase tracking-[0.16em] text-black/60">Level progress</p>
-                <h3 className="text-xl font-black uppercase">Quest XP</h3>
+                <h3 className="text-lg font-black uppercase">Quest XP</h3>
               </div>
               <span className="inline-flex items-center gap-2 whitespace-nowrap border-2 border-black bg-[#67E8F9] px-2 py-1 text-[10px] font-black uppercase shadow-[2px_2px_0_0_#000]">
                 <Radar className="h-3.5 w-3.5 shrink-0" />
@@ -183,14 +183,14 @@ export function DashboardStats({
           </div>
         </div>
 
-        <div className="min-w-0 space-y-6">
+        <div className="min-w-0 space-y-4">
           <DailyQuestCard questsRemaining={questsRemaining} leadsCount={leads.length} />
 
-          <div className="min-w-0 border-4 border-black bg-white p-5 shadow-[4px_4px_0_0_#000]">
+          <div className="min-w-0 border-4 border-black bg-white p-4 shadow-[4px_4px_0_0_#000]">
             <div className="flex flex-col gap-3 border-b-2 border-black pb-3 sm:flex-row sm:items-start sm:justify-between">
               <div className="min-w-0 flex-1">
                 <p className="text-[11px] font-black uppercase tracking-[0.16em] text-black/60">Hunter pressure</p>
-                <h3 className="text-xl font-black uppercase">Lead posture</h3>
+                <h3 className="text-lg font-black uppercase">Lead posture</h3>
               </div>
               <span className="inline-flex w-full justify-center sm:w-auto shrink-0 items-center gap-2 whitespace-nowrap border-2 border-black bg-[#A3E635] px-2 py-1 text-[10px] font-black uppercase shadow-[2px_2px_0_0_#000]">
                 <ScrollText className="h-3.5 w-3.5 shrink-0" />
@@ -215,12 +215,12 @@ export function DashboardStats({
           </div>
         </div>
 
-        <div className="min-w-0 space-y-6">
-          <div className="min-w-0 border-4 border-black bg-white p-5 shadow-[4px_4px_0_0_#000]">
+        <div className="min-w-0 space-y-4">
+          <div className="min-w-0 border-4 border-black bg-white p-4 shadow-[4px_4px_0_0_#000]">
             <div className="flex flex-col gap-3 border-b-2 border-black pb-3 sm:flex-row sm:items-start sm:justify-between">
               <div className="min-w-0 flex-1">
                 <p className="text-[11px] font-black uppercase tracking-[0.16em] text-black/60">Share your command state</p>
-                <h3 className="text-xl font-black uppercase">Broadcast snapshot</h3>
+                <h3 className="text-lg font-black uppercase">Broadcast snapshot</h3>
               </div>
               <button
                 type="button"
@@ -242,11 +242,11 @@ export function DashboardStats({
             </div>
           </div>
 
-          <div className="min-w-0 border-4 border-black bg-white p-5 shadow-[4px_4px_0_0_#000]">
+          <div className="min-w-0 border-4 border-black bg-white p-4 shadow-[4px_4px_0_0_#000]">
             <div className="flex flex-col gap-3 border-b-2 border-black pb-3 sm:flex-row sm:items-start sm:justify-between">
               <div className="min-w-0 flex-1">
                 <p className="text-[11px] font-black uppercase tracking-[0.16em] text-black/60">Battlestation brief</p>
-                <h3 className="text-xl font-black uppercase">Command doctrine</h3>
+                <h3 className="text-lg font-black uppercase">Command doctrine</h3>
               </div>
               <span className="inline-flex w-full justify-center sm:w-auto shrink-0 items-center gap-2 whitespace-nowrap border-2 border-black bg-[#D9F99D] px-2 py-1 text-[10px] font-black uppercase shadow-[2px_2px_0_0_#000]">
                 <Crosshair className="h-3.5 w-3.5 shrink-0" />
@@ -268,7 +268,7 @@ export function DashboardStats({
             <div className="flex flex-col gap-3 border-b-2 border-black pb-3 sm:flex-row sm:items-start sm:justify-between">
               <div className="min-w-0 flex-1">
                 <p className="text-[11px] font-black uppercase tracking-[0.16em] text-black/60">Signal pressure</p>
-                <h3 className="text-xl font-black uppercase">Live command cue</h3>
+                <h3 className="text-lg font-black uppercase">Live command cue</h3>
               </div>
               <span className="inline-flex w-full justify-center sm:w-auto shrink-0 items-center gap-2 whitespace-nowrap border-2 border-black bg-white px-2 py-1 text-[10px] font-black uppercase shadow-[2px_2px_0_0_#000]">
                 <ShieldAlert className="h-3.5 w-3.5 shrink-0" />

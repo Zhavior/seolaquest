@@ -1,0 +1,61 @@
+import HQButton from "@/components/coquest/ui/HQButton"
+
+interface MissionCardCompactProps {
+  title: string
+  progress: number
+  xp: number
+  mana: number
+  onDeploy?: () => void
+}
+
+export default function MissionCardCompact({
+  title,
+  progress,
+  xp,
+  mana,
+  onDeploy,
+}: MissionCardCompactProps) {
+  return (
+    <section className="rounded-none border-4 border-black bg-[#FFF8D9] p-4 shadow-[6px_6px_0_0_#000]">
+
+      <p className="text-[10px] font-black uppercase tracking-[0.18em] text-black/60">
+        Today's Mission
+      </p>
+
+      <h2 className="mt-2 text-xl font-black uppercase leading-tight">
+        {title}
+      </h2>
+
+      <div className="mt-4 h-3 overflow-hidden border-2 border-black bg-white">
+
+        <div
+          className="h-full bg-[#13D7C2]"
+          style={{
+            width: `${Math.max(0, Math.min(progress, 100))}%`,
+          }}
+        />
+
+      </div>
+
+      <div className="mt-3 flex items-center justify-between text-xs font-black uppercase">
+
+        <span>
+          +{xp} XP
+        </span>
+
+        <span>
+          +{mana} Mana
+        </span>
+
+      </div>
+
+      <HQButton
+        className="mt-4 w-full"
+        onClick={onDeploy}
+      >
+        Deploy Mission
+      </HQButton>
+
+    </section>
+  )
+}
