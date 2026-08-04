@@ -15,7 +15,7 @@ describe('boundedBatchSize', () => {
     expect(boundedBatchSize(undefined)).toBe(4)
   })
   it('returns default batch size for null', () => {
-    expect(boundedBatchSize(null as any)).toBe(4)
+    expect(boundedBatchSize(null as unknown as number | undefined)).toBe(4)
   })
   it('returns default batch size for NaN', () => {
     expect(boundedBatchSize(NaN)).toBe(4)

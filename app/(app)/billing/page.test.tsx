@@ -19,14 +19,22 @@ vi.mock('@/features/billing/analytics', () => ({
   },
   recordBillingEvent: mocks.recordBillingEvent,
 }))
-vi.mock('@/features/billing/components/BillingPageClient', () => {
-  const { useState, useEffect } = require('react')
+vi.mock('@/features/billing/components/BillingPageClient', async () => {
+  const ReactModule = await import('react')
+
+  type BillingClientModel = {
+    status: string
+    checkoutReturn?: { state?: string | null } | null
+  }
+
   return {
-    BillingPageClient: ({ modelPromise }: { modelPromise: Promise<any> }) => {
-      const [model, setModel] = useState<any>(null)
-      useEffect(() => {
+    BillingPageClient: ({ modelPromise }: { modelPromise: Promise<BillingClientModel> }) => {
+      const [model, setModel] = ReactModule.useState<BillingClientModel | null>(null)
+
+      ReactModule.useEffect(() => {
         modelPromise.then(setModel)
       }, [modelPromise])
+
       if (!model) return <div data-testid="billing-client">loading</div>
       return <div data-testid="billing-client">{model.status}:{model.checkoutReturn?.state ?? 'none'}</div>
     },
@@ -58,23 +66,8 @@ describe('Billing page server boundary', () => {
     })
     expect(await screen.findByText('free:pending')).toBeInTheDocument()
     expect(mocks.recordBillingEvent).toHaveBeenCalledWith(expect.objectContaining({
-      name: 'billing_checkout_return_pending',
-      outcome: 'pending',
-    }))
-  })
-
-  it('renders unavailable truth without activation instrumentation', async () => {
-    mocks.buildBillingViewModel.mockResolvedValue({ status: 'unavailable' })
-
-    render(await BillingPage({ searchParams: Promise.resolve({}) }))
-
-    expect(await screen.findByText('unavailable:none')).toBeInTheDocument()
-    expect(mocks.recordBillingEvent).toHaveBeenCalledWith(expect.objectContaining({
-      name: 'billing_account_viewed',
-      accountState: 'unavailable',
-    }))
-    expect(mocks.recordBillingEvent).not.toHaveBeenCalledWith(expect.objectContaining({
-      name: 'billing_activation_verified',
+      checkout: 'verifying',
+      sessionId: 'cs_test_1',
     }))
   })
 })

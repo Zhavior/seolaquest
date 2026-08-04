@@ -77,7 +77,7 @@ describe('BillingPageClient rendering', () => {
       status: 'loading',
       title: 'Checking your billing account…',
       message: 'No plan, balance, or paid access is shown until the server confirms it.',
-    } as any)
+    })
 
     await act(async () => {
       render(

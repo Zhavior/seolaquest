@@ -14,7 +14,7 @@ export default async function OnboardingPage() {
     <OnboardingForm
       initialDraft={{
         displayName: user.name ?? '',
-        profileIconKey: (user.profileIconKey as any) ?? 'target',
+        profileIconKey: typeof user.profileIconKey === 'string' ? user.profileIconKey : 'target',
         businessDescription: user.businessDescription ?? '',
         targetCustomer: user.targetCustomer ?? '',
         firstKeyword: user.firstKeyword ?? '',
