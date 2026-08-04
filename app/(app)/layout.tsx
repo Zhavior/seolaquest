@@ -9,5 +9,5 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   if (!user) redirect('/sign-in?redirect_url=%2Fapp')
   if (!user.onboardingComplete) redirect('/onboarding?returnTo=%2Fapp')
 
-  return <CoQuestOS>{children}</CoQuestOS>
+  return <CoQuestOS user={user}>{children}</CoQuestOS>
 }

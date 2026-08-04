@@ -34,26 +34,26 @@ export function DashboardHeader({
         <div className="min-w-0 max-w-3xl">
           <div className="flex flex-wrap items-center gap-2">
             <span className="border-4 border-black bg-black px-3 py-1 text-[10px] font-black uppercase tracking-[0.18em] text-[#FFE600] shadow-[4px_4px_0_0_#000]">
-              Battlestation live command
+              Battle Area
             </span>
             <span className="border-4 border-black bg-white px-3 py-1 text-[10px] font-black uppercase tracking-[0.18em] text-black shadow-[4px_4px_0_0_#000]">
-              /app tactical surface
+              Mission Brief
             </span>
           </div>
 
           <h2 className="mt-4 text-3xl font-black uppercase tracking-[0.03em] text-black md:text-4xl">
-            Command live scans before the trail goes cold
+            Welcome back, boydsantos
           </h2>
 
           <p className="mt-3 max-w-2xl text-sm font-bold uppercase tracking-[0.04em] text-black/75 md:text-[15px]">
-            Ready the radar, track active signal pressure, and turn fresh matches into actions while the board is still hot.
+            Review your active campaigns, prioritize today's objectives, and launch your next action from the tactical command center.
           </p>
         </div>
 
         <div className="grid gap-3 sm:grid-cols-2 xl:min-w-[420px]">
           <div className="border-4 border-black bg-white px-4 py-3 shadow-[4px_4px_0_0_#000]">
             <p className="text-[10px] font-black uppercase tracking-[0.18em] text-black/60">
-              Hunter title
+              Class
             </p>
             <p className="mt-2 text-sm font-black uppercase tracking-[0.08em] text-black">
               {characterTitle}
@@ -62,7 +62,7 @@ export function DashboardHeader({
 
           <div className="border-4 border-black bg-white px-4 py-3 shadow-[4px_4px_0_0_#000]">
             <p className="text-[10px] font-black uppercase tracking-[0.18em] text-black/60">
-              Open objectives
+              Active Quests
             </p>
             <p className="mt-2 text-sm font-black uppercase tracking-[0.08em] text-black">
               {remainingQuests} live quests
@@ -71,17 +71,17 @@ export function DashboardHeader({
 
           <div className="border-4 border-black bg-[#FFF8CC] px-4 py-3 shadow-[4px_4px_0_0_#000]">
             <p className="text-[10px] font-black uppercase tracking-[0.18em] text-black/60">
-              Scan mode
+              Tactical Status
             </p>
             <p className="mt-2 flex items-center gap-2 text-sm font-black uppercase tracking-[0.08em] text-black">
               <Radar className="h-4 w-4" />
-              High-alert patrol
+              Operational
             </p>
           </div>
 
           <div className="border-4 border-black bg-white px-4 py-3 shadow-[4px_4px_0_0_#000]">
             <p className="text-[10px] font-black uppercase tracking-[0.18em] text-black/60">
-              Command state
+              Subscription
             </p>
             <p className="mt-2 flex items-center gap-2 text-sm font-black uppercase tracking-[0.08em] text-black">
               <ShieldAlert className="h-4 w-4" />
