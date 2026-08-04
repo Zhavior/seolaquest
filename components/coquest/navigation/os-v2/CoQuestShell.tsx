@@ -1,9 +1,27 @@
 'use client'
 
-export default function CoQuestShell() {
+import type { ReactNode } from 'react'
+
+import ShellLayout from './layout/ShellLayout'
+import Sidebar from './sidebar/Sidebar'
+import StatusBar from './statusbar/StatusBar'
+import Workspace from './workspace/Workspace'
+
+interface Props {
+  children: ReactNode
+}
+
+export default function CoQuestShell({
+  children,
+}: Props) {
   return (
-    <div className="min-h-screen bg-[#F4EFE6] text-black">
-      CoQuest Shell V2
-    </div>
+    <ShellLayout
+      sidebar={<Sidebar />}
+      statusBar={<StatusBar />}
+    >
+      <Workspace>
+        {children}
+      </Workspace>
+    </ShellLayout>
   )
 }
