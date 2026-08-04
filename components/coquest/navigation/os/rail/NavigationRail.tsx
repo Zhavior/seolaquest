@@ -1,200 +1,120 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import RailLogo from './RailLogo'
-import { navigation } from '../shared/navigation'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { LogOut, Menu, X } from 'lucide-react'
 import { SignOutButton, useUser } from '@clerk/nextjs'
-import { LogOut, Menu, X, LayoutDashboard, History, Send } from 'lucide-react'
 
-const bottomNav = [
-  { label: 'Battlestation', href: '/app',           icon: LayoutDashboard },
-  { label: 'Scan Runs',     href: '/app/runs',       icon: History         },
-  { label: 'Deliveries',    href: '/app/deliveries', icon: Send            },
-]
+import RailLogo from './RailLogo'
+import { navigation } from '../shared/navigation'
 
 export default function NavigationRail() {
   const pathname = usePathname()
   const { user } = useUser()
   const [mobileOpen, setMobileOpen] = useState(false)
 
-  useEffect(() => { setMobileOpen(false) }, [pathname])
-
   useEffect(() => {
     document.body.style.overflow = mobileOpen ? 'hidden' : ''
-    return () => { document.body.style.overflow = '' }
+    return () => {
+      document.body.style.overflow = ''
+    }
   }, [mobileOpen])
 
-  const displayName = user?.fullName ?? user?.emailAddresses?.[0]?.emailAddress ?? 'Hunter'
-  const initials = displayName.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase()
+  useEffect(() => {
+    setMobileOpen(false)
+  }, [pathname])
 
-  return (
-    <>
-      {/* ── DESKTOP rail (hidden on mobile) ── */}
-      <aside className="group hidden md:flex h-screen w-20 flex-col border-r-4 border-black bg-[#F8F5EF] transition-all duration-300 hover:w-72 shrink-0">
-        <RailLogo />
-
-        <nav className="flex-1 space-y-1 overflow-y-auto p-3">
-          {navigation.map(item => {
-            const Icon = item.icon
-            const active = item.href === '/app'
-              ? pathname === '/app'
-              : pathname.startsWith(item.href)
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={[
-                  'flex h-12 items-center rounded-xl px-4 transition-all',
-                  active
-                    ? 'border-2 border-black bg-[#FFD84D] shadow-[4px_4px_0_0_#000]'
-                    : 'hover:bg-[#FFF2B3]',
-                ].join(' ')}
-              >
-                <Icon className="h-5 w-5 shrink-0" />
-                <span className="ml-4 hidden truncate font-semibold group-hover:block">{item.label}</span>
-              </Link>
-            )
-          })}
-        </nav>
-
-        <div className="border-t-4 border-black p-3 space-y-1">
-          <div className="flex h-12 items-center rounded-xl px-4">
-            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border-2 border-black bg-[#FFD84D] text-xs font-black">
-              {initials}
-            </div>
-            <div className="ml-4 hidden min-w-0 group-hover:block">
-              <p className="truncate text-sm font-bold leading-tight">{displayName}</p>
-              <p className="truncate text-xs text-neutral-500">Hunter</p>
-            </div>
+  const railInner = (
+    <div className="flex h-full flex-col border-r-2 border-black bg-[#FFF8D6]">
+      <div className="border-b-2 border-black p-3">
+        <div className="flex items-center gap-3 rounded-none border-2 border-black bg-[#FFD54F] px-3 py-3 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]">
+          <RailLogo />
+          <div className="min-w-0">
+            <p className="truncate text-sm font-black uppercase tracking-[0.14em] text-black">
+              CoQuest OS
+            </p>
+            <p className="truncate text-[11px] font-bold uppercase tracking-[0.14em] text-black/70">
+              Command Rail
+            </p>
           </div>
-          <SignOutButton redirectUrl="/">
-            <button className="flex h-12 w-full items-center rounded-xl px-4 text-red-600 transition-all hover:bg-red-50">
-              <LogOut className="h-5 w-5 shrink-0" />
-              <span className="ml-4 hidden font-semibold group-hover:block">Log out</span>
-            </button>
-          </SignOutButton>
-        </div>
-      </aside>
-
-      {/* ── MOBILE: backdrop ── */}
-      {mobileOpen && (
-        <div
-          className="md:hidden fixed inset-0 z-40 bg-black/50 backdrop-blur-sm"
-          onClick={() => setMobileOpen(false)}
-        />
-      )}
-
-      {/* ── MOBILE: slide-in drawer ── */}
-      <div className={[
-        'md:hidden fixed inset-y-0 left-0 z-50 flex w-72 flex-col border-r-4 border-black bg-[#F8F5EF]',
-        'transition-transform duration-300 ease-in-out',
-        mobileOpen ? 'translate-x-0' : '-translate-x-full',
-      ].join(' ')}>
-
-        <div className="flex h-20 items-center justify-between border-b-4 border-black px-4">
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl border-4 border-black bg-[#FFD84D] font-black shadow-[4px_4px_0_0_#000]">
-            CQ
-          </div>
-          <button
-            onClick={() => setMobileOpen(false)}
-            className="flex h-10 w-10 items-center justify-center rounded-xl border-2 border-black hover:bg-[#FFF2B3]"
-            aria-label="Close menu"
-          >
-            <X className="h-5 w-5" />
-          </button>
-        </div>
-
-        <nav className="flex-1 space-y-1 overflow-y-auto p-3">
-          {navigation.map(item => {
-            const Icon = item.icon
-            const active = item.href === '/app'
-              ? pathname === '/app'
-              : pathname.startsWith(item.href)
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={[
-                  'flex h-12 items-center rounded-xl px-4 transition-all',
-                  active
-                    ? 'border-2 border-black bg-[#FFD84D] shadow-[4px_4px_0_0_#000]'
-                    : 'hover:bg-[#FFF2B3]',
-                ].join(' ')}
-              >
-                <Icon className="h-5 w-5 shrink-0" />
-                <span className="ml-4 truncate font-semibold">{item.label}</span>
-              </Link>
-            )
-          })}
-        </nav>
-
-        <div className="border-t-4 border-black p-3 space-y-1">
-          <div className="flex h-12 items-center rounded-xl px-4 gap-3">
-            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border-2 border-black bg-[#FFD84D] text-xs font-black">
-              {initials}
-            </div>
-            <div className="min-w-0">
-              <p className="truncate text-sm font-bold leading-tight">{displayName}</p>
-              <p className="truncate text-xs text-neutral-500">Hunter</p>
-            </div>
-          </div>
-          <SignOutButton redirectUrl="/">
-            <button className="flex h-12 w-full items-center gap-3 rounded-xl px-4 text-red-600 transition-all hover:bg-red-50">
-              <LogOut className="h-5 w-5 shrink-0" />
-              <span className="font-semibold">Log out</span>
-            </button>
-          </SignOutButton>
         </div>
       </div>
 
-      {/* ── MOBILE: bottom tab bar (hidden when drawer open) ── */}
-      <nav className={[
-        'md:hidden fixed bottom-0 inset-x-0 z-30',
-        'flex items-center justify-around',
-        'h-16 border-t-4 border-black bg-[#F8F5EF]',
-        'transition-transform duration-300 ease-in-out',
-        mobileOpen ? 'translate-y-full' : 'translate-y-0',
-      ].join(' ')}>
+      <nav className="flex-1 space-y-2 p-3">
+        {navigation.map((item) => {
+          const active =
+            pathname === item.href ||
+            (item.href !== '/app' && pathname.startsWith(item.href))
 
-        {bottomNav.map(item => {
           const Icon = item.icon
-          const active = item.href === '/app'
-            ? pathname === '/app'
-            : pathname.startsWith(item.href)
+
           return (
             <Link
               key={item.href}
               href={item.href}
-              className="flex flex-1 flex-col items-center justify-center gap-1 h-full"
-            >
-              <div className={[
-                'flex h-9 w-9 items-center justify-center rounded-xl transition-all',
+              className={[
+                'flex items-center gap-3 border-2 border-black px-3 py-3 text-sm font-black uppercase tracking-[0.12em] transition-all',
                 active
-                  ? 'bg-[#FFD84D] border-2 border-black shadow-[2px_2px_0_0_#000]'
-                  : '',
-              ].join(' ')}>
-                <Icon className="h-5 w-5" />
-              </div>
-              <span className="text-[10px] font-semibold leading-none">{item.label}</span>
+                  ? 'bg-[#FFD54F] text-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]'
+                  : 'bg-white text-black hover:bg-[#FFF1A8] hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]',
+              ].join(' ')}
+            >
+              <Icon className="h-5 w-5 shrink-0" />
+              <span>{item.label}</span>
             </Link>
           )
         })}
-
-        {/* Sidebar toggle button */}
-        <button
-          onClick={() => setMobileOpen(true)}
-          className="flex flex-1 flex-col items-center justify-center gap-1 h-full"
-          aria-label="Open menu"
-        >
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl transition-all">
-            <Menu className="h-5 w-5" />
-          </div>
-          <span className="text-[10px] font-semibold leading-none">Menu</span>
-        </button>
-
       </nav>
+
+      <div className="border-t-2 border-black p-3">
+        <div className="mb-3 border-2 border-black bg-white p-3 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]">
+          <p className="truncate text-sm font-black uppercase tracking-[0.12em] text-black">
+            {user?.fullName || user?.username || user?.primaryEmailAddress?.emailAddress || 'Player One'}
+          </p>
+          <p className="mt-1 text-[11px] font-bold uppercase tracking-[0.12em] text-black/60">
+            Active Patrol
+          </p>
+        </div>
+
+        <SignOutButton redirectUrl="/">
+          <button className="flex w-full items-center justify-center gap-2 border-2 border-black bg-[#FF8A80] px-3 py-3 text-sm font-black uppercase tracking-[0.12em] text-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] transition-transform hover:-translate-y-[1px]">
+            <LogOut className="h-4 w-4" />
+            Log Out
+          </button>
+        </SignOutButton>
+      </div>
+    </div>
+  )
+
+  return (
+    <>
+      <button
+        type="button"
+        aria-label={mobileOpen ? 'Close navigation' : 'Open navigation'}
+        onClick={() => setMobileOpen((value) => !value)}
+        className="fixed left-4 top-4 z-[70] flex h-12 w-12 items-center justify-center border-2 border-black bg-[#FFD54F] text-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] md:hidden"
+      >
+        {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+      </button>
+
+      <aside className="sticky top-0 hidden h-screen w-[280px] shrink-0 md:block">
+        {railInner}
+      </aside>
+
+      {mobileOpen && (
+        <>
+          <button
+            type="button"
+            aria-label="Close navigation backdrop"
+            onClick={() => setMobileOpen(false)}
+            className="fixed inset-0 z-[60] bg-black/50 md:hidden"
+          />
+          <aside className="fixed inset-y-0 left-0 z-[65] w-[300px] md:hidden">
+            {railInner}
+          </aside>
+        </>
+      )}
     </>
   )
 }
