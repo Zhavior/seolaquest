@@ -10,6 +10,8 @@ import { DashboardHeader } from '@/features/dashboard/components/DashboardHeader
 import { DashboardStats } from '@/features/dashboard/components/DashboardStats'
 import { DashboardKeywords } from '@/features/dashboard/components/DashboardKeywords'
 import DashboardFeed from '@/features/dashboard/components/DashboardFeed'
+import { DashboardRadar } from '@/features/dashboard/components/DashboardRadar'
+import { DashboardLeaderboard } from '@/features/dashboard/components/DashboardLeaderboard'
 import type {
   AnalyticsData,
   DashboardKeyword,
@@ -21,22 +23,6 @@ import type {
 const QuickStrikeReplyModal = dynamic(() => import('@/components/QuickStrikeReplyModal'))
 const DashboardScannerModal = dynamic(() =>
   import('@/features/dashboard/components/DashboardScannerModal').then((module) => module.DashboardScannerModal)
-)
-const DashboardRadar = dynamic(
-  () => import('@/features/dashboard/components/DashboardRadar').then((module) => module.DashboardRadar),
-  {
-    loading: () => (
-      <div className="xl:col-span-4 min-h-[420px] border-4 border-black bg-white p-8 shadow-[8px_8px_0_0_#000] animate-pulse" />
-    ),
-  }
-)
-const DashboardLeaderboard = dynamic(
-  () => import('@/features/dashboard/components/DashboardLeaderboard').then((module) => module.DashboardLeaderboard),
-  {
-    loading: () => (
-      <div className="min-h-[420px] border-4 border-black bg-[#F7D046] p-6 shadow-[6px_6px_0_0_#000] animate-pulse" />
-    ),
-  }
 )
 
 const sectionReveal: Variants = {
