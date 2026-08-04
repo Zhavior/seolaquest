@@ -1,52 +1,64 @@
 import type { ReactNode } from "react"
 import clsx from "clsx"
+import HQCard from "./HQCard"
 
 interface HQSectionProps {
   title: string
   subtitle?: string
+  description?: string
+  children?: ReactNode
   actions?: ReactNode
-  children: ReactNode
   className?: string
 }
 
 export default function HQSection({
   title,
   subtitle,
-  actions,
+  description,
   children,
+  actions,
   className,
 }: HQSectionProps) {
   return (
-    <section
-      className={clsx(
-        "border-4 border-black bg-[#F7F1DD]",
-        "shadow-[6px_6px_0_0_#000]",
-        className,
-      )}
+    <HQCard
+      className={clsx("overflow-hidden", className)}
     >
-      <header className="flex items-center justify-between border-b-4 border-black bg-[#FFE082] px-5 py-3">
-        <div>
-          <h2 className="text-lg font-black uppercase tracking-wide">
-            {title}
-          </h2>
+      <div className="space-y-8">
 
-          {subtitle && (
-            <p className="text-xs font-bold uppercase tracking-[0.15em] text-black/60">
-              {subtitle}
-            </p>
-          )}
+        <div className="relative">
+
+          <div className="absolute left-0 top-0 h-10 w-1 rounded-full bg-cyan-400 shadow-[0_0_20px_rgba(34,211,238,.8)]" />
+
+          <div className="pl-6">
+
+            <p className="text-[11px] uppercase tracking-[0.28em] text-cyan-300/70 font-semibold">{subtitle ?? "COMMAND MODULE"}</p>
+
+            <h2 className="mt-2 text-3xl font-black tracking-tight text-white">
+              {title}
+            </h2>
+
+            {description && (
+              <p className="mt-3 max-w-3xl text-sm leading-7 text-white/60">
+                {description}
+              </p>
+            )}
+
+          </div>
         </div>
 
+        {children && (
+          <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+            {children}
+          </div>
+        )}
+
         {actions && (
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap gap-3 border-t border-white/10 pt-6">
             {actions}
           </div>
         )}
-      </header>
 
-      <div className="p-5">
-        {children}
       </div>
-    </section>
+    </HQCard>
   )
 }
