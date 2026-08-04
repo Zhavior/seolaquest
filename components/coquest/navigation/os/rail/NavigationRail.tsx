@@ -7,6 +7,7 @@ import { LogOut, Menu, X } from 'lucide-react'
 import { SignOutButton, useUser } from '@clerk/nextjs'
 
 import { navigation } from '../shared/navigation'
+import { player } from '../shared/player'
 import { PlayerStatusCard } from './PlayerStatusCard'
 
 export default function NavigationRail() {
@@ -82,10 +83,10 @@ export default function NavigationRail() {
   <PlayerStatusCard
     collapsed={collapsed}
     name={displayName}
-    level={14}
-    title="Apprentice Builder"
-    quest="Launch Public Beta"
-    progress={73}
+    level={player.level}
+    title={player.title}
+    quest={player.activeQuest}
+    progress={player.questProgress}
   />
 </div>
 

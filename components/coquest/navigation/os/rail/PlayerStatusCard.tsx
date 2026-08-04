@@ -1,5 +1,7 @@
 'use client'
 
+import { getLevelInfo } from '../shared/progression'
+
 interface PlayerStatusCardProps {
   collapsed: boolean
   name: string
@@ -17,12 +19,14 @@ export function PlayerStatusCard({
   quest,
   progress,
 }: PlayerStatusCardProps) {
+  const info = getLevelInfo(level * 250)
+
   if (collapsed) {
     return (
       <div className="border-2 border-black bg-[#FFE066] p-3 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
         <div className="flex flex-col items-center gap-2">
           <div className="text-3xl">⚔</div>
-          <div className="text-[10px] font-black">LV {level}</div>
+          <div className="text-[10px] font-black">LV {info.level}</div>
         </div>
       </div>
     )
@@ -46,14 +50,14 @@ export function PlayerStatusCard({
 
       <div className="mb-4">
         <div className="mb-1 flex justify-between text-[10px] font-black uppercase">
-          <span>Level {level}</span>
-          <span>{progress}%</span>
+          <span>Level {info.level}</span>
+          <span>{info.progress}%</span>
         </div>
 
         <div className="h-3 border-2 border-black bg-white">
           <div
             className="h-full bg-[#FFD54F] transition-all duration-300"
-            style={{ width: `${progress}%` }}
+            style={{ width: `${info.progress}%` }}
           />
         </div>
       </div>
