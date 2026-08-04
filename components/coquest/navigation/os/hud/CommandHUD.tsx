@@ -24,7 +24,7 @@ export default function CommandHUD({ user }: CommandHUDProps) {
     user.xpRequired > 0 ? Math.min(100, Math.round((user.xp / user.xpRequired) * 100)) : 0
 
   return (
-    <header className="sticky top-0 z-40 border-b-2 border-black bg-[#FFF8D6]">
+    <header className="relative z-30 border-b-2 border-black bg-[#FFF8D6]">
       <div className="grid min-h-20 grid-cols-1 gap-4 px-4 py-3 lg:grid-cols-[220px_minmax(320px,1fr)_auto] lg:items-center lg:px-6">
         <div className="min-w-0">
           <p className="text-[10px] font-black uppercase tracking-[0.18em] text-black/55">

@@ -1,9 +1,11 @@
-import { LayoutProvider } from './layout/LayoutContext'
+'use client'
+
 import type { ReactNode } from 'react'
 
 import CommandHUD from './hud/CommandHUD'
 import CommandPalette from './palette/CommandPalette'
 import NavigationRail from './rail/NavigationRail'
+import { LayoutProvider } from './layout/LayoutContext'
 
 interface UserSummary {
   name: string | null
@@ -23,24 +25,29 @@ interface CoQuestOSProps {
   children: ReactNode
 }
 
-export default function CoQuestOS({ user, children }: CoQuestOSProps) {
+function Shell({ user, children }: CoQuestOSProps) {
+
   return (
-    <LayoutProvider>
     <div className="min-h-screen bg-[#F4EFE6] text-black">
       <CommandPalette />
 
-      <div className="flex min-h-screen">
-        <NavigationRail />
+      <NavigationRail />
 
-        <div className="flex min-w-0 flex-1 flex-col lg:pl-[288px]">
-          <CommandHUD user={user} />
+      <div className="min-h-screen">
+        <CommandHUD user={user} />
 
-          <main className="min-w-0 flex-1 overflow-auto bg-[#F4EFE6]">
-            {children}
-          </main>
-        </div>
+        <main className="min-h-[calc(100vh-80px)] overflow-auto bg-[#F4EFE6]">
+          {children}
+        </main>
       </div>
     </div>
+  )
+}
+
+export default function CoQuestOS(props: CoQuestOSProps) {
+  return (
+    <LayoutProvider>
+      <Shell {...props} />
     </LayoutProvider>
   )
 }

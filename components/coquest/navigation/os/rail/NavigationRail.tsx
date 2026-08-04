@@ -7,6 +7,7 @@ import { LogOut, Menu, X } from 'lucide-react'
 import { SignOutButton, useUser } from '@clerk/nextjs'
 
 import { navigation } from '../shared/navigation'
+import { useLayout } from '../layout/LayoutContext'
 import { player } from '../shared/player'
 import { PlayerStatusCard } from './PlayerStatusCard'
 
@@ -14,8 +15,6 @@ export default function NavigationRail() {
   const pathname = usePathname()
   const { user } = useUser()
   const [mobileOpen, setMobileOpen] = useState(false)
-  const [desktopExpanded, setDesktopExpanded] = useState(false)
-
   useEffect(() => {
     document.body.style.overflow = mobileOpen ? 'hidden' : ''
     return () => {
@@ -55,7 +54,7 @@ export default function NavigationRail() {
     return () => window.removeEventListener('keydown', onKeyDown)
   }, [])
 
-  const collapsed = !desktopExpanded
+  const { collapsed, setCollapsed } = useLayout()
   const displayName =
     user?.fullName || user?.username || user?.primaryEmailAddress?.emailAddress || 'Player One'
 
@@ -145,7 +144,7 @@ export default function NavigationRail() {
       <div className="mt-auto border-t-2 border-black bg-[#FFF8D6] p-3">
         <button
           type="button"
-          onClick={() => setDesktopExpanded((value) => !value)}
+          onClick={() => setCollapsed((value) => !value)}
           className="mb-3 flex w-full items-center justify-center gap-2 rounded-xl border border-stone-200 bg-white px-3 py-2 text-[11px] font-black uppercase tracking-[0.12em] text-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all duration-200 ease-out hover:-translate-y-[1px] hover:bg-[#FFF1A8]"
         >
           {collapsed ? 'Expand Rail' : 'Collapse Rail'}
