@@ -1,8 +1,6 @@
 import { redirect } from 'next/navigation'
 import { getCurrentUser } from '@/lib/auth'
-import { AppShell } from '@/components/coquest/shell/AppShell'
-import { buildGuildHudData } from '@/components/coquest/hud/buildGuildHudData'
-import { roomRouteMetaByPath } from '@/components/coquest/nav/room-route-meta'
+import CoQuestOS from '@/components/coquest/navigation/os/CoQuestOS'
 
 export const dynamic = 'force-dynamic'
 
@@ -11,8 +9,5 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   if (!user) redirect('/sign-in?redirect_url=%2Fapp')
   if (!user.onboardingComplete) redirect('/onboarding?returnTo=%2Fapp')
 
-  const hud = buildGuildHudData(user)
-  const room = roomRouteMetaByPath['/app']
-
-  return <AppShell hud={hud} room={room}>{children}</AppShell>
+  return <CoQuestOS>{children}</CoQuestOS>
 }

@@ -1,15 +1,23 @@
 export default function BillingLoading() {
   return (
-    <div className="min-h-[50vh] bg-[#F4F0EA] p-5 sm:p-8 lg:p-10">
-      <div className="mx-auto max-w-6xl">
-        <div className="mb-6 h-6 w-40 animate-pulse border-4 border-black bg-[#FFE600]" />
-        <div className="mb-8 h-14 w-full animate-pulse border-4 border-black bg-white" />
-        <div className="grid gap-5 lg:grid-cols-3">
-          <div className="h-48 animate-pulse border-4 border-black bg-white" />
-          <div className="h-48 animate-pulse border-4 border-black bg-white" />
-          <div className="h-48 animate-pulse border-4 border-black bg-white" />
-        </div>
+    <div className="p-10 max-w-6xl mx-auto space-y-8">
+
+      {/* Page title shimmer */}
+      <div className="h-7 w-48 animate-pulse rounded-xl bg-black/10" />
+
+      {/* Top banner shimmer */}
+      <div className="h-24 w-full animate-pulse rounded-2xl bg-black/10" />
+
+      {/* 3 plan cards shimmer */}
+      <div className="grid gap-5 lg:grid-cols-3">
+        <div className="h-56 animate-pulse rounded-2xl bg-black/10" />
+        <div className="h-56 animate-pulse rounded-2xl bg-black/[0.15]" />
+        <div className="h-56 animate-pulse rounded-2xl bg-black/10" />
       </div>
+
+      {/* Bottom detail shimmer */}
+      <div className="h-32 w-full animate-pulse rounded-2xl bg-black/10" />
+
     </div>
   )
 }
