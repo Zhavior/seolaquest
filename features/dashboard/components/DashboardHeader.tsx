@@ -18,11 +18,11 @@ function StatChip({
   tone?: string
 }) {
   return (
-    <div className={`border-2 border-black px-3 py-2 ${tone}`}>
-      <div className="text-[10px] font-black uppercase tracking-[0.16em] text-black/55">
+    <div className={`px-4 py-3 flex flex-col justify-center ${tone}`}>
+      <div className="text-[10px] font-black uppercase tracking-[0.16em] text-black/60">
         {label}
       </div>
-      <div className="mt-1 text-base font-black text-black">
+      <div className="mt-1 text-xl font-black text-black">
         {value}
       </div>
     </div>
@@ -40,50 +40,54 @@ export function DashboardHeader({
       variants={item}
       initial="hidden"
       animate="show"
-      className="border-2 border-black bg-[#F7F1DD] p-4 md:p-5"
+      className="border-2 border-black bg-[#F7F1DD] shadow-[4px_4px_0_#000] flex flex-col xl:flex-row xl:items-stretch divide-y-2 divide-black xl:divide-y-0 xl:divide-x-2"
     >
-      <div className="flex flex-col gap-5 xl:flex-row xl:items-start xl:justify-between">
-        <div className="min-w-0 max-w-3xl">
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="border-2 border-black bg-black px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.16em] text-[#FFE600]">
-              Battle Area
-            </span>
-            <span className="border-2 border-black bg-white px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.16em] text-black">
-              Mission Brief
-            </span>
-          </div>
-
-          <p className="mt-4 text-[10px] font-black uppercase tracking-[0.2em] text-black/50">
-            Current Objective
-          </p>
-
-          <h2 className="mt-2 text-2xl font-black uppercase tracking-tight text-black md:text-3xl">
-            Continue Today&apos;s Campaign
-          </h2>
-
-          <p className="mt-3 max-w-2xl text-sm font-bold leading-6 text-black/70">
-            Review your highest priority leads, complete open quests, and push your guild toward today&apos;s objective.
-          </p>
-
-          <div className="mt-4 flex flex-wrap gap-2">
-            <StatChip label="Reward" value="+240 XP" tone="bg-[#FFE082]" />
-            <StatChip label="Mana" value="+15" tone="bg-[#B8FFF3]" />
-          </div>
+      <div className="min-w-0 flex-1 p-6 md:p-8">
+        <div className="flex flex-wrap items-center gap-3">
+          <span className="bg-black px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.16em] text-[#FFE600] shadow-[2px_2px_0_#000]">
+            Battle Area
+          </span>
+          <span className="bg-white px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.16em] text-black shadow-[2px_2px_0_#000]">
+            Mission Brief
+          </span>
         </div>
 
-        <div className="xl:w-[340px]">
-          <div className="border-2 border-black bg-[#FFF6D8] p-3">
-            <p className="border-b-2 border-black pb-2 text-[10px] font-black uppercase tracking-[0.18em] text-black/55">
-              Player Status
-            </p>
+        <p className="mt-6 text-[11px] font-black uppercase tracking-[0.2em] text-black/50">
+          Current Objective
+        </p>
 
-            <div className="mt-3 grid grid-cols-2 gap-2">
-              <StatChip label="Level" value={user.level} tone="bg-[#FFF1A8]" />
-              <StatChip label="XP" value={user.xp.toLocaleString()} tone="bg-[#D8FFF8]" />
-              <StatChip label="Mana" value={maxCredits.toLocaleString()} tone="bg-[#FFD9B8]" />
-              <StatChip label="Quests" value={remainingQuests} />
-            </div>
+        <h2 className="mt-2 text-[clamp(1.5rem,3vw,2.5rem)] font-black uppercase tracking-tight text-black leading-none">
+          Continue Today&apos;s Campaign
+        </h2>
+
+        <p className="mt-4 max-w-2xl text-[clamp(0.875rem,1.5vw,1rem)] font-bold leading-relaxed text-black/70">
+          Review your highest priority leads, complete open quests, and push your guild toward today&apos;s objective.
+        </p>
+
+        <div className="mt-8 flex flex-wrap gap-4">
+          <div className="flex items-center gap-3 bg-[#FFE082] px-4 py-2 shadow-[2px_2px_0_#000]">
+            <span className="text-[10px] font-black uppercase tracking-wider text-black/60">Reward</span>
+            <span className="text-sm font-black text-black">+240 XP</span>
           </div>
+          <div className="flex items-center gap-3 bg-[#B8FFF3] px-4 py-2 shadow-[2px_2px_0_#000]">
+            <span className="text-[10px] font-black uppercase tracking-wider text-black/60">Mana</span>
+            <span className="text-sm font-black text-black">+15</span>
+          </div>
+        </div>
+      </div>
+
+      <div className="xl:w-[380px] bg-[#FFF6D8] flex flex-col">
+        <div className="p-4 border-b-2 border-black bg-[#FFE082]">
+          <p className="text-[10px] font-black uppercase tracking-[0.18em] text-black/70">
+            Player Status
+          </p>
+        </div>
+
+        <div className="grid grid-cols-2 flex-1 bg-black gap-[2px]">
+          <StatChip label="Level" value={user.level} tone="bg-[#FFF1A8]" />
+          <StatChip label="XP" value={user.xp.toLocaleString()} tone="bg-[#D8FFF8]" />
+          <StatChip label="Mana" value={maxCredits.toLocaleString()} tone="bg-[#FFD9B8]" />
+          <StatChip label="Quests" value={remainingQuests} tone="bg-white" />
         </div>
       </div>
     </motion.section>
