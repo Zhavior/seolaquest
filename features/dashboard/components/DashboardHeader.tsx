@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { motion, type Variants } from 'framer-motion'
-import { Swords, Radar, Shield, Sparkles, Zap, Scroll, Trophy, ArrowRight } from 'lucide-react'
+import { Swords, Radar, Scroll, Trophy, ArrowRight, Sparkles, CheckCircle2 } from 'lucide-react'
 import type { DashboardUser } from '@/features/dashboard/types'
 import { sfx } from '@/lib/sfx'
 
@@ -14,51 +14,20 @@ type DashboardHeaderProps = {
   runMockScanner?: () => void
 }
 
-function StatChip({
-  label,
-  value,
-  subtext,
-  tone = 'bg-white',
-}: {
-  label: string
-  value: string | number
-  subtext?: string
-  tone?: string
-}) {
-  return (
-    <div className={`px-4 py-3 flex flex-col justify-center border-2 border-black ${tone} shadow-[2px_2px_0_0_#000]`}>
-      <div className="text-[10px] font-black uppercase tracking-[0.14em] text-black/70">
-        {label}
-      </div>
-      <div className="mt-0.5 text-2xl font-black text-black leading-none">
-        {value}
-      </div>
-      {subtext && (
-        <div className="mt-1 text-[9px] font-mono font-bold text-black/60 uppercase">
-          {subtext}
-        </div>
-      )}
-    </div>
-  )
-}
-
 export function DashboardHeader({
   item,
-  user,
   remainingQuests,
-  maxCredits,
   runMockScanner,
 }: DashboardHeaderProps) {
-  const currentXp = user.xp ?? 1250
-  const xpRequired = user.xpRequired ?? 2000
-  const xpPercent = Math.min(100, Math.round((currentXp / Math.max(1, xpRequired)) * 100))
+  const maxQuests = 15
+  const questProgressPercent = Math.min(100, Math.round((remainingQuests / maxQuests) * 100))
 
   return (
     <motion.section
       variants={item}
       initial="hidden"
       animate="show"
-      className="relative border-4 border-black bg-white shadow-[6px_6px_0_0_#000] md:shadow-[8px_8px_0_0_#000] flex flex-col xl:flex-row xl:items-stretch overflow-hidden select-none"
+      className="relative border-4 border-black bg-white shadow-[6px_6px_0_0_#000] md:shadow-[8px_8px_0_0_#000] flex flex-col lg:flex-row lg:items-stretch overflow-hidden select-none"
     >
       {/* Noise Texture Overlay */}
       <div
@@ -69,7 +38,7 @@ export function DashboardHeader({
       />
 
       {/* Main Campaign Hero Content */}
-      <div className="relative z-10 min-w-0 flex-1 p-5 md:p-8 bg-[#FFF8D9] border-b-4 xl:border-b-0 xl:border-r-4 border-black flex flex-col justify-between">
+      <div className="relative z-10 min-w-0 flex-1 p-5 md:p-8 bg-[#FFF8D9] border-b-4 lg:border-b-0 lg:border-r-4 border-black flex flex-col justify-between">
         <div>
           <div className="flex flex-wrap items-center gap-2.5">
             <span className="bg-black px-3 py-1 text-xs font-black uppercase tracking-widest text-[#FFE600] border-2 border-black shadow-[2px_2px_0_0_#000] -rotate-1 flex items-center gap-1.5">
@@ -96,25 +65,6 @@ export function DashboardHeader({
           <p className="mt-3.5 max-w-2xl text-xs sm:text-sm md:text-base font-bold leading-relaxed text-black/80">
             Sweep your high-priority Reddit and Twitter streams, execute active bounties, and claim verified source matches to push your level forward today.
           </p>
-
-          {/* XP Level Progress Bar Inside Campaign Card */}
-          <div className="mt-5 max-w-xl border-2 border-black bg-white p-3 shadow-[3px_3px_0_0_#000]">
-            <div className="flex items-center justify-between text-xs font-black uppercase mb-1.5">
-              <span className="flex items-center gap-1.5 text-black">
-                <Sparkles className="size-3.5 text-[#F59E0B]" />
-                Level Progress (LVL {user.level})
-              </span>
-              <span className="font-mono text-black">
-                {currentXp.toLocaleString()} / {xpRequired.toLocaleString()} XP ({xpPercent}%)
-              </span>
-            </div>
-            <div className="h-3.5 w-full border-2 border-black bg-slate-100 overflow-hidden relative">
-              <div
-                className="h-full bg-gradient-to-r from-[#FFE600] via-[#F59E0B] to-[#A3E635] transition-all duration-500"
-                style={{ width: `${xpPercent}%` }}
-              />
-            </div>
-          </div>
         </div>
 
         {/* Action Button Cluster */}
@@ -162,52 +112,55 @@ export function DashboardHeader({
         </div>
       </div>
 
-      {/* Right Telemetry Column */}
-      <div className="relative z-10 xl:w-[360px] bg-[#FFF6D8] flex flex-col justify-between p-4 space-y-4">
-        <div className="p-3 border-3 border-black bg-[#FFE082] shadow-[3px_3px_0_0_#000] flex items-center justify-between">
-          <p className="text-xs font-black uppercase tracking-widest text-black">
-            PLAYER COMMAND TELEMETRY
-          </p>
-          <span className="size-2.5 rounded-full bg-[#00c951] animate-pulse border border-black" />
-        </div>
-
-        <div className="grid grid-cols-2 gap-2.5 flex-1">
-          <StatChip
-            label="Level"
-            value={`LVL ${user.level}`}
-            subtext="Hero Rank"
-            tone="bg-[#FFF1A8]"
-          />
-          <StatChip
-            label="EXP"
-            value={`${currentXp.toLocaleString()}`}
-            subtext={`Target ${xpRequired.toLocaleString()}`}
-            tone="bg-[#FFE600]"
-          />
-          <StatChip
-            label="Quests"
-            value={remainingQuests}
-            subtext="Active Bounties"
-            tone="bg-[#FFD9B8]"
-          />
-          <StatChip
-            label="Mana (MP)"
-            value={`${maxCredits.toLocaleString()}`}
-            subtext="Vault Capacity"
-            tone="bg-[#06B6D4] text-white"
-          />
-        </div>
-
-        <div className="p-3 border-3 border-black bg-white shadow-[3px_3px_0_0_#000] space-y-1.5">
-          <div className="flex items-center justify-between text-xs font-black uppercase">
-            <span className="flex items-center gap-1">
-              <Zap className="size-3.5 text-[#06B6D4]" /> Daily Reward
+      {/* Upgraded Quest Counter & Capacity Box */}
+      <div className="relative z-10 lg:w-[380px] bg-[#FF5722] p-6 text-white flex flex-col justify-between border-t-4 lg:border-t-0 border-black shadow-[inset_0_0_30px_rgba(0,0,0,0.15)]">
+        <div>
+          <div className="flex items-center justify-between">
+            <span className="bg-black text-[#FFE600] text-[10px] font-black uppercase tracking-widest px-2.5 py-1 border-2 border-white shadow-[2px_2px_0_0_#000]">
+              ACTIVE QUEST TRACKER
             </span>
-            <span className="text-[#16A34A]">+240 XP • +15 MP</span>
+            <Scroll className="size-6 text-[#FFE600] animate-bounce" style={{ animationDuration: '3s' }} />
           </div>
-          <p className="text-[10px] font-bold text-black/70 leading-normal">
-            Completing daily scans unlocks bonus XP and restores mana vault credits.
-          </p>
+
+          <div className="mt-4">
+            <p className="text-[11px] font-black uppercase tracking-[0.14em] text-white/80">
+              Quests Available Today
+            </p>
+            <div className="mt-1 flex items-baseline gap-2">
+              <span className="text-5xl font-black text-[#FFE600] tracking-tight leading-none drop-shadow-[3px_3px_0_#000]">
+                {remainingQuests}
+              </span>
+              <span className="text-lg font-black uppercase text-white/90">
+                / {maxQuests} QUESTS READY
+              </span>
+            </div>
+          </div>
+
+          {/* Upgraded Quest Capacity Progress Bar */}
+          <div className="mt-4 border-3 border-black bg-black p-2.5 shadow-[3px_3px_0_0_#000]">
+            <div className="flex items-center justify-between text-[11px] font-black uppercase text-[#FFE600] mb-1.5">
+              <span>Quest Ready Capacity</span>
+              <span>{questProgressPercent}%</span>
+            </div>
+            <div className="h-3.5 w-full border-2 border-white bg-slate-900 overflow-hidden relative">
+              <div
+                className="h-full bg-gradient-to-r from-[#FFE600] via-[#A3E635] to-[#06B6D4] transition-all duration-500"
+                style={{ width: `${questProgressPercent}%` }}
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* High-Octane Quest Perks */}
+        <div className="mt-5 space-y-2 text-xs font-black uppercase text-white">
+          <div className="flex items-center gap-2 border-2 border-black bg-black/40 px-3 py-2 shadow-[2px_2px_0_0_#000]">
+            <CheckCircle2 className="size-4 text-[#A3E635] shrink-0" />
+            <span>High-Priority Buyer Signals Armed</span>
+          </div>
+          <div className="flex items-center gap-2 border-2 border-black bg-black/40 px-3 py-2 shadow-[2px_2px_0_0_#000]">
+            <Sparkles className="size-4 text-[#FFE600] shrink-0" />
+            <span>+240 XP Bonus on Complete Claim</span>
+          </div>
         </div>
       </div>
     </motion.section>
