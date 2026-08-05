@@ -301,6 +301,34 @@
 }
 
 /* ── Grey Background Mode (Sun/Moon Toggle High-Contrast System) ───────── */
+
+/*
+ * Which icon the colour-mode button shows is decided by CSS, not React state.
+ * The blocking script in the root layout sets `grey-mode` before first paint,
+ * so the correct icon is painted immediately and the button's server-rendered
+ * HTML always matches its first client render.
+ */
+.theme-icon-sun {
+  display: none;
+}
+html.grey-mode .theme-icon-sun {
+  display: block;
+}
+html.grey-mode .theme-icon-moon {
+  display: none;
+}
+
+/* Same trick for the sound toggle, driven by the `sfx-muted` class. */
+.sfx-icon-off {
+  display: none;
+}
+html.sfx-muted .sfx-icon-off {
+  display: block;
+}
+html.sfx-muted .sfx-icon-on {
+  display: none;
+}
+
 html.grey-mode,
 html.grey-mode body,
 html.grey-mode main,

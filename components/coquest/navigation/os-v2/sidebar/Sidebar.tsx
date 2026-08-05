@@ -6,11 +6,9 @@ import { LogOut, X, Sparkles, PanelLeftOpen } from 'lucide-react'
 import LogOutButton from '@/components/auth/LogOutButton'
 import { sfx } from '@/lib/sfx'
 
-import { type UserSummary } from '../CoQuestShell'
 import { navigation } from '../../os/shared/navigation'
 
 interface SidebarProps {
-  user?: UserSummary
   collapsed?: boolean
   mobileOpen?: boolean
   onCloseMobile?: () => void

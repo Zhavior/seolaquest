@@ -10,15 +10,13 @@ vi.mock('next/link', () => ({
   ),
 }))
 
-import StatusBar from './StatusBar'
+import ShellHud from './ShellHud'
 
-const noop = () => {}
-
-function renderStatusBar(user?: Parameters<typeof StatusBar>[0]['user']) {
-  return render(<StatusBar user={user} onOpenNavigation={noop} onToggleCollapsed={noop} />)
+function renderStatusBar(user?: Parameters<typeof ShellHud>[0]['user']) {
+  return render(<ShellHud user={user} />)
 }
 
-describe('StatusBar telemetry', () => {
+describe('ShellHud telemetry', () => {
   it('renders the account’s own progression rather than a demo player', () => {
     renderStatusBar({
       name: 'Ada',
