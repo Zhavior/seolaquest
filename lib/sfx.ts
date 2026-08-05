@@ -56,6 +56,66 @@ class RetroSFX {
     })
   }
 
+  public playSidebarHover() {
+    this.withCtx((ctx) => {
+      const now = ctx.currentTime
+      const osc = ctx.createOscillator()
+      const gain = ctx.createGain()
+
+      osc.type = 'sine'
+      osc.frequency.setValueAtTime(840, now)
+      osc.frequency.exponentialRampToValueAtTime(980, now + 0.035)
+
+      gain.gain.setValueAtTime(0.02, now)
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.035)
+
+      osc.connect(gain)
+      gain.connect(ctx.destination)
+      osc.start(now)
+      osc.stop(now + 0.035)
+    })
+  }
+
+  public playSidebarExpand() {
+    this.withCtx((ctx) => {
+      const now = ctx.currentTime
+      const osc = ctx.createOscillator()
+      const gain = ctx.createGain()
+
+      osc.type = 'triangle'
+      osc.frequency.setValueAtTime(360, now)
+      osc.frequency.exponentialRampToValueAtTime(880, now + 0.09)
+
+      gain.gain.setValueAtTime(0.035, now)
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.09)
+
+      osc.connect(gain)
+      gain.connect(ctx.destination)
+      osc.start(now)
+      osc.stop(now + 0.09)
+    })
+  }
+
+  public playSidebarCollapse() {
+    this.withCtx((ctx) => {
+      const now = ctx.currentTime
+      const osc = ctx.createOscillator()
+      const gain = ctx.createGain()
+
+      osc.type = 'triangle'
+      osc.frequency.setValueAtTime(880, now)
+      osc.frequency.exponentialRampToValueAtTime(360, now + 0.09)
+
+      gain.gain.setValueAtTime(0.035, now)
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.09)
+
+      osc.connect(gain)
+      gain.connect(ctx.destination)
+      osc.start(now)
+      osc.stop(now + 0.09)
+    })
+  }
+
   public playCoinDrop() {
     this.withCtx((ctx) => {
       const now = ctx.currentTime

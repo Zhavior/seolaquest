@@ -26,6 +26,8 @@ import {
   type LucideIcon,
 } from 'lucide-react';
 
+import { sfx } from '@/lib/sfx';
+
 export interface AppLayoutProps {
   children: React.ReactNode;
   user?: {
@@ -64,10 +66,15 @@ export function AppLayout({ children, user }: AppLayoutProps) {
     }
   });
 
-  // Toggle collapse state with persistence
+  // Toggle collapse state with persistence and audio feedback
   const toggleCollapsed = () => {
     setCollapsed((prev) => {
       const next = !prev;
+      if (next) {
+        sfx.playSidebarCollapse();
+      } else {
+        sfx.playSidebarExpand();
+      }
       try {
         localStorage.setItem('coquest_sidebar_collapsed', String(next));
       } catch {
@@ -279,6 +286,9 @@ export function AppLayout({ children, user }: AppLayoutProps) {
                     <Link
                       key={item.path}
                       href={item.path}
+                      onMouseEnter={() => sfx.playSidebarHover()}
+                      onFocus={() => sfx.playSidebarHover()}
+                      onClick={() => sfx.playCoinDrop()}
                       title={`${item.label} (${item.hotkey || ''})`}
                       className={`relative group grid size-11 place-items-center border-3 border-black transition-all ${
                         isActive
@@ -311,6 +321,8 @@ export function AppLayout({ children, user }: AppLayoutProps) {
                 <Link
                   href="/sign-in"
                   title="Log Out"
+                  onMouseEnter={() => sfx.playSidebarHover()}
+                  onClick={() => sfx.playCoinDrop()}
                   className="grid size-11 place-items-center border-3 border-black bg-[#FF5722] text-white shadow-[3px_3px_0_0_#000] hover:-translate-y-0.5 transition-all"
                 >
                   <LogOut className="size-5" strokeWidth={3} />
@@ -328,6 +340,8 @@ export function AppLayout({ children, user }: AppLayoutProps) {
                   <button
                     type="button"
                     onClick={toggleCollapsed}
+                    onMouseEnter={() => sfx.playSidebarHover()}
+                    onFocus={() => sfx.playSidebarHover()}
                     title="Collapse Sidebar (Cmd+B)"
                     aria-label="Collapse navigation"
                     className="text-[9px] font-black uppercase bg-[#FFE600] text-black border-2 border-black px-1.5 py-0.5 shadow-[1.5px_1.5px_0_0_#000] -rotate-2 hover:bg-[#FFD600]"
@@ -354,6 +368,9 @@ export function AppLayout({ children, user }: AppLayoutProps) {
                           <Link
                             key={item.path}
                             href={item.path}
+                            onMouseEnter={() => sfx.playSidebarHover()}
+                            onFocus={() => sfx.playSidebarHover()}
+                            onClick={() => sfx.playCoinDrop()}
                             className={`flex items-center justify-between p-3 border-3 border-black font-black text-xs uppercase tracking-wider transition-all ${
                               isActive
                                 ? `${item.color} shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] -translate-x-0.5 -translate-y-0.5`
