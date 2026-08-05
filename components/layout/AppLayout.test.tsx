@@ -27,16 +27,15 @@ describe('Neobrutalist AppLayout Component', () => {
     // Brand and Identity
     expect(screen.getByText('COQUEST')).toBeInTheDocument()
     expect(screen.getByText('REINALD')).toBeInTheDocument()
-    expect(screen.getByText('LVL 10')).toBeInTheDocument()
+    expect(screen.getAllByText('LVL 10').length).toBeGreaterThan(0)
 
-    // Mana Vault HUD
-    expect(screen.getByText(/Vault:/i)).toBeInTheDocument()
+    // Telemetry HUD
     expect(screen.getByText('70/100 MP')).toBeInTheDocument()
-    expect(screen.getByText('LEGEND')).toBeInTheDocument()
+    expect(screen.getByText('12 QUESTS')).toBeInTheDocument()
+    expect(screen.getByText('XP 1,250')).toBeInTheDocument()
 
-    // Health Dot & Billing CTA
-    expect(screen.getByText('RADAR ACTIVE')).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: /RECHARGE/i })).toHaveAttribute('href', '/billing')
+    // Billing CTA
+    expect(screen.getByRole('link', { name: /Recharge/i })).toHaveAttribute('href', '/billing')
   })
 
   it('renders Neobrutalist Sidebar (Quest Compass) elements', () => {
