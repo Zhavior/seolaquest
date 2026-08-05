@@ -66,8 +66,10 @@ describe('Billing page server boundary', () => {
     })
     expect(await screen.findByText('free:pending')).toBeInTheDocument()
     expect(mocks.recordBillingEvent).toHaveBeenCalledWith(expect.objectContaining({
-      checkout: 'verifying',
-      sessionId: 'cs_test_1',
+      name: 'billing_checkout_return_pending',
+      surface: 'billing',
+      outcome: 'pending',
+      accountState: 'free',
     }))
   })
 })

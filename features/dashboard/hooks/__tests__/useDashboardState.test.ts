@@ -81,16 +81,23 @@ describe('useDashboardState', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     resetActionMocks()
-    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response(JSON.stringify({
-      success: true,
-      scan: {
-        status: 'SUCCEEDED',
-        counts: { leadsCreated: 2 },
-        refunded: false,
-        balance: 49,
-        provider: { status: 'AVAILABLE' },
-      },
-    }), { status: 200 })))
+    vi.stubGlobal('fetch', vi.fn().mockImplementation(() =>
+      Promise.resolve(
+        new Response(
+          JSON.stringify({
+            success: true,
+            scan: {
+              status: 'SUCCEEDED',
+              counts: { leadsCreated: 2 },
+              refunded: false,
+              balance: 49,
+              provider: { status: 'AVAILABLE' },
+            },
+          }),
+          { status: 200 },
+        ),
+      ),
+    ))
   })
 
   it('initializes with provided user and leads', () => {
@@ -193,8 +200,17 @@ describe('useDashboardState', () => {
 
     await act(async () => {
       result.current.runMockScanner()
+      await Promise.resolve()
+      await Promise.resolve()
     })
 
+    expect(actionMocks.scanForLeadsAction).toHaveBeenCalled()
+
+    await act(async () => {
+      await new Promise((r) => setTimeout(r, 100))
+    })
+
+    expect(result.current.scanOutcome).toBe('succeeded')
     expect(result.current.asyncStatus).toBe('idle')
     expect(result.current.isScannerModalOpen).toBe(true)
     expect(result.current.scanLogs).toEqual([

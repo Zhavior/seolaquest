@@ -20,8 +20,8 @@ describe('DashboardKeywords accessibility', () => {
       />,
     )
 
-    expect(screen.getByRole('textbox', { name: /keyword or phrase to track/i })).toBeVisible()
-    expect(screen.getByRole('combobox', { name: /keyword display class/i })).toBeVisible()
-    expect(screen.getByRole('button', { name: /remove keyword need a website/i })).not.toHaveClass('opacity-0')
+    expect(screen.getByRole('textbox', { name: /signal phrase to track/i })).toBeVisible()
+    expect(screen.getByRole('combobox', { name: /signal class/i })).toBeVisible()
+    expect(screen.getByRole('button', { name: /remove need a website/i })).not.toHaveClass('opacity-0')
   })
 })
