@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
 import {
   Menu,
@@ -11,6 +11,8 @@ import {
   VolumeX,
   PanelLeftClose,
   PanelLeftOpen,
+  Sun,
+  Moon,
 } from 'lucide-react'
 import { type UserSummary } from '../CoQuestShell'
 import { player } from '../../os/shared/player'
@@ -24,17 +26,7 @@ interface StatusBarProps {
 }
 
 /**
- * Authenticated shell header.
- *
- * Deliberately mirrors the marketing header (`features/landing/components/LandingNav`)
- * so signing in doesn't feel like landing in a different product: same cream bar,
- * same sword mark and wordmark, same "RADAR ONLINE" pill, same 3px/black/offset-shadow
- * button treatment. Only the right-hand cluster differs — it carries the shell's
- * controls instead of the marketing sign-in links.
- *
- * Height matches LandingNav (h-16 / sm:h-20 + 4px bottom border). Anything that
- * sticks below it — the mobile sub-header and the desktop sidebar — offsets by
- * 68px / 84px accordingly.
+ * Authenticated shell header with Sun/Moon Grey Mode toggle.
  */
 export default function StatusBar({
   user,
@@ -43,6 +35,28 @@ export default function StatusBar({
   onToggleCollapsed,
 }: StatusBarProps) {
   const [sfxEnabled, setSfxEnabled] = useState(true)
+  const [isGreyMode, setIsGreyMode] = useState(false)
+
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('coquest_theme')
+    if (savedTheme === 'grey') {
+      setIsGreyMode(true)
+      document.documentElement.classList.add('grey-mode')
+    }
+  }, [])
+
+  const toggleThemeMode = () => {
+    const nextMode = !isGreyMode
+    setIsGreyMode(nextMode)
+    if (nextMode) {
+      document.documentElement.classList.add('grey-mode')
+      localStorage.setItem('coquest_theme', 'grey')
+    } else {
+      document.documentElement.classList.remove('grey-mode')
+      localStorage.setItem('coquest_theme', 'parchment')
+    }
+  }
+
   const userName = user?.name || player.name || 'REINALD'
   const playerXp = user?.xp ?? player.xp
   const level = getLevelInfo(playerXp)
@@ -108,6 +122,21 @@ export default function StatusBar({
         </div>
 
         <div className="flex shrink-0 items-center gap-2 sm:gap-3">
+          {/* Sun / Moon Theme Mode Toggle Button */}
+          <button
+            type="button"
+            onClick={toggleThemeMode}
+            aria-label={isGreyMode ? 'Switch to Parchment Light Mode' : 'Switch to Slate Grey Dark Mode'}
+            title={isGreyMode ? 'Parchment Light Mode' : 'Slate Grey Dark Mode'}
+            className="size-9 grid place-items-center border-[3px] border-black bg-white shadow-[3px_3px_0_0_#000] transition-transform duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[1px_1px_0_0_#000] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none"
+          >
+            {isGreyMode ? (
+              <Sun className="size-4.5 text-amber-500 fill-amber-400" strokeWidth={3} />
+            ) : (
+              <Moon className="size-4.5 text-black fill-black/20" strokeWidth={3} />
+            )}
+          </button>
+
           <button
             type="button"
             onClick={() => setSfxEnabled((v) => !v)}

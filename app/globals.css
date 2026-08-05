@@ -241,3 +241,48 @@
     transition-duration: 0.01ms !important;
   }
 }
+
+/* ── Grey Background Mode (Sun/Moon Toggle) ────────────────────────────── */
+html.grey-mode,
+html.grey-mode body {
+  background-color: #1E293B !important;
+  color: #F8FAFC !important;
+}
+
+html.grey-mode [class*="bg-[#FDFBF7]"],
+html.grey-mode [class*="bg-[#F4F0EA]"],
+html.grey-mode [class*="bg-[#f4ebd8]"],
+html.grey-mode [class*="bg-[#FAF7F2]"] {
+  background-color: #1E293B !important;
+}
+
+html.grey-mode [class*="bg-white"] {
+  background-color: #0F172A !important;
+  color: #F8FAFC !important;
+}
+
+html.grey-mode [class*="text-black"] {
+  color: #F8FAFC !important;
+}
+
+html.grey-mode [class*="text-zinc-700"],
+html.grey-mode [class*="text-zinc-600"],
+html.grey-mode [class*="text-zinc-500"],
+html.grey-mode [class*="text-black/70"],
+html.grey-mode [class*="text-black/60"] {
+  color: #94A3B8 !important;
+}
+
+html.grey-mode [class*="border-black"] {
+  border-color: #334155 !important;
+}
+
+html.grey-mode [class*="shadow-[4px_4px_0_0_#000]"],
+html.grey-mode [class*="shadow-[6px_6px_0_0_#000]"],
+html.grey-mode [class*="shadow-[8px_8px_0_0_#000]"],
+html.grey-mode [class*="shadow-[10px_10px_0_0_#000]"],
+html.grey-mode [class*="shadow-[3px_3px_0_0_#000]"],
+html.grey-mode [class*="shadow-[2px_2px_0_0_#000]"] {
+  box-shadow: 4px 4px 0 0 #020617 !important;
+}
+
