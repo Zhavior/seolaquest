@@ -242,7 +242,7 @@
   }
 }
 
-/* ── Grey Background Mode (Sun/Moon Toggle) ────────────────────────────── */
+/* ── Grey Background Mode (Sun/Moon Toggle High-Contrast System) ───────── */
 html.grey-mode,
 html.grey-mode body,
 html.grey-mode main,
@@ -252,7 +252,7 @@ html.grey-mode [data-nextjs-scroll-focus-boundary] {
   color: #F8FAFC !important;
 }
 
-/* Direct class & attribute overrides for all light canvas backgrounds */
+/* Light canvas backgrounds -> Slate-800 (#1E293B) */
 html.grey-mode [class*="bg-[#FDFBF7]"],
 html.grey-mode [class*="bg-[#F4F0EA]"],
 html.grey-mode [class*="bg-[#f4ebd8]"],
@@ -266,14 +266,14 @@ html.grey-mode .bg-\[\#FFF8D9\] {
   background-color: #1E293B !important;
 }
 
-/* Hard white card containers -> Dark Slate #0F172A */
+/* Hard white card containers -> Dark Slate (#0F172A) */
 html.grey-mode .bg-white,
 html.grey-mode [class*="bg-white"] {
   background-color: #0F172A !important;
   color: #F8FAFC !important;
 }
 
-/* Light Slate / Zinc sub-boxes -> Slate-700 #334155 */
+/* Sub-containers & inputs -> Slate-700 (#334155) */
 html.grey-mode .bg-slate-100,
 html.grey-mode .bg-zinc-50,
 html.grey-mode .bg-zinc-100,
@@ -286,32 +286,112 @@ html.grey-mode [class*="bg-zinc-200"] {
   color: #F8FAFC !important;
 }
 
-/* Text color overrides */
-html.grey-mode .text-black,
-html.grey-mode [class*="text-black"] {
-  color: #F8FAFC !important;
+/* Universal Typography & Text Contrast Overrides */
+html.grey-mode h1,
+html.grey-mode h2,
+html.grey-mode h3,
+html.grey-mode h4,
+html.grey-mode h5,
+html.grey-mode h6,
+html.grey-mode p,
+html.grey-mode span,
+html.grey-mode div,
+html.grey-mode label,
+html.grey-mode dt,
+html.grey-mode dd,
+html.grey-mode li,
+html.grey-mode th,
+html.grey-mode td,
+html.grey-mode a:not([class*="bg-"]) {
+  color: #F8FAFC;
 }
 
+/* Primary Dark Text Utility Overrides -> Pure White (#FFFFFF) */
+html.grey-mode .text-black,
+html.grey-mode .text-zinc-900,
+html.grey-mode .text-zinc-800,
+html.grey-mode .text-slate-900,
+html.grey-mode .text-slate-800,
+html.grey-mode .text-gray-900,
+html.grey-mode .text-gray-800,
+html.grey-mode [class*="text-black"],
+html.grey-mode [class*="text-zinc-900"],
+html.grey-mode [class*="text-zinc-800"],
+html.grey-mode [class*="text-slate-900"],
+html.grey-mode [class*="text-slate-800"] {
+  color: #FFFFFF !important;
+}
+
+/* Muted & Secondary Text Utility Overrides -> Bright Light Slate (#CBD5E1) */
 html.grey-mode .text-zinc-700,
 html.grey-mode .text-zinc-600,
 html.grey-mode .text-zinc-500,
+html.grey-mode .text-zinc-400,
+html.grey-mode .text-slate-700,
 html.grey-mode .text-slate-600,
 html.grey-mode .text-slate-500,
-html.grey-mode [class*="text-zinc-"],
-html.grey-mode [class*="text-slate-"],
+html.grey-mode .text-slate-400,
+html.grey-mode .text-gray-700,
+html.grey-mode .text-gray-600,
+html.grey-mode .text-gray-500,
+html.grey-mode [class*="text-zinc-700"],
+html.grey-mode [class*="text-zinc-600"],
+html.grey-mode [class*="text-zinc-500"],
+html.grey-mode [class*="text-slate-700"],
+html.grey-mode [class*="text-slate-600"],
+html.grey-mode [class*="text-slate-500"],
 html.grey-mode [class*="text-black/"] {
+  color: #CBD5E1 !important;
+}
+
+/* Form Inputs, Textareas, Selects & Placeholders in Grey Mode */
+html.grey-mode input:not([type="checkbox"]):not([type="radio"]),
+html.grey-mode textarea,
+html.grey-mode select {
+  background-color: #0F172A !important;
+  color: #FFFFFF !important;
+  border-color: #475569 !important;
+}
+
+html.grey-mode input::placeholder,
+html.grey-mode textarea::placeholder {
   color: #94A3B8 !important;
 }
 
-/* Border overrides */
+/* Preserve Ultra-Sharp Deep Black Text on Neon Badges & Highlights */
+html.grey-mode .bg-\[\#FFE600\],
+html.grey-mode .bg-\[\#FFD84D\],
+html.grey-mode .bg-\[\#A3E635\],
+html.grey-mode .bg-\[\#06B6D4\],
+html.grey-mode .bg-\[\#38BDF8\],
+html.grey-mode .bg-\[\#FF5722\],
+html.grey-mode [class*="bg-[#FFE600]"],
+html.grey-mode [class*="bg-[#FFD84D]"],
+html.grey-mode [class*="bg-[#A3E635]"],
+html.grey-mode [class*="bg-[#06B6D4]"],
+html.grey-mode [class*="bg-[#38BDF8]"],
+html.grey-mode [class*="bg-[#FF5722]"] {
+  color: #000000 !important;
+}
+
+html.grey-mode .bg-\[\#FFE600\] *,
+html.grey-mode .bg-\[\#FFD84D\] *,
+html.grey-mode .bg-\[\#A3E635\] *,
+html.grey-mode [class*="bg-[#FFE600]"] *,
+html.grey-mode [class*="bg-[#FFD84D]"] *,
+html.grey-mode [class*="bg-[#A3E635]"] * {
+  color: #000000 !important;
+}
+
+/* Border & Shadow Overrides for Dark Slate Canvas */
 html.grey-mode .border-black,
 html.grey-mode [class*="border-black"] {
   border-color: #475569 !important;
 }
 
-/* 3D Offset Shadow overrides */
 html.grey-mode [class*="shadow-"] {
   box-shadow: 4px 4px 0 0 #020617 !important;
 }
+
 
 
