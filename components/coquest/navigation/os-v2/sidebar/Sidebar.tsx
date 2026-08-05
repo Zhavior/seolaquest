@@ -40,12 +40,15 @@ function NavigationContent({
   const pathname = usePathname()
 
   const handleToggle = () => {
-    if (collapsed) {
-      sfx.playSidebarExpand()
+    if (onToggleCollapsed) {
+      onToggleCollapsed()
     } else {
-      sfx.playSidebarCollapse()
+      if (collapsed) {
+        sfx.playSidebarExpand()
+      } else {
+        sfx.playSidebarCollapse()
+      }
     }
-    onToggleCollapsed?.()
   }
 
   if (collapsed && !mobile) {

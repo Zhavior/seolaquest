@@ -10,6 +10,7 @@ import MobileBottomNav from './mobile/MobileBottomNav'
 import Sidebar, { SidebarNavigation } from './sidebar/Sidebar'
 import StatusBar from './statusbar/StatusBar'
 import Workspace from './workspace/Workspace'
+import { sfx } from '@/lib/sfx'
 
 export interface UserSummary {
   name?: string | null
@@ -50,6 +51,11 @@ export default function CoQuestShell({
   const toggleCollapsed = () => {
     setCollapsed((prev) => {
       const next = !prev
+      if (next) {
+        sfx.playSidebarCollapse()
+      } else {
+        sfx.playSidebarExpand()
+      }
       try {
         localStorage.setItem('coquest_sidebar_collapsed', String(next))
       } catch {

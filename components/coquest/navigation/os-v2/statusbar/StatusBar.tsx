@@ -17,6 +17,7 @@ import {
 import { type UserSummary } from '../CoQuestShell'
 import { player } from '../../os/shared/player'
 import { getLevelInfo } from '../../os/shared/progression'
+import { sfx } from '@/lib/sfx'
 
 interface StatusBarProps {
   user?: UserSummary
@@ -87,6 +88,8 @@ export default function StatusBar({
             <button
               type="button"
               onClick={onToggleCollapsed}
+              onMouseEnter={() => sfx.playSidebarHover()}
+              onFocus={() => sfx.playSidebarHover()}
               title={collapsed ? 'Expand Sidebar (Cmd+B)' : 'Collapse Sidebar (Cmd+B)'}
               aria-label={collapsed ? 'Expand navigation' : 'Collapse navigation'}
               className="hidden size-9 shrink-0 place-items-center border-[3px] border-black bg-[#FFD84D] shadow-[3px_3px_0_0_#000] transition-transform duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[1px_1px_0_0_#000] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none md:grid"

@@ -76,43 +76,67 @@ class RetroSFX {
     })
   }
 
+  /**
+   * Sound when expanding (opening) the sidebar: Dual-oscillator pitch-up chime
+   */
   public playSidebarExpand() {
     this.withCtx((ctx) => {
       const now = ctx.currentTime
-      const osc = ctx.createOscillator()
+      const osc1 = ctx.createOscillator()
+      const osc2 = ctx.createOscillator()
       const gain = ctx.createGain()
 
-      osc.type = 'triangle'
-      osc.frequency.setValueAtTime(360, now)
-      osc.frequency.exponentialRampToValueAtTime(880, now + 0.09)
+      osc1.type = 'triangle'
+      osc1.frequency.setValueAtTime(320, now)
+      osc1.frequency.exponentialRampToValueAtTime(760, now + 0.1)
 
-      gain.gain.setValueAtTime(0.035, now)
-      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.09)
+      osc2.type = 'square'
+      osc2.frequency.setValueAtTime(480, now)
+      osc2.frequency.exponentialRampToValueAtTime(1140, now + 0.1)
 
-      osc.connect(gain)
+      gain.gain.setValueAtTime(0.04, now)
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.1)
+
+      osc1.connect(gain)
+      osc2.connect(gain)
       gain.connect(ctx.destination)
-      osc.start(now)
-      osc.stop(now + 0.09)
+
+      osc1.start(now)
+      osc2.start(now)
+      osc1.stop(now + 0.1)
+      osc2.stop(now + 0.1)
     })
   }
 
+  /**
+   * Sound when collapsing (closing) the sidebar: Dual-oscillator pitch-down click
+   */
   public playSidebarCollapse() {
     this.withCtx((ctx) => {
       const now = ctx.currentTime
-      const osc = ctx.createOscillator()
+      const osc1 = ctx.createOscillator()
+      const osc2 = ctx.createOscillator()
       const gain = ctx.createGain()
 
-      osc.type = 'triangle'
-      osc.frequency.setValueAtTime(880, now)
-      osc.frequency.exponentialRampToValueAtTime(360, now + 0.09)
+      osc1.type = 'triangle'
+      osc1.frequency.setValueAtTime(760, now)
+      osc1.frequency.exponentialRampToValueAtTime(320, now + 0.1)
 
-      gain.gain.setValueAtTime(0.035, now)
-      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.09)
+      osc2.type = 'square'
+      osc2.frequency.setValueAtTime(1140, now)
+      osc2.frequency.exponentialRampToValueAtTime(480, now + 0.1)
 
-      osc.connect(gain)
+      gain.gain.setValueAtTime(0.04, now)
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.1)
+
+      osc1.connect(gain)
+      osc2.connect(gain)
       gain.connect(ctx.destination)
-      osc.start(now)
-      osc.stop(now + 0.09)
+
+      osc1.start(now)
+      osc2.start(now)
+      osc1.stop(now + 0.1)
+      osc2.stop(now + 0.1)
     })
   }
 
