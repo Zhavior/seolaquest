@@ -10,7 +10,7 @@ const FEATURES = [
     icon: '🤖',
     room: 'Mage Tower',
     headline: 'AI agents that actually do the work',
-    body: 'Your adventurers patrol Reddit, X, and web forums — classifying, scoring, and filtering in real time.',
+    body: 'Your adventurers patrol X — classifying, scoring, and filtering in real time. Reddit and web forums are next.',
     tag: 'AI AGENTS',
   },
   {

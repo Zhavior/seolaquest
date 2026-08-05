@@ -1,5 +1,25 @@
 'use server'
 
+// ORPHANED — no call sites. The live onboarding path is `completeOnboardingAction` in
+// `features/auth/actions.ts`, which is Clerk/Prisma-backed and returns a result object
+// instead of throwing. This file is the Supabase-era predecessor and still reads
+// `profiles`/`tracked_keywords`, tables the current schema does not own.
+//
+// Its ~17 bare `throw new Error(...)` sites were reviewed during the backend hardening
+// audit and deliberately NOT converted to the AppError taxonomy: a Server Action does not
+// pass through `withApiHandler`, so the taxonomy's status codes are never read, and
+// investing in dead code would imply it is supported. Several of the messages interpolate
+// raw Supabase error text, which is exactly the kind of upstream detail the audit set out
+// to keep off the wire — one more reason to delete rather than harden.
+//
+// Not currently a live surface: Server Action ids are minted from the module graph, and
+// because nothing imports this file it appears in no `server-reference-manifest.json` and
+// none of its strings reach `.next` (verified against a production build). It is dead
+// source, not a reachable endpoint — but it becomes one the moment anything imports it.
+//
+// Recommended action: delete this file (and `lib/supabase/*` if nothing else imports it).
+// Left in place here because deletion is out of scope for the hardening batches.
+
 import { revalidatePath, revalidateTag } from 'next/cache'
 import { redirect } from 'next/navigation'
 

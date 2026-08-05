@@ -37,7 +37,7 @@ export function DashboardScannerModal({
         initial={{ scale: 0.94, opacity: 0, y: 16 }}
         animate={{ scale: 1, opacity: 1, y: 0 }}
         exit={{ scale: 0.98, opacity: 0, y: 10 }}
-        className="max-h-[calc(100dvh-2rem)] w-full max-w-4xl overflow-y-auto overscroll-contain border-4 border-black bg-[#13D7C2] shadow-[12px_12px_0_0_#000]"
+        className="max-h-[calc(100dvh-1rem)] sm:max-h-[calc(100dvh-2rem)] w-full max-w-4xl overflow-y-auto overscroll-contain border-4 border-black bg-[#13D7C2] shadow-[6px_6px_0_0_#000] md:shadow-[12px_12px_0_0_#000]"
         role="dialog"
         aria-label="Battlestation live scan"
       >

@@ -17,6 +17,8 @@ import {
 } from '@/features/auth/profileIconOptions'
 import {
   clampOnboardingStep,
+  DEFAULT_PREFERRED_SOURCE,
+  isSelectablePreferredSource,
   type OnboardingDraft,
   type PreferredSource,
   type SaveOnboardingStepInput,
@@ -45,8 +47,10 @@ export default function OnboardingForm({ initialDraft }: Props) {
   const [businessDescription, setBusinessDescription] = useState(initialDraft.businessDescription)
   const [targetCustomer, setTargetCustomer] = useState(initialDraft.targetCustomer)
   const [firstKeyword, setFirstKeyword] = useState(initialDraft.firstKeyword)
-  const [preferredSource, setPreferredSource] = useState<PreferredSource>(
-    initialDraft.preferredSource ?? 'REDDIT',
+  const [preferredSource, setPreferredSource] = useState<PreferredSource>(() =>
+    isSelectablePreferredSource(initialDraft.preferredSource)
+      ? (initialDraft.preferredSource as PreferredSource)
+      : DEFAULT_PREFERRED_SOURCE,
   )
   const [error, setError] = useState('')
   const [signedOut, setSignedOut] = useState(false)
@@ -96,8 +100,8 @@ export default function OnboardingForm({ initialDraft }: Props) {
     }
 
     if (step === 5) {
-      if (preferredSource !== 'REDDIT' && preferredSource !== 'X') {
-        return 'Choose a preferred source before continuing.'
+      if (!isSelectablePreferredSource(preferredSource)) {
+        return 'Choose an available source before continuing.'
       }
       return null
     }
@@ -461,26 +465,27 @@ export default function OnboardingForm({ initialDraft }: Props) {
             <StepPanel
               focusRef={stepHeadingRef}
               title="Where should CoQuest start looking?"
-              description="This only sets the starting source. You can add more providers later."
+              description="X is the source we scan today. More providers are on the way."
             >
               <fieldset>
                 <legend className="font-black uppercase">Preferred source</legend>
 
                 <div className="mt-3 grid gap-3 sm:grid-cols-2">
                   <SourceOption
-                    value="REDDIT"
-                    selected={preferredSource === 'REDDIT'}
-                    onChange={setPreferredSource}
-                    title="Reddit"
-                    description="Best default for broad discovery and intent-rich posts."
-                  />
-
-                  <SourceOption
                     value="X"
                     selected={preferredSource === 'X'}
                     onChange={setPreferredSource}
                     title="X"
-                    description="Requires configured X provider access. Selection alone does not enable it."
+                    description="Live source for real-time posts with buying intent."
+                  />
+
+                  <SourceOption
+                    value="REDDIT"
+                    selected={false}
+                    onChange={setPreferredSource}
+                    title="Reddit"
+                    description="Broad discovery across subreddits. Not available to select yet."
+                    badge="Coming soon"
                   />
                 </div>
               </fieldset>
@@ -514,7 +519,7 @@ export default function OnboardingForm({ initialDraft }: Props) {
                 <ReviewItem label="Target customer" value={normalizedTargetCustomer || 'Skipped for now'} />
                 <ReviewItem
                   label="Preferred source"
-                  value={preferredSource === 'X' ? 'X (configuration required)' : 'Reddit'}
+                  value={preferredSource === 'X' ? 'X' : 'Reddit (coming soon)'}
                 />
                 <div className="sm:col-span-2">
                   <ReviewItem label="First keyword" value={normalizedFirstKeyword} />
@@ -596,26 +601,44 @@ function SourceOption({
   onChange,
   title,
   description,
+  badge,
 }: {
   value: PreferredSource
   selected: boolean
   onChange: (value: PreferredSource) => void
   title: string
   description: string
+  badge?: string
 }) {
+  const disabled = !isSelectablePreferredSource(value)
+
   return (
-    <label className={`block cursor-pointer border-3 p-4 ${selected ? 'border-black bg-[#FDE68A]' : 'border-black bg-[#F4F0EA]'}`}>
+    <label
+      className={`block border-3 border-black p-4 ${
+        disabled
+          ? 'cursor-not-allowed bg-[#E7E2DA] opacity-70'
+          : selected
+            ? 'cursor-pointer bg-[#FDE68A]'
+            : 'cursor-pointer bg-[#F4F0EA]'
+      }`}
+    >
       <input
         type="radio"
         name="preferredSource"
         value={value}
         checked={selected}
+        disabled={disabled}
         onChange={() => onChange(value)}
         className="sr-only"
       />
-      <p className="flex items-center gap-2 text-lg font-black uppercase">
+      <p className="flex flex-wrap items-center gap-2 text-lg font-black uppercase">
         <Search aria-hidden="true" size={18} />
         {title}
+        {badge ? (
+          <span className="border-2 border-black bg-[#F7D046] px-2 py-0.5 text-xs font-black uppercase">
+            {badge}
+          </span>
+        ) : null}
       </p>
       <p className="mt-2 font-bold text-gray-700">{description}</p>
     </label>

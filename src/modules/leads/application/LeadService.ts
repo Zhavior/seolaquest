@@ -135,6 +135,10 @@ export class LeadService {
         })
       })
 
+      // Stays a bare Error: this method's own catch below converts it to
+      // `{ ok: false, message }`, so it never reaches withApiHandler's error branch and
+      // the taxonomy is never consulted. The status code an AppError carried would be dead
+      // weight. Deliberately does not include the upstream body — that is logged, not returned.
       if (!response.ok) {
         throw new Error('OpenAI API request failed')
       }

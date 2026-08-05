@@ -95,6 +95,10 @@ async function processOne(job: ClaimedDurableJob): Promise<void> {
     return
   }
 
+  // Deliberately not an AppError: reaching here means a job kind was persisted that this
+  // worker has no branch for — a programming bug, not an operational condition. AppError
+  // sets `isOperational: true`, which would misreport it as expected and hide it from the
+  // "unknown failure" lane the queue's dead-letter handling keys on.
   throw new Error(`Unsupported durable job kind: ${job.kind}`)
 }
 

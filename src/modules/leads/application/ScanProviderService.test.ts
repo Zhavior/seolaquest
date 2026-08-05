@@ -34,18 +34,20 @@ vi.mock('@/src/modules/core/infrastructure/logger', () => ({
   logger: { warn: mocks.loggerWarn },
 }))
 
-import { MAX_PROVIDER_CONCURRENCY, ScanProviderService } from './ScanProviderService'
+import {
+  ENABLED_PROVIDERS,
+  MAX_PROVIDER_CONCURRENCY,
+  ScanProviderService,
+} from './ScanProviderService'
 
-function redditBody(name = 't3_abc') {
+function xBody(id = '1234567890') {
   return {
-    data: { children: [{ data: {
-      name,
-      permalink: `/r/saas/comments/${name}`,
-      title: 'Need a CRM',
-      selftext: '',
-      author: 'buyer',
-      created_utc: Date.now() / 1_000,
-    } }] },
+    data: [{
+      id,
+      text: 'Need a CRM',
+      created_at: new Date().toISOString(),
+      author_id: '42',
+    }],
   }
 }
 
@@ -63,40 +65,66 @@ describe('ScanProviderService', () => {
     mocks.transaction.mockImplementation(async (callback: (client: typeof tx) => unknown) => callback(tx))
     mocks.leadCreateMany.mockResolvedValue({ count: 1 })
     mocks.leadUpdateMany.mockResolvedValue({ count: 1 })
-    mocks.leadFindMany.mockResolvedValue([{ id: 'lead-1', externalPostId: 't3_abc' }])
+    mocks.leadFindMany.mockResolvedValue([{ id: 'lead-1', externalPostId: 'tw_1234567890' }])
     mocks.leadMatchCreateMany.mockResolvedValue({ count: 1 })
     mocks.attemptUpdate.mockResolvedValue({ id: 'attempt-1' })
   })
 
-  it('treats successful zero-result responses as success while exposing the unconfigured provider', async () => {
-    const fetchMock = vi.fn().mockResolvedValue(new Response(JSON.stringify({
-      data: { children: [] },
-    }), { status: 200 }))
+  it('scans X only and leaves the unreleased Reddit source untouched', async () => {
+    vi.stubEnv('TWITTER_BEARER_TOKEN', 'configured-token')
+    const fetchMock = vi.fn().mockImplementation(async () => (
+      new Response(JSON.stringify({ data: [] }), { status: 200 })
+    ))
     vi.stubGlobal('fetch', fetchMock)
 
     await expect(ScanProviderService.scanTenant('user-1', 'run-1')).resolves.toEqual({
       providerSucceeded: true,
       leadsCreated: 0,
-      errorCode: 'PARTIAL_PROVIDER_OUTAGE',
     })
+    expect(ENABLED_PROVIDERS).toEqual(['X'])
     expect(fetchMock).toHaveBeenCalledTimes(2)
-    expect(mocks.attemptUpsert).toHaveBeenCalledTimes(4)
-    expect(mocks.attemptUpdate).toHaveBeenCalledTimes(4)
+    for (const [url] of fetchMock.mock.calls) {
+      expect(url).toContain('api.twitter.com')
+    }
+    expect(mocks.attemptUpsert).toHaveBeenCalledTimes(2)
+    expect(mocks.attemptUpsert).not.toHaveBeenCalledWith(expect.objectContaining({
+      create: expect.objectContaining({ provider: 'REDDIT' }),
+    }))
+    expect(mocks.attemptUpdate).toHaveBeenCalledTimes(2)
     expect(mocks.attemptUpdate).toHaveBeenCalledWith(expect.objectContaining({
       data: expect.objectContaining({ outcome: 'ZERO_RESULTS', resultCount: 0 }),
-    }))
-    expect(mocks.attemptUpdate).toHaveBeenCalledWith(expect.objectContaining({
-      data: expect.objectContaining({ outcome: 'PROVIDER_UNAVAILABLE', httpStatusClass: null }),
     }))
     expect(mocks.leadCreateMany).not.toHaveBeenCalled()
   })
 
+  it('reports an unconfigured X provider without reaching the network', async () => {
+    const fetchMock = vi.fn()
+    vi.stubGlobal('fetch', fetchMock)
+
+    await expect(ScanProviderService.scanTenant('user-1', 'run-1')).resolves.toEqual({
+      providerSucceeded: false,
+      leadsCreated: 0,
+      errorCode: 'ALL_SCAN_PROVIDERS_UNAVAILABLE',
+    })
+    expect(fetchMock).not.toHaveBeenCalled()
+    expect(mocks.attemptUpdate).toHaveBeenCalledTimes(2)
+    expect(mocks.attemptUpdate).toHaveBeenCalledWith(expect.objectContaining({
+      data: expect.objectContaining({ outcome: 'PROVIDER_UNAVAILABLE', httpStatusClass: null }),
+    }))
+  })
+
   it('persists rate limits and malformed 2xx bodies as distinct stable outcomes', async () => {
     vi.stubEnv('TWITTER_BEARER_TOKEN', 'configured-token')
+    mocks.keywordFindMany.mockResolvedValue([
+      { id: 'kw-1', phrase: 'need a CRM' },
+      { id: 'kw-2', phrase: 'sales pipeline' },
+      { id: 'kw-3', phrase: 'crm recommendations' },
+    ])
     const fetchMock = vi.fn()
-      .mockResolvedValueOnce(new Response(JSON.stringify({ wrong: true }), { status: 200 }))
+      .mockResolvedValueOnce(new Response(JSON.stringify({
+        data: [{ id: 'not-a-post-id', text: 'hi', created_at: new Date().toISOString() }],
+      }), { status: 200 }))
       .mockResolvedValueOnce(new Response('', { status: 429, headers: { 'retry-after': '60' } }))
-      .mockResolvedValueOnce(new Response(JSON.stringify({ data: { children: [] } }), { status: 200 }))
       .mockResolvedValueOnce(new Response(JSON.stringify({ data: [] }), { status: 200 }))
     vi.stubGlobal('fetch', fetchMock)
 
@@ -118,8 +146,9 @@ describe('ScanProviderService', () => {
   })
 
   it('records multi-keyword provenance even when a matching lead already exists', async () => {
+    vi.stubEnv('TWITTER_BEARER_TOKEN', 'configured-token')
     vi.stubGlobal('fetch', vi.fn().mockImplementation(async () => (
-      new Response(JSON.stringify(redditBody()), { status: 200 })
+      new Response(JSON.stringify(xBody()), { status: 200 })
     )))
     mocks.leadCreateMany
       .mockResolvedValueOnce({ count: 1 })
@@ -149,20 +178,18 @@ describe('ScanProviderService', () => {
     })))
     let active = 0
     let peak = 0
-    vi.stubGlobal('fetch', vi.fn().mockImplementation(async (url: string) => {
+    vi.stubGlobal('fetch', vi.fn().mockImplementation(async () => {
       active += 1
       peak = Math.max(peak, active)
       await new Promise((resolve) => setTimeout(resolve, 2))
       active -= 1
-      return new Response(JSON.stringify(
-        url.includes('reddit.com') ? { data: { children: [] } } : { data: [] },
-      ), { status: 200 })
+      return new Response(JSON.stringify({ data: [] }), { status: 200 })
     }))
 
     await ScanProviderService.scanTenant('user-1', 'run-1')
 
     expect(peak).toBeLessThanOrEqual(MAX_PROVIDER_CONCURRENCY)
     expect(peak).toBeLessThan(20)
-    expect(mocks.attemptUpsert).toHaveBeenCalledTimes(20)
+    expect(mocks.attemptUpsert).toHaveBeenCalledTimes(10)
   })
 })

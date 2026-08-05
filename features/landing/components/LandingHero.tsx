@@ -284,8 +284,8 @@ export function LandingHero() {
             variants={fadeUp}
             className="mt-4 max-w-xl text-base font-bold leading-relaxed text-black/80 sm:text-lg"
           >
-            CoQuest helps founders and operators scan Reddit and X conversations, spot recurring buyer pain,
-            and turn scattered signals into clearer product direction.
+            CoQuest helps founders and operators scan X conversations, spot recurring buyer pain,
+            and turn scattered signals into clearer product direction. Reddit is coming soon.
           </motion.p>
 
           <motion.div

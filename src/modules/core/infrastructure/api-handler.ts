@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { ZodError } from 'zod'
 import { logger, requestPath, loggerContext } from './logger'
-import { AppError } from './errors'
+import { AppError, sanitizeDetails } from './errors'
 import { auth } from '@clerk/nextjs/server'
 import { RateLimiterService } from '../security/RateLimiter'
 
@@ -49,7 +49,9 @@ export function withApiHandler(handler: RouteHandler): RouteHandler {
           return NextResponse.json(
             {
               error: 'Validation failed',
-              details: error.errors,
+              // Projected to path/code/message: raw issues carry the rejected input on
+              // `received` for literal and enum failures.
+              details: sanitizeDetails(error.issues),
             },
             { status: 400 }
           )
@@ -75,11 +77,14 @@ export function withApiHandler(handler: RouteHandler): RouteHandler {
             )
           }
 
+          // 4xx messages are authored by us and are meant for the caller; `details` is
+          // caller-supplied and is sanitized before it crosses the trust boundary.
+          const details = sanitizeDetails(error.details)
           return NextResponse.json(
             {
               error: error.message,
               code: error.code,
-              details: error.details,
+              ...(details === undefined ? {} : { details }),
             },
             { status: error.statusCode }
           )

@@ -24,6 +24,10 @@ async function databaseNow(tx: DbClient) {
   const [row] = await tx.$queryRaw<Array<{ now: Date }>>`
     SELECT clock_timestamp() AS "now"
   `
+  // Infrastructure failure, not an operational one: `clock_timestamp()` returning no row
+  // means the connection is broken, so there is no 4xx that describes it. It renders as
+  // 500 through withApiHandler either way, and AppError would add a misleading
+  // `isOperational: true`.
   if (!row) throw new Error('Database clock unavailable')
   return row.now
 }

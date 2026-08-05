@@ -77,6 +77,10 @@ export class AccountDeletionService {
   static async promoteSelfServiceDeletion(clerkUserId: string) {
     return withUserDeletionLock(clerkUserId, async (tx, state) => {
       if (state.audit) return { promoted: false, alreadyAccepted: true }
+      // Both throws in this callback are assertions rather than AppErrors:
+      // `withUserDeletionLock` only invokes it with state it read under the row lock, so
+      // neither a missing request nor a zero-count promotion is reachable without the lock
+      // being broken. A 4xx would invite the caller to retry a corrupted state machine.
       if (!state.request) throw new Error('Prepared account deletion is missing')
       if (state.request.status !== 'AWAITING_IDENTITY_DELETE') {
         return { promoted: false, alreadyAccepted: true }

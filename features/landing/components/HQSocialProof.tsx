@@ -8,7 +8,7 @@ const GUILD_ROSTER = [
 
 const TESTIMONIALS = [
   {
-    quote: 'The War Room inbox replaced 3 hours of manual Reddit scanning per day.',
+    quote: 'The War Room inbox replaced 3 hours of manual X scanning per day.',
     author: 'SaaS founder, AppSumo launch',
     class: 'Archmage',
   },

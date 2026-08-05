@@ -2,7 +2,16 @@
 
 import React, { useState } from 'react'
 import Link from 'next/link'
-import { Menu, User, Zap, Volume2, VolumeX, PanelLeftClose, PanelLeftOpen } from 'lucide-react'
+import {
+  Menu,
+  Sword,
+  User,
+  Zap,
+  Volume2,
+  VolumeX,
+  PanelLeftClose,
+  PanelLeftOpen,
+} from 'lucide-react'
 import { type UserSummary } from '../CoQuestShell'
 import { player } from '../../os/shared/player'
 import { getLevelInfo } from '../../os/shared/progression'
@@ -14,6 +23,19 @@ interface StatusBarProps {
   onToggleCollapsed?: () => void
 }
 
+/**
+ * Authenticated shell header.
+ *
+ * Deliberately mirrors the marketing header (`features/landing/components/LandingNav`)
+ * so signing in doesn't feel like landing in a different product: same cream bar,
+ * same sword mark and wordmark, same "RADAR ONLINE" pill, same 3px/black/offset-shadow
+ * button treatment. Only the right-hand cluster differs — it carries the shell's
+ * controls instead of the marketing sign-in links.
+ *
+ * Height matches LandingNav (h-16 / sm:h-20 + 4px bottom border). Anything that
+ * sticks below it — the mobile sub-header and the desktop sidebar — offsets by
+ * 68px / 84px accordingly.
+ */
 export default function StatusBar({
   user,
   collapsed = false,
@@ -26,110 +48,117 @@ export default function StatusBar({
   const level = getLevelInfo(playerXp)
   const currentMp = 70
   const maxMp = 100
+  const activeManaSegments = Math.round((currentMp / maxMp) * 10)
 
   return (
-    <header className="w-full border-b-4 border-black bg-white px-4 py-2.5 shadow-[0px_4px_0px_0px_rgba(0,0,0,1)] sticky top-0 z-50 flex items-center justify-between relative">
-      {/* Mobile Menu Button + Left: Brand & Adventurer Identity */}
-      <div className="flex items-center gap-3 md:gap-4">
-        <button
-          type="button"
-          onClick={onOpenNavigation}
-          aria-label="Open navigation"
-          className="grid size-11 shrink-0 place-items-center border-3 border-black bg-[#FFE600] shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none md:hidden"
-        >
-          <Menu className="size-5 text-black" strokeWidth={3} />
-        </button>
-
-        {onToggleCollapsed && (
+    <header
+      aria-label="SEO la Quest navigation"
+      className="sticky inset-x-0 top-0 z-50 border-b-4 border-black bg-[#f4ebd8]/95 pt-[env(safe-area-inset-top)] backdrop-blur-md"
+    >
+      <div className="relative z-10 mx-auto flex h-16 max-w-7xl items-center justify-between gap-3 pl-[max(0.5rem,env(safe-area-inset-left))] pr-[max(0.5rem,env(safe-area-inset-right))] sm:h-20 sm:gap-6 sm:px-6">
+        <div className="flex min-w-0 shrink-0 items-center gap-2 sm:gap-3">
           <button
             type="button"
-            onClick={onToggleCollapsed}
-            title={collapsed ? 'Expand Sidebar (Cmd+B)' : 'Collapse Sidebar (Cmd+B)'}
-            aria-label={collapsed ? 'Expand navigation' : 'Collapse navigation'}
-            className="hidden md:grid size-9 shrink-0 place-items-center border-3 border-black bg-[#FFE600] shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[4.5px_4.5px_0px_0px_rgba(0,0,0,1)] active:translate-x-0 active:translate-y-0 active:shadow-none transition-all"
+            onClick={onOpenNavigation}
+            aria-label="Open navigation"
+            className="grid size-11 shrink-0 place-items-center border-[3px] border-black bg-[#FFD84D] shadow-[3px_3px_0_0_#000] transition-transform duration-150 active:translate-x-[2px] active:translate-y-[2px] active:shadow-none md:hidden"
           >
-            {collapsed ? (
-              <PanelLeftOpen className="size-5 text-black" strokeWidth={3} />
+            <Menu className="size-5 text-black" strokeWidth={3} />
+          </button>
+
+          {onToggleCollapsed && (
+            <button
+              type="button"
+              onClick={onToggleCollapsed}
+              title={collapsed ? 'Expand Sidebar (Cmd+B)' : 'Collapse Sidebar (Cmd+B)'}
+              aria-label={collapsed ? 'Expand navigation' : 'Collapse navigation'}
+              className="hidden size-9 shrink-0 place-items-center border-[3px] border-black bg-[#FFD84D] shadow-[3px_3px_0_0_#000] transition-transform duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[1px_1px_0_0_#000] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none md:grid"
+            >
+              {collapsed ? (
+                <PanelLeftOpen className="size-5 text-black" strokeWidth={3} />
+              ) : (
+                <PanelLeftClose className="size-5 text-black" strokeWidth={3} />
+              )}
+            </button>
+          )}
+
+          <Link href="/app" className="flex min-w-0 shrink-0 items-center gap-3">
+            <div className="flex h-9 w-9 shrink-0 -rotate-6 items-center justify-center border-[3px] border-black bg-[#FFD84D] shadow-[3px_3px_0_0_#000] sm:h-11 sm:w-11 sm:border-4">
+              <Sword aria-hidden="true" size={18} strokeWidth={3} className="text-black sm:h-5 sm:w-5" />
+            </div>
+
+            <div className="hidden min-[400px]:flex flex-col">
+              <span className="text-xl font-black uppercase leading-none tracking-[0.18em] text-black sm:text-3xl">
+                SEO LA QUEST
+              </span>
+              <span className="font-mono text-[9px] uppercase tracking-[0.22em] text-zinc-600 sm:text-[10px]">
+                {'// REALM v1.0'}
+              </span>
+            </div>
+          </Link>
+        </div>
+
+        <div className="hidden items-center gap-3 md:flex">
+          <div className="flex items-center gap-2 border-[3px] border-black bg-white px-3 py-1.5 shadow-[3px_3px_0_0_#000]">
+            <span className="h-2.5 w-2.5 rounded-full bg-[#00c951] motion-safe:animate-pulse motion-reduce:animate-none" />
+            <span className="font-mono text-[11px] font-black uppercase tracking-[0.18em] text-black">
+              RADAR ONLINE
+            </span>
+          </div>
+        </div>
+
+        <div className="flex shrink-0 items-center gap-2 sm:gap-3">
+          <button
+            type="button"
+            onClick={() => setSfxEnabled((v) => !v)}
+            aria-label={sfxEnabled ? 'Mute sound effects' : 'Unmute sound effects'}
+            className="hidden size-9 place-items-center border-[3px] border-black bg-white shadow-[3px_3px_0_0_#000] transition-transform duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[1px_1px_0_0_#000] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none xl:grid"
+          >
+            {sfxEnabled ? (
+              <Volume2 className="size-4 text-black" strokeWidth={3} />
             ) : (
-              <PanelLeftClose className="size-5 text-black" strokeWidth={3} />
+              <VolumeX className="size-4 text-black" strokeWidth={3} />
             )}
           </button>
-        )}
 
-        <Link
-          href="/app"
-          className="font-black text-xl md:text-2xl tracking-[0.16em] uppercase border-3 border-black bg-[#FFE600] px-3.5 py-1 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:bg-[#FFD600] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[4.5px_4.5px_0px_0px_rgba(0,0,0,1)] active:translate-x-0 active:translate-y-0 active:shadow-none transition-all flex items-center gap-1.5"
-        >
-          <span>COQUEST</span>
-        </Link>
-
-        <div className="hidden sm:flex items-center gap-2.5 border-3 border-black bg-white px-3 py-1 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]">
-          <div className="grid size-6 place-items-center border-2 border-black bg-[#FFE600]">
-            <User className="size-3.5 shrink-0 text-black" strokeWidth={3} />
+          <div className="hidden items-center gap-2 border-[3px] border-black bg-white px-3 py-1.5 shadow-[3px_3px_0_0_#000] lg:flex">
+            <Zap aria-hidden="true" className="size-3.5 shrink-0 text-black" strokeWidth={3} />
+            <div className="flex items-center gap-1">
+              {Array.from({ length: 10 }).map((_, i) => (
+                <span
+                  key={i}
+                  className={`inline-block h-3 w-1.5 border border-black ${
+                    i < activeManaSegments ? 'bg-[#FFD84D]' : 'bg-zinc-200'
+                  }`}
+                />
+              ))}
+            </div>
+            <span className="font-mono text-[11px] font-black uppercase tracking-[0.18em] text-black">
+              {currentMp}/{maxMp} MP
+            </span>
           </div>
-          <span className="font-black text-xs uppercase tracking-wider text-black">{userName}</span>
-          <span className="bg-black text-[#FFE600] text-[10px] font-black px-2 py-0.5 tracking-widest uppercase border border-black -rotate-1">
-            LVL {level.level}
-          </span>
+
+          <div className="hidden items-center gap-2 border-[3px] border-black bg-white px-3 py-1.5 shadow-[3px_3px_0_0_#000] sm:flex">
+            <div className="grid size-6 shrink-0 place-items-center border-2 border-black bg-[#FFD84D]">
+              <User aria-hidden="true" className="size-3.5 text-black" strokeWidth={3} />
+            </div>
+            <span className="max-w-[9rem] truncate font-mono text-[11px] font-black uppercase tracking-[0.18em] text-black">
+              {userName}
+            </span>
+            <span className="border-2 border-black bg-[#FFD84D] px-1.5 py-0.5 font-mono text-[9px] font-black uppercase tracking-[0.12em] text-black">
+              LVL {level.level}
+            </span>
+          </div>
+
+          <Link
+            href="/app/billing"
+            className="inline-flex min-h-11 shrink-0 items-center gap-1.5 border-[3px] border-black bg-[#ff5a36] px-3 py-2 font-black uppercase tracking-[0.14em] text-black shadow-[3px_3px_0_0_#000] transition-transform duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[1px_1px_0_0_#000] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none sm:px-4 sm:text-sm"
+          >
+            <Zap aria-hidden="true" className="size-4 text-black" strokeWidth={3} />
+            <span className="hidden sm:inline">Recharge</span>
+            <span className="sr-only sm:hidden">Recharge</span>
+          </Link>
         </div>
-      </div>
-
-      {/* Center: Mana Vault Indicators */}
-      <div className="flex items-center gap-3.5 border-3 border-black bg-black text-white px-4 py-1.5 shadow-[4px_4px_0px_0px_#06B6D4]">
-        <div className="flex items-center gap-2">
-          <Zap className="size-4 text-[#06B6D4] animate-pulse" strokeWidth={3} />
-          <span className="text-xs font-black uppercase tracking-wider text-cyan-300 hidden md:inline">
-            Mana Vault:
-          </span>
-        </div>
-
-        <div className="flex items-center gap-1">
-          {Array.from({ length: 10 }).map((_, i) => {
-            const activeCount = Math.round((currentMp / maxMp) * 10)
-            const isActive = i < activeCount
-            return (
-              <span
-                key={i}
-                className={`inline-block h-4 w-2.5 border border-white transition-all ${
-                  isActive
-                    ? 'bg-gradient-to-t from-cyan-500 to-[#A3E635] shadow-[0_0_8px_#06B6D4]'
-                    : 'bg-slate-800 opacity-40'
-                }`}
-              />
-            )
-          })}
-        </div>
-
-        <span className="font-mono text-xs font-black border-l-2 border-dashed border-[#06B6D4] pl-3 text-[#FFE600] tracking-wider">
-          {currentMp}/{maxMp} MP
-        </span>
-        <span className="hidden lg:inline-block bg-[#FFE600] text-black border border-black px-2 py-0.5 text-[9px] font-black tracking-widest uppercase -rotate-1">
-          LEGEND
-        </span>
-      </div>
-
-      {/* Right: Quick Recharge Action & SFX Toggle */}
-      <div className="flex items-center gap-3">
-        <button
-          onClick={() => setSfxEnabled((v) => !v)}
-          className="hidden xl:flex items-center gap-1.5 bg-black text-[#FFE600] border-2 border-white px-2.5 py-1 text-[10px] uppercase font-black shadow-[2px_2px_0_0_#fff] hover:-translate-y-0.5 hover:shadow-[3px_3px_0_0_#fff] active:translate-y-0.5 active:shadow-none transition-all"
-        >
-          {sfxEnabled ? <Volume2 className="w-3.5 h-3.5" /> : <VolumeX className="w-3.5 h-3.5" />}
-          SFX {sfxEnabled ? 'ON' : 'OFF'}
-        </button>
-
-        <div className="hidden lg:flex items-center gap-2 border-2 border-black bg-[#A3E635] px-3 py-1 text-xs font-black tracking-wider shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] -rotate-1">
-          <span className="h-2.5 w-2.5 rounded-full bg-black animate-pulse" />
-          <span>RADAR ACTIVE</span>
-        </div>
-
-        <Link
-          href="/app/billing"
-          className="border-3 border-black bg-[#06B6D4] text-white px-4 py-1.5 text-xs font-black uppercase tracking-wider shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[5px_5px_0px_0px_rgba(0,0,0,1)] active:translate-x-0 active:translate-y-0 active:shadow-none transition-all flex items-center gap-1.5"
-        >
-          <Zap className="size-4 text-[#FFE600]" strokeWidth={3} />
-          <span>+ RECHARGE</span>
-        </Link>
       </div>
     </header>
   )

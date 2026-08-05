@@ -277,6 +277,10 @@ export class BillingService {
         )
         createdCheckoutSessionId = session.id
 
+        // Upstream contract violation, not a user error: a successfully created Checkout
+        // Session always carries a url. Throwing rolls back the enclosing transaction so
+        // the intent is never persisted pointing at a session the user cannot open. 500 is
+        // the honest status — the client did nothing wrong and retrying will not help.
         if (!session.url) throw new Error('Stripe Checkout did not return a URL')
         await tx.checkoutIntent.update({
           where: { id: intent.id },
@@ -371,6 +375,10 @@ export class BillingService {
         )
         createdCheckoutSessionId = session.id
 
+        // Upstream contract violation, not a user error: a successfully created Checkout
+        // Session always carries a url. Throwing rolls back the enclosing transaction so
+        // the intent is never persisted pointing at a session the user cannot open. 500 is
+        // the honest status — the client did nothing wrong and retrying will not help.
         if (!session.url) throw new Error('Stripe Checkout did not return a URL')
         await tx.checkoutIntent.update({
           where: { id: intent.id },

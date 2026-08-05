@@ -14,6 +14,10 @@ type CreditGrantInput = {
 export class CreditService {
   /** The ledger source is the economic idempotency boundary. */
   static async grantInvoiceAllocation(input: CreditGrantInput, transaction?: Prisma.TransactionClient) {
+    // An internal call-contract check, not a ValidationError: `credits` comes from plan
+    // configuration and webhook-derived price metadata, never from a request body. A bad
+    // value is a deployment bug, and a 400 would imply the client could fix it by changing
+    // its input.
     if (!Number.isSafeInteger(input.credits) || input.credits <= 0) {
       throw new Error('Credit allocation must be a positive integer')
     }
@@ -39,6 +43,10 @@ export class CreditService {
             },
           },
         })
+        // Not a ConflictError: the ledger source is the economic idempotency boundary, so a
+        // source id reused with a different user or delta means two distinct economic events
+        // collided on one key. That is a data-integrity bug to page on, not a 409 inviting
+        // the caller to retry — a retry would reproduce it exactly.
         if (!existing || existing.userId !== input.userId || existing.delta !== input.credits) {
           throw new Error('Credit ledger source conflicts with the expected allocation')
         }

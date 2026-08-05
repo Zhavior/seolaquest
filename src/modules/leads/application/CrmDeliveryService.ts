@@ -105,6 +105,10 @@ export class CrmDeliveryService {
         where: { id: delivery.id, userId: input.userId, status: 'DEAD' },
         data: { status: 'QUEUED', responseStatus: null, lastErrorCode: null },
       })
+      // An assertion, not a ConflictError: the row is already pinned by the `FOR UPDATE`
+      // above and was just observed as DEAD, so a zero-count reset is unreachable unless
+      // the fence itself is broken. Throwing rolls the transaction back; a 409 would tell
+      // the caller to retry a request that is not actually racing anyone.
       if (reset.count !== 1) throw new Error('CRM_DELIVERY_RETRY_FENCE_FAILED')
       return { ok: true as const, deliveryId: delivery.id, status: 'QUEUED' as const }
     })

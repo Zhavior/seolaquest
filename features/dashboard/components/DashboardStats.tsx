@@ -18,16 +18,16 @@ import { DashboardUser, DashboardLead } from '@/features/dashboard/types'
 function ProviderStatusStrip() {
   const providers = [
     {
-      label: 'Reddit',
+      label: 'X',
       state: 'ACTIVE',
       detail: 'Signal feed live',
       tone: 'bg-[#A3E635]',
       dotTone: 'bg-[#2F5A00]',
     },
     {
-      label: 'X',
-      state: 'WARNING',
-      detail: 'Rate limit watch',
+      label: 'Reddit',
+      state: 'SOON',
+      detail: 'Coming soon',
       tone: 'bg-[#F7D046]',
       dotTone: 'bg-[#7A5200]',
     },
@@ -343,7 +343,7 @@ export function DashboardStats({
                 },
                 {
                   title: 'Multi-feed scanner',
-                  detail: 'Blend Reddit, X, and future provider signals into one pass.',
+                  detail: 'Blend X, Reddit, and future provider signals into one pass.',
                   unlocked: user.level >= 4,
                 },
               ].map((perk) => (
