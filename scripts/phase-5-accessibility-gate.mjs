@@ -289,8 +289,23 @@ async function launchBrowser(chromePath, axeSource) {
         new Promise((resolveExit) => chrome.once('exit', resolveExit)),
         delay(2_000),
       ])
-      if (chrome.exitCode === null) chrome.kill('SIGKILL')
-      await rm(profileDirectory, { recursive: true, force: true })
+      if (chrome.exitCode === null) {
+        chrome.kill('SIGKILL')
+        await Promise.race([
+          new Promise((resolveExit) => chrome.once('exit', resolveExit)),
+          delay(2_000),
+        ])
+      }
+      // Chrome keeps writing to its profile as it tears down, so a plain
+      // recursive rm can walk a directory, have Chrome drop a new file into it,
+      // and then fail the rmdir with ENOTEMPTY. That crashed the gate on CI
+      // *after* every route had already been checked, turning a clean run into
+      // exit 2. Retry the walk, and never let cleanup decide the run's verdict.
+      try {
+        await rm(profileDirectory, { recursive: true, force: true, maxRetries: 5, retryDelay: 200 })
+      } catch (error) {
+        console.warn(`Could not remove the temporary Chrome profile: ${error.message}`)
+      }
     },
   }
 }
