@@ -2,23 +2,25 @@ import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { getCurrentUser } from '@/lib/auth'
 import { ScanRunService } from '@/src/modules/leads/application/ScanRunService'
+import { withApiHandler } from '@/src/modules/core/infrastructure/api-handler'
+import { NotFoundError, UnauthorizedError, ValidationError } from '@/src/modules/core/infrastructure/errors'
 
 const scanRunIdSchema = z.string().uuid()
 
-export async function GET(
+export const GET = withApiHandler(async (
   _request: Request,
   context: { params: Promise<{ id: string }> },
-) {
-  try {
-    const user = await getCurrentUser()
-    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+) => {
+  const user = await getCurrentUser()
+  if (!user) throw new UnauthorizedError()
 
-    const parsed = scanRunIdSchema.safeParse((await context.params).id)
-    if (!parsed.success) return NextResponse.json({ error: 'Invalid scan ID' }, { status: 400 })
-    const status = await ScanRunService.getStatus(user.id, parsed.data)
-    if (!status) return NextResponse.json({ error: 'Scan not found' }, { status: 404 })
-    return NextResponse.json({ success: true, scan: status })
-  } catch {
-    return NextResponse.json({ error: 'Scan status unavailable' }, { status: 500 })
-  }
-}
+  const { id } = await context.params
+  const parsed = scanRunIdSchema.safeParse(id)
+  if (!parsed.success) throw new ValidationError('Invalid scan ID', parsed.error.issues)
+
+  const status = await ScanRunService.getStatus(user.id, parsed.data)
+  if (!status) throw new NotFoundError('Scan not found')
+
+  return NextResponse.json({ success: true, scan: status })
+})
+
