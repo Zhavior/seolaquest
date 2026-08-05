@@ -33,7 +33,21 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" className={inter.variable}>
+    <html lang="en" className={inter.variable} suppressHydrationWarning>
+      <head>
+        {/*
+          Runs synchronously while the browser parses the document, so the saved
+          colour mode and mute setting are on `<html>` before the first paint.
+          Without it, grey-mode users saw a full page of parchment flash to slate
+          on every single load: the server cannot read localStorage, so it always
+          emitted the light theme and the correction only landed after hydration.
+        */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `try{var d=document.documentElement;if(localStorage.getItem('coquest_theme')==='grey'){d.classList.add('grey-mode')}if(localStorage.getItem('coquest_sfx_enabled')==='false'){d.classList.add('sfx-muted')}}catch(e){}`,
+          }}
+        />
+      </head>
       <body
         className="font-sans min-h-screen text-black antialiased"
         style={{
