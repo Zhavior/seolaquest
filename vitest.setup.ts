@@ -32,5 +32,8 @@ vi.mock('@/lib/sfx', () => ({
     playSidebarExpand: vi.fn(),
     playSidebarHover: vi.fn(),
     playSwordSlash: vi.fn(),
+    isEnabled: vi.fn(() => true),
+    setEnabled: vi.fn(),
+    toggle: vi.fn(() => true),
   },
 }))
