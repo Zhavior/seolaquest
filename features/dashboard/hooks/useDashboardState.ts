@@ -67,6 +67,7 @@ export function useDashboardState({
   const [scanStep, setScanStep] = useState(0)
   const [scanOutcome, setScanOutcome] = useState<ScanOutcome>('waiting')
   const restoredScanRef = useRef<string | null>(null)
+  const activeScanAbortRef = useRef<AbortController | null>(null)
 
   const filter = searchParams.get('platform') || 'ALL'
 
@@ -118,6 +119,20 @@ export function useDashboardState({
   const maxCredits = Math.max(0, user.maxCredits ?? 0, remainingQuests)
   const PRESET_KEYWORDS = ['looking for CRM', 'best SaaS for...', 'alternative to...']
 
+  const abortActiveScan = useCallback(() => {
+    if (activeScanAbortRef.current) {
+      activeScanAbortRef.current.abort()
+      activeScanAbortRef.current = null
+    }
+  }, [])
+
+  // Clean up scan polling on unmount
+  useEffect(() => {
+    return () => {
+      abortActiveScan()
+    }
+  }, [abortActiveScan])
+
   function addKeyword() {
     const phrase = newKeyword.trim()
     if (!phrase) return
@@ -154,6 +169,11 @@ export function useDashboardState({
   }
 
   function runMockScanner() {
+    abortActiveScan()
+    const controller = new AbortController()
+    activeScanAbortRef.current = controller
+    const { signal } = controller
+
     setIsScannerModalOpen(true)
     setScanLogs([
       'Preparing durable scan request...',
@@ -163,92 +183,115 @@ export function useDashboardState({
     setScanStep(1)
     setScanOutcome('waiting')
     setAsyncStatus('scanning')
+    sfx.playRadarBlip()
 
-    startTransition(async () => {
-      const result = await scanForLeadsAction()
-      if (!result.ok || !result.runId) {
-        setScanLogs((current) => [...current, result.message ?? 'Scan could not be started.'])
-        setNotice(result.message ?? 'Could not start scan.')
-        setScanOutcome('failed')
+    void (async () => {
+      try {
+        const result = await scanForLeadsAction()
+        if (signal.aborted) return
+
+        if (!result.ok || !result.runId) {
+          sfx.playCriticalWarning()
+          setScanLogs((current) => [...current, result.message ?? 'Scan could not be started.'])
+          setNotice(result.message ?? 'Could not start scan.')
+          setScanOutcome('failed')
+          setScanStep(5)
+          setAsyncStatus('idle')
+          return
+        }
+
+        const scanRunId = result.runId
+        setScanLogs((current) => [...current, `Scan queued with durable run ${scanRunId}.`])
+        setScanStep(2)
+
+        const deadline = Date.now() + SCAN_STATUS_TIMEOUT_MS
+        let lastStatus = ''
+
+        while (!signal.aborted && Date.now() < deadline) {
+          try {
+            const response = await fetch(`/api/v1/scans/${encodeURIComponent(scanRunId)}`, {
+              cache: 'no-store',
+              signal,
+            })
+            if (!response.ok) throw new Error('SCAN_STATUS_UNAVAILABLE')
+            const payload = (await response.json()) as {
+              scan?: {
+                status?: ScanStatus
+                counts?: { leadsCreated?: number }
+                provider?: { status?: string }
+                balance?: number | null
+              }
+            }
+            const scan = payload.scan
+            if (!scan?.status) throw new Error('SCAN_STATUS_MISSING')
+
+            if (scan.status !== lastStatus) {
+              lastStatus = scan.status
+              setScanLogs((current) => [...current, `Server status: ${scan.status}`])
+              sfx.playRadarBlip()
+            }
+
+            if (scan.status === 'RUNNING') {
+              setScanStep(3)
+            }
+
+            if (scan.status === 'SUCCEEDED') {
+              sfx.playCoinDrop()
+              const leadsCreated = scan.counts?.leadsCreated ?? 0
+              const providerStatus = scan.provider?.status ?? 'unknown'
+              const completed = `Scan completed: ${leadsCreated} new source match${leadsCreated === 1 ? '' : 'es'}; provider status ${providerStatus}.`
+              setScanLogs((current) => [...current, completed])
+              setNotice(completed)
+              if (typeof scan.balance === 'number') setRemainingQuests(scan.balance)
+              setScanOutcome('succeeded')
+              setScanStep(5)
+              setAsyncStatus('idle')
+              router.refresh()
+              return
+            }
+
+            if (scan.status === 'FAILED_REFUNDED') {
+              sfx.playCriticalWarning()
+              const failed = 'Scan failed after provider retries. The scan credit was refunded.'
+              setScanLogs((current) => [...current, failed])
+              setNotice(failed)
+              if (typeof scan.balance === 'number') setRemainingQuests(scan.balance)
+              setScanOutcome('failed')
+              setScanStep(5)
+              setAsyncStatus('idle')
+              return
+            }
+
+            if (scan.status === 'DEAD' || scan.status === 'CANCELLED' || scan.status === 'UNKNOWN') {
+              sfx.playCriticalWarning()
+              const failed = `Scan ended with status ${scan.status}. No successful result is being claimed.`
+              setScanLogs((current) => [...current, failed])
+              setNotice(failed)
+              setScanOutcome('failed')
+              setScanStep(5)
+              setAsyncStatus('idle')
+              return
+            }
+          } catch (err: unknown) {
+            if ((err as Error)?.name === 'AbortError') return
+          }
+          await wait(SCAN_STATUS_POLL_MS)
+        }
+
+        if (signal.aborted) return
+
+        const pending = 'Scan is still queued. Its run reference is preserved; refresh to check verified results.'
+        setScanLogs((current) => [...current, pending])
+        setNotice(pending)
+        setScanOutcome('pending')
         setScanStep(5)
         setAsyncStatus('idle')
-        return
-      }
-
-      const scanRunId = result.runId
-      setScanLogs((current) => [...current, `Scan queued with durable run ${scanRunId}.`])
-      setScanStep(2)
-
-      const deadline = Date.now() + SCAN_STATUS_TIMEOUT_MS
-      while (Date.now() < deadline) {
-        try {
-          const response = await fetch(`/api/v1/scans/${encodeURIComponent(scanRunId)}`, { cache: 'no-store' })
-          if (!response.ok) throw new Error('SCAN_STATUS_UNAVAILABLE')
-          const payload = await response.json() as {
-            scan?: {
-              status?: ScanStatus
-              counts?: { leadsCreated?: number }
-              provider?: { status?: string }
-              balance?: number | null
-            }
-          }
-          const scan = payload.scan
-          if (!scan?.status) throw new Error('SCAN_STATUS_MISSING')
-
-          setScanLogs((current) => [...current, `Server status: ${scan.status}`])
-
-          if (scan.status === 'RUNNING') {
-            setScanStep(3)
-          }
-
-          if (scan.status === 'SUCCEEDED') {
-            const leadsCreated = scan.counts?.leadsCreated ?? 0
-            const providerStatus = scan.provider?.status ?? 'unknown'
-            const completed = `Scan completed: ${leadsCreated} new source match${leadsCreated === 1 ? '' : 'es'}; provider status ${providerStatus}.`
-            setScanLogs((current) => [...current, completed])
-            setNotice(completed)
-            if (typeof scan.balance === 'number') setRemainingQuests(scan.balance)
-            setScanOutcome('succeeded')
-            setScanStep(5)
-            setAsyncStatus('idle')
-            router.refresh()
-            return
-          }
-
-          if (scan.status === 'FAILED_REFUNDED') {
-            const failed = 'Scan failed after provider retries. The scan credit was refunded.'
-            setScanLogs((current) => [...current, failed])
-            setNotice(failed)
-            if (typeof scan.balance === 'number') setRemainingQuests(scan.balance)
-            setScanOutcome('failed')
-            setScanStep(5)
-            setAsyncStatus('idle')
-            return
-          }
-
-          if (scan.status === 'DEAD' || scan.status === 'CANCELLED' || scan.status === 'UNKNOWN') {
-            const failed = `Scan ended with status ${scan.status}. No successful result is being claimed.`
-            setScanLogs((current) => [...current, failed])
-            setNotice(failed)
-            setScanOutcome('failed')
-            setScanStep(5)
-            setAsyncStatus('idle')
-            return
-          }
-        } catch {
-          // The durable run remains authoritative. A transient status read is
-          // retried until the bounded UI deadline without inventing success.
+      } catch {
+        if (!signal.aborted) {
+          setAsyncStatus('idle')
         }
-        await wait(SCAN_STATUS_POLL_MS)
       }
-
-      const pending = 'Scan is still queued. Its run reference is preserved; refresh to check verified results.'
-      setScanLogs((current) => [...current, pending])
-      setNotice(pending)
-      setScanOutcome('pending')
-      setScanStep(5)
-      setAsyncStatus('idle')
-    })
+    })()
   }
 
   useEffect(() => {
@@ -271,15 +314,18 @@ export function useDashboardState({
           if (status !== lastStatus) {
             lastStatus = status
             setScanLogs((current) => [...current, `Server status: ${status}`])
+            sfx.playRadarBlip()
           }
           if (status === 'RUNNING') setScanStep(3)
           if (status === 'SUCCEEDED') {
+            sfx.playCoinDrop()
             setScanStep(5)
             setScanOutcome('succeeded')
             router.refresh()
             return
           }
           if (status === 'FAILED_REFUNDED' || status === 'DEAD' || status === 'CANCELLED' || status === 'UNKNOWN') {
+            sfx.playCriticalWarning()
             setScanStep(5)
             setScanOutcome('failed')
             return
@@ -431,6 +477,7 @@ export function useDashboardState({
     handlePresetClick,
     removeKeyword,
     runMockScanner,
+    abortActiveScan,
     handleClaimBounty,
     handleConfirmQuickStrikeClaim,
     dismissLead,

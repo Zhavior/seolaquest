@@ -116,6 +116,7 @@ export default function DashboardClient({
             scanLogs={state.scanLogs}
             scanStep={state.scanStep}
             scanOutcome={state.scanOutcome}
+            onAbortScan={state.abortActiveScan}
           />
         ) : null}
       </AnimatePresence>
