@@ -5,6 +5,11 @@ vi.mock('@/lib/auth', () => ({
   getCurrentUser: vi.fn().mockResolvedValue({ onboardingComplete: true }),
 }))
 
+// The shell's Log Out control calls useClerk(), which requires a ClerkProvider.
+vi.mock('@clerk/nextjs', () => ({
+  useClerk: () => ({ signOut: vi.fn() }),
+}))
+
 vi.mock('next/navigation', () => ({
   redirect: vi.fn(),
   usePathname: () => '/app',

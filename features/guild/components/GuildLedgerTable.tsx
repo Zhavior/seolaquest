@@ -1,6 +1,7 @@
 'use client'
 
 import { Shield } from 'lucide-react'
+import { QuestPanel, QuestSectionHeading, questSurface } from '@/components/quest'
 import { GuildHunter } from '@/features/guild/types'
 
 interface GuildLedgerTableProps {
@@ -16,33 +17,32 @@ export default function GuildLedgerTable({ hunters, isAnonymousMode, onSelectHun
   }
 
   return (
-    <section className="w-full space-y-4">
-      <header className="flex items-center gap-3 border-b-4 border-black pb-3">
-        <div className="border-2 border-black bg-[#FFE600] p-2 shadow-[2px_2px_0_0_#000]">
-          <Shield className="h-6 w-6" />
-        </div>
-        <div>
-          <h2 className="text-2xl font-black uppercase md:text-3xl">Guild activity ledger</h2>
-          <p className="text-xs font-bold uppercase text-gray-500">Only stored, consented profile values</p>
-        </div>
-      </header>
+    <section className="w-full space-y-4" aria-labelledby="guild-ledger-heading">
+      <QuestSectionHeading
+        titleId="guild-ledger-heading"
+        icon={<Shield className="h-6 w-6" />}
+        iconTone="gold"
+        title="Guild activity ledger"
+        subtitle="Only stored, consented profile values"
+        className="mb-0 pb-3"
+      />
 
       {hunters.length === 0 ? (
-        <div className="border-4 border-black bg-white p-8 text-center shadow-[6px_6px_0_0_#000]">
+        <QuestPanel padding="lg" className="text-center">
           <h3 className="text-xl font-black uppercase">No public hunters</h3>
           <p className="mt-2 font-bold text-gray-600">Public rankings require explicit participant opt-in.</p>
-        </div>
+        </QuestPanel>
       ) : (
         <>
-        {/* Phones get stacked cards; the table needs 620px and would only scroll sideways. */}
-        <ul className="space-y-3 md:hidden">
+        {/* Phones (<640px) get stacked cards; tablets and desktops (640px+) get the scrollable table */}
+        <ul className="space-y-3 sm:hidden">
           {hunters.map((hunter) => (
             <li
               key={hunter.id}
-              className="border-4 border-black bg-white p-4 shadow-[6px_6px_0_0_#000]"
+              className={questSurface({ shadow: 'md', className: 'p-3.5' })}
             >
               <div className="flex items-start gap-3">
-                <span className="shrink-0 border-2 border-black bg-[#FFE600] px-2 py-1 text-sm font-black shadow-[2px_2px_0_0_#000]">
+                <span className={questSurface({ tone: 'gold', border: 2, shadow: 'xs', className: 'shrink-0 px-2 py-1 text-xs font-black' })}>
                   #{hunter.rank}
                 </span>
                 <div className="min-w-0 flex-1 text-sm font-black uppercase">
@@ -50,31 +50,31 @@ export default function GuildLedgerTable({ hunters, isAnonymousMode, onSelectHun
                     <button
                       type="button"
                       onClick={() => onSelectHunter(hunter)}
-                      className="min-h-11 text-left font-black underline decoration-2 underline-offset-4"
+                      className="min-h-[44px] flex items-center font-black underline decoration-2 underline-offset-4 text-left break-word-safe"
                     >
                       View {displayName(hunter)} details
                     </button>
                   ) : (
-                    <span className="break-words">{displayName(hunter)}</span>
+                    <span className="break-word-safe">{displayName(hunter)}</span>
                   )}
                 </div>
               </div>
 
               <dl className="mt-3 grid grid-cols-2 gap-3 border-t-2 border-black pt-3">
                 <div className="min-w-0">
-                  <dt className="text-xs font-black uppercase text-gray-500">Processed leads</dt>
-                  <dd className="mt-1 text-lg font-black">{hunter.bountiesSlayed.toLocaleString()}</dd>
+                  <dt className="text-[11px] font-black uppercase text-gray-500">Processed leads</dt>
+                  <dd className="mt-0.5 text-base font-black">{hunter.bountiesSlayed.toLocaleString()}</dd>
                 </div>
                 <div className="min-w-0">
-                  <dt className="text-xs font-black uppercase text-gray-500">Active streak</dt>
-                  <dd className="mt-1 text-lg font-black">{hunter.activeStreak} days</dd>
+                  <dt className="text-[11px] font-black uppercase text-gray-500">Active streak</dt>
+                  <dd className="mt-0.5 text-base font-black">{hunter.activeStreak} days</dd>
                 </div>
               </dl>
             </li>
           ))}
         </ul>
 
-        <div className="hidden overflow-x-auto border-4 border-black bg-white shadow-[6px_6px_0_0_#000] md:block">
+        <div className={questSurface({ className: 'hidden overflow-x-auto sm:block' })}>
           <table className="min-w-[620px] w-full border-collapse text-left">
             <thead>
               <tr className="border-b-4 border-black bg-black text-xs font-black uppercase text-white">
@@ -90,7 +90,7 @@ export default function GuildLedgerTable({ hunters, isAnonymousMode, onSelectHun
                   <td className="p-4">#{hunter.rank}</td>
                   <td className="p-4 uppercase">
                     {onSelectHunter ? (
-                      <button type="button" onClick={() => onSelectHunter(hunter)} className="min-h-11 font-black underline decoration-2 underline-offset-4">
+                      <button type="button" onClick={() => onSelectHunter(hunter)} className="min-h-[44px] flex items-center font-black underline decoration-2 underline-offset-4">
                         View {displayName(hunter)} details
                       </button>
                     ) : displayName(hunter)}

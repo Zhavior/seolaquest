@@ -1,3 +1,4 @@
+import { questBadge } from '@/components/quest'
 import type { ScanStatus } from '../types'
 
 const styles: Record<ScanStatus, string> = {
@@ -13,7 +14,10 @@ const styles: Record<ScanStatus, string> = {
 export function ScanStatusBadge({ status }: { status: ScanStatus }) {
   return (
     <span
-      className={`inline-flex border-2 border-black px-2.5 py-1 text-xs font-black tracking-wide shadow-[2px_2px_0_0_#000] ${styles[status]}`}
+      className={questBadge({
+        tone: 'none',
+        className: `px-2.5 py-1 tracking-wide ${styles[status]}`,
+      })}
     >
       {status}
     </span>

@@ -1,5 +1,6 @@
 import { motion, Variants } from 'framer-motion'
 import { Trophy, Lock } from 'lucide-react'
+import { QuestBadge, QuestSectionHeading, questSurface } from '@/components/quest'
 import { Achievement } from '@/features/guild/types'
 
 type GuildAchievementsCardProps = {
@@ -12,40 +13,50 @@ export function GuildAchievementsCard({
   achievementsList
 }: GuildAchievementsCardProps) {
   return (
-    <motion.div variants={item} className="mt-12">
-      <div className="flex items-center gap-4 mb-6 border-b-4 border-black pb-4">
-        <div className="bg-[#FFE600] p-3 border-2 border-black shadow-[3px_3px_0_0_#000]">
-          <Trophy className="w-8 h-8 text-black" />
-        </div>
-        <div>
-          <h2 className="text-2xl sm:text-3xl md:text-4xl uppercase font-black">Guild Achievements</h2>
-          <p className="text-sm font-bold text-gray-600 uppercase">Unlockable Trophies & Badges</p>
-        </div>
-      </div>
+    <motion.section variants={item} aria-labelledby="guild-achievements-heading" className="mt-12">
+      <QuestSectionHeading
+        titleId="guild-achievements-heading"
+        icon={<Trophy className="w-8 h-8 text-black" />}
+        iconTone="gold"
+        title="Guild Achievements"
+        subtitle="Unlockable Trophies & Badges"
+        className="gap-4"
+      />
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {achievementsList.map((ach) => (
-          <motion.div
+          <motion.li
             key={ach.id}
             whileHover={{ y: -4, x: -4, boxShadow: "8px 8px 0px 0px rgba(0,0,0,1)" }}
-            className={`border-4 border-black p-6 relative flex flex-col justify-between shadow-[5px_5px_0_0_#000] ${
-              ach.unlocked ? 'bg-white' : 'bg-[#F4F0EA] opacity-90'
-            }`}
+            className={questSurface({
+              tone: ach.unlocked ? 'white' : 'parchment',
+              shadow: 'none',
+              className: `relative flex flex-col justify-between p-6 shadow-[5px_5px_0_0_#000] ${
+                ach.unlocked ? '' : 'opacity-90'
+              }`,
+            })}
           >
             <div>
               {/* Badge Top Header */}
               <div className="flex justify-between items-start mb-4">
-                <span className="text-4xl">{ach.badge}</span>
+                <span aria-hidden="true" className="text-4xl">{ach.badge}</span>
                 {ach.unlocked ? (
-                  <span className="bg-emerald-400 text-black border-2 border-black text-[10px] font-black uppercase px-2 py-0.5 shadow-[2px_2px_0_0_#000]">
-                    UNLOCKED
-                  </span>
+                  <QuestBadge
+                    tone="none"
+                    className="bg-emerald-400 px-2 py-0.5 text-[10px] tracking-normal text-black"
+                  >
+                    Unlocked
+                  </QuestBadge>
                 ) : (
-                  <span className="bg-gray-300 text-gray-700 border-2 border-black text-[10px] font-black uppercase px-2 py-0.5 flex items-center gap-1">
-                    <Lock className="w-3 h-3" /> LOCKED
-                  </span>
-                )
-              }
+                  <QuestBadge
+                    tone="none"
+                    shadow="none"
+                    className="gap-1 bg-gray-300 px-2 py-0.5 text-[10px] tracking-normal text-gray-700"
+                    icon={<Lock aria-hidden="true" className="w-3 h-3" />}
+                  >
+                    Locked
+                  </QuestBadge>
+                )}
               </div>
 
               <h3 className="text-xl uppercase font-black mb-1">{ach.title}</h3>
@@ -60,16 +71,23 @@ export function GuildAchievementsCard({
                 <span>Progress</span>
                 <span>{ach.progress} / {ach.target}</span>
               </div>
-              <div className="w-full bg-gray-200 border-2 border-black h-3 overflow-hidden">
-                <div 
+              <div
+                role="progressbar"
+                aria-label={`${ach.title} progress`}
+                aria-valuemin={0}
+                aria-valuemax={ach.target}
+                aria-valuenow={ach.progress}
+                className="w-full bg-gray-200 border-2 border-black h-3 overflow-hidden"
+              >
+                <div
                   className={`h-full ${ach.unlocked ? 'bg-[#A3E635]' : 'bg-[#06B6D4]'}`}
                   style={{ width: `${Math.min(100, (ach.progress / ach.target) * 100)}%` }}
                 ></div>
               </div>
             </div>
-          </motion.div>
+          </motion.li>
         ))}
-      </div>
-    </motion.div>
+      </ul>
+    </motion.section>
   )
 }

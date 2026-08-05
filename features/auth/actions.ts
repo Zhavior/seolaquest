@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache'
 import prisma from '@/lib/prisma'
 import { getCurrentUser } from '@/lib/auth'
+import { logger } from '@/src/modules/core/infrastructure/logger'
 import { MAX_ACTIVE_KEYWORDS_PER_TENANT } from '@/src/modules/keywords/application/KeywordService'
 import { DEFAULT_PROFILE_ICON_KEY } from './profileIconOptions'
 import {
@@ -110,7 +111,10 @@ export async function saveOnboardingStepAction(input: SaveOnboardingStepInput): 
     revalidatePath('/onboarding')
     return { ok: true, nextStep }
   } catch (error) {
-    console.error('saveOnboardingStepAction failed:', error)
+    logger.error(
+      { err: error, step: parsed.data.step, outcomeCode: 'ONBOARDING_STEP_SAVE_FAILED' },
+      'Onboarding step could not be saved',
+    )
     return validationFailure('This step could not be saved. Your earlier progress is still safe; try again.')
   }
 }
@@ -140,7 +144,11 @@ export async function skipOnboardingStepAction(step: 2 | 3): Promise<SaveStepRes
     if (updated.count !== 1) return alreadyCompleteFailure()
     revalidatePath('/onboarding')
     return { ok: true, nextStep }
-  } catch {
+  } catch (error) {
+    logger.error(
+      { err: error, step: parsed.data, outcomeCode: 'ONBOARDING_STEP_SKIP_FAILED' },
+      'Onboarding step could not be skipped',
+    )
     return validationFailure('This step could not be skipped. Your earlier progress is still safe; try again.')
   }
 }
@@ -263,7 +271,10 @@ export async function completeOnboardingAction(): Promise<CompleteOnboardingResu
     revalidatePath('/app')
     return result
   } catch (error) {
-    console.error('completeOnboardingAction failed:', error)
+    logger.error(
+      { err: error, outcomeCode: 'ONBOARDING_COMPLETE_FAILED' },
+      'Onboarding completion transaction failed',
+    )
     return validationFailure('Setup could not be completed right now. Your saved progress is still available.')
   }
 }

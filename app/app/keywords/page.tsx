@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation'
 import type { Metadata } from 'next'
 import { getCurrentUser } from '@/lib/auth'
 import { KeywordService } from '@/src/modules/keywords/application/KeywordService'
+import { QuestPageSkeleton } from '@/components/quest'
 import type { Keyword } from '@/features/dashboard/components/KeywordsClient'
 
 const KeywordsClient = nextDynamic(() =>
@@ -19,7 +20,7 @@ export const metadata: Metadata = {
 
 export default function KeywordsPage() {
   return (
-    <Suspense fallback={<KeywordsLoading />}>
+    <Suspense fallback={<QuestPageSkeleton />}>
       <KeywordsData />
     </Suspense>
   )
@@ -33,13 +34,4 @@ async function KeywordsData() {
 
   const keywords: Keyword[] = await KeywordService.listKeywords()
   return <KeywordsClient initialKeywords={keywords} />
-}
-
-function KeywordsLoading() {
-  return (
-    <div className="min-h-[100dvh] w-full bg-[#FDFBF7] p-4 sm:p-8 space-y-6">
-      <div className="h-32 border-4 border-black bg-zinc-200 animate-pulse shadow-[6px_6px_0_0_#000]" />
-      <div className="h-64 border-4 border-black bg-zinc-200 animate-pulse shadow-[6px_6px_0_0_#000]" />
-    </div>
-  )
 }

@@ -1,6 +1,13 @@
 import type { ReactNode } from 'react'
 import { render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
+
+const signOutMock = vi.fn()
+
+vi.mock('@clerk/nextjs', () => ({
+  useClerk: () => ({ signOut: signOutMock }),
+}))
 
 vi.mock('next/navigation', () => ({
   usePathname: () => '/dashboard',
@@ -62,7 +69,24 @@ describe('Neobrutalist AppLayout Component', () => {
     expect(
       screen.getByText('Scouts currently patrolling r/SaaS and Twitter streams.')
     ).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: /LOG OUT/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /LOG OUT/i })).toBeInTheDocument()
+  })
+
+  it('ends the Clerk session instead of only linking to /sign-in', async () => {
+    signOutMock.mockClear()
+
+    render(
+      <AppLayout>
+        <div>Content Shell</div>
+      </AppLayout>
+    )
+
+    const logOut = screen.getByRole('button', { name: /LOG OUT/i })
+    expect(logOut).not.toHaveAttribute('href')
+
+    await userEvent.click(logOut)
+
+    expect(signOutMock).toHaveBeenCalledWith({ redirectUrl: '/' })
   })
 
   it('renders children within main container', () => {

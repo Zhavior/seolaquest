@@ -1,6 +1,7 @@
 import { motion, Variants } from 'framer-motion'
 import { Flame, BarChart3 } from 'lucide-react'
 import { useState } from 'react'
+import { QuestBadge, QUEST_EYEBROW, questSurface } from '@/components/quest'
 
 type GuildActivityCardProps = {
   item: Variants
@@ -20,32 +21,42 @@ export function GuildActivityCard({
   const [hoveredDate, setHoveredDate] = useState<string | null>(null)
 
   return (
-    <motion.div 
+    <motion.section
       variants={item}
-      className="md:col-span-6 border-4 border-black bg-white p-6 md:p-8 shadow-[6px_6px_0_0_#000] flex flex-col justify-between"
+      aria-labelledby="guild-activity-heading"
+      className={questSurface({
+        className: 'md:col-span-6 flex flex-col justify-between p-6 md:p-8',
+      })}
     >
       <div>
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6 border-b-4 border-black pb-4">
-          <div className="flex items-center gap-3">
-            <div className="bg-[#FFE600] p-2.5 border-2 border-black shadow-[2px_2px_0_0_#000]">
+          <div className="flex min-w-0 items-center gap-3">
+            <span
+              aria-hidden="true"
+              className={questSurface({ tone: 'gold', border: 2, shadow: 'xs', className: 'shrink-0 p-2.5' })}
+            >
               <BarChart3 className="w-7 h-7 text-black" />
-            </div>
-            <div>
-              <h2 className="text-2xl md:text-3xl uppercase font-black leading-none">Activity Heatmap</h2>
+            </span>
+            <div className="min-w-0">
+              <h2 id="guild-activity-heading" className="text-2xl md:text-3xl uppercase font-black leading-none">
+                Activity Heatmap
+              </h2>
               <p className="text-xs uppercase font-bold text-gray-500 mt-0.5">Bounty Hunter Grid</p>
             </div>
           </div>
-          
+
           {/* Hunting Streak Badge */}
-          <div className="bg-[#FF5722] text-white border-2 border-black px-3 py-1.5 shadow-[3px_3px_0_0_#000] flex items-center gap-2 self-start sm:self-auto">
-            <Flame className="w-5 h-5 fill-[#FFE600] text-black animate-bounce" />
-            <span className="text-xs md:text-sm font-black uppercase tracking-wider text-[#FFE600]" style={{ WebkitTextStroke: '0.5px black' }}>
-              {huntingStreak}-DAY HUNTING STREAK 🔥
-            </span>
-          </div>
+          <QuestBadge
+            tone="ember"
+            shadow="sm"
+            className="self-start px-3 py-1.5 text-xs text-[#FFE600] sm:self-auto md:text-sm"
+            icon={<Flame aria-hidden="true" className="w-5 h-5 fill-[#FFE600] text-black animate-bounce motion-reduce:animate-none" />}
+          >
+            <span style={{ WebkitTextStroke: '0.5px black' }}>{huntingStreak}-DAY HUNTING STREAK 🔥</span>
+          </QuestBadge>
         </div>
 
-        <p className="text-xs font-black uppercase text-gray-500 mb-3 tracking-wider">
+        <p className={`${QUEST_EYEBROW} mb-3`}>
           Daily tenant lead activity (hover for counts)
         </p>
 
@@ -75,7 +86,7 @@ export function GuildActivityCard({
                   onMouseLeave={() => setHoveredDate(null)}
                   onFocus={() => setHoveredDate(dateStr)}
                   onBlur={() => setHoveredDate(null)}
-                  className={`aspect-square border-2 ${bgClass} cursor-crosshair relative transition-all duration-200 hover:scale-125 hover:z-30 hover:border-white focus-visible:scale-125 focus-visible:z-30`}
+                  className={`aspect-square border-2 ${bgClass} cursor-crosshair relative transition-all duration-200 hover:scale-125 hover:z-30 hover:border-white focus-visible:scale-125 focus-visible:z-30 motion-reduce:transition-none`}
                 >
                   {/* Hover Tooltip */}
                   {hoveredDate === dateStr && (
@@ -96,7 +107,7 @@ export function GuildActivityCard({
           {/* Heatmap Legend */}
           <div className="flex items-center justify-between mt-4 pt-3 border-t-2 border-gray-800 text-[11px] font-black uppercase text-gray-400">
             <span>Less Active</span>
-            <div className="flex items-center gap-2">
+            <div aria-hidden="true" className="flex items-center gap-2">
               <span className="w-3 h-3 bg-[#1E293B] border border-gray-600 inline-block"></span>
               <span className="w-3 h-3 bg-[#FEF08A] border border-black inline-block"></span>
               <span className="w-3 h-3 bg-[#FF5722] border border-black inline-block"></span>
@@ -111,6 +122,6 @@ export function GuildActivityCard({
         <span>*30-day tenant activity ledger</span>
         <span className="text-black font-black">No reward value inferred</span>
       </div>
-    </motion.div>
+    </motion.section>
   )
 }

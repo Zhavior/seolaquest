@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { LogOut, X, Sparkles, PanelLeftOpen } from 'lucide-react'
+import LogOutButton from '@/components/auth/LogOutButton'
 import { sfx } from '@/lib/sfx'
 
 import { type UserSummary } from '../CoQuestShell'
@@ -112,15 +113,15 @@ function NavigationContent({
             <span className="h-2.5 w-2.5 rounded-full bg-black border border-white animate-pulse" />
           </div>
 
-          <Link
-            href="/sign-in"
+          <LogOutButton
             title="Log Out"
+            aria-label="Log out"
             onMouseEnter={() => sfx.playSidebarHover()}
-            onClick={() => sfx.playCoinDrop()}
+            onBeforeSignOut={() => sfx.playCoinDrop()}
             className="grid size-11 place-items-center border-3 border-black bg-[#FF5722] text-white shadow-[3px_3px_0_0_#000] hover:-translate-y-0.5 transition-all"
           >
             <LogOut className="size-5" strokeWidth={3} />
-          </Link>
+          </LogOutButton>
         </div>
       </div>
     )
@@ -236,14 +237,13 @@ function NavigationContent({
           </div>
         </div>
 
-        <Link
-          href="/sign-in"
+        <LogOutButton
           onMouseEnter={() => sfx.playSidebarHover()}
-          onClick={() => {
+          onBeforeSignOut={() => {
             sfx.playCoinDrop()
             onNavigate?.()
           }}
-          className="flex items-center justify-between p-3 border-3 border-black font-black text-xs uppercase tracking-wider bg-[#FF5722] text-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] active:translate-x-0 active:translate-y-0 active:shadow-none transition-all"
+          className="w-full flex items-center justify-between p-3 border-3 border-black font-black text-xs uppercase tracking-wider bg-[#FF5722] text-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] active:translate-x-0 active:translate-y-0 active:shadow-none transition-all"
         >
           <div className="flex items-center gap-2.5">
             <LogOut className="size-4 shrink-0" strokeWidth={3} />
@@ -252,7 +252,7 @@ function NavigationContent({
           <span className="font-mono text-[9px] font-black text-black bg-[#FFE600] border border-black px-1.5">
             ESC
           </span>
-        </Link>
+        </LogOutButton>
       </div>
     </div>
   )

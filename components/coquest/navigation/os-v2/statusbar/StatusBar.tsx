@@ -87,7 +87,7 @@ export default function StatusBar({
             type="button"
             onClick={onOpenNavigation}
             aria-label="Open navigation"
-            className="grid size-10 shrink-0 place-items-center border-[3px] border-black bg-[#FFD84D] shadow-[2.5px_2.5px_0_0_#000] transition-transform duration-150 active:translate-x-[2px] active:translate-y-[2px] active:shadow-none md:hidden"
+            className="grid min-h-[44px] min-w-[44px] size-11 shrink-0 place-items-center border-[3px] border-black bg-[#FFD84D] shadow-[2.5px_2.5px_0_0_#000] transition-transform duration-150 active:translate-x-[2px] active:translate-y-[2px] active:shadow-none md:hidden"
           >
             <Menu className="size-5 text-black" strokeWidth={3} />
           </button>

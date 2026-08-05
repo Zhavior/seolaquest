@@ -98,23 +98,6 @@ export default function CoQuestShell({
         mobileOpen={mobileOpen}
         onCloseMobile={closeMobile}
         sidebar={<SidebarNavigation mobile onNavigate={closeMobile} />}
-        header={
-          <div className="flex items-center gap-3 py-2">
-            <button
-              type="button"
-              onClick={openMobile}
-              aria-label="Open navigation"
-              aria-controls={MOBILE_NAV_ID}
-              aria-expanded={mobileOpen}
-              className="grid size-9 shrink-0 place-items-center border-3 border-black bg-[#FFE600] shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none"
-            >
-              <Menu className="size-5 text-black" strokeWidth={3} />
-            </button>
-            {/* Short brand mark — this bar is inside the `md:hidden` mobile header,
-                so the desktop sidebar's full "SEO la Quest" never competes with it. */}
-            <span className="text-xs font-black uppercase tracking-[0.2em]">SEOLQ</span>
-          </div>
-        }
         bottomBar={<MobileBottomNav mobileOpen={mobileOpen} onOpenNavigation={openMobile} />}
       >
         <Workspace>{children}</Workspace>
