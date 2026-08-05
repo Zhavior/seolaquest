@@ -39,19 +39,19 @@ export default function ShellHud({ user }: { user?: Partial<ShellUser> }) {
         <Link
           href="/app/runs"
           title={`${openQuests} signals waiting for action`}
-          className="flex items-center gap-1 border-2 border-black bg-[#FF5722] text-white px-1.5 py-0.5 text-[9px] font-black uppercase shadow-[1px_1px_0_0_#000]"
+          className="flex items-center gap-1 border-2 border-outline bg-accent-2 text-white px-1.5 py-0.5 text-[9px] font-black uppercase shadow-brutal-sm"
         >
           <Scroll className="size-2.5 shrink-0" strokeWidth={3} />
           <span>{openQuests}</span>
         </Link>
 
-        <div className="flex items-center gap-1 border-2 border-black bg-[#06B6D4] text-white px-1.5 py-0.5 text-[9px] font-black uppercase shadow-[1px_1px_0_0_#000]">
+        <div className="flex items-center gap-1 border-2 border-outline bg-info text-white px-1.5 py-0.5 text-[9px] font-black uppercase shadow-brutal-sm">
           <Zap className="size-2.5 text-[#FFE600] animate-pulse shrink-0" strokeWidth={3} />
           <span>{currentMp}</span>
         </div>
 
-        <div className="flex items-center gap-1 border-2 border-black bg-[#FFE600] text-black px-1.5 py-0.5 text-[9px] font-black uppercase shadow-[1px_1px_0_0_#000]">
-          <Sparkles className="size-2.5 text-black shrink-0" strokeWidth={3} />
+        <div className="flex items-center gap-1 border-2 border-outline bg-accent text-on-accent px-1.5 py-0.5 text-[9px] font-black uppercase shadow-brutal-sm">
+          <Sparkles className="size-2.5 text-on-accent shrink-0" strokeWidth={3} />
           <span>L{playerLevel}</span>
         </div>
       </div>
@@ -61,7 +61,7 @@ export default function ShellHud({ user }: { user?: Partial<ShellUser> }) {
         <Link
           href="/app/runs"
           title={`${openQuests} signals waiting for action`}
-          className="flex items-center gap-1.5 border-[3px] border-black bg-[#FF5722] text-white px-3 py-1.5 shadow-[3px_3px_0_0_#000] hover:-translate-y-0.5 transition-transform"
+          className="flex items-center gap-1.5 border-[3px] border-outline bg-accent-2 text-white px-3 py-1.5 shadow-brutal-sm hover:-translate-y-0.5 transition-transform"
         >
           <Scroll className="size-3.5 shrink-0" strokeWidth={3} />
           <span className="font-mono text-[11px] font-black uppercase tracking-wider">
@@ -72,11 +72,11 @@ export default function ShellHud({ user }: { user?: Partial<ShellUser> }) {
         {/* EXP / Level Progress Bar */}
         <div
           title={`${playerXp} of ${xpRequired} XP toward level ${playerLevel + 1}`}
-          className="flex items-center gap-2 border-[3px] border-black bg-white px-3 py-1.5 shadow-[3px_3px_0_0_#000]"
+          className="flex items-center gap-2 border-[3px] border-outline bg-card px-3 py-1.5 shadow-brutal-sm"
         >
           <div className="flex items-center gap-1">
             <Sparkles className="size-3.5 text-[#F59E0B]" strokeWidth={3} />
-            <span className="border-2 border-black bg-[#FFE600] px-1.5 py-0.2 font-mono text-[9px] font-black uppercase text-black">
+            <span className="border-2 border-outline bg-accent px-1.5 py-0.2 font-mono text-[9px] font-black uppercase text-on-accent">
               LVL {playerLevel}
             </span>
           </div>
@@ -84,13 +84,13 @@ export default function ShellHud({ user }: { user?: Partial<ShellUser> }) {
             {Array.from({ length: 8 }).map((_, i) => (
               <span
                 key={i}
-                className={`inline-block h-3 w-1.5 border border-black ${
-                  i < activeXpSegments ? 'bg-[#FFE600]' : 'bg-zinc-200'
+                className={`inline-block h-3 w-1.5 border border-outline ${
+                  i < activeXpSegments ? 'bg-accent' : 'bg-inset'
                 }`}
               />
             ))}
           </div>
-          <span className="font-mono text-[10px] font-black uppercase tracking-wider text-black">
+          <span className="font-mono text-[10px] font-black uppercase tracking-wider text-ink">
             XP {playerXp.toLocaleString()}/{xpRequired.toLocaleString()}
           </span>
         </div>
@@ -98,30 +98,30 @@ export default function ShellHud({ user }: { user?: Partial<ShellUser> }) {
         {/* MP / Mana Vault Meter */}
         <div
           title={`${currentMp} scan credits left — each scan costs 1 MP`}
-          className="flex items-center gap-2 border-[3px] border-black bg-white px-3 py-1.5 shadow-[3px_3px_0_0_#000]"
+          className="flex items-center gap-2 border-[3px] border-outline bg-card px-3 py-1.5 shadow-brutal-sm"
         >
           <Zap aria-hidden="true" className="size-3.5 shrink-0 text-[#06B6D4] animate-pulse" strokeWidth={3} />
           <div className="flex items-center gap-0.5">
             {Array.from({ length: 8 }).map((_, i) => (
               <span
                 key={i}
-                className={`inline-block h-3 w-1.5 border border-black ${
-                  i < activeManaSegments ? 'bg-[#06B6D4]' : 'bg-zinc-200'
+                className={`inline-block h-3 w-1.5 border border-outline ${
+                  i < activeManaSegments ? 'bg-info' : 'bg-inset'
                 }`}
               />
             ))}
           </div>
-          <span className="font-mono text-[10px] font-black uppercase tracking-wider text-black">
+          <span className="font-mono text-[10px] font-black uppercase tracking-wider text-ink">
             {currentMp}/{maxMp} MP
           </span>
         </div>
 
         {/* User Name Badge */}
-        <div className="hidden lg:flex items-center gap-2 border-[3px] border-black bg-white px-3 py-1.5 shadow-[3px_3px_0_0_#000]">
-          <div className="grid size-6 shrink-0 place-items-center border-2 border-black bg-[#FFD84D]">
-            <User aria-hidden="true" className="size-3.5 text-black" strokeWidth={3} />
+        <div className="hidden lg:flex items-center gap-2 border-[3px] border-outline bg-card px-3 py-1.5 shadow-brutal-sm">
+          <div className="grid size-6 shrink-0 place-items-center border-2 border-outline bg-highlight-strong">
+            <User aria-hidden="true" className="size-3.5 text-on-accent" strokeWidth={3} />
           </div>
-          <span className="max-w-[8rem] truncate font-mono text-[11px] font-black uppercase tracking-wider text-black">
+          <span className="max-w-[8rem] truncate font-mono text-[11px] font-black uppercase tracking-wider text-ink">
             {userName}
           </span>
         </div>

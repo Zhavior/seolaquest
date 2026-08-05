@@ -23,12 +23,11 @@ import {
   PanelLeftOpen,
   Menu,
   X,
-  Sun,
-  Moon,
   type LucideIcon,
 } from 'lucide-react';
 
 import LogOutButton from '@/components/auth/LogOutButton';
+import { ThemeToggle } from '@/components/theme/ThemeToggle';
 import { sfx } from '@/lib/sfx';
 
 export interface AppLayoutProps {
@@ -59,33 +58,6 @@ export function AppLayout({ children, user }: AppLayoutProps) {
   const pathname = usePathname();
   const [sfxEnabled, setSfxEnabled] = useState(true);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [isGreyMode, setIsGreyMode] = useState(() => {
-    if (typeof window !== 'undefined') {
-      return localStorage.getItem('coquest_theme') === 'grey'
-    }
-    return false
-  })
-
-  useEffect(() => {
-    if (isGreyMode) {
-      document.documentElement.classList.add('grey-mode')
-      document.body?.classList.add('grey-mode')
-    }
-  }, [isGreyMode])
-
-  const toggleThemeMode = () => {
-    const nextMode = !isGreyMode
-    setIsGreyMode(nextMode)
-    if (nextMode) {
-      document.documentElement.classList.add('grey-mode')
-      document.body?.classList.add('grey-mode')
-      localStorage.setItem('coquest_theme', 'grey')
-    } else {
-      document.documentElement.classList.remove('grey-mode')
-      document.body?.classList.remove('grey-mode')
-      localStorage.setItem('coquest_theme', 'parchment')
-    }
-  }
 
   const [collapsed, setCollapsed] = useState(() => {
     if (typeof window === 'undefined') return false
@@ -136,15 +108,15 @@ export function AppLayout({ children, user }: AppLayoutProps) {
     {
       title: "TACTICAL COMMAND",
       items: [
-        { label: "LIVING HQ", path: "/dashboard", altPath: "/app", icon: LayoutDashboard, color: "bg-[#A3E635]", hotkey: "B" },
-        { label: "QUEST BOARD", path: "/signals", altPath: "/app/runs", icon: Scroll, color: "bg-[#FFE600]", badge: "12", hotkey: "S" },
-        { label: "QUEST LOG", path: "/keywords", altPath: "/app/keywords", icon: Swords, color: "bg-[#FF5722] text-white", badge: "0/3", hotkey: "Q" },
+        { label: "LIVING HQ", path: "/dashboard", altPath: "/app", icon: LayoutDashboard, color: "bg-success", hotkey: "B" },
+        { label: "QUEST BOARD", path: "/signals", altPath: "/app/runs", icon: Scroll, color: "bg-accent", badge: "12", hotkey: "S" },
+        { label: "QUEST LOG", path: "/keywords", altPath: "/app/keywords", icon: Swords, color: "bg-accent-2 text-white", badge: "0/3", hotkey: "Q" },
       ],
     },
     {
       title: "GUILD & OPERATIONS",
       items: [
-        { label: "GUILD HALL", path: "/guild", altPath: "/app/guild", icon: Shield, color: "bg-[#06B6D4] text-white", hotkey: "G" },
+        { label: "GUILD HALL", path: "/guild", altPath: "/app/guild", icon: Shield, color: "bg-info text-white", hotkey: "G" },
         { label: "CAMPAIGN BROADCAST", path: "/deliveries", altPath: "/app/deliveries", icon: Radio, color: "bg-[#38BDF8]", hotkey: "C" },
       ],
     },
@@ -161,7 +133,7 @@ export function AppLayout({ children, user }: AppLayoutProps) {
   const allNavItems = navSections.flatMap((s) => s.items);
 
   return (
-    <div className="min-h-screen bg-[#FDFBF7] text-black flex flex-col font-black relative select-none selection:bg-[#FFE600] selection:text-black">
+    <div className="min-h-screen bg-surface text-ink flex flex-col font-black relative select-none selection:bg-accent selection:text-on-accent">
       
       {/* Authentic Parchment / Commander's Paper Overlay */}
       <div 
@@ -173,7 +145,7 @@ export function AppLayout({ children, user }: AppLayoutProps) {
       />
 
       {/* 1. TOP UNIVERSAL HUD */}
-      <header className="sticky top-0 inset-x-0 z-50 w-full max-w-full border-b-4 border-black bg-white px-3 sm:px-4 py-2 shadow-[0px_4px_0px_0px_rgba(0,0,0,1)] flex items-center justify-between pt-safe">
+      <header className="sticky top-0 inset-x-0 z-50 w-full max-w-full border-b-4 border-outline bg-card px-3 sm:px-4 py-2 shadow-[0px_4px_0px_0px_rgba(0,0,0,1)] flex items-center justify-between pt-safe">
         
         {/* Left: Brand, Toggle & Adventurer Identity */}
         <div className="flex items-center gap-2.5 sm:gap-4">
@@ -181,9 +153,9 @@ export function AppLayout({ children, user }: AppLayoutProps) {
             type="button"
             onClick={() => setMobileOpen(true)}
             aria-label="Open navigation"
-            className="grid min-h-[44px] min-w-[44px] size-11 shrink-0 place-items-center border-3 border-black bg-[#FFE600] shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none md:hidden"
+            className="grid min-h-[44px] min-w-[44px] size-11 shrink-0 place-items-center border-3 border-outline bg-accent shadow-brutal-sm active:translate-x-[1px] active:translate-y-[1px] active:shadow-none md:hidden"
           >
-            <Menu className="size-5 text-black" strokeWidth={3} />
+            <Menu className="size-5 text-on-accent" strokeWidth={3} />
           </button>
 
           <button
@@ -191,28 +163,28 @@ export function AppLayout({ children, user }: AppLayoutProps) {
             onClick={toggleCollapsed}
             title={collapsed ? "Expand Sidebar (Cmd+B)" : "Collapse Sidebar (Cmd+B)"}
             aria-label={collapsed ? "Expand navigation" : "Collapse navigation"}
-            className="hidden md:grid size-10 shrink-0 place-items-center border-3 border-black bg-[#FFE600] shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[4.5px_4.5px_0px_0px_rgba(0,0,0,1)] active:translate-x-0 active:translate-y-0 active:shadow-none transition-all"
+            className="hidden md:grid size-10 shrink-0 place-items-center border-3 border-outline bg-accent shadow-brutal-sm hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-brutal active:translate-x-0 active:translate-y-0 active:shadow-none transition-all"
           >
             {collapsed ? (
-              <PanelLeftOpen className="size-5 text-black" strokeWidth={3} />
+              <PanelLeftOpen className="size-5 text-ink" strokeWidth={3} />
             ) : (
-              <PanelLeftClose className="size-5 text-black" strokeWidth={3} />
+              <PanelLeftClose className="size-5 text-ink" strokeWidth={3} />
             )}
           </button>
 
           <Link
             href="/dashboard"
-            className="font-black text-lg sm:text-xl md:text-2xl tracking-[0.14em] uppercase border-3 border-black bg-[#FFE600] px-2.5 sm:px-3.5 py-1 min-h-[44px] flex items-center shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:bg-[#FFD600] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[4.5px_4.5px_0px_0px_rgba(0,0,0,1)] active:translate-x-0 active:translate-y-0 active:shadow-none transition-all gap-1.5"
+            className="font-black text-lg sm:text-xl md:text-2xl tracking-[0.14em] uppercase border-3 border-outline bg-accent px-2.5 sm:px-3.5 py-1 min-h-[44px] flex items-center shadow-brutal-sm hover:bg-highlight-strong hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-brutal active:translate-x-0 active:translate-y-0 active:shadow-none transition-all gap-1.5"
           >
             <span>COQUEST</span>
           </Link>
 
-          <div className="hidden sm:flex items-center gap-2 border-3 border-black bg-white px-3 py-1 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]">
-            <div className="grid size-6 place-items-center border-2 border-black bg-[#FFE600]">
-              <User className="size-3.5 shrink-0 text-black" strokeWidth={3} />
+          <div className="hidden sm:flex items-center gap-2 border-3 border-outline bg-card px-3 py-1 shadow-brutal-sm">
+            <div className="grid size-6 place-items-center border-2 border-outline bg-accent">
+              <User className="size-3.5 shrink-0 text-on-accent" strokeWidth={3} />
             </div>
-            <span className="font-black text-xs uppercase tracking-wider text-black">{userName}</span>
-            <span className="bg-black text-[#FFE600] text-[10px] font-black px-2 py-0.5 tracking-widest uppercase border border-black -rotate-1">
+            <span className="font-black text-xs uppercase tracking-wider text-ink">{userName}</span>
+            <span className="bg-black text-[#FFE600] text-[10px] font-black px-2 py-0.5 tracking-widest uppercase border border-outline -rotate-1">
               LVL {userLevel}
             </span>
           </div>
@@ -226,19 +198,19 @@ export function AppLayout({ children, user }: AppLayoutProps) {
             <Link
               href="/app/runs"
               title="12 Active Quests"
-              className="flex items-center gap-1 border-2 border-black bg-[#FF5722] text-white px-2 min-h-[38px] text-[10px] font-black uppercase shadow-[1.5px_1.5px_0_0_#000]"
+              className="flex items-center gap-1 border-2 border-outline bg-accent-2 text-white px-2 min-h-[38px] text-[10px] font-black uppercase shadow-brutal-sm"
             >
               <Scroll className="size-3.5" strokeWidth={3} />
               <span>12</span>
             </Link>
 
-            <div className="flex items-center gap-1 border-2 border-black bg-[#06B6D4] text-white px-2 min-h-[38px] text-[10px] font-black uppercase shadow-[1.5px_1.5px_0_0_#000]">
+            <div className="flex items-center gap-1 border-2 border-outline bg-info text-white px-2 min-h-[38px] text-[10px] font-black uppercase shadow-brutal-sm">
               <Zap className="size-3.5 text-[#FFE600] animate-pulse" strokeWidth={3} />
               <span>{currentMp}</span>
             </div>
 
-            <div className="flex items-center gap-1 border-2 border-black bg-[#FFE600] text-black px-2 min-h-[38px] text-[10px] font-black uppercase shadow-[1.5px_1.5px_0_0_#000]">
-              <Sparkles className="size-3.5 text-black" strokeWidth={3} />
+            <div className="flex items-center gap-1 border-2 border-outline bg-accent text-on-accent px-2 min-h-[38px] text-[10px] font-black uppercase shadow-brutal-sm">
+              <Sparkles className="size-3.5 text-on-accent" strokeWidth={3} />
               <span>L{userLevel}</span>
             </div>
           </div>
@@ -250,7 +222,7 @@ export function AppLayout({ children, user }: AppLayoutProps) {
             <Link
               href="/app/runs"
               title="View Active Quests"
-              className="flex items-center gap-1.5 border-[3px] border-black bg-[#FF5722] text-white px-3 py-1.5 shadow-[3px_3px_0_0_#000] hover:-translate-y-0.5 transition-transform"
+              className="flex items-center gap-1.5 border-[3px] border-outline bg-accent-2 text-white px-3 py-1.5 shadow-brutal-sm hover:-translate-y-0.5 transition-transform"
             >
               <Scroll className="size-3.5 shrink-0" strokeWidth={3} />
               <span className="font-mono text-[11px] font-black uppercase tracking-wider">
@@ -259,10 +231,10 @@ export function AppLayout({ children, user }: AppLayoutProps) {
             </Link>
 
             {/* EXP Progress Meter */}
-            <div className="flex items-center gap-2 border-[3px] border-black bg-white px-3 py-1.5 shadow-[3px_3px_0_0_#000]">
+            <div className="flex items-center gap-2 border-[3px] border-outline bg-card px-3 py-1.5 shadow-brutal-sm">
               <div className="flex items-center gap-1">
                 <Sparkles className="size-3.5 text-[#F59E0B]" strokeWidth={3} />
-                <span className="border-2 border-black bg-[#FFE600] px-1.5 py-0.2 font-mono text-[9px] font-black uppercase text-black">
+                <span className="border-2 border-outline bg-accent px-1.5 py-0.2 font-mono text-[9px] font-black uppercase text-on-accent">
                   LVL {userLevel}
                 </span>
               </div>
@@ -270,71 +242,58 @@ export function AppLayout({ children, user }: AppLayoutProps) {
                 {Array.from({ length: 8 }).map((_, i) => (
                   <span
                     key={i}
-                    className={`inline-block h-3 w-1.5 border border-black ${
-                      i < 5 ? 'bg-[#FFE600]' : 'bg-zinc-200'
+                    className={`inline-block h-3 w-1.5 border border-outline ${
+                      i < 5 ? 'bg-accent' : 'bg-inset'
                     }`}
                   />
                 ))}
               </div>
-              <span className="font-mono text-[10px] font-black uppercase tracking-wider text-black">
+              <span className="font-mono text-[10px] font-black uppercase tracking-wider text-ink">
                 XP 1,250
               </span>
             </div>
 
             {/* MP Mana Meter */}
-            <div className="flex items-center gap-2 border-[3px] border-black bg-white px-3 py-1.5 shadow-[3px_3px_0_0_#000]">
+            <div className="flex items-center gap-2 border-[3px] border-outline bg-card px-3 py-1.5 shadow-brutal-sm">
               <Zap aria-hidden="true" className="size-3.5 shrink-0 text-[#06B6D4] animate-pulse" strokeWidth={3} />
               <div className="flex items-center gap-0.5">
                 {Array.from({ length: 8 }).map((_, i) => (
                   <span
                     key={i}
-                    className={`inline-block h-3 w-1.5 border border-black ${
-                      i < 6 ? 'bg-[#06B6D4]' : 'bg-zinc-200'
+                    className={`inline-block h-3 w-1.5 border border-outline ${
+                      i < 6 ? 'bg-info' : 'bg-inset'
                     }`}
                   />
                 ))}
               </div>
-              <span className="font-mono text-[10px] font-black uppercase tracking-wider text-black">
+              <span className="font-mono text-[10px] font-black uppercase tracking-wider text-ink">
                 {currentMp}/{maxMp} MP
               </span>
             </div>
           </div>
 
-          {/* Sun / Moon Theme Mode Toggle Button */}
-          <button
-            type="button"
-            onClick={toggleThemeMode}
-            aria-label={isGreyMode ? 'Switch to Parchment Light Mode' : 'Switch to Slate Grey Dark Mode'}
-            title={isGreyMode ? 'Parchment Light Mode' : 'Slate Grey Dark Mode'}
-            className="min-h-[44px] min-w-[44px] size-11 grid place-items-center border-[3px] border-black bg-white shadow-[2.5px_2.5px_0_0_#000] transition-transform duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[1px_1px_0_0_#000] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none shrink-0"
-          >
-            {isGreyMode ? (
-              <Sun className="size-4 sm:size-5 text-amber-500 fill-amber-400" strokeWidth={3} />
-            ) : (
-              <Moon className="size-4 sm:size-5 text-black fill-black/20" strokeWidth={3} />
-            )}
-          </button>
+          <ThemeToggle className="shrink-0 border-[3px]" />
 
           {/* SFX Toggle */}
           <button
             type="button"
             onClick={() => setSfxEnabled((v) => !v)}
             aria-label={sfxEnabled ? 'Mute sound effects' : 'Unmute sound effects'}
-            className="hidden min-h-[44px] min-w-[44px] size-11 place-items-center border-[3px] border-black bg-white shadow-[3px_3px_0_0_#000] transition-transform duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[1px_1px_0_0_#000] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none xl:grid shrink-0"
+            className="hidden min-h-[44px] min-w-[44px] size-11 place-items-center border-[3px] border-outline bg-card shadow-brutal-sm transition-transform duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-brutal-sm active:translate-x-[2px] active:translate-y-[2px] active:shadow-none xl:grid shrink-0"
           >
             {sfxEnabled ? (
-              <Volume2 className="size-5 text-black" strokeWidth={3} />
+              <Volume2 className="size-5 text-ink" strokeWidth={3} />
             ) : (
-              <VolumeX className="size-5 text-black" strokeWidth={3} />
+              <VolumeX className="size-5 text-ink" strokeWidth={3} />
             )}
           </button>
 
           {/* Recharge CTA — lands on the Founder offer, not the top of the page */}
           <Link
             href="/billing?offer=founder"
-            className="inline-flex min-h-[44px] shrink-0 items-center gap-1 border-[3px] border-black bg-[#ff5a36] px-2.5 sm:px-4 py-1 font-black uppercase tracking-wider text-black shadow-[2.5px_2.5px_0_0_#000] transition-transform duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[1px_1px_0_0_#000] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none text-xs sm:text-sm"
+            className="inline-flex min-h-[44px] shrink-0 items-center gap-1 border-[3px] border-outline bg-accent-2 px-2.5 sm:px-4 py-1 font-black uppercase tracking-wider text-on-accent shadow-brutal-sm transition-transform duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-brutal-sm active:translate-x-[2px] active:translate-y-[2px] active:shadow-none text-xs sm:text-sm"
           >
-            <Zap aria-hidden="true" className="size-4 text-black" strokeWidth={3} />
+            <Zap aria-hidden="true" className="size-4 text-on-accent" strokeWidth={3} />
             <span className="hidden sm:inline">Recharge</span>
             <span className="sm:hidden text-xs font-black">+</span>
           </Link>
@@ -348,7 +307,7 @@ export function AppLayout({ children, user }: AppLayoutProps) {
         <aside
           aria-label="Sidebar navigation"
           role="navigation"
-          className={`border-r-4 border-black bg-white p-4 hidden md:flex flex-col justify-between shadow-[4px_0px_0px_0px_rgba(0,0,0,1)] sticky top-[61px] h-[calc(100vh-61px)] overflow-y-auto shrink-0 transition-[width,padding] duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+          className={`border-r-4 border-outline bg-card p-4 hidden md:flex flex-col justify-between shadow-[4px_0px_0px_0px_rgba(0,0,0,1)] sticky top-[61px] h-[calc(100vh-61px)] overflow-y-auto shrink-0 transition-[width,padding] duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${
             collapsed ? "w-20 px-2" : "w-72 px-4"
           }`}
         >
@@ -361,9 +320,9 @@ export function AppLayout({ children, user }: AppLayoutProps) {
                   onClick={toggleCollapsed}
                   title="Expand Sidebar (Cmd+B)"
                   aria-label="Expand navigation"
-                  className="grid size-10 place-items-center border-3 border-black bg-[#FFE600] shadow-[3px_3px_0_0_#000] hover:-translate-y-0.5 transition-all mb-2"
+                  className="grid size-10 place-items-center border-3 border-outline bg-accent shadow-brutal-sm hover:-translate-y-0.5 transition-all mb-2"
                 >
-                  <PanelLeftOpen className="size-5 text-black" strokeWidth={3} />
+                  <PanelLeftOpen className="size-5 text-on-accent" strokeWidth={3} />
                 </button>
 
                 <div className="w-full h-0.5 bg-black/20 my-1" />
@@ -384,21 +343,21 @@ export function AppLayout({ children, user }: AppLayoutProps) {
                       onFocus={() => sfx.playSidebarHover()}
                       onClick={() => sfx.playCoinDrop()}
                       title={`${item.label} (${item.hotkey || ''})`}
-                      className={`relative group grid size-11 place-items-center border-3 border-black transition-all ${
+                      className={`relative group grid size-11 place-items-center border-3 border-outline transition-all ${
                         isActive
-                          ? `${item.color} shadow-[3.5px_3.5px_0_0_#000] -translate-x-0.5 -translate-y-0.5`
-                          : "bg-white hover:bg-[#FAF7F2] hover:shadow-[3px_3px_0_0_#000] hover:-translate-x-0.5 hover:-translate-y-0.5"
+                          ? `${item.color} shadow-brutal -translate-x-0.5 -translate-y-0.5`
+                          : "bg-card hover:bg-canvas hover:shadow-brutal-sm hover:-translate-x-0.5 hover:-translate-y-0.5"
                       }`}
                     >
-                      <Icon className="size-5 text-black" strokeWidth={3} />
+                      <Icon className="size-5 text-on-accent" strokeWidth={3} />
                       {item.badge && (
-                        <span className="absolute -top-1 -right-1 bg-[#FF5722] text-white text-[8px] font-black border border-black px-1 rounded-full">
+                        <span className="absolute -top-1 -right-1 bg-accent-2 text-white text-[8px] font-black border border-outline px-1 rounded-full">
                           {item.badge}
                         </span>
                       )}
 
                       {/* Tooltip on Hover */}
-                      <div className="absolute left-full ml-3 px-3 py-1.5 bg-black text-[#FFE600] border-2 border-white text-xs font-black uppercase tracking-wider whitespace-nowrap opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity z-50 shadow-[4px_4px_0_0_#000]">
+                      <div className="absolute left-full ml-3 px-3 py-1.5 bg-black text-[#FFE600] border-2 border-white text-xs font-black uppercase tracking-wider whitespace-nowrap opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity z-50 shadow-brutal">
                         {item.label}
                       </div>
                     </Link>
@@ -408,7 +367,7 @@ export function AppLayout({ children, user }: AppLayoutProps) {
 
               {/* Bottom Collapsed Icon Actions */}
               <div className="flex flex-col items-center gap-3 w-full">
-                <div className="grid size-10 place-items-center border-2 border-black bg-[#A3E635] shadow-[2px_2px_0_0_#000]" title="3/3 Party Agents Active">
+                <div className="grid size-10 place-items-center border-2 border-outline bg-success shadow-brutal-sm" title="3/3 Party Agents Active">
                   <span className="h-2.5 w-2.5 rounded-full bg-black border border-white animate-pulse" />
                 </div>
 
@@ -417,7 +376,7 @@ export function AppLayout({ children, user }: AppLayoutProps) {
                   aria-label="Log out"
                   onMouseEnter={() => sfx.playSidebarHover()}
                   onBeforeSignOut={() => sfx.playCoinDrop()}
-                  className="grid size-11 place-items-center border-3 border-black bg-[#FF5722] text-white shadow-[3px_3px_0_0_#000] hover:-translate-y-0.5 transition-all"
+                  className="grid size-11 place-items-center border-3 border-outline bg-accent-2 text-white shadow-brutal-sm hover:-translate-y-0.5 transition-all"
                 >
                   <LogOut className="size-5" strokeWidth={3} />
                 </LogOutButton>
@@ -427,8 +386,8 @@ export function AppLayout({ children, user }: AppLayoutProps) {
             /* FULL EXPANDED MODE */
             <div className="flex flex-col justify-between h-full">
               <div className="space-y-5">
-                <div className="flex items-center justify-between border-b-3 border-black pb-2.5 mb-1">
-                  <span className="text-xs font-black text-black uppercase tracking-[0.2em]">
+                <div className="flex items-center justify-between border-b-3 border-outline pb-2.5 mb-1">
+                  <span className="text-xs font-black text-ink uppercase tracking-[0.2em]">
                     Command Compass
                   </span>
                   <button
@@ -438,7 +397,7 @@ export function AppLayout({ children, user }: AppLayoutProps) {
                     onFocus={() => sfx.playSidebarHover()}
                     title="Collapse Sidebar (Cmd+B)"
                     aria-label="Collapse navigation"
-                    className="text-[9px] font-black uppercase bg-[#FFE600] text-black border-2 border-black px-1.5 py-0.5 shadow-[1.5px_1.5px_0_0_#000] -rotate-2 hover:bg-[#FFD600]"
+                    className="text-[9px] font-black uppercase bg-accent text-on-accent border-2 border-outline px-1.5 py-0.5 shadow-brutal-sm -rotate-2 hover:bg-highlight-strong"
                   >
                     ONLINE ⚔️
                   </button>
@@ -446,8 +405,8 @@ export function AppLayout({ children, user }: AppLayoutProps) {
 
                 {navSections.map((section) => (
                   <div key={section.title} className="space-y-2">
-                    <div className="text-[10px] font-black text-slate-500 uppercase tracking-[0.18em] px-1 flex items-center gap-1.5">
-                      <Sparkles className="size-3 text-black" />
+                    <div className="text-[10px] font-black text-ink-muted uppercase tracking-[0.18em] px-1 flex items-center gap-1.5">
+                      <Sparkles className="size-3 text-ink" />
                       <span>{section.title}</span>
                     </div>
                     <div className="space-y-2">
@@ -465,10 +424,10 @@ export function AppLayout({ children, user }: AppLayoutProps) {
                             onMouseEnter={() => sfx.playSidebarHover()}
                             onFocus={() => sfx.playSidebarHover()}
                             onClick={() => sfx.playCoinDrop()}
-                            className={`flex items-center justify-between p-3 border-3 border-black font-black text-xs uppercase tracking-wider transition-all ${
+                            className={`flex items-center justify-between p-3 border-3 border-outline font-black text-xs uppercase tracking-wider transition-all ${
                               isActive
-                                ? `${item.color} shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] -translate-x-0.5 -translate-y-0.5`
-                                : "bg-white hover:bg-[#FAF7F2] hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-0.5 hover:-translate-y-0.5"
+                                ? `${item.color} shadow-brutal -translate-x-0.5 -translate-y-0.5`
+                                : "bg-card hover:bg-canvas hover:shadow-brutal-sm hover:-translate-x-0.5 hover:-translate-y-0.5"
                             }`}
                           >
                             <div className="flex items-center gap-3">
@@ -477,12 +436,12 @@ export function AppLayout({ children, user }: AppLayoutProps) {
                             </div>
                             <div className="flex items-center gap-1.5">
                               {item.badge && (
-                                <span className="bg-[#FF5722] text-white text-[9px] font-black border-2 border-black px-1.5 py-0.5 shadow-[1.5px_1.5px_0px_0px_rgba(0,0,0,1)]">
+                                <span className="bg-accent-2 text-white text-[9px] font-black border-2 border-outline px-1.5 py-0.5 shadow-brutal-sm">
                                   {item.badge}
                                 </span>
                               )}
                               {item.hotkey && !item.badge && (
-                                <span className="font-mono text-[9px] font-black text-black bg-slate-100 border border-black px-1 py-0.2">
+                                <span className="font-mono text-[9px] font-black text-ink bg-inset border border-outline px-1 py-0.2">
                                   {item.hotkey}
                                 </span>
                               )}
@@ -497,29 +456,29 @@ export function AppLayout({ children, user }: AppLayoutProps) {
 
               {/* Bottom Sidebar Mini-Party Status Card & Log Out */}
               <div className="mt-5 space-y-3 pt-2">
-                <div className="border-3 border-black bg-[#A3E635] p-3.5 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] relative overflow-hidden">
+                <div className="border-3 border-outline bg-success p-3.5 shadow-brutal relative overflow-hidden">
                   <div className="flex items-center justify-between text-xs font-black uppercase mb-1.5 tracking-wider">
                     <div className="flex items-center gap-2">
                       <span className="h-2.5 w-2.5 rounded-full bg-black border border-white animate-pulse" />
                       <span>Party Status</span>
                     </div>
-                    <span className="text-black bg-[#FFE600] border-2 border-black px-1.5 text-[9px] font-black uppercase -rotate-1">
+                    <span className="text-on-accent bg-accent border-2 border-outline px-1.5 text-[9px] font-black uppercase -rotate-1">
                       3/3 Active
                     </span>
                   </div>
-                  <div className="text-[11px] font-bold text-black leading-snug">
+                  <div className="text-[11px] font-bold text-ink leading-snug">
                     Scouts currently patrolling r/SaaS and Twitter streams.
                   </div>
                 </div>
 
                 <LogOutButton
-                  className="w-full flex items-center justify-between p-3 border-3 border-black font-black text-xs uppercase tracking-wider bg-[#FF5722] text-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] active:translate-x-0 active:translate-y-0 active:shadow-none transition-all"
+                  className="w-full flex items-center justify-between p-3 border-3 border-outline font-black text-xs uppercase tracking-wider bg-accent-2 text-white shadow-brutal hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-brutal-lg active:translate-x-0 active:translate-y-0 active:shadow-none transition-all"
                 >
                   <div className="flex items-center gap-2.5">
                     <LogOut className="size-4 shrink-0" strokeWidth={3} />
                     <span>LOG OUT</span>
                   </div>
-                  <span className="font-mono text-[9px] font-black text-black bg-[#FFE600] border border-black px-1.5">
+                  <span className="font-mono text-[9px] font-black text-on-accent bg-accent border border-outline px-1.5">
                     ESC
                   </span>
                 </LogOutButton>
@@ -541,25 +500,25 @@ export function AppLayout({ children, user }: AppLayoutProps) {
             <aside
               aria-label="Mobile navigation"
               role="navigation"
-              className="absolute inset-y-0 left-0 h-dvh w-[88vw] max-w-[320px] border-r-4 border-black bg-white shadow-[10px_0_0_rgba(0,0,0,0.3)] p-4 flex flex-col justify-between overflow-y-auto animate-in slide-in-from-left duration-250"
+              className="absolute inset-y-0 left-0 h-dvh w-[88vw] max-w-[320px] border-r-4 border-outline bg-card shadow-[10px_0_0_rgba(0,0,0,0.3)] p-4 flex flex-col justify-between overflow-y-auto animate-in slide-in-from-left duration-250"
             >
               <div className="space-y-5">
-                <div className="flex items-center justify-between border-b-3 border-black pb-2.5 mb-2">
+                <div className="flex items-center justify-between border-b-3 border-outline pb-2.5 mb-2">
                   <span className="font-black text-xs uppercase tracking-widest">Navigation</span>
                   <button
                     type="button"
                     onClick={() => setMobileOpen(false)}
                     aria-label="Close navigation"
-                    className="grid size-8 place-items-center border-2 border-black bg-[#FFE600] shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-[1px] active:translate-y-[1px]"
+                    className="grid size-8 place-items-center border-2 border-outline bg-accent shadow-brutal-sm active:translate-x-[1px] active:translate-y-[1px]"
                   >
-                    <X className="size-4 text-black" strokeWidth={3} />
+                    <X className="size-4 text-on-accent" strokeWidth={3} />
                   </button>
                 </div>
 
                 {navSections.map((section) => (
                   <div key={section.title} className="space-y-2">
-                    <div className="text-[10px] font-black text-slate-500 uppercase tracking-[0.18em] px-1 flex items-center gap-1.5">
-                      <Sparkles className="size-3 text-black" />
+                    <div className="text-[10px] font-black text-ink-muted uppercase tracking-[0.18em] px-1 flex items-center gap-1.5">
+                      <Sparkles className="size-3 text-ink" />
                       <span>{section.title}</span>
                     </div>
                     <div className="space-y-2">
@@ -575,10 +534,10 @@ export function AppLayout({ children, user }: AppLayoutProps) {
                             key={item.path}
                             href={item.path}
                             onClick={() => setMobileOpen(false)}
-                            className={`flex items-center justify-between p-3 border-3 border-black font-black text-xs uppercase tracking-wider transition-all ${
+                            className={`flex items-center justify-between p-3 border-3 border-outline font-black text-xs uppercase tracking-wider transition-all ${
                               isActive
-                                ? `${item.color} shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] -translate-x-0.5 -translate-y-0.5`
-                                : "bg-white hover:bg-[#FAF7F2] hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]"
+                                ? `${item.color} shadow-brutal -translate-x-0.5 -translate-y-0.5`
+                                : "bg-card hover:bg-canvas hover:shadow-brutal-sm"
                             }`}
                           >
                             <div className="flex items-center gap-3">
@@ -586,7 +545,7 @@ export function AppLayout({ children, user }: AppLayoutProps) {
                               <span>{item.label}</span>
                             </div>
                             {item.badge && (
-                              <span className="bg-[#FF5722] text-white text-[9px] font-black border-2 border-black px-1.5 py-0.5">
+                              <span className="bg-accent-2 text-white text-[9px] font-black border-2 border-outline px-1.5 py-0.5">
                                 {item.badge}
                               </span>
                             )}
@@ -601,7 +560,7 @@ export function AppLayout({ children, user }: AppLayoutProps) {
               <div className="mt-5 space-y-3 pt-2">
                 <LogOutButton
                   onBeforeSignOut={() => setMobileOpen(false)}
-                  className="w-full flex items-center justify-between p-3 border-3 border-black font-black text-xs uppercase tracking-wider bg-[#FF5722] text-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-x-0 active:translate-y-0 transition-all"
+                  className="w-full flex items-center justify-between p-3 border-3 border-outline font-black text-xs uppercase tracking-wider bg-accent-2 text-white shadow-brutal active:translate-x-0 active:translate-y-0 transition-all"
                 >
                   <div className="flex items-center gap-2.5">
                     <LogOut className="size-4 shrink-0" strokeWidth={3} />
@@ -621,13 +580,13 @@ export function AppLayout({ children, user }: AppLayoutProps) {
         {/* STICKY MOBILE QUICK-NAV BAR (< md) */}
         <nav
           aria-label="Mobile quick navigation"
-          className="fixed bottom-0 inset-x-0 w-full max-w-full z-50 bg-white border-t-4 border-black px-2 py-1 shadow-[0_-4px_0_0_rgba(0,0,0,1)] flex items-center justify-around md:hidden pb-safe"
+          className="fixed bottom-0 inset-x-0 w-full max-w-full z-50 bg-card border-t-4 border-outline px-2 py-1 shadow-[0_-4px_0_0_rgba(0,0,0,1)] flex items-center justify-around md:hidden pb-safe"
         >
           <Link
             href="/dashboard"
             onClick={() => sfx.playCoinDrop()}
             className={`flex flex-col items-center justify-center min-h-[44px] min-w-[56px] px-2 py-1 font-black text-[9px] uppercase tracking-wider transition-colors ${
-              pathname === "/dashboard" || pathname === "/app" ? "text-black bg-[#FFE600] border-2 border-black -rotate-1 shadow-[1.5px_1.5px_0_0_#000]" : "text-zinc-600 hover:text-black"
+              pathname === "/dashboard" || pathname === "/app" ? "text-on-accent bg-accent border-2 border-outline -rotate-1 shadow-brutal-sm" : "text-ink-muted hover:text-on-accent"
             }`}
           >
             <LayoutDashboard className="size-4 shrink-0" strokeWidth={3} />
@@ -638,7 +597,7 @@ export function AppLayout({ children, user }: AppLayoutProps) {
             href="/signals"
             onClick={() => sfx.playCoinDrop()}
             className={`flex flex-col items-center justify-center min-h-[44px] min-w-[56px] px-2 py-1 font-black text-[9px] uppercase tracking-wider transition-colors ${
-              pathname === "/signals" || pathname === "/app/runs" ? "text-black bg-[#FFE600] border-2 border-black -rotate-1 shadow-[1.5px_1.5px_0_0_#000]" : "text-zinc-600 hover:text-black"
+              pathname === "/signals" || pathname === "/app/runs" ? "text-on-accent bg-accent border-2 border-outline -rotate-1 shadow-brutal-sm" : "text-ink-muted hover:text-on-accent"
             }`}
           >
             <Scroll className="size-4 shrink-0" strokeWidth={3} />
@@ -649,7 +608,7 @@ export function AppLayout({ children, user }: AppLayoutProps) {
             href="/guild"
             onClick={() => sfx.playCoinDrop()}
             className={`flex flex-col items-center justify-center min-h-[44px] min-w-[56px] px-2 py-1 font-black text-[9px] uppercase tracking-wider transition-colors ${
-              pathname === "/guild" || pathname === "/app/guild" ? "text-black bg-[#FFE600] border-2 border-black -rotate-1 shadow-[1.5px_1.5px_0_0_#000]" : "text-zinc-600 hover:text-black"
+              pathname === "/guild" || pathname === "/app/guild" ? "text-on-accent bg-accent border-2 border-outline -rotate-1 shadow-brutal-sm" : "text-ink-muted hover:text-on-accent"
             }`}
           >
             <Shield className="size-4 shrink-0" strokeWidth={3} />
@@ -660,7 +619,7 @@ export function AppLayout({ children, user }: AppLayoutProps) {
             href="/settings"
             onClick={() => sfx.playCoinDrop()}
             className={`flex flex-col items-center justify-center min-h-[44px] min-w-[56px] px-2 py-1 font-black text-[9px] uppercase tracking-wider transition-colors ${
-              pathname === "/settings" || pathname === "/app/settings" ? "text-black bg-[#FFE600] border-2 border-black -rotate-1 shadow-[1.5px_1.5px_0_0_#000]" : "text-zinc-600 hover:text-black"
+              pathname === "/settings" || pathname === "/app/settings" ? "text-on-accent bg-accent border-2 border-outline -rotate-1 shadow-brutal-sm" : "text-ink-muted hover:text-on-accent"
             }`}
           >
             <Settings className="size-4 shrink-0" strokeWidth={3} />
@@ -671,9 +630,9 @@ export function AppLayout({ children, user }: AppLayoutProps) {
             type="button"
             onClick={() => setMobileOpen(true)}
             aria-label="Open full menu"
-            className="flex flex-col items-center justify-center min-h-[44px] min-w-[56px] px-2 py-1 font-black text-[9px] uppercase tracking-wider text-zinc-600 hover:text-black"
+            className="flex flex-col items-center justify-center min-h-[44px] min-w-[56px] px-2 py-1 font-black text-[9px] uppercase tracking-wider text-ink-muted hover:text-ink"
           >
-            <Menu className="size-4 shrink-0 text-black" strokeWidth={3} />
+            <Menu className="size-4 shrink-0 text-ink" strokeWidth={3} />
             <span>MENU</span>
           </button>
         </nav>

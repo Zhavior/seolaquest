@@ -27,7 +27,7 @@ function FounderSeatCounter({ founderPass }: { founderPass: FounderPassView }) {
   const filled = founderPass.limit > 0 ? Math.round((taken / founderPass.limit) * 100) : 100
 
   return (
-    <div className="mt-4 border-3 border-black bg-white p-3">
+    <div className="mt-4 border-3 border-outline bg-card p-3">
       <p
         // Announced politely: the number moves as other people buy, and a live
         // seat count should never interrupt what the hunter is reading.
@@ -39,12 +39,12 @@ function FounderSeatCounter({ founderPass }: { founderPass: FounderPassView }) {
           : `${founderPass.remaining} / ${founderPass.limit} founder seats remaining`}
       </p>
 
-      <div className="mt-2 h-3 w-full border-2 border-black bg-[#F4F0EA]">
-        <div className="h-full bg-[#FF5722]" style={{ width: `${Math.min(100, filled)}%` }} />
+      <div className="mt-2 h-3 w-full border-2 border-outline bg-canvas">
+        <div className="h-full bg-accent-2" style={{ width: `${Math.min(100, filled)}%` }} />
       </div>
 
       {founderPass.reserved > 0 && !founderPass.soldOut ? (
-        <p className="mt-2 text-[10px] font-bold uppercase text-zinc-600">
+        <p className="mt-2 text-[10px] font-bold uppercase text-ink-muted">
           {founderPass.reserved} held by checkouts in progress
         </p>
       ) : null}
@@ -72,11 +72,11 @@ export function PlanGrid({
 
   return (
     <section aria-labelledby="billing-plans-heading" className="mt-12">
-      <div className="border-b-4 border-black pb-4">
+      <div className="border-b-4 border-outline pb-4">
         <h2 id="billing-plans-heading" className="text-3xl font-black uppercase md:text-4xl">
           Canonical plan catalog
         </h2>
-        <p className="mt-2 max-w-3xl text-sm font-bold text-zinc-600">
+        <p className="mt-2 max-w-3xl text-sm font-bold text-ink-muted">
           Names, prices, included credits, and sellability come from the server catalog. Disabled plans grant nothing.
         </p>
       </div>
@@ -104,13 +104,13 @@ export function PlanGrid({
               key={plan.code}
               id={`plan-${plan.code.toLowerCase()}`}
               ref={highlighted ? highlightRef : undefined}
-              className={`flex min-h-[390px] flex-col border-4 border-black p-6 shadow-[7px_7px_0_0_#000] ${
-                isFounder ? 'bg-[#FDE68A]' : isPaidOffer ? 'bg-[#A3E635]' : plan.enabled ? 'bg-white' : 'bg-zinc-200'
+              className={`flex min-h-[390px] flex-col border-4 border-outline p-6 shadow-brutal-lg ${
+                isFounder ? 'bg-highlight-strong' : isPaidOffer ? 'bg-success' : plan.enabled ? 'bg-card' : 'bg-inset'
               } ${highlighted ? 'outline-4 outline-offset-4 outline-[#FF5722]' : ''}`}
             >
               <div className="flex items-start justify-between gap-3">
                 <div>
-                  <p className="text-xs font-black uppercase text-zinc-600">{plan.availabilityLabel}</p>
+                  <p className="text-xs font-black uppercase text-ink-muted">{plan.availabilityLabel}</p>
                   <h3 className="mt-1 text-2xl font-black uppercase">{plan.name}</h3>
                 </div>
                 {isFounder ? <Crown aria-hidden className="h-7 w-7" /> : isPaidOffer
@@ -121,19 +121,19 @@ export function PlanGrid({
               </div>
 
               {isFounder ? (
-                <p className="mt-3 inline-flex w-fit items-center gap-2 border-3 border-black bg-black px-2 py-1 text-[10px] font-black uppercase tracking-wider text-[#FDE68A]">
+                <p className="mt-3 inline-flex w-fit items-center gap-2 border-3 border-outline bg-black px-2 py-1 text-[10px] font-black uppercase tracking-wider text-[#FDE68A]">
                   <Crown aria-hidden className="h-3.5 w-3.5" /> Founder — price locked for life
                 </p>
               ) : null}
 
               <p className="mt-5 text-4xl font-black">{plan.priceLabel}</p>
-              <p className="mt-2 text-xs font-black uppercase text-zinc-700">
+              <p className="mt-2 text-xs font-black uppercase text-ink-muted">
                 {plan.scanLimit.toLocaleString()} credits per qualifying paid invoice
               </p>
 
               {isFounder ? <FounderSeatCounter founderPass={founderPass} /> : null}
 
-              <ul className="mt-6 flex-1 space-y-3 border-3 border-black bg-white p-4 text-sm font-bold">
+              <ul className="mt-6 flex-1 space-y-3 border-3 border-outline bg-card p-4 text-sm font-bold">
                 {plan.benefits.map((benefit) => (
                   <li key={benefit} className="flex gap-2">
                     <CheckCircle2 aria-hidden className="h-5 w-5 shrink-0" />
@@ -146,7 +146,7 @@ export function PlanGrid({
                 type="button"
                 onClick={() => onSelectPlan(plan.code)}
                 disabled={disabled}
-                className="mt-6 min-h-12 w-full border-4 border-black bg-black px-4 py-3 text-sm font-black uppercase text-white shadow-[4px_4px_0_0_#06B6D4] disabled:cursor-not-allowed disabled:bg-zinc-600 disabled:text-zinc-300 disabled:shadow-none"
+                className="mt-6 min-h-12 w-full border-4 border-outline bg-black px-4 py-3 text-sm font-black uppercase text-white shadow-[4px_4px_0_0_#06B6D4] disabled:cursor-not-allowed disabled:bg-zinc-600 disabled:text-ink-muted disabled:shadow-none"
               >
                 {isCurrent
                   ? 'Current plan'
@@ -164,7 +164,7 @@ export function PlanGrid({
               </button>
 
               {isFounder ? (
-                <ul className="mt-4 space-y-2 border-3 border-black bg-white p-3 text-[11px] font-bold leading-snug">
+                <ul className="mt-4 space-y-2 border-3 border-outline bg-card p-3 text-[11px] font-bold leading-snug">
                   {founderPass.lockTerms.map((term) => (
                     <li key={term}>{term}</li>
                   ))}

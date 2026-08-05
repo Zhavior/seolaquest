@@ -15,10 +15,10 @@ export const metadata: Metadata = {
 
 export default function ScanRunsPage() {
   return (
-    <QuestPageShell watermark={<Scroll className="h-[650px] w-[650px] text-black" />}>
+    <QuestPageShell watermark={<Scroll className="h-[650px] w-[650px] text-ink" />}>
       <QuestTicker label="Quest board and battle scans. Measured run ledger.">
-        <Sparkles className="h-5 w-5 text-black" /> 📜 QUEST BOARD &amp; BATTLE SCANS{' '}
-        <Sparkles className="h-5 w-5 text-black" /> 🛡️ MEASURED RUN LEDGER
+        <Sparkles className="h-5 w-5 text-ink" /> 📜 QUEST BOARD &amp; BATTLE SCANS{' '}
+        <Sparkles className="h-5 w-5 text-ink" /> 🛡️ MEASURED RUN LEDGER
       </QuestTicker>
 
       <QuestPageHeader

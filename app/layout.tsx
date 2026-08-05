@@ -3,6 +3,8 @@ import { ClerkProvider } from '@clerk/nextjs'
 import type { Metadata, Viewport } from 'next'
 import { Inter } from 'next/font/google'
 import { SkipLink } from '@/components/SkipLink'
+import { ThemeProvider } from '@/components/theme/ThemeProvider'
+import { ThemeScript } from '@/components/theme/ThemeScript'
 
 const inter = Inter({
   subsets: ['latin'],
@@ -36,33 +38,30 @@ export default function RootLayout({
     <html lang="en" className={inter.variable} suppressHydrationWarning>
       <head>
         {/*
-          Runs synchronously while the browser parses the document, so the saved
-          colour mode and mute setting are on `<html>` before the first paint.
-          Without it, grey-mode users saw a full page of parchment flash to slate
-          on every single load: the server cannot read localStorage, so it always
-          emitted the light theme and the correction only landed after hydration.
+          Both scripts run synchronously while the browser parses the document,
+          so the saved settings are on `<html>` before the first paint. Without
+          them the server (which cannot read localStorage) always emits the
+          default, and the correction only lands after hydration — a full page
+          of parchment flashing to slate on every load.
         */}
+        <ThemeScript />
         <script
           dangerouslySetInnerHTML={{
-            __html: `try{var d=document.documentElement;if(localStorage.getItem('coquest_theme')==='grey'){d.classList.add('grey-mode')}if(localStorage.getItem('coquest_sfx_enabled')==='false'){d.classList.add('sfx-muted')}}catch(e){}`,
+            __html: `try{if(localStorage.getItem('coquest_sfx_enabled')==='false'){document.documentElement.classList.add('sfx-muted')}}catch(e){}`,
           }}
         />
       </head>
-      <body
-        className="font-sans min-h-screen text-black antialiased"
-        style={{
-          backgroundColor: '#F4F0EA',
-          backgroundImage: `
-            repeating-linear-gradient(transparent, transparent 39px, rgba(0,0,0,0.06) 39px, rgba(0,0,0,0.06) 40px)
-          `
-        }}
-      >
-        <ClerkProvider>
-          <SkipLink />
-          <div id="main-content" tabIndex={-1}>
-            {children}
-          </div>
-        </ClerkProvider>
+      {/* Canvas colour and texture come from `@layer base` in globals.css — an
+          inline style here would outrank every theme. */}
+      <body className="font-sans min-h-screen bg-canvas text-ink antialiased">
+        <ThemeProvider>
+          <ClerkProvider>
+            <SkipLink />
+            <div id="main-content" tabIndex={-1}>
+              {children}
+            </div>
+          </ClerkProvider>
+        </ThemeProvider>
       </body>
     </html>
   )

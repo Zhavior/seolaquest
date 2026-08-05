@@ -21,6 +21,7 @@ vi.mock('next/link', () => ({
   ),
 }))
 
+import { ThemeProvider } from '@/components/theme/ThemeProvider'
 import AppLayout from './AppLayout'
 
 describe('Neobrutalist AppLayout Component', () => {
@@ -28,7 +29,8 @@ describe('Neobrutalist AppLayout Component', () => {
     render(
       <AppLayout>
         <div>Content Shell</div>
-      </AppLayout>
+      </AppLayout>,
+      { wrapper: ThemeProvider },
     )
 
     // Brand and Identity
@@ -53,7 +55,8 @@ describe('Neobrutalist AppLayout Component', () => {
     render(
       <AppLayout>
         <div>Content Shell</div>
-      </AppLayout>
+      </AppLayout>,
+      { wrapper: ThemeProvider },
     )
 
     // Sidebar items
@@ -82,7 +85,8 @@ describe('Neobrutalist AppLayout Component', () => {
     render(
       <AppLayout>
         <div>Content Shell</div>
-      </AppLayout>
+      </AppLayout>,
+      { wrapper: ThemeProvider },
     )
 
     const logOut = screen.getByRole('button', { name: /LOG OUT/i })
@@ -97,7 +101,8 @@ describe('Neobrutalist AppLayout Component', () => {
     render(
       <AppLayout>
         <div data-testid="page-child">Test Page Content</div>
-      </AppLayout>
+      </AppLayout>,
+      { wrapper: ThemeProvider },
     )
 
     expect(screen.getByTestId('page-child')).toBeInTheDocument()

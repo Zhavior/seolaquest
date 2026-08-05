@@ -4,12 +4,12 @@ export function ProfileInventory({ inventorySlots }: { inventorySlots: Inventory
   const occupiedSlotCount = inventorySlots.filter((slot) => slot.rarity !== 'EMPTY').length
 
   return (
-    <div className="bg-white border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] p-6">
-      <div className="flex justify-between items-center mb-6 border-b-4 border-black pb-4">
+    <div className="bg-card border-4 border-outline shadow-brutal-lg p-6">
+      <div className="flex justify-between items-center mb-6 border-b-4 border-outline pb-4">
         <h2 className="text-2xl font-black uppercase tracking-tight flex items-center gap-2">
           🎒 HUNTER STASH
         </h2>
-        <span className="text-xs font-black bg-slate-200 border-2 border-black px-2 py-0.5 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+        <span className="text-xs font-black bg-inset border-2 border-outline px-2 py-0.5 shadow-brutal-sm">
           {occupiedSlotCount} / {inventorySlots.length} SLOTS
         </span>
       </div>
@@ -23,14 +23,14 @@ export function ProfileInventory({ inventorySlots }: { inventorySlots: Inventory
               key={slot.id}
               className={`relative flex h-28 flex-col justify-between border-4 p-2 ${
                 slot.rarity !== 'EMPTY' 
-                  ? `${slot.color} border-black`
-                  : 'bg-slate-100 border-dashed border-slate-300'
+                  ? `${slot.color} border-outline`
+                  : 'bg-inset border-dashed border-hairline'
               }`}
             >
               {slot.rarity !== 'EMPTY' ? (
                 <>
                   <div className="flex items-start">
-                    <span className="text-xs font-black bg-black text-white px-1 border border-black">
+                    <span className="text-xs font-black bg-black text-white px-1 border border-outline">
                       {slot.rarity}
                     </span>
                   </div>
@@ -45,7 +45,7 @@ export function ProfileInventory({ inventorySlots }: { inventorySlots: Inventory
                   <span className="sr-only">{slot.stat}</span>
                 </>
               ) : (
-                <div className="h-full flex items-center justify-center text-slate-400 font-bold text-xs">
+                <div className="h-full flex items-center justify-center text-ink-muted font-bold text-xs">
                   LOCKED
                 </div>
               )}

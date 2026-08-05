@@ -20,7 +20,7 @@ export interface QuestSectionHeadingProps {
 
 /**
  * Panel header: icon tile + title + subtitle, separated by the signature
- * `border-b-4 border-black` rule. Used by The Armory, Activity Heatmap,
+ * `border-b-4 border-outline` rule. Used by The Armory, Activity Heatmap,
  * the guild ledger, achievements and the keyword monitor form.
  */
 export function QuestSectionHeading({
@@ -36,7 +36,7 @@ export function QuestSectionHeading({
   return (
     <div
       className={clsx(
-        'mb-6 flex flex-col gap-3 border-b-4 border-black pb-4 sm:flex-row sm:items-center sm:justify-between',
+        'mb-6 flex flex-col gap-3 border-b-4 border-outline pb-4 sm:flex-row sm:items-center sm:justify-between',
         className
       )}
     >
@@ -59,7 +59,7 @@ export function QuestSectionHeading({
             {title}
           </Heading>
           {subtitle ? (
-            <p className="mt-1 text-xs font-bold uppercase text-gray-500">{subtitle}</p>
+            <p className="mt-1 text-xs font-bold uppercase text-ink-muted">{subtitle}</p>
           ) : null}
         </div>
       </div>

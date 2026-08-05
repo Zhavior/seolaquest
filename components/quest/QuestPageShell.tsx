@@ -38,7 +38,7 @@ export function QuestPageShell({
   return (
     // `overflow-x-clip` (not `hidden`) contains the watermark without turning
     // this into a scroll container, which would break sticky descendants.
-    <div className={clsx('relative min-h-[100dvh] w-full max-w-full overflow-x-clip bg-[#FDFBF7] select-none', className)}>
+    <div className={clsx('relative min-h-[100dvh] w-full max-w-full overflow-x-clip bg-surface select-none', className)}>
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 z-0 opacity-[0.07]"

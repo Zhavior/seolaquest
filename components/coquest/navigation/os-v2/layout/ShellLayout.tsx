@@ -20,7 +20,7 @@ export default function ShellLayout({
     // and a scroll-container ancestor is what `position: sticky` resolves
     // against — so the row on the second line below would silently stop the
     // sidebar rail from pinning. `clip` contains overflow without that effect.
-    <div className="min-h-screen max-w-full overflow-x-clip bg-[#FAF7F2] text-black flex flex-col font-sans selection:bg-yellow-400 selection:text-black">
+    <div className="min-h-screen max-w-full overflow-x-clip bg-canvas text-ink flex flex-col font-sans selection:bg-yellow-400 selection:text-ink">
       {statusBar}
       <div className="flex flex-1 min-w-0 max-w-full overflow-x-clip">
         {sidebar}

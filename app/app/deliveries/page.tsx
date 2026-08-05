@@ -19,10 +19,10 @@ export const metadata: Metadata = {
 
 export default function DeliveriesPage() {
   return (
-    <QuestPageShell watermark={<Radio className="h-[650px] w-[650px] text-black" />}>
+    <QuestPageShell watermark={<Radio className="h-[650px] w-[650px] text-ink" />}>
       <QuestTicker label="Campaign broadcast. CRM dispatch ledger.">
-        <Sparkles className="h-5 w-5 text-black" /> 📡 CAMPAIGN BROADCAST{' '}
-        <Sparkles className="h-5 w-5 text-black" /> 🛡️ CRM DISPATCH LEDGER
+        <Sparkles className="h-5 w-5 text-ink" /> 📡 CAMPAIGN BROADCAST{' '}
+        <Sparkles className="h-5 w-5 text-ink" /> 🛡️ CRM DISPATCH LEDGER
       </QuestTicker>
 
       <QuestPageHeader

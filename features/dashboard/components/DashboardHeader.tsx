@@ -31,7 +31,7 @@ export function DashboardHeader({
       variants={item}
       initial="hidden"
       animate="show"
-      className="relative border-4 border-black bg-white shadow-[4px_4px_0_0_#000] sm:shadow-[6px_6px_0_0_#000] md:shadow-[8px_8px_0_0_#000] flex flex-col lg:flex-row lg:items-stretch overflow-hidden select-none w-full min-w-0"
+      className="relative border-4 border-outline bg-card shadow-brutal sm:shadow-brutal-lg md:shadow-brutal-lg flex flex-col lg:flex-row lg:items-stretch overflow-hidden select-none w-full min-w-0"
     >
       {/* Noise Texture Overlay */}
       <div
@@ -42,31 +42,31 @@ export function DashboardHeader({
       />
 
       {/* Main Campaign Hero Content */}
-      <div className="relative z-10 min-w-0 flex-1 p-4 sm:p-6 md:p-8 bg-[#FFF8D9] border-b-4 lg:border-b-0 lg:border-r-4 border-black flex flex-col justify-between">
+      <div className="relative z-10 min-w-0 flex-1 p-4 sm:p-6 md:p-8 bg-highlight border-b-4 lg:border-b-0 lg:border-r-4 border-outline flex flex-col justify-between">
         <div>
           <div className="flex flex-wrap items-center gap-2 sm:gap-2.5">
-            <span className="bg-black px-2.5 py-1 text-[10px] sm:text-xs font-black uppercase tracking-widest text-[#FFE600] border-2 border-black shadow-[2px_2px_0_0_#000] -rotate-1 flex items-center gap-1.5">
+            <span className="bg-black px-2.5 py-1 text-[10px] sm:text-xs font-black uppercase tracking-widest text-[#FFE600] border-2 border-outline shadow-brutal-sm -rotate-1 flex items-center gap-1.5">
               <Swords className="size-3.5" />
               <span>BATTLE COMMAND</span>
             </span>
-            <span className="bg-white px-2.5 py-1 text-[10px] sm:text-xs font-black uppercase tracking-widest text-black border-2 border-black shadow-[2px_2px_0_0_#000] flex items-center gap-1.5">
+            <span className="bg-card px-2.5 py-1 text-[10px] sm:text-xs font-black uppercase tracking-widest text-ink border-2 border-outline shadow-brutal-sm flex items-center gap-1.5">
               <Trophy className="size-3.5 text-[#F59E0B]" />
               <span>DAILY CAMPAIGN</span>
             </span>
-            <span className="bg-[#A3E635] text-black px-2 py-1 text-[10px] font-black uppercase border-2 border-black shadow-[2px_2px_0_0_#000] rotate-1 hidden sm:inline-block">
+            <span className="bg-success text-on-accent px-2 py-1 text-[10px] font-black uppercase border-2 border-outline shadow-brutal-sm rotate-1 hidden sm:inline-block">
               ACTIVE STREAK ⚡
             </span>
           </div>
 
-          <p className="mt-4 sm:mt-5 text-[10px] sm:text-[11px] font-black uppercase tracking-[0.2em] text-black/60">
+          <p className="mt-4 sm:mt-5 text-[10px] sm:text-[11px] font-black uppercase tracking-[0.2em] text-ink/60">
             Current Primary Objective
           </p>
 
-          <h2 className="mt-1 text-2xl sm:text-3xl md:text-5xl font-black uppercase tracking-tight text-black leading-none break-words">
+          <h2 className="mt-1 text-2xl sm:text-3xl md:text-5xl font-black uppercase tracking-tight text-ink leading-none break-words">
             Continue Today&apos;s Campaign
           </h2>
 
-          <p className="mt-3 sm:mt-3.5 max-w-2xl text-xs sm:text-sm md:text-base font-bold leading-relaxed text-black/80">
+          <p className="mt-3 sm:mt-3.5 max-w-2xl text-xs sm:text-sm md:text-base font-bold leading-relaxed text-ink/80">
             Sweep your high-priority Reddit and Twitter streams, execute active bounties, and claim verified source matches to push your level forward today.
           </p>
         </div>
@@ -77,7 +77,7 @@ export function DashboardHeader({
             href="/app/runs"
             onMouseEnter={() => sfx.playSidebarHover()}
             onClick={() => sfx.playCoinDrop()}
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 border-3 border-black bg-[#FFE600] px-4 py-2.5 text-xs md:text-sm font-black uppercase tracking-wider text-black shadow-[3px_3px_0_0_#000] sm:shadow-[4px_4px_0_0_#000] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[6px_6px_0_0_#000] active:translate-x-0 active:translate-y-0 transition-all"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 border-3 border-outline bg-accent px-4 py-2.5 text-xs md:text-sm font-black uppercase tracking-wider text-on-accent shadow-brutal-sm sm:shadow-brutal hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-brutal-lg active:translate-x-0 active:translate-y-0 transition-all"
           >
             <Swords className="size-4 shrink-0" strokeWidth={3} />
             <span>EXECUTE QUESTS</span>
@@ -89,7 +89,7 @@ export function DashboardHeader({
               type="button"
               onClick={runMockScanner}
               onMouseEnter={() => sfx.playSidebarHover()}
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 border-3 border-black bg-[#06B6D4] px-4 py-2.5 text-xs md:text-sm font-black uppercase tracking-wider text-white shadow-[3px_3px_0_0_#000] sm:shadow-[4px_4px_0_0_#000] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[6px_6px_0_0_#000] active:translate-x-0 active:translate-y-0 transition-all"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 border-3 border-outline bg-info px-4 py-2.5 text-xs md:text-sm font-black uppercase tracking-wider text-white shadow-brutal-sm sm:shadow-brutal hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-brutal-lg active:translate-x-0 active:translate-y-0 transition-all"
             >
               <Radar className="size-4 shrink-0 animate-spin" style={{ animationDuration: '4s' }} strokeWidth={3} />
               <span>RADAR SCAN</span>
@@ -108,7 +108,7 @@ export function DashboardHeader({
               }
             }}
             onMouseEnter={() => sfx.playSidebarHover()}
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 border-3 border-black bg-white px-4 py-2.5 text-xs md:text-sm font-black uppercase tracking-wider text-black shadow-[3px_3px_0_0_#000] sm:shadow-[4px_4px_0_0_#000] hover:bg-[#FAF7F2] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[6px_6px_0_0_#000] active:translate-x-0 active:translate-y-0 transition-all"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 border-3 border-outline bg-card px-4 py-2.5 text-xs md:text-sm font-black uppercase tracking-wider text-ink shadow-brutal-sm sm:shadow-brutal hover:bg-canvas hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-brutal-lg active:translate-x-0 active:translate-y-0 transition-all"
           >
             <Scroll className="size-4 shrink-0" strokeWidth={3} />
             <span>BATTLE SIGNALS</span>
@@ -117,10 +117,10 @@ export function DashboardHeader({
       </div>
 
       {/* Upgraded Quest Counter & Capacity Box */}
-      <div className="relative z-10 w-full lg:w-[380px] bg-[#FF5722] p-4 sm:p-6 text-white flex flex-col justify-between border-t-4 lg:border-t-0 border-black shadow-[inset_0_0_30px_rgba(0,0,0,0.15)] min-w-0">
+      <div className="relative z-10 w-full lg:w-[380px] bg-accent-2 p-4 sm:p-6 text-white flex flex-col justify-between border-t-4 lg:border-t-0 border-outline shadow-[inset_0_0_30px_rgba(0,0,0,0.15)] min-w-0">
         <div>
           <div className="flex items-center justify-between gap-2">
-            <span className="bg-black text-[#FFE600] text-[10px] font-black uppercase tracking-widest px-2.5 py-1 border-2 border-white shadow-[2px_2px_0_0_#000] truncate">
+            <span className="bg-black text-[#FFE600] text-[10px] font-black uppercase tracking-widest px-2.5 py-1 border-2 border-white shadow-brutal-sm truncate">
               ACTIVE QUEST TRACKER
             </span>
             <Scroll className="size-5 sm:size-6 text-[#FFE600] animate-bounce shrink-0" style={{ animationDuration: '3s' }} />
@@ -131,7 +131,7 @@ export function DashboardHeader({
               Quests Available Today
             </p>
             <div className="mt-1 flex items-baseline gap-2 flex-wrap">
-              <span className="text-4xl sm:text-5xl font-black text-[#FFE600] tracking-tight leading-none drop-shadow-[3px_3px_0_#000]">
+              <span className="text-4xl sm:text-5xl font-black text-[#FFE600] tracking-tight leading-none drop-shadow-brutal-sm">
                 {remainingQuests}
               </span>
               <span className="text-base sm:text-lg font-black uppercase text-white/90">
@@ -141,7 +141,7 @@ export function DashboardHeader({
           </div>
 
           {/* Upgraded Quest Capacity Progress Bar */}
-          <div className="mt-3.5 sm:mt-4 border-3 border-black bg-black p-2 sm:p-2.5 shadow-[3px_3px_0_0_#000]">
+          <div className="mt-3.5 sm:mt-4 border-3 border-outline bg-black p-2 sm:p-2.5 shadow-brutal-sm">
             <div className="flex items-center justify-between text-[10px] sm:text-[11px] font-black uppercase text-[#FFE600] mb-1.5">
               <span>Quest Ready Capacity</span>
               <span>{questProgressPercent}%</span>
@@ -157,11 +157,11 @@ export function DashboardHeader({
 
         {/* High-Octane Quest Perks */}
         <div className="mt-4 sm:mt-5 space-y-2 text-[11px] sm:text-xs font-black uppercase text-white">
-          <div className="flex items-center gap-2 border-2 border-black bg-black/40 px-2.5 py-1.5 sm:px-3 sm:py-2 shadow-[2px_2px_0_0_#000]">
+          <div className="flex items-center gap-2 border-2 border-outline bg-black/40 px-2.5 py-1.5 sm:px-3 sm:py-2 shadow-brutal-sm">
             <CheckCircle2 className="size-3.5 sm:size-4 text-[#A3E635] shrink-0" />
             <span className="truncate">High-Priority Buyer Signals Armed</span>
           </div>
-          <div className="flex items-center gap-2 border-2 border-black bg-black/40 px-2.5 py-1.5 sm:px-3 sm:py-2 shadow-[2px_2px_0_0_#000]">
+          <div className="flex items-center gap-2 border-2 border-outline bg-black/40 px-2.5 py-1.5 sm:px-3 sm:py-2 shadow-brutal-sm">
             <Sparkles className="size-3.5 sm:size-4 text-[#FFE600] shrink-0" />
             <span className="truncate">+240 XP Bonus on Complete Claim</span>
           </div>

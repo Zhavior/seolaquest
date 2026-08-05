@@ -26,7 +26,7 @@ const PADDING_CLASS = {
 /**
  * The Guild Hall card/panel surface: hard black border, flat offset shadow,
  * square corners. Use this instead of re-typing
- * `border-4 border-black bg-white p-6 shadow-[6px_6px_0_0_#000]`.
+ * `border-4 border-outline bg-card p-6 shadow-brutal-lg`.
  *
  * For `motion.*` elements or `<Link>`/`<form>`, use `questSurface()` from
  * `./questStyles` to get the same class string.

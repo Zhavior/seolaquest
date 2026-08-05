@@ -23,7 +23,7 @@ const GRAIN_TEXTURE_DATA_URI = `data:image/svg+xml,%3Csvg viewBox='0 0 200 200' 
 
 export default function LandingPage() {
   return (
-    <div className="relative min-h-screen overflow-x-hidden bg-[#f4ebd8] font-sans text-black selection:bg-[#ff4500] selection:text-white">
+    <div className="relative min-h-screen overflow-x-hidden bg-canvas font-sans text-ink selection:bg-[#ff4500] selection:text-white">
       <div
         className="pointer-events-none absolute inset-0 z-0 opacity-100"
         style={{

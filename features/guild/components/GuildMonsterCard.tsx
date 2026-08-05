@@ -34,9 +34,9 @@ export function GuildMonsterCard({ item, userLevel, monstersDefeated }: GuildMon
               Processed leads
             </h2>
           </div>
-          <Database aria-hidden="true" className="h-20 w-20 shrink-0 text-black opacity-20 md:h-28 md:w-28" />
+          <Database aria-hidden="true" className="h-20 w-20 shrink-0 text-ink opacity-20 md:h-28 md:w-28" />
         </div>
-        <p className="text-7xl font-black leading-none text-[#FFE600] drop-shadow-[8px_8px_0_rgba(0,0,0,1)] md:text-[130px]" style={{ WebkitTextStroke: '3px black' }}>
+        <p className="text-7xl font-black leading-none text-[#FFE600] drop-shadow-brutal-lg md:text-[130px]" style={{ WebkitTextStroke: '3px black' }}>
           {monstersDefeated.toLocaleString()}
         </p>
         <p className={questSurface({ shadow: 'md', className: 'p-4 text-sm font-black uppercase' })}>

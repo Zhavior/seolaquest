@@ -7,7 +7,7 @@ export function HQNav() {
 
   return (
     <nav
-      className="fixed inset-x-0 top-0 z-50 border-b-4 border-black"
+      className="fixed inset-x-0 top-0 z-50 border-b-4 border-outline"
       style={{ background: '#f4ebd8' }}
       aria-label="HypeQuest navigation"
     >
@@ -16,7 +16,7 @@ export function HQNav() {
         {/* Logo mark */}
         <Link href="/" className="flex items-center gap-3 shrink-0 group">
           <span
-            className="flex h-9 w-9 items-center justify-center border-4 border-black font-black text-black text-lg leading-none shadow-[4px_4px_0_0_#000] group-hover:translate-x-[-2px] group-hover:translate-y-[-2px] transition-transform"
+            className="flex h-9 w-9 items-center justify-center border-4 border-outline font-black text-ink text-lg leading-none shadow-brutal group-hover:translate-x-[-2px] group-hover:translate-y-[-2px] transition-transform"
             style={{ background: '#FFE600' }}
             aria-hidden="true"
           >
@@ -24,7 +24,7 @@ export function HQNav() {
           </span>
           <div className="hidden sm:flex flex-col">
             <span className="text-xl font-black uppercase tracking-[0.15em] leading-none">HypeQuest</span>
-            <span className="text-[9px] font-bold uppercase tracking-widest text-black/50">AI Lead Guild</span>
+            <span className="text-[9px] font-bold uppercase tracking-widest text-ink/50">AI Lead Guild</span>
           </div>
         </Link>
 
@@ -38,7 +38,7 @@ export function HQNav() {
             <a
               key={label}
               href={href}
-              className="px-4 py-2 text-sm font-black uppercase tracking-wider border-2 border-transparent hover:border-black hover:shadow-[3px_3px_0_0_#000] transition-all"
+              className="px-4 py-2 text-sm font-black uppercase tracking-wider border-2 border-transparent hover:border-outline hover:shadow-brutal-sm transition-all"
             >
               {label}
             </a>
@@ -49,19 +49,19 @@ export function HQNav() {
         <div className="flex items-center gap-3">
           <Link
             href="/sign-in"
-            className="hidden sm:inline-flex items-center px-5 py-2.5 border-3 border-black font-black uppercase tracking-widest text-sm bg-white hover:bg-zinc-100 shadow-[3px_3px_0_0_#000] hover:translate-x-[-2px] hover:translate-y-[-2px] transition-transform"
+            className="hidden sm:inline-flex items-center px-5 py-2.5 border-3 border-outline font-black uppercase tracking-widest text-sm bg-card hover:bg-inset shadow-brutal-sm hover:translate-x-[-2px] hover:translate-y-[-2px] transition-transform"
           >
             Sign In
           </Link>
           <Link
             href="/sign-up"
-            className="inline-flex items-center px-5 py-2.5 border-3 border-black font-black uppercase tracking-widest text-sm text-black shadow-[4px_4px_0_0_#000] hover:translate-x-[-2px] hover:translate-y-[-2px] active:translate-x-0 active:translate-y-0 transition-transform"
+            className="inline-flex items-center px-5 py-2.5 border-3 border-outline font-black uppercase tracking-widest text-sm text-ink shadow-brutal hover:translate-x-[-2px] hover:translate-y-[-2px] active:translate-x-0 active:translate-y-0 transition-transform"
             style={{ background: '#ff4500' }}
           >
             Join Guild
           </Link>
           <button
-            className="md:hidden p-2 border-2 border-black font-black"
+            className="md:hidden p-2 border-2 border-outline font-black"
             aria-label={open ? 'Close menu' : 'Open menu'}
             onClick={() => setOpen(!open)}
           >
@@ -72,7 +72,7 @@ export function HQNav() {
 
       {/* Mobile drawer */}
       {open && (
-        <div className="md:hidden border-t-4 border-black px-4 pb-5 pt-4 flex flex-col gap-3" style={{ background: '#f4ebd8' }}>
+        <div className="md:hidden border-t-4 border-outline px-4 pb-5 pt-4 flex flex-col gap-3" style={{ background: '#f4ebd8' }}>
           {[
             { label: 'How It Works', href: '#features' },
             { label: 'Ranking Board', href: '#leaderboard' },
@@ -83,7 +83,7 @@ export function HQNav() {
               key={label}
               href={href}
               onClick={() => setOpen(false)}
-              className="block px-4 py-3 border-2 border-black font-black uppercase tracking-wider text-sm bg-white shadow-[3px_3px_0_0_#000]"
+              className="block px-4 py-3 border-2 border-outline font-black uppercase tracking-wider text-sm bg-card shadow-brutal-sm"
             >
               {label}
             </a>

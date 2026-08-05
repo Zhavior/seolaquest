@@ -33,7 +33,7 @@ export function HQHero() {
         {/* Live badge */}
         <div className="mb-6 flex justify-center lg:justify-start">
           <span
-            className="inline-flex items-center gap-2 border-3 border-black px-4 py-1.5 text-xs font-black uppercase tracking-[0.2em] shadow-[4px_4px_0_0_#000]"
+            className="inline-flex items-center gap-2 border-3 border-outline px-4 py-1.5 text-xs font-black uppercase tracking-[0.2em] shadow-brutal"
             style={{ background: '#FFE600' }}
           >
             <span className="h-2 w-2 rounded-full bg-green-600 animate-pulse" aria-hidden="true" />
@@ -46,7 +46,7 @@ export function HQHero() {
           <div className="text-center lg:text-left">
             <h1
               id="hero-heading"
-              className="font-black uppercase leading-[0.9] tracking-tighter text-black"
+              className="font-black uppercase leading-[0.9] tracking-tighter text-ink"
               style={{ fontSize: 'clamp(3rem, 8vw, 7rem)' }}
             >
               Your AI Scouts.<br />
@@ -67,14 +67,14 @@ export function HQHero() {
               </span>
             </h1>
 
-            <p className="mt-6 text-lg sm:text-xl font-bold leading-snug max-w-xl mx-auto lg:mx-0 text-black/80">
+            <p className="mt-6 text-lg sm:text-xl font-bold leading-snug max-w-xl mx-auto lg:mx-0 text-ink/80">
               SEO la Quest deploys AI adventurers across X — hunting
               keyword-matched leads and delivering them straight to your
               War Room. Reddit and the wider web are coming soon.
             </p>
 
             <div
-              className="mt-6 border-4 border-black p-4 font-bold text-sm sm:text-base shadow-[6px_6px_0_0_#000] max-w-xl mx-auto lg:mx-0 -rotate-[0.5deg]"
+              className="mt-6 border-4 border-outline p-4 font-bold text-sm sm:text-base shadow-brutal-lg max-w-xl mx-auto lg:mx-0 -rotate-[0.5deg]"
               style={{ background: '#ffd700' }}
             >
               ⚔ You are the Guild Master. AI agents are your adventurers.
@@ -84,14 +84,14 @@ export function HQHero() {
             <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
               <Link
                 href="/sign-up"
-                className="inline-flex items-center justify-center gap-2 px-10 py-4 border-4 border-black font-black uppercase tracking-widest text-lg sm:text-xl text-black shadow-[6px_6px_0_0_#000] hover:translate-x-[-3px] hover:translate-y-[-3px] active:translate-x-0 active:translate-y-0 transition-transform"
+                className="inline-flex items-center justify-center gap-2 px-10 py-4 border-4 border-outline font-black uppercase tracking-widest text-lg sm:text-xl text-ink shadow-brutal-lg hover:translate-x-[-3px] hover:translate-y-[-3px] active:translate-x-0 active:translate-y-0 transition-transform"
                 style={{ background: '#ff4500' }}
               >
                 ⚔ Enter the Guild
               </Link>
               <a
                 href="#features"
-                className="inline-flex items-center justify-center gap-2 px-10 py-4 border-4 border-black font-black uppercase tracking-widest text-lg sm:text-xl bg-white shadow-[6px_6px_0_0_#000] hover:translate-x-[-3px] hover:translate-y-[-3px] active:translate-x-0 active:translate-y-0 transition-transform"
+                className="inline-flex items-center justify-center gap-2 px-10 py-4 border-4 border-outline font-black uppercase tracking-widest text-lg sm:text-xl bg-card shadow-brutal-lg hover:translate-x-[-3px] hover:translate-y-[-3px] active:translate-x-0 active:translate-y-0 transition-transform"
               >
                 Explore Rooms →
               </a>
@@ -102,7 +102,7 @@ export function HQHero() {
               {STATS.map(({ value, label }) => (
                 <div key={label} className="text-center lg:text-left">
                   <div className="text-2xl sm:text-3xl font-black">{value}</div>
-                  <div className="text-xs font-bold uppercase tracking-wider text-black/50">{label}</div>
+                  <div className="text-xs font-bold uppercase tracking-wider text-ink/50">{label}</div>
                 </div>
               ))}
             </div>
@@ -111,11 +111,11 @@ export function HQHero() {
           {/* Right: HQ map card */}
           <aside
             aria-label="Headquarters room map"
-            className="border-4 border-black shadow-[8px_8px_0_0_#000] overflow-hidden"
+            className="border-4 border-outline shadow-brutal-lg overflow-hidden"
             style={{ background: '#f4ebd8' }}
           >
             <div
-              className="border-b-4 border-black px-5 py-3 flex items-center gap-2"
+              className="border-b-4 border-outline px-5 py-3 flex items-center gap-2"
               style={{ background: '#FFE600' }}
             >
               <span className="font-black uppercase tracking-widest text-sm">🏰 HQ Rooms</span>
@@ -124,16 +124,16 @@ export function HQHero() {
               {ROOMS.map(({ icon, name, desc }) => (
                 <div
                   key={name}
-                  className="flex flex-col items-center justify-center gap-1 px-4 py-5 text-center border-black hover:bg-black hover:text-white transition-colors cursor-default group"
+                  className="flex flex-col items-center justify-center gap-1 px-4 py-5 text-center border-outline hover:bg-black hover:text-white transition-colors cursor-default group"
                 >
                   <span className="text-2xl" aria-hidden="true">{icon}</span>
                   <span className="font-black uppercase tracking-wide text-xs">{name}</span>
-                  <span className="text-[10px] font-bold uppercase tracking-widest text-black/50 group-hover:text-white/60">{desc}</span>
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-ink/50 group-hover:text-white/60">{desc}</span>
                 </div>
               ))}
             </div>
-            <div className="px-5 py-3 border-t-4 border-black text-center">
-              <span className="text-xs font-black uppercase tracking-widest text-black/50">
+            <div className="px-5 py-3 border-t-4 border-outline text-center">
+              <span className="text-xs font-black uppercase tracking-widest text-ink/50">
                 One Persistent Headquarters
               </span>
             </div>

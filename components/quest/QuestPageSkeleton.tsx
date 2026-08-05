@@ -21,7 +21,7 @@ export function QuestPageSkeleton({ blocks = 2, className }: QuestPageSkeletonPr
     <div
       role="status"
       aria-live="polite"
-      className={clsx('min-h-[100dvh] w-full max-w-full space-y-6 bg-[#FDFBF7] p-4 sm:p-8', className)}
+      className={clsx('min-h-[100dvh] w-full max-w-full space-y-6 bg-surface p-4 sm:p-8', className)}
     >
       <span className="sr-only">Loading</span>
       {Array.from({ length: blocks }).map((_, i) => (

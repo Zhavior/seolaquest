@@ -111,31 +111,31 @@ export function DashboardScannerModal({
         animate={{ scale: 1, opacity: 1, y: 0 }}
         exit={{ scale: 0.98, opacity: 0, y: 10 }}
         transition={{ type: 'spring', stiffness: 350, damping: 25 }}
-        className="max-h-[calc(100dvh-1rem)] sm:max-h-[calc(100dvh-2rem)] w-full max-w-4xl overflow-y-auto overscroll-contain border-4 border-black bg-[#13D7C2] shadow-[6px_6px_0_0_#000] md:shadow-[12px_12px_0_0_#000]"
+        className="max-h-[calc(100dvh-1rem)] sm:max-h-[calc(100dvh-2rem)] w-full max-w-4xl overflow-y-auto overscroll-contain border-4 border-outline bg-[#13D7C2] shadow-brutal-lg md:shadow-brutal-lg"
         role="dialog"
         aria-label="Battlestation live scan"
       >
         {/* Header Bar */}
-        <div className="relative border-b-4 border-black bg-[#13D7C2] px-4 py-3.5 md:px-5">
+        <div className="relative border-b-4 border-outline bg-[#13D7C2] px-4 py-3.5 md:px-5">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_rgba(255,255,255,0.26),_transparent_34%),linear-gradient(135deg,_rgba(10,23,33,0.12),_transparent_60%)] pointer-events-none" />
           <div className="relative flex items-center justify-between gap-3">
             <div className="flex min-w-0 items-center gap-3">
-              <div className="flex h-11 w-11 shrink-0 items-center justify-center border-3 border-black bg-white shadow-[3px_3px_0_0_#000]">
-                <Radar className="h-5 w-5 text-black animate-spin" style={{ animationDuration: '4s' }} />
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center border-3 border-outline bg-card shadow-brutal-sm">
+                <Radar className="h-5 w-5 text-ink animate-spin" style={{ animationDuration: '4s' }} />
               </div>
 
               <div className="min-w-0">
                 <div className="flex items-center gap-2">
-                  <p className="text-[10px] md:text-xs font-black uppercase tracking-[0.14em] text-black/75">
+                  <p className="text-[10px] md:text-xs font-black uppercase tracking-[0.14em] text-ink/75">
                     Battlestation Live Radar
                   </p>
                   {scanRunId && (
-                    <span className="hidden sm:inline-block bg-black text-[#FFE600] text-[9px] font-mono font-black px-1.5 py-0.5 border border-black -rotate-1">
+                    <span className="hidden sm:inline-block bg-black text-[#FFE600] text-[9px] font-mono font-black px-1.5 py-0.5 border border-outline -rotate-1">
                       RUN #{scanRunId.slice(0, 8)}
                     </span>
                   )}
                 </div>
-                <h2 className="truncate text-base font-black uppercase text-black md:text-2xl tracking-wide">
+                <h2 className="truncate text-base font-black uppercase text-ink md:text-2xl tracking-wide">
                   Tactical Scan Run
                 </h2>
               </div>
@@ -147,7 +147,7 @@ export function DashboardScannerModal({
                   type="button"
                   onClick={copyRunId}
                   title="Copy Durable Run Reference ID"
-                  className="hidden sm:flex items-center gap-1 border-3 border-black bg-white px-2.5 py-1 text-[10px] font-black uppercase text-black shadow-[2px_2px_0_0_#000] hover:bg-[#FFE600] active:translate-x-[1px] active:translate-y-[1px] transition-all"
+                  className="hidden sm:flex items-center gap-1 border-3 border-outline bg-card px-2.5 py-1 text-[10px] font-black uppercase text-ink shadow-brutal-sm hover:bg-accent active:translate-x-[1px] active:translate-y-[1px] transition-all"
                 >
                   {copied ? <Check className="size-3.5 text-green-600" /> : <Copy className="size-3.5" />}
                   <span>{copied ? 'COPIED!' : 'COPY ID'}</span>
@@ -157,7 +157,7 @@ export function DashboardScannerModal({
               <button
                 type="button"
                 onClick={close}
-                className="flex h-10 w-10 shrink-0 items-center justify-center border-3 border-black bg-white text-black shadow-[3px_3px_0_0_#000] hover:bg-[#FF5722] hover:text-white active:translate-x-[1px] active:translate-y-[1px] transition-all"
+                className="flex h-10 w-10 shrink-0 items-center justify-center border-3 border-outline bg-card text-ink shadow-brutal-sm hover:bg-accent-2 hover:text-white active:translate-x-[1px] active:translate-y-[1px] transition-all"
                 aria-label="Close scanner modal"
               >
                 <X className="h-5 w-5" strokeWidth={3} />
@@ -166,7 +166,7 @@ export function DashboardScannerModal({
           </div>
 
           {/* Live Tactial Progress Bar */}
-          <div className="mt-3 relative h-3 w-full border-2 border-black bg-black/20 overflow-hidden shadow-[2px_2px_0_0_#000]">
+          <div className="mt-3 relative h-3 w-full border-2 border-outline bg-black/20 overflow-hidden shadow-brutal-sm">
             <motion.div
               className="h-full bg-gradient-to-r from-[#FFE600] via-[#06B6D4] to-[#A3E635]"
               initial={{ width: '0%' }}
@@ -180,7 +180,7 @@ export function DashboardScannerModal({
         <div className="grid gap-4 bg-[#F4EFE2] p-4 md:grid-cols-[minmax(0,1.2fr)_300px] md:p-5">
           
           {/* Left Column: Terminal Execution Console */}
-          <div className="flex flex-col min-w-0 border-4 border-black bg-[#0C1F2E] p-4 text-[#8CF3E7] shadow-[6px_6px_0_0_#000]">
+          <div className="flex flex-col min-w-0 border-4 border-outline bg-[#0C1F2E] p-4 text-[#8CF3E7] shadow-brutal-lg">
             <div className="mb-3 flex flex-wrap items-center justify-between gap-2 border-b-2 border-[#8CF3E7]/30 pb-3 text-xs font-black uppercase tracking-[0.1em]">
               <div className="flex items-center gap-2">
                 <span className="h-2 w-2 rounded-full bg-[#8CF3E7] animate-pulse" />
@@ -241,11 +241,11 @@ export function DashboardScannerModal({
           <div className="space-y-4">
             
             {/* Scan Status Card */}
-            <div className="border-4 border-black bg-white p-4 shadow-[6px_6px_0_0_#000]">
-              <p className="text-xs font-black uppercase tracking-[0.12em] text-black/60">
+            <div className="border-4 border-outline bg-card p-4 shadow-brutal-lg">
+              <p className="text-xs font-black uppercase tracking-[0.12em] text-ink/60">
                 Scan Status
               </p>
-              <div className="mt-2 flex items-center gap-2 text-sm font-black uppercase text-black">
+              <div className="mt-2 flex items-center gap-2 text-sm font-black uppercase text-ink">
                 {scanOutcome === 'succeeded' ? (
                   <>
                     <CheckCircle2 className="h-4 w-4 text-[#16A34A]" />
@@ -263,32 +263,32 @@ export function DashboardScannerModal({
                   </>
                 )}
               </div>
-              <p className="mt-2 text-xs font-bold uppercase tracking-[0.04em] text-black/70 leading-normal">
+              <p className="mt-2 text-xs font-bold uppercase tracking-[0.04em] text-ink/70 leading-normal">
                 Track live signal pressure and review matched leads before momentum drops.
               </p>
             </div>
 
             {/* Tactical Yield Metrics */}
-            <div className="border-4 border-black bg-[#FFF7CC] p-4 shadow-[6px_6px_0_0_#000]">
-              <p className="text-xs font-black uppercase tracking-[0.12em] text-black/60">
+            <div className="border-4 border-outline bg-highlight p-4 shadow-brutal-lg">
+              <p className="text-xs font-black uppercase tracking-[0.12em] text-ink/60">
                 Tactical Yield
               </p>
 
               <div className="mt-3 grid grid-cols-2 gap-3">
-                <div className="border-3 border-black bg-white p-2.5 text-center shadow-[3px_3px_0_0_#000]">
-                  <p className="text-[10px] font-black uppercase tracking-[0.1em] text-black/60">
+                <div className="border-3 border-outline bg-card p-2.5 text-center shadow-brutal-sm">
+                  <p className="text-[10px] font-black uppercase tracking-[0.1em] text-ink/60">
                     Leads
                   </p>
-                  <p className="mt-1 text-2xl font-black uppercase text-black">
+                  <p className="mt-1 text-2xl font-black uppercase text-ink">
                     {matchedLeadCount}
                   </p>
                 </div>
 
-                <div className="border-3 border-black bg-white p-2.5 text-center shadow-[3px_3px_0_0_#000]">
-                  <p className="text-[10px] font-black uppercase tracking-[0.1em] text-black/60">
+                <div className="border-3 border-outline bg-card p-2.5 text-center shadow-brutal-sm">
+                  <p className="text-[10px] font-black uppercase tracking-[0.1em] text-ink/60">
                     Posts
                   </p>
-                  <p className="mt-1 text-2xl font-black uppercase text-black">
+                  <p className="mt-1 text-2xl font-black uppercase text-ink">
                     {matchedPostCount}
                   </p>
                 </div>
@@ -296,18 +296,18 @@ export function DashboardScannerModal({
             </div>
 
             {/* Command Notes */}
-            <div className="border-4 border-black bg-white p-4 shadow-[6px_6px_0_0_#000]">
-              <p className="text-xs font-black uppercase tracking-[0.12em] text-black/60">
+            <div className="border-4 border-outline bg-card p-4 shadow-brutal-lg">
+              <p className="text-xs font-black uppercase tracking-[0.12em] text-ink/60">
                 Command Notes
               </p>
 
-              <div className="mt-2.5 space-y-2 text-xs font-bold uppercase tracking-[0.04em] text-black/80">
+              <div className="mt-2.5 space-y-2 text-xs font-bold uppercase tracking-[0.04em] text-ink/80">
                 <div className="flex items-start gap-2">
-                  <ShieldAlert className="mt-0.5 h-3.5 w-3.5 shrink-0 text-black" />
+                  <ShieldAlert className="mt-0.5 h-3.5 w-3.5 shrink-0 text-ink" />
                   <span>Review fresh matches first for highest conversion.</span>
                 </div>
                 <div className="flex items-start gap-2">
-                  <Sparkles className="mt-0.5 h-3.5 w-3.5 shrink-0 text-black" />
+                  <Sparkles className="mt-0.5 h-3.5 w-3.5 shrink-0 text-ink" />
                   <span>Durable runs preserve state across page reloads.</span>
                 </div>
               </div>
@@ -321,15 +321,15 @@ export function DashboardScannerModal({
                   initial={{ opacity: 0, y: 8 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: 6 }}
-                  className="border-4 border-black bg-[#D9FFE3] p-3.5 shadow-[6px_6px_0_0_#000]"
+                  className="border-4 border-outline bg-[#D9FFE3] p-3.5 shadow-brutal-lg"
                 >
                   <div className="flex items-start gap-2.5">
                     <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-[#15803D]" />
                     <div className="min-w-0">
-                      <p className="text-[10px] font-black uppercase tracking-[0.12em] text-black/60">
+                      <p className="text-[10px] font-black uppercase tracking-[0.12em] text-ink/60">
                         Outcome Report
                       </p>
-                      <p className="mt-1 text-xs font-black uppercase tracking-[0.04em] text-black">
+                      <p className="mt-1 text-xs font-black uppercase tracking-[0.04em] text-ink">
                         Hunt Completed Successfully!
                       </p>
                     </div>
@@ -341,15 +341,15 @@ export function DashboardScannerModal({
                   initial={{ opacity: 0, y: 8 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: 6 }}
-                  className="border-4 border-black bg-[#FFF1F2] p-3.5 shadow-[6px_6px_0_0_#000]"
+                  className="border-4 border-outline bg-[#FFF1F2] p-3.5 shadow-brutal-lg"
                 >
                   <div className="flex items-start gap-3">
                     <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-[#E11D48]" />
                     <div className="min-w-0">
-                      <p className="text-[10px] font-black uppercase tracking-[0.12em] text-black/60">
+                      <p className="text-[10px] font-black uppercase tracking-[0.12em] text-ink/60">
                         Scan Interrupted
                       </p>
-                      <p className="mt-1 text-xs font-black uppercase tracking-[0.04em] text-black">
+                      <p className="mt-1 text-xs font-black uppercase tracking-[0.04em] text-ink">
                         Scan credit was refunded or paused.
                       </p>
                     </div>
@@ -361,15 +361,15 @@ export function DashboardScannerModal({
                   initial={{ opacity: 0, y: 8 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: 6 }}
-                  className="border-4 border-black bg-[#FFF8D9] p-3.5 shadow-[6px_6px_0_0_#000]"
+                  className="border-4 border-outline bg-highlight p-3.5 shadow-brutal-lg"
                 >
                   <div className="flex items-start gap-2.5">
-                    <Clock3 className="mt-0.5 h-4 w-4 shrink-0 text-black animate-spin" />
+                    <Clock3 className="mt-0.5 h-4 w-4 shrink-0 text-ink animate-spin" />
                     <div className="min-w-0">
-                      <p className="text-[10px] font-black uppercase tracking-[0.12em] text-black/60">
+                      <p className="text-[10px] font-black uppercase tracking-[0.12em] text-ink/60">
                         Awaiting Result
                       </p>
-                      <p className="mt-1 text-xs font-black uppercase tracking-[0.04em] text-black leading-snug">
+                      <p className="mt-1 text-xs font-black uppercase tracking-[0.04em] text-ink leading-snug">
                         Channel open while battlestation routes hunt.
                       </p>
                     </div>
@@ -384,7 +384,7 @@ export function DashboardScannerModal({
                 <Link
                   href="/app/runs"
                   onClick={close}
-                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 border-3 border-black bg-[#FFE600] px-4 py-2.5 text-xs font-black uppercase tracking-[0.08em] text-black shadow-[4px_4px_0_0_#000] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[6px_6px_0_0_#000] active:translate-x-0 active:translate-y-0 transition-all"
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 border-3 border-outline bg-accent px-4 py-2.5 text-xs font-black uppercase tracking-[0.08em] text-on-accent shadow-brutal hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-brutal-lg active:translate-x-0 active:translate-y-0 transition-all"
                 >
                   <ExternalLink className="h-4 w-4" />
                   <span>VIEW QUEST BOARD</span>
@@ -393,7 +393,7 @@ export function DashboardScannerModal({
                 <button
                   type="button"
                   onClick={close}
-                  className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 border-3 border-black bg-[#FF5722] text-white px-3 py-2 text-xs font-black uppercase tracking-[0.08em] shadow-[3px_3px_0_0_#000] hover:bg-red-600 transition-all"
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 border-3 border-outline bg-accent-2 text-white px-3 py-2 text-xs font-black uppercase tracking-[0.08em] shadow-brutal-sm hover:bg-red-600 transition-all"
                 >
                   <Ban className="h-3.5 w-3.5" />
                   <span>CANCEL SCAN</span>
@@ -403,7 +403,7 @@ export function DashboardScannerModal({
               <button
                 type="button"
                 onClick={close}
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 border-3 border-black bg-black px-4 py-2.5 text-xs font-black uppercase tracking-[0.08em] text-[#FFE600] shadow-[4px_4px_0_0_#000] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[6px_6px_0_0_#000] active:translate-x-0 active:translate-y-0 transition-all"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 border-3 border-outline bg-black px-4 py-2.5 text-xs font-black uppercase tracking-[0.08em] text-[#FFE600] shadow-brutal hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-brutal-lg active:translate-x-0 active:translate-y-0 transition-all"
               >
                 <span>RETURN TO COMMAND</span>
                 <ArrowRight className="h-4 w-4" />

@@ -24,7 +24,7 @@ function renderInlineText(text: string): React.ReactNode {
         href={href}
         onMouseEnter={() => sfx.playHoverBlip()}
         onClick={() => sfx.playCoinDrop()}
-        className="font-black text-[#8A2BE2] underline decoration-2 underline-offset-2 hover:bg-[#FFE600] px-1 py-0.5 border border-black shadow-[1px_1px_0_0_#000] transition-colors"
+        className="font-black text-[#8A2BE2] underline decoration-2 underline-offset-2 hover:bg-accent px-1 py-0.5 border border-outline shadow-brutal-sm transition-colors"
       >
         {label}
       </Link>
@@ -65,7 +65,7 @@ function renderMarkdownContent(content: string) {
           // Horizontal rule (--- or ***)
           if (/^[-*_]{3,}$/.test(trimmed)) {
             return (
-              <hr key={pIdx} className="my-8 border-t-4 border-black" />
+              <hr key={pIdx} className="my-8 border-t-4 border-outline" />
             )
           }
 
@@ -96,13 +96,13 @@ function renderMarkdownContent(content: string) {
 
             return (
               <div key={pIdx} className="my-6 overflow-x-auto">
-                <table className="w-full border-4 border-black shadow-[4px_4px_0_0_#000] text-sm">
+                <table className="w-full border-4 border-outline shadow-brutal text-sm">
                   <thead>
                     <tr className="bg-black text-[#FFE600]">
                       {headerCells.map((cell, cIdx) => (
                         <th
                           key={cIdx}
-                          className="border-2 border-black px-4 py-2.5 font-black uppercase text-xs text-left"
+                          className="border-2 border-outline px-4 py-2.5 font-black uppercase text-xs text-left"
                           style={{ textAlign: alignments[cIdx] || 'left' }}
                         >
                           {renderInlineText(cell)}
@@ -114,12 +114,12 @@ function renderMarkdownContent(content: string) {
                     {bodyRows.map((row, rIdx) => (
                       <tr
                         key={rIdx}
-                        className={rIdx % 2 === 0 ? 'bg-white' : 'bg-[#F4F0EA]'}
+                        className={rIdx % 2 === 0 ? 'bg-card' : 'bg-canvas'}
                       >
                         {row.map((cell, cIdx) => (
                           <td
                             key={cIdx}
-                            className="border-2 border-black px-4 py-2 font-bold text-zinc-800"
+                            className="border-2 border-outline px-4 py-2 font-bold text-ink"
                             style={{ textAlign: alignments[cIdx] || 'left' }}
                           >
                             {renderInlineText(cell)}
@@ -138,7 +138,7 @@ function renderMarkdownContent(content: string) {
             const text = trimmed.slice(2).trim()
             const id = text.toLowerCase().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-')
             return (
-              <h1 id={id} key={pIdx} className="text-2xl sm:text-3xl md:text-4xl font-black uppercase text-black pt-6 pb-2 border-b-3 border-black">
+              <h1 id={id} key={pIdx} className="text-2xl sm:text-3xl md:text-4xl font-black uppercase text-ink pt-6 pb-2 border-b-3 border-outline">
                 {renderInlineText(text)}
               </h1>
             )
@@ -149,8 +149,8 @@ function renderMarkdownContent(content: string) {
             const text = trimmed.slice(3).trim()
             const id = text.toLowerCase().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-')
             return (
-              <h2 id={id} key={pIdx} className="text-xl sm:text-2xl font-black uppercase text-black pt-5 pb-1 border-b-2 border-black flex items-center gap-2">
-                <span className="h-3 w-3 bg-[#FFE600] border border-black inline-block"></span>
+              <h2 id={id} key={pIdx} className="text-xl sm:text-2xl font-black uppercase text-on-accent pt-5 pb-1 border-b-2 border-outline flex items-center gap-2">
+                <span className="h-3 w-3 bg-accent border border-outline inline-block"></span>
                 {renderInlineText(text)}
               </h2>
             )
@@ -161,7 +161,7 @@ function renderMarkdownContent(content: string) {
             const text = trimmed.slice(4).trim()
             const id = text.toLowerCase().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-')
             return (
-              <h3 id={id} key={pIdx} className="text-lg font-black uppercase text-black pt-3">
+              <h3 id={id} key={pIdx} className="text-lg font-black uppercase text-ink pt-3">
                 {renderInlineText(text)}
               </h3>
             )
@@ -172,7 +172,7 @@ function renderMarkdownContent(content: string) {
             const quoteLines = trimmed.split('\n').map(l => l.replace(/^>\s?/, '').trim())
             const quoteText = quoteLines.join(' ')
             return (
-              <blockquote key={pIdx} className="my-5 border-l-8 border-[#8A2BE2] bg-[#FFE600]/20 border-4 border-black p-4 font-bold text-black shadow-[4px_4px_0_0_#000]">
+              <blockquote key={pIdx} className="my-5 border-l-8 border-[#8A2BE2] bg-accent/20 border-4 border-outline p-4 font-bold text-on-accent shadow-brutal">
                 {renderInlineText(quoteText)}
               </blockquote>
             )
@@ -184,7 +184,7 @@ function renderMarkdownContent(content: string) {
             return (
               <ul key={pIdx} className="my-3 space-y-2 pl-4">
                 {items.map((item, iIdx) => (
-                  <li key={iIdx} className="flex items-start gap-2 font-bold text-zinc-800 text-sm md:text-base">
+                  <li key={iIdx} className="flex items-start gap-2 font-bold text-ink text-sm md:text-base">
                     <span className="mt-1 flex h-2 w-2 shrink-0 bg-black rotate-45" />
                     <span>{renderInlineText(item)}</span>
                   </li>
@@ -197,7 +197,7 @@ function renderMarkdownContent(content: string) {
           if (/^\d+\.\s/.test(trimmed)) {
             const items = trimmed.split(/\n/).map((line) => line.replace(/^\d+\.\s*/, '').trim())
             return (
-              <ol key={pIdx} className="my-3 space-y-2 pl-4 list-decimal font-bold text-zinc-800 text-sm md:text-base">
+              <ol key={pIdx} className="my-3 space-y-2 pl-4 list-decimal font-bold text-ink text-sm md:text-base">
                 {items.map((item, iIdx) => (
                   <li key={iIdx} className="pl-1">
                     {renderInlineText(item)}
@@ -209,7 +209,7 @@ function renderMarkdownContent(content: string) {
 
           // Standard Paragraph text with inline formatting
           return (
-            <p key={pIdx} className="text-sm md:text-base font-bold text-zinc-800 leading-relaxed">
+            <p key={pIdx} className="text-sm md:text-base font-bold text-ink leading-relaxed">
               {renderInlineText(trimmed)}
             </p>
           )

@@ -38,20 +38,20 @@ export default function HunterStatModal({ hunter, isAnonymousMode = false, onClo
       labelledBy="hunter-stat-dialog-title"
       describedBy="hunter-stat-dialog-description"
       overlayClassName="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/80 p-4 backdrop-blur-xs"
-      panelClassName="relative my-8 w-full max-w-xl space-y-6 border-4 border-black bg-[#FFE600] p-6 text-black shadow-[12px_12px_0_0_#000] md:p-8"
+      panelClassName="relative my-8 w-full max-w-xl space-y-6 border-4 border-outline bg-accent p-6 text-on-accent shadow-brutal-lg md:p-8"
       initial={{ scale: 0.9, opacity: 0, y: 24 }}
       animate={{ scale: 1, opacity: 1, y: 0 }}
     >
         <button
           onClick={handleClose}
-          className="absolute right-4 top-4 border-2 border-black bg-black px-3 py-1.5 text-xs font-black uppercase text-[#FFE600] hover:bg-[#FF5722] hover:text-white"
+          className="absolute right-4 top-4 border-2 border-outline bg-black px-3 py-1.5 text-xs font-black uppercase text-[#FFE600] hover:bg-accent-2 hover:text-white"
           aria-label="Close hunter details"
         >
           [✕ Close]
         </button>
 
-        <header className="border-b-4 border-black pb-5 pr-24">
-          <span className="inline-block border border-black bg-black px-2.5 py-0.5 text-xs font-black uppercase text-[#FFE600]">
+        <header className="border-b-4 border-outline pb-5 pr-24">
+          <span className="inline-block border border-outline bg-black px-2.5 py-0.5 text-xs font-black uppercase text-[#FFE600]">
             Stored rank #{hunter.rank}
           </span>
           <h2 id="hunter-stat-dialog-title" className="mt-3 break-words text-3xl font-black uppercase leading-none">{displayName}</h2>
@@ -59,17 +59,17 @@ export default function HunterStatModal({ hunter, isAnonymousMode = false, onClo
         </header>
 
         {hasXp ? (
-          <section className="space-y-2 border-4 border-black bg-white p-4 shadow-[4px_4px_0_0_#000]">
+          <section className="space-y-2 border-4 border-outline bg-card p-4 shadow-brutal">
             <div className="flex justify-between text-xs font-black uppercase">
               <span className="flex items-center gap-1"><Shield className="h-4 w-4" /> Level {hunter.level}</span>
               <span>{hunter.xp!.toLocaleString()} / {hunter.xpMax!.toLocaleString()} XP</span>
             </div>
-            <div className="h-5 overflow-hidden border-2 border-black bg-gray-200">
-              <div className="h-full bg-[#A3E635]" style={{ width: `${xpPercent}%` }} />
+            <div className="h-5 overflow-hidden border-2 border-outline bg-inset">
+              <div className="h-full bg-success" style={{ width: `${xpPercent}%` }} />
             </div>
           </section>
         ) : (
-          <p className="border-4 border-black bg-white p-4 text-sm font-black uppercase shadow-[4px_4px_0_0_#000]">
+          <p className="border-4 border-outline bg-card p-4 text-sm font-black uppercase shadow-brutal">
             Level and XP are not measured for this profile.
           </p>
         )}
@@ -85,35 +85,35 @@ export default function HunterStatModal({ hunter, isAnonymousMode = false, onClo
         </div>
 
         {hunter.totalLeads !== undefined && (
-          <p className="border-2 border-black bg-white p-3 text-sm font-black uppercase">
+          <p className="border-2 border-outline bg-card p-3 text-sm font-black uppercase">
             Stored lead total: {hunter.totalLeads.toLocaleString()}
           </p>
         )}
 
         {hunter.avgLatency && (
-          <p className="border-2 border-black bg-white p-3 text-sm font-black uppercase">
+          <p className="border-2 border-outline bg-card p-3 text-sm font-black uppercase">
             Measured average latency: {hunter.avgLatency}
           </p>
         )}
 
-        <section className="border-4 border-black bg-white p-4 shadow-[4px_4px_0_0_#000]">
-          <h3 className="flex items-center gap-2 border-b-2 border-black pb-2 text-xs font-black uppercase">
+        <section className="border-4 border-outline bg-card p-4 shadow-brutal">
+          <h3 className="flex items-center gap-2 border-b-2 border-outline pb-2 text-xs font-black uppercase">
             <Search className="h-4 w-4" /> Stored scout labels
           </h3>
           {activeScouts.length > 0 ? (
             <div className="mt-3 flex flex-wrap gap-2">
               {activeScouts.map((scout) => (
-                <span key={scout} className="border-2 border-black bg-[#F4F0EA] px-3 py-1 text-xs font-black uppercase">
+                <span key={scout} className="border-2 border-outline bg-canvas px-3 py-1 text-xs font-black uppercase">
                   {scout}
                 </span>
               ))}
             </div>
           ) : (
-            <p className="mt-3 text-sm font-bold text-gray-600">No scout labels are stored for this profile.</p>
+            <p className="mt-3 text-sm font-bold text-ink-muted">No scout labels are stored for this profile.</p>
           )}
         </section>
 
-        <p id="hunter-stat-dialog-description" className="text-xs font-bold uppercase text-gray-700">
+        <p id="hunter-stat-dialog-description" className="text-xs font-bold uppercase text-ink-muted">
           No pipeline value, response SLA, customer identity, or achievement is inferred in this view.
         </p>
     </AccessibleDialog>
@@ -122,8 +122,8 @@ export default function HunterStatModal({ hunter, isAnonymousMode = false, onClo
 
 function StatCard({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
   return (
-    <div className="border-4 border-black bg-white p-4 shadow-[4px_4px_0_0_#000]">
-      <div className="flex items-center gap-2 text-xs font-black uppercase text-gray-700">{icon}{label}</div>
+    <div className="border-4 border-outline bg-card p-4 shadow-brutal">
+      <div className="flex items-center gap-2 text-xs font-black uppercase text-ink-muted">{icon}{label}</div>
       <p className="mt-2 text-2xl font-black uppercase">{value}</p>
     </div>
   )

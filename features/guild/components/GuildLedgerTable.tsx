@@ -30,7 +30,7 @@ export default function GuildLedgerTable({ hunters, isAnonymousMode, onSelectHun
       {hunters.length === 0 ? (
         <QuestPanel padding="lg" className="text-center">
           <h3 className="text-xl font-black uppercase">No public hunters</h3>
-          <p className="mt-2 font-bold text-gray-600">Public rankings require explicit participant opt-in.</p>
+          <p className="mt-2 font-bold text-ink-muted">Public rankings require explicit participant opt-in.</p>
         </QuestPanel>
       ) : (
         <>
@@ -60,13 +60,13 @@ export default function GuildLedgerTable({ hunters, isAnonymousMode, onSelectHun
                 </div>
               </div>
 
-              <dl className="mt-3 grid grid-cols-2 gap-3 border-t-2 border-black pt-3">
+              <dl className="mt-3 grid grid-cols-2 gap-3 border-t-2 border-outline pt-3">
                 <div className="min-w-0">
-                  <dt className="text-[11px] font-black uppercase text-gray-500">Processed leads</dt>
+                  <dt className="text-[11px] font-black uppercase text-ink-muted">Processed leads</dt>
                   <dd className="mt-0.5 text-base font-black">{hunter.bountiesSlayed.toLocaleString()}</dd>
                 </div>
                 <div className="min-w-0">
-                  <dt className="text-[11px] font-black uppercase text-gray-500">Active streak</dt>
+                  <dt className="text-[11px] font-black uppercase text-ink-muted">Active streak</dt>
                   <dd className="mt-0.5 text-base font-black">{hunter.activeStreak} days</dd>
                 </div>
               </dl>
@@ -77,7 +77,7 @@ export default function GuildLedgerTable({ hunters, isAnonymousMode, onSelectHun
         <div className={questSurface({ className: 'hidden overflow-x-auto sm:block' })}>
           <table className="min-w-[620px] w-full border-collapse text-left">
             <thead>
-              <tr className="border-b-4 border-black bg-black text-xs font-black uppercase text-white">
+              <tr className="border-b-4 border-outline bg-black text-xs font-black uppercase text-white">
                 <th className="p-4">Stored rank</th>
                 <th className="p-4">Hunter</th>
                 <th className="p-4 text-right">Processed leads</th>
@@ -86,7 +86,7 @@ export default function GuildLedgerTable({ hunters, isAnonymousMode, onSelectHun
             </thead>
             <tbody className="divide-y-2 divide-black text-sm font-black">
               {hunters.map((hunter) => (
-                <tr key={hunter.id} className={onSelectHunter ? 'hover:bg-[#F4F0EA] focus-within:bg-[#F4F0EA]' : ''}>
+                <tr key={hunter.id} className={onSelectHunter ? 'hover:bg-canvas focus-within:bg-canvas' : ''}>
                   <td className="p-4">#{hunter.rank}</td>
                   <td className="p-4 uppercase">
                     {onSelectHunter ? (

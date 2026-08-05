@@ -48,15 +48,15 @@ export default function GuildLawsModal({ isOpen, onClose }: GuildLawsModalProps)
       labelledBy="guild-laws-dialog-title"
       describedBy="guild-laws-dialog-description"
       overlayClassName="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm animate-in fade-in duration-200"
-      panelClassName="flex max-h-[90vh] w-full max-w-2xl flex-col overflow-hidden border-4 border-black bg-white shadow-[10px_10px_0_0_#000]"
+      panelClassName="flex max-h-[90vh] w-full max-w-2xl flex-col overflow-hidden border-4 border-outline bg-card shadow-brutal-lg"
     >
         {/* Header */}
-        <header className="border-b-4 border-black bg-[#06B6D4] p-5 flex items-center justify-between">
+        <header className="border-b-4 border-outline bg-info p-5 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Shield className="text-black" size={32} />
+            <Shield className="text-on-accent" size={32} />
             <div>
-              <h2 id="guild-laws-dialog-title" className="text-2xl font-black uppercase tracking-tight text-black">Guild Laws & Laws of Mana</h2>
-              <p id="guild-laws-dialog-description" className="text-xs font-bold uppercase text-black/80">Official Guild Codex & Refund Directives</p>
+              <h2 id="guild-laws-dialog-title" className="text-2xl font-black uppercase tracking-tight text-ink">Guild Laws & Laws of Mana</h2>
+              <p id="guild-laws-dialog-description" className="text-xs font-bold uppercase text-ink/80">Official Guild Codex & Refund Directives</p>
             </div>
           </div>
           <button
@@ -64,7 +64,7 @@ export default function GuildLawsModal({ isOpen, onClose }: GuildLawsModalProps)
               sfx.playHoverBlip()
               onClose()
             }}
-            className="border-3 border-black bg-white p-2 text-black hover:bg-[#FFE600] transition-colors shadow-[3px_3px_0_0_#000] active:translate-x-1 active:translate-y-1 active:shadow-none"
+            className="border-3 border-outline bg-card p-2 text-ink hover:bg-accent transition-colors shadow-brutal-sm active:translate-x-1 active:translate-y-1 active:shadow-none"
             aria-label="Close modal"
           >
             <X size={20} />
@@ -72,10 +72,10 @@ export default function GuildLawsModal({ isOpen, onClose }: GuildLawsModalProps)
         </header>
 
         {/* Content */}
-        <div className="p-6 overflow-y-auto space-y-4 bg-[#F4F0EA]">
-          <div className="border-3 border-black bg-[#FFE600] p-4 flex items-start gap-3 shadow-[4px_4px_0_0_#000]">
-            <HelpCircle className="text-black shrink-0 mt-0.5" size={24} />
-            <p className="text-sm font-black uppercase text-black">
+        <div className="p-6 overflow-y-auto space-y-4 bg-canvas">
+          <div className="border-3 border-outline bg-accent p-4 flex items-start gap-3 shadow-brutal">
+            <HelpCircle className="text-on-accent shrink-0 mt-0.5" size={24} />
+            <p className="text-sm font-black uppercase text-on-accent">
               Guild Laws govern accounts, server-recorded credits, billing, and supported lead workflows.
             </p>
           </div>
@@ -84,17 +84,17 @@ export default function GuildLawsModal({ isOpen, onClose }: GuildLawsModalProps)
             {laws.map((law, index) => {
               const isOpenItem = openIndex === index
               return (
-                <div key={law.title} className="border-3 border-black bg-white shadow-[4px_4px_0_0_#000] overflow-hidden">
+                <div key={law.title} className="border-3 border-outline bg-card shadow-brutal overflow-hidden">
                   <button
                     type="button"
                     onClick={() => toggleAccordion(index)}
-                    className="w-full text-left p-4 font-black uppercase flex items-center justify-between bg-white hover:bg-yellow-50 transition-colors"
+                    className="w-full text-left p-4 font-black uppercase flex items-center justify-between bg-card hover:bg-yellow-50 transition-colors"
                   >
                     <span className="text-base flex items-center gap-2">{law.title}</span>
                     {isOpenItem ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
                   </button>
                   {isOpenItem && (
-                    <div className="p-4 border-t-3 border-black bg-[#F4F0EA] text-sm font-bold text-gray-800 leading-relaxed border-dashed">
+                    <div className="p-4 border-t-3 border-outline bg-canvas text-sm font-bold text-ink leading-relaxed border-dashed">
                       {law.content}
                     </div>
                   )}
@@ -105,8 +105,8 @@ export default function GuildLawsModal({ isOpen, onClose }: GuildLawsModalProps)
         </div>
 
         {/* Footer */}
-        <footer className="border-t-4 border-black bg-white p-4 flex justify-between items-center">
-          <span className="text-xs font-black uppercase flex items-center gap-1.5 text-gray-600">
+        <footer className="border-t-4 border-outline bg-card p-4 flex justify-between items-center">
+          <span className="text-xs font-black uppercase flex items-center gap-1.5 text-ink-muted">
             <Scroll size={16} /> Guild Seal Approved
           </span>
           <button
@@ -115,7 +115,7 @@ export default function GuildLawsModal({ isOpen, onClose }: GuildLawsModalProps)
               sfx.playHoverBlip()
               onClose()
             }}
-            className="border-3 border-black bg-[#06B6D4] px-6 py-2 font-black uppercase text-black shadow-[3px_3px_0_0_#000] hover:translate-x-0.5 hover:translate-y-0.5 transition-all"
+            className="border-3 border-outline bg-info px-6 py-2 font-black uppercase text-on-accent shadow-brutal-sm hover:translate-x-0.5 hover:translate-y-0.5 transition-all"
           >
             Acknowledge Laws
           </button>

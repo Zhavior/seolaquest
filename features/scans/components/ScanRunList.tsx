@@ -93,7 +93,7 @@ export function ScanRunList({ runs: initialRuns, hasMore: initialHasMore }: Scan
         <h2 className="text-2xl font-black uppercase sm:text-3xl">
           Durable scans will appear here after they are queued.
         </h2>
-        <p className="mx-auto mt-3 max-w-xl text-sm font-bold text-zinc-600">
+        <p className="mx-auto mt-3 max-w-xl text-sm font-bold text-ink-muted">
           This ledger reports saved backend state only. It does not invent provider activity or results.
         </p>
         <Link href="/app" className={questButton({ tone: 'gold', className: 'mt-6 hover:bg-yellow-300' })}>
@@ -115,7 +115,7 @@ export function ScanRunList({ runs: initialRuns, hasMore: initialHasMore }: Scan
         variants={item}
         className={questSurface({ shadow: 'md', className: 'relative flex items-center' })}
       >
-        <Search aria-hidden="true" className="pointer-events-none absolute left-3.5 h-4 w-4 text-black/60" />
+        <Search aria-hidden="true" className="pointer-events-none absolute left-3.5 h-4 w-4 text-ink/60" />
         <label htmlFor="scan-run-search" className="sr-only">
           Search run ID, trigger, or status
         </label>
@@ -125,13 +125,13 @@ export function ScanRunList({ runs: initialRuns, hasMore: initialHasMore }: Scan
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder="SEARCH RUN ID, TRIGGER, OR STATUS..."
-          className="min-h-11 w-full bg-transparent py-3 pl-10 pr-12 text-xs font-black uppercase text-black placeholder:text-black/40 focus:outline-none sm:text-sm"
+          className="min-h-11 w-full bg-transparent py-3 pl-10 pr-12 text-xs font-black uppercase text-ink placeholder:text-ink/40 focus:outline-none sm:text-sm"
         />
         {searchQuery && (
           <button
             type="button"
             onClick={() => setSearchQuery('')}
-            className="absolute right-0 flex h-11 w-11 items-center justify-center text-black/60 hover:text-black"
+            className="absolute right-0 flex h-11 w-11 items-center justify-center text-ink/60 hover:text-ink"
             aria-label="Clear search"
           >
             <X aria-hidden="true" className="h-4 w-4" />
@@ -157,13 +157,13 @@ export function ScanRunList({ runs: initialRuns, hasMore: initialHasMore }: Scan
                       {run.trigger}
                     </QuestBadge>
                   </div>
-                  <p className="mt-3 break-word-safe text-base font-black uppercase text-black">{run.statusMessage}</p>
-                  <p className="mt-1.5 break-word-safe text-xs font-bold uppercase text-black/70">{run.providerSummary}</p>
+                  <p className="mt-3 break-word-safe text-base font-black uppercase text-ink">{run.statusMessage}</p>
+                  <p className="mt-1.5 break-word-safe text-xs font-bold uppercase text-ink/70">{run.providerSummary}</p>
                 </div>
                 <div className="shrink-0 text-left sm:text-right">
-                  <p className="text-[10px] font-black uppercase tracking-wider text-black/50">Last updated</p>
-                  <p className="mt-0.5 text-xs font-black uppercase text-black">{formatScanTime(run.updatedAt)}</p>
-                  <p className="mt-2 text-[10px] font-black uppercase tracking-wider text-black/50">
+                  <p className="text-[10px] font-black uppercase tracking-wider text-ink/50">Last updated</p>
+                  <p className="mt-0.5 text-xs font-black uppercase text-ink">{formatScanTime(run.updatedAt)}</p>
+                  <p className="mt-2 text-[10px] font-black uppercase tracking-wider text-ink/50">
                     Completed: {formatScanTime(run.completedAt)}
                   </p>
                 </div>
@@ -172,9 +172,9 @@ export function ScanRunList({ runs: initialRuns, hasMore: initialHasMore }: Scan
               <QuestCountGrid
                 className="mt-4"
                 counts={[
-                  { label: 'Attempts', value: run.counts.providerAttempts, accent: 'bg-white' },
-                  { label: 'Returned', value: run.counts.providerResults, accent: 'bg-[#FFE600]' },
-                  { label: 'Source matches', value: run.counts.leadsCreated, accent: 'bg-[#06B6D4] text-black' },
+                  { label: 'Attempts', value: run.counts.providerAttempts, accent: 'bg-card' },
+                  { label: 'Returned', value: run.counts.providerResults, accent: 'bg-accent' },
+                  { label: 'Source matches', value: run.counts.leadsCreated, accent: 'bg-info text-on-accent' },
                 ]}
               />
             </Link>

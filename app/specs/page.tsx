@@ -24,31 +24,31 @@ const pending = [
 
 export default function SpecsPage() {
   return (
-    <main className="min-h-screen bg-[#F4F0EA] px-4 py-10 text-black sm:px-6 sm:py-14">
+    <main className="min-h-screen bg-canvas px-4 py-10 text-ink sm:px-6 sm:py-14">
       <div className="mx-auto max-w-5xl space-y-8">
-        <header className="border-4 border-black bg-white p-7 shadow-[8px_8px_0_0_#000] sm:p-10">
-          <span className="inline-flex items-center gap-2 border-2 border-black bg-[#FFE600] px-3 py-1 text-xs font-black uppercase shadow-[2px_2px_0_0_#000]">
+        <header className="border-4 border-outline bg-card p-7 shadow-brutal-lg sm:p-10">
+          <span className="inline-flex items-center gap-2 border-2 border-outline bg-accent px-3 py-1 text-xs font-black uppercase shadow-brutal-sm">
             <Gauge size={15} /> Implementation status
           </span>
           <h1 className="mt-4 text-4xl font-black uppercase leading-none tracking-tight sm:text-6xl">Architecture without theatre</h1>
-          <p className="mt-4 max-w-3xl text-sm font-bold leading-relaxed text-zinc-700 sm:text-base">
+          <p className="mt-4 max-w-3xl text-sm font-bold leading-relaxed text-ink-muted sm:text-base">
             This is a code-status document, not a live status page. CoQuest does not currently publish an uptime SLA,
             discovery-latency guarantee, edge-region benchmark, or production capacity number.
           </p>
         </header>
 
         <section className="grid gap-4 sm:grid-cols-3">
-          <article className="border-4 border-black bg-[#A3E635] p-5 shadow-[5px_5px_0_0_#000]">
+          <article className="border-4 border-outline bg-success p-5 shadow-brutal">
             <CheckCircle2 />
             <p className="mt-3 text-xs font-black uppercase">Local code gates</p>
             <p className="mt-1 text-2xl font-black uppercase">Implemented</p>
           </article>
-          <article className="border-4 border-black bg-[#FFF7AA] p-5 shadow-[5px_5px_0_0_#000]">
+          <article className="border-4 border-outline bg-highlight p-5 shadow-brutal">
             <AlertTriangle />
             <p className="mt-3 text-xs font-black uppercase">Production proof</p>
             <p className="mt-1 text-2xl font-black uppercase">Pending</p>
           </article>
-          <article className="border-4 border-black bg-[#FFB4A2] p-5 shadow-[5px_5px_0_0_#000]">
+          <article className="border-4 border-outline bg-[#FFB4A2] p-5 shadow-brutal">
             <XCircle />
             <p className="mt-3 text-xs font-black uppercase">Public SLA</p>
             <p className="mt-1 text-2xl font-black uppercase">Not offered</p>
@@ -56,22 +56,22 @@ export default function SpecsPage() {
         </section>
 
         <section className="grid gap-6 lg:grid-cols-2">
-          <article className="border-4 border-black bg-white p-6 shadow-[6px_6px_0_0_#000]">
+          <article className="border-4 border-outline bg-card p-6 shadow-brutal-lg">
             <h2 className="flex items-center gap-2 text-xl font-black uppercase"><Server className="text-emerald-600" /> Present in the codebase</h2>
             <ul className="mt-5 space-y-3">
               {implemented.map((item) => (
-                <li key={item} className="flex gap-3 border-2 border-black bg-emerald-50 p-3 text-sm font-bold">
+                <li key={item} className="flex gap-3 border-2 border-outline bg-emerald-50 p-3 text-sm font-bold">
                   <CheckCircle2 className="mt-0.5 shrink-0 text-emerald-700" size={17} /> {item}
                 </li>
               ))}
             </ul>
           </article>
 
-          <article className="border-4 border-black bg-white p-6 shadow-[6px_6px_0_0_#000]">
+          <article className="border-4 border-outline bg-card p-6 shadow-brutal-lg">
             <h2 className="flex items-center gap-2 text-xl font-black uppercase"><AlertTriangle className="text-amber-600" /> Blocks production claims</h2>
             <ul className="mt-5 space-y-3">
               {pending.map((item) => (
-                <li key={item} className="flex gap-3 border-2 border-black bg-amber-50 p-3 text-sm font-bold">
+                <li key={item} className="flex gap-3 border-2 border-outline bg-amber-50 p-3 text-sm font-bold">
                   <AlertTriangle className="mt-0.5 shrink-0 text-amber-700" size={17} /> {item}
                 </li>
               ))}
@@ -79,19 +79,19 @@ export default function SpecsPage() {
           </article>
         </section>
 
-        <section className="border-4 border-black bg-black p-6 text-white shadow-[6px_6px_0_0_#A855F7] sm:p-8">
+        <section className="border-4 border-outline bg-black p-6 text-white shadow-[6px_6px_0_0_#A855F7] sm:p-8">
           <h2 className="text-xl font-black uppercase text-[#FFE600]">Current trust boundaries</h2>
           <div className="mt-5 grid gap-4 sm:grid-cols-3">
-            <div className="border-2 border-zinc-700 p-4"><Lock className="text-[#A855F7]" /><h3 className="mt-2 font-black uppercase">Identity</h3><p className="mt-1 text-xs font-bold text-zinc-300">Clerk session plus server-side tenant checks.</p></div>
-            <div className="border-2 border-zinc-700 p-4"><Database className="text-[#06B6D4]" /><h3 className="mt-2 font-black uppercase">State</h3><p className="mt-1 text-xs font-bold text-zinc-300">PostgreSQL is the source of truth for product and billing state.</p></div>
-            <div className="border-2 border-zinc-700 p-4"><Server className="text-[#A3E635]" /><h3 className="mt-2 font-black uppercase">Providers</h3><p className="mt-1 text-xs font-bold text-zinc-300">Optional provider failures return unavailable or empty results, not demo records.</p></div>
+            <div className="border-2 border-hairline p-4"><Lock className="text-[#A855F7]" /><h3 className="mt-2 font-black uppercase">Identity</h3><p className="mt-1 text-xs font-bold text-ink-muted">Clerk session plus server-side tenant checks.</p></div>
+            <div className="border-2 border-hairline p-4"><Database className="text-[#06B6D4]" /><h3 className="mt-2 font-black uppercase">State</h3><p className="mt-1 text-xs font-bold text-ink-muted">PostgreSQL is the source of truth for product and billing state.</p></div>
+            <div className="border-2 border-hairline p-4"><Server className="text-[#A3E635]" /><h3 className="mt-2 font-black uppercase">Providers</h3><p className="mt-1 text-xs font-bold text-ink-muted">Optional provider failures return unavailable or empty results, not demo records.</p></div>
           </div>
         </section>
 
-        <nav className="flex flex-wrap gap-3 border-t-4 border-black pt-6 text-xs font-black uppercase">
-          <Link href="/" className="border-2 border-black bg-white px-4 py-2 shadow-[2px_2px_0_0_#000]">Home</Link>
-          <Link href="/privacy" className="border-2 border-black bg-white px-4 py-2 shadow-[2px_2px_0_0_#000]">Privacy</Link>
-          <Link href="/api-terms" className="border-2 border-black bg-white px-4 py-2 shadow-[2px_2px_0_0_#000]">API status</Link>
+        <nav className="flex flex-wrap gap-3 border-t-4 border-outline pt-6 text-xs font-black uppercase">
+          <Link href="/" className="border-2 border-outline bg-card px-4 py-2 shadow-brutal-sm">Home</Link>
+          <Link href="/privacy" className="border-2 border-outline bg-card px-4 py-2 shadow-brutal-sm">Privacy</Link>
+          <Link href="/api-terms" className="border-2 border-outline bg-card px-4 py-2 shadow-brutal-sm">API status</Link>
         </nav>
       </div>
     </main>

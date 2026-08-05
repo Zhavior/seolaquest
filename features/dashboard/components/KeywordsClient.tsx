@@ -77,7 +77,7 @@ export function KeywordsClient({ initialKeywords }: KeywordsClientProps) {
   }, [keywords, searchQuery])
 
   return (
-    <QuestPageShell watermark={<Swords className="h-[650px] w-[650px] text-black" />} gap="none">
+    <QuestPageShell watermark={<Swords className="h-[650px] w-[650px] text-ink" />} gap="none">
       <motion.div
         variants={container}
         initial={shouldReduceMotion ? 'show' : 'hidden'}
@@ -86,8 +86,8 @@ export function KeywordsClient({ initialKeywords }: KeywordsClientProps) {
       >
         <motion.div variants={item}>
           <QuestTicker label="Quest log and keyword monitors. Live signal streams.">
-            <Sparkles className="h-5 w-5 text-black" /> ⚔️ QUEST LOG &amp; KEYWORD MONITORS{' '}
-            <Sparkles className="h-5 w-5 text-black" /> 🛡️ LIVE SIGNAL STREAMS
+            <Sparkles className="h-5 w-5 text-ink" /> ⚔️ QUEST LOG &amp; KEYWORD MONITORS{' '}
+            <Sparkles className="h-5 w-5 text-ink" /> 🛡️ LIVE SIGNAL STREAMS
           </QuestTicker>
         </motion.div>
 
@@ -109,10 +109,10 @@ export function KeywordsClient({ initialKeywords }: KeywordsClientProps) {
           aria-labelledby="arm-keyword-heading"
           className={questSurface({ className: 'space-y-6 p-6' })}
         >
-          <div className="flex flex-wrap items-center justify-between gap-3 border-b-4 border-black pb-3">
+          <div className="flex flex-wrap items-center justify-between gap-3 border-b-4 border-outline pb-3">
             <h2
               id="arm-keyword-heading"
-              className="flex items-center gap-2 text-xl font-black uppercase text-black"
+              className="flex items-center gap-2 text-xl font-black uppercase text-ink"
             >
               <Plus aria-hidden="true" className="h-6 w-6 stroke-[3px] text-[#FF5722]" /> Arm New Keyword Stream
             </h2>
@@ -120,7 +120,7 @@ export function KeywordsClient({ initialKeywords }: KeywordsClientProps) {
           </div>
 
           <div className="space-y-2">
-            <label htmlFor="keyword-phrase" className="block text-xs font-black uppercase text-black/70">
+            <label htmlFor="keyword-phrase" className="block text-xs font-black uppercase text-ink/70">
               Target Buyer Phrase / Keyword
             </label>
             <input
@@ -129,7 +129,7 @@ export function KeywordsClient({ initialKeywords }: KeywordsClientProps) {
               value={newPhrase}
               onChange={(e) => setNewPhrase(e.target.value)}
               placeholder="e.g. need a crm tool, looking for hubspot alternative"
-              className="w-full min-h-11 border-3 border-black bg-[#FFF8D9] p-3.5 text-sm font-black text-black shadow-[3px_3px_0_0_#000] placeholder:text-black/40 focus:bg-[#FFE600] focus:outline-none"
+              className="w-full min-h-11 border-3 border-outline bg-highlight p-3.5 text-sm font-black text-on-accent shadow-brutal-sm placeholder:text-on-accent/50 focus:bg-accent focus:outline-none"
             />
           </div>
 
@@ -150,14 +150,14 @@ export function KeywordsClient({ initialKeywords }: KeywordsClientProps) {
           <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
             <h2
               id="active-streams-heading"
-              className="inline-block -rotate-1 border-2 border-black bg-black px-4 py-1.5 text-2xl font-black uppercase text-white"
+              className="inline-block -rotate-1 border-2 border-outline bg-black px-4 py-1.5 text-2xl font-black uppercase text-white"
             >
               Active Keyword Streams ({filteredKeywords.length})
             </h2>
 
             {/* Instant Search Bar */}
             <div className={questSurface({ shadow: 'md', className: 'relative flex min-w-0 items-center sm:min-w-[260px]' })}>
-              <Search aria-hidden="true" className="pointer-events-none absolute left-3 h-4 w-4 text-black/60" />
+              <Search aria-hidden="true" className="pointer-events-none absolute left-3 h-4 w-4 text-ink/60" />
               <label htmlFor="keyword-search" className="sr-only">
                 Search stream phrases
               </label>
@@ -167,13 +167,13 @@ export function KeywordsClient({ initialKeywords }: KeywordsClientProps) {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="SEARCH STREAM PHRASES..."
-                className="min-h-11 w-full bg-transparent py-2.5 pl-9 pr-12 text-xs font-black uppercase text-black placeholder:text-black/40 focus:outline-none"
+                className="min-h-11 w-full bg-transparent py-2.5 pl-9 pr-12 text-xs font-black uppercase text-ink placeholder:text-on-accent/50 focus:outline-none"
               />
               {searchQuery && (
                 <button
                   type="button"
                   onClick={() => setSearchQuery('')}
-                  className="absolute right-0 flex h-11 w-11 items-center justify-center text-black/60 hover:text-black"
+                  className="absolute right-0 flex h-11 w-11 items-center justify-center text-ink/60 hover:text-ink"
                   aria-label="Clear search"
                 >
                   <X aria-hidden="true" className="h-4 w-4" />
@@ -184,9 +184,9 @@ export function KeywordsClient({ initialKeywords }: KeywordsClientProps) {
 
           {filteredKeywords.length === 0 ? (
             <QuestPanel padding="lg" className="text-center">
-              <ShieldAlert aria-hidden="true" className="mx-auto mb-3 h-8 w-8 text-black" />
+              <ShieldAlert aria-hidden="true" className="mx-auto mb-3 h-8 w-8 text-ink" />
               <h3 className="text-xl font-black uppercase">No matching keyword streams</h3>
-              <p className="mt-1 text-sm font-bold text-black/70">
+              <p className="mt-1 text-sm font-bold text-ink/70">
                 Arm a new phrase above to start tracking live buyer signals.
               </p>
             </QuestPanel>
@@ -209,7 +209,7 @@ export function KeywordsClient({ initialKeywords }: KeywordsClientProps) {
                         {kw.platform}
                       </QuestBadge>
                     </div>
-                    <h3 className="break-word-safe text-xl font-black uppercase text-black md:text-2xl">
+                    <h3 className="break-word-safe text-xl font-black uppercase text-ink md:text-2xl">
                       &quot;{kw.phrase}&quot;
                     </h3>
                   </div>
@@ -223,10 +223,10 @@ export function KeywordsClient({ initialKeywords }: KeywordsClientProps) {
                         className: 'px-3.5 py-2 text-right',
                       })}
                     >
-                      <div className="text-[10px] font-black uppercase tracking-wider text-black/60">
+                      <div className="text-[10px] font-black uppercase tracking-wider text-ink/60">
                         Matches found
                       </div>
-                      <div className="text-2xl font-black text-black">{kw.matchesFound}</div>
+                      <div className="text-2xl font-black text-ink">{kw.matchesFound}</div>
                     </div>
 
                     <QuestBadge
