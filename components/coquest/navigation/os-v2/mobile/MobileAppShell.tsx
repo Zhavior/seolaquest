@@ -11,8 +11,11 @@ export const MOBILE_NAV_ID = 'coquest-mobile-nav'
 /** Height of the bottom tray content box, published to CSS as a variable. */
 const TRAY_HEIGHT = '4.75rem'
 
-/** StatusBar height — same constant the desktop sidebar sticks against. */
-const TOP_BAR_OFFSET = '61px'
+/**
+ * StatusBar height (h-16 + 4px border, h-20 + 4px from `sm`) plus the top safe
+ * area it pads itself with — the desktop sidebar sticks against the same value.
+ */
+const TOP_BAR_OFFSET = 'calc(68px + env(safe-area-inset-top, 0px))'
 
 const FOCUSABLE =
   'a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])'

@@ -1,9 +1,14 @@
 'use client'
 
-import { CheckCircle2, CircleSlash2, LockKeyhole, Search } from 'lucide-react'
+import { useEffect, useRef } from 'react'
+import { CheckCircle2, CircleSlash2, Crown, LockKeyhole, Search } from 'lucide-react'
 
 import type { BillingPlanView } from '@/features/billing/catalog'
-import type { BillingAvailability, BillingReadyViewModel } from '@/features/billing/viewModel'
+import type {
+  BillingAvailability,
+  BillingReadyViewModel,
+  FounderPassView,
+} from '@/features/billing/viewModel'
 import type { PlanCode } from '@/src/modules/billing/domain/catalog'
 
 type PlanGridProps = {
@@ -11,7 +16,40 @@ type PlanGridProps = {
   currentPlan: BillingReadyViewModel['subscription']['plan']
   purchasingPlan: PlanCode | null
   checkoutAvailability: BillingAvailability
+  founderPass: FounderPassView
+  /** Set by `/billing?offer=founder`, so the Recharge CTA lands on the offer. */
+  highlightPlan?: PlanCode | null
   onSelectPlan: (plan: PlanCode) => void
+}
+
+function FounderSeatCounter({ founderPass }: { founderPass: FounderPassView }) {
+  const taken = founderPass.limit - founderPass.remaining
+  const filled = founderPass.limit > 0 ? Math.round((taken / founderPass.limit) * 100) : 100
+
+  return (
+    <div className="mt-4 border-3 border-black bg-white p-3">
+      <p
+        // Announced politely: the number moves as other people buy, and a live
+        // seat count should never interrupt what the hunter is reading.
+        aria-live="polite"
+        className="text-xs font-black uppercase"
+      >
+        {founderPass.soldOut
+          ? `All ${founderPass.limit} founder seats claimed`
+          : `${founderPass.remaining} / ${founderPass.limit} founder seats remaining`}
+      </p>
+
+      <div className="mt-2 h-3 w-full border-2 border-black bg-[#F4F0EA]">
+        <div className="h-full bg-[#FF5722]" style={{ width: `${Math.min(100, filled)}%` }} />
+      </div>
+
+      {founderPass.reserved > 0 && !founderPass.soldOut ? (
+        <p className="mt-2 text-[10px] font-bold uppercase text-zinc-600">
+          {founderPass.reserved} held by checkouts in progress
+        </p>
+      ) : null}
+    </div>
+  )
 }
 
 export function PlanGrid({
@@ -19,8 +57,19 @@ export function PlanGrid({
   currentPlan,
   purchasingPlan,
   checkoutAvailability,
+  founderPass,
+  highlightPlan,
   onSelectPlan,
 }: PlanGridProps) {
+  const highlightRef = useRef<HTMLElement>(null)
+
+  useEffect(() => {
+    if (!highlightPlan) return
+    // The model streams in behind Suspense, so a plain `#anchor` would resolve
+    // before this section exists. Scroll once the card has actually rendered.
+    highlightRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+  }, [highlightPlan])
+
   return (
     <section aria-labelledby="billing-plans-heading" className="mt-12">
       <div className="border-b-4 border-black pb-4">
@@ -36,34 +85,53 @@ export function PlanGrid({
         {plans.map((plan) => {
           const isCurrent = currentPlan === plan.code
           const canCheckout = checkoutAvailability.state === 'available'
+          const isFounder = plan.code === 'FOUNDER'
+          // A sold-out or unconfigured Founder Pass must not offer a button that
+          // the server would only refuse. The seat cap is enforced at checkout;
+          // this keeps the UI honest about it before the click.
+          const founderBlocked = isFounder && !founderPass.sellable
           const disabled = plan.code === 'FREE'
             || !plan.enabled
             || isCurrent
             || !canCheckout
+            || founderBlocked
             || purchasingPlan !== null
           const isPaidOffer = plan.code !== 'FREE' && plan.enabled
+          const highlighted = highlightPlan === plan.code
 
           return (
             <article
               key={plan.code}
+              id={`plan-${plan.code.toLowerCase()}`}
+              ref={highlighted ? highlightRef : undefined}
               className={`flex min-h-[390px] flex-col border-4 border-black p-6 shadow-[7px_7px_0_0_#000] ${
-                isPaidOffer ? 'bg-[#A3E635]' : plan.enabled ? 'bg-white' : 'bg-zinc-200'
-              }`}
+                isFounder ? 'bg-[#FDE68A]' : isPaidOffer ? 'bg-[#A3E635]' : plan.enabled ? 'bg-white' : 'bg-zinc-200'
+              } ${highlighted ? 'outline-4 outline-offset-4 outline-[#FF5722]' : ''}`}
             >
               <div className="flex items-start justify-between gap-3">
                 <div>
                   <p className="text-xs font-black uppercase text-zinc-600">{plan.availabilityLabel}</p>
                   <h3 className="mt-1 text-2xl font-black uppercase">{plan.name}</h3>
                 </div>
-                {isPaidOffer ? <Search aria-hidden className="h-7 w-7" /> : plan.enabled
-                  ? <CircleSlash2 aria-hidden className="h-7 w-7" />
-                  : <LockKeyhole aria-hidden className="h-7 w-7" />}
+                {isFounder ? <Crown aria-hidden className="h-7 w-7" /> : isPaidOffer
+                  ? <Search aria-hidden className="h-7 w-7" />
+                  : plan.enabled
+                    ? <CircleSlash2 aria-hidden className="h-7 w-7" />
+                    : <LockKeyhole aria-hidden className="h-7 w-7" />}
               </div>
+
+              {isFounder ? (
+                <p className="mt-3 inline-flex w-fit items-center gap-2 border-3 border-black bg-black px-2 py-1 text-[10px] font-black uppercase tracking-wider text-[#FDE68A]">
+                  <Crown aria-hidden className="h-3.5 w-3.5" /> Founder — price locked for life
+                </p>
+              ) : null}
 
               <p className="mt-5 text-4xl font-black">{plan.priceLabel}</p>
               <p className="mt-2 text-xs font-black uppercase text-zinc-700">
-                {plan.scanLimit} credits per qualifying paid invoice
+                {plan.scanLimit.toLocaleString()} credits per qualifying paid invoice
               </p>
+
+              {isFounder ? <FounderSeatCounter founderPass={founderPass} /> : null}
 
               <ul className="mt-6 flex-1 space-y-3 border-3 border-black bg-white p-4 text-sm font-bold">
                 {plan.benefits.map((benefit) => (
@@ -90,8 +158,18 @@ export function PlanGrid({
                         ? 'Opening Stripe…'
                         : !canCheckout
                           ? checkoutAvailability.label
-                          : `Choose ${plan.name}`}
+                          : founderBlocked
+                            ? founderPass.soldOut ? 'Founder seats sold out' : 'Founder pass unavailable'
+                            : `Choose ${plan.name}`}
               </button>
+
+              {isFounder ? (
+                <ul className="mt-4 space-y-2 border-3 border-black bg-white p-3 text-[11px] font-bold leading-snug">
+                  {founderPass.lockTerms.map((term) => (
+                    <li key={term}>{term}</li>
+                  ))}
+                </ul>
+              ) : null}
             </article>
           )
         })}

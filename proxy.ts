@@ -19,6 +19,10 @@ export const PUBLIC_ROUTE_PATTERNS = [
   '/api/v1/internal/dead-letters',
   '/api/v1/webhooks/clerk',
   '/api/v1/webhooks/stripe',
+  // Design previews under /dev render real components against fixed props and
+  // touch no account data. They are public only outside production, and the
+  // pages themselves 404 there, so this can never widen the live boundary.
+  ...(process.env.NODE_ENV === 'production' ? [] : ['/dev(.*)']),
 ]
 
 const isPublicRoute = createRouteMatcher(PUBLIC_ROUTE_PATTERNS)

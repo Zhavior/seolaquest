@@ -50,6 +50,19 @@ describe('Clerk public route boundary', () => {
     expect(PUBLIC_ROUTE_PATTERNS).not.toContain('/api/webhooks(.*)')
   })
 
+  it('never exposes the /dev design previews in a production build', async () => {
+    // The pattern list is read at module load, so the guard is asserted through
+    // a fresh import under a production environment rather than by mutating it.
+    vi.stubEnv('NODE_ENV', 'production')
+    vi.resetModules()
+
+    const { PUBLIC_ROUTE_PATTERNS: productionPatterns } = await import('./proxy')
+    expect(productionPatterns).not.toContain('/dev(.*)')
+
+    vi.unstubAllEnvs()
+    vi.resetModules()
+  })
+
   it.each([
     '/onboarding',
     '/app',

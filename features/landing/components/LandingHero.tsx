@@ -255,7 +255,7 @@ export function LandingHero() {
           </button>
         </div>
 
-        <div className="grid items-start gap-10 lg:min-h-[calc(100vh-7rem)] lg:grid-cols-[minmax(0,0.92fr)_minmax(420px,1.08fr)] lg:gap-12">
+        <div className="grid items-start gap-8 lg:gap-12 lg:min-h-[calc(100vh-7rem)] lg:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)]">
         <motion.div
           initial={shouldReduceMotion ? false : 'hidden'}
           animate="show"
@@ -284,8 +284,8 @@ export function LandingHero() {
             variants={fadeUp}
             className="mt-4 max-w-xl text-base font-bold leading-relaxed text-black/80 sm:text-lg"
           >
-            CoQuest helps founders and operators scan Reddit and X conversations, spot recurring buyer pain,
-            and turn scattered signals into clearer product direction.
+            CoQuest helps founders and operators scan X conversations, spot recurring buyer pain,
+            and turn scattered signals into clearer product direction. Reddit is coming soon.
           </motion.p>
 
           <motion.div

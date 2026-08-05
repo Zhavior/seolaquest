@@ -1,15 +1,23 @@
 'use client'
 
 import { useState, useEffect, useCallback, type ReactNode } from 'react'
-import { Menu } from 'lucide-react'
 
-import CommandPalette from '../os/palette/CommandPalette'
+import dynamic from 'next/dynamic'
+
 import ShellLayout from './layout/ShellLayout'
-import MobileAppShell, { MOBILE_NAV_ID } from './mobile/MobileAppShell'
+import MobileAppShell from './mobile/MobileAppShell'
 import MobileBottomNav from './mobile/MobileBottomNav'
 import Sidebar, { SidebarNavigation } from './sidebar/Sidebar'
 import StatusBar from './statusbar/StatusBar'
 import Workspace from './workspace/Workspace'
+import { sfx } from '@/lib/sfx'
+
+/**
+ * The palette renders `null` until Cmd/Ctrl+K opens it, so it contributes
+ * nothing above the fold. Loading it as its own client chunk keeps it — and the
+ * whole navigation index it closes over — out of the shell's critical path.
+ */
+const CommandPalette = dynamic(() => import('../os/palette/CommandPalette'), { ssr: false })
 
 export interface UserSummary {
   name?: string | null
@@ -17,10 +25,14 @@ export interface UserSummary {
   level?: number
   xp?: number
   xpRequired?: number
+  /** Spendable scan credits. The HUD renders this as the MP bar. */
   questsRemaining?: number
   spellsCast?: number
   questsExported?: number
+  /** High-water mark for credits, used as the MP bar's denominator. */
   maxCredits?: number
+  /** Live signals still awaiting a claim or dismissal. */
+  openQuests?: number
   profileIconKey?: string | null
 }
 
@@ -50,6 +62,11 @@ export default function CoQuestShell({
   const toggleCollapsed = () => {
     setCollapsed((prev) => {
       const next = !prev
+      if (next) {
+        sfx.playSidebarCollapse()
+      } else {
+        sfx.playSidebarExpand()
+      }
       try {
         localStorage.setItem('coquest_sidebar_collapsed', String(next))
       } catch {
@@ -92,23 +109,6 @@ export default function CoQuestShell({
         mobileOpen={mobileOpen}
         onCloseMobile={closeMobile}
         sidebar={<SidebarNavigation mobile onNavigate={closeMobile} />}
-        header={
-          <div className="flex items-center gap-3 py-2">
-            <button
-              type="button"
-              onClick={openMobile}
-              aria-label="Open navigation"
-              aria-controls={MOBILE_NAV_ID}
-              aria-expanded={mobileOpen}
-              className="grid size-9 shrink-0 place-items-center border-3 border-black bg-[#FFE600] shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none"
-            >
-              <Menu className="size-5 text-black" strokeWidth={3} />
-            </button>
-            {/* Short brand mark — this bar is inside the `md:hidden` mobile header,
-                so the desktop sidebar's full "SEO la Quest" never competes with it. */}
-            <span className="text-xs font-black uppercase tracking-[0.2em]">SEOLQ</span>
-          </div>
-        }
         bottomBar={<MobileBottomNav mobileOpen={mobileOpen} onOpenNavigation={openMobile} />}
       >
         <Workspace>{children}</Workspace>

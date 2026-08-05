@@ -3,7 +3,13 @@
 import { revalidatePath } from 'next/cache'
 import prisma from '@/lib/prisma'
 import { getCurrentUser } from '@/lib/auth'
+import { logger } from '@/src/modules/core/infrastructure/logger'
 import { MAX_ACTIVE_KEYWORDS_PER_TENANT } from '@/src/modules/keywords/application/KeywordService'
+import { buildSampleQuests } from '@/src/modules/onboarding/domain/sampleQuests'
+import {
+  applyXpGain,
+  XP_FIRST_QUEST_BONUS,
+} from '@/src/modules/progression/domain/progression'
 import { DEFAULT_PROFILE_ICON_KEY } from './profileIconOptions'
 import {
   cleanOnboardingText,
@@ -28,12 +34,22 @@ type SaveStepResult = ActionFailure | {
   nextStep: number
 }
 
+export type OnboardingReward = {
+  xpAwarded: number
+  xp: number
+  level: number
+  xpRequired: number
+  didLevelUp: boolean
+  sampleQuestsSeeded: number
+}
+
 export type CompleteOnboardingResult = ActionFailure | {
   ok: true
   keyword: {
     id: string
     phrase: string
   }
+  reward: OnboardingReward
 }
 
 function signedOutFailure(): ActionFailure {
@@ -110,7 +126,10 @@ export async function saveOnboardingStepAction(input: SaveOnboardingStepInput): 
     revalidatePath('/onboarding')
     return { ok: true, nextStep }
   } catch (error) {
-    console.error('saveOnboardingStepAction failed:', error)
+    logger.error(
+      { err: error, step: parsed.data.step, outcomeCode: 'ONBOARDING_STEP_SAVE_FAILED' },
+      'Onboarding step could not be saved',
+    )
     return validationFailure('This step could not be saved. Your earlier progress is still safe; try again.')
   }
 }
@@ -140,7 +159,11 @@ export async function skipOnboardingStepAction(step: 2 | 3): Promise<SaveStepRes
     if (updated.count !== 1) return alreadyCompleteFailure()
     revalidatePath('/onboarding')
     return { ok: true, nextStep }
-  } catch {
+  } catch (error) {
+    logger.error(
+      { err: error, step: parsed.data, outcomeCode: 'ONBOARDING_STEP_SKIP_FAILED' },
+      'Onboarding step could not be skipped',
+    )
     return validationFailure('This step could not be skipped. Your earlier progress is still safe; try again.')
   }
 }
@@ -154,6 +177,9 @@ type LockedOnboardingUser = {
   targetCustomer: string | null
   firstKeyword: string | null
   preferredSource: PreferredSource | null
+  xp: number
+  level: number
+  xpRequired: number
 }
 
 export async function completeOnboardingAction(): Promise<CompleteOnboardingResult> {
@@ -172,7 +198,10 @@ export async function completeOnboardingAction(): Promise<CompleteOnboardingResu
           "businessDescription",
           "targetCustomer",
           "firstKeyword",
-          "preferredSource"
+          "preferredSource",
+          "xp",
+          "level",
+          "xpRequired"
         FROM "User"
         WHERE "id" = ${currentUser.id}
         FOR UPDATE
@@ -229,12 +258,42 @@ export async function completeOnboardingAction(): Promise<CompleteOnboardingResu
         })
       }
 
+      // Seeded tutorial signals, so the queue is never empty on the first visit.
+      // `skipDuplicates` keeps this a no-op if a previous attempt already wrote
+      // them — the ids are stable and the table is unique on (userId, externalPostId).
+      const sampleQuests = buildSampleQuests(keyword.phrase)
+      const seeded = await tx.lead.createMany({
+        data: sampleQuests.map((quest) => ({
+          userId: currentUser.id,
+          keywordId: keyword.id,
+          platform: quest.platform,
+          externalPostId: quest.externalPostId,
+          author: quest.author,
+          content: quest.content,
+          matched: quest.matched,
+          url: quest.url,
+        })),
+        skipDuplicates: true,
+      })
+
+      // The first-quest reward. It rides the same row lock as the rest of
+      // completion, so a double-submitted Complete button cannot pay it twice:
+      // the second pass sees `onboardingComplete` and returns above.
+      const reward = applyXpGain(
+        { xp: user.xp, level: user.level, xpRequired: user.xpRequired },
+        XP_FIRST_QUEST_BONUS,
+      )
+
       await tx.user.update({
         where: { id: currentUser.id },
         data: {
           onboardingComplete: true,
           onboardingStep: LAST_ONBOARDING_STEP,
           profileIconKey: user.profileIconKey ?? DEFAULT_PROFILE_ICON_KEY,
+          xp: reward.xp,
+          level: reward.level,
+          xpRequired: reward.xpRequired,
+          xpMultiplier: reward.xpMultiplier,
         },
       })
 
@@ -255,6 +314,14 @@ export async function completeOnboardingAction(): Promise<CompleteOnboardingResu
           id: keyword.id,
           phrase: keyword.phrase,
         },
+        reward: {
+          xpAwarded: XP_FIRST_QUEST_BONUS,
+          xp: reward.xp,
+          level: reward.level,
+          xpRequired: reward.xpRequired,
+          didLevelUp: reward.didLevelUp,
+          sampleQuestsSeeded: seeded.count,
+        },
       }
     })
 
@@ -263,7 +330,10 @@ export async function completeOnboardingAction(): Promise<CompleteOnboardingResu
     revalidatePath('/app')
     return result
   } catch (error) {
-    console.error('completeOnboardingAction failed:', error)
+    logger.error(
+      { err: error, outcomeCode: 'ONBOARDING_COMPLETE_FAILED' },
+      'Onboarding completion transaction failed',
+    )
     return validationFailure('Setup could not be completed right now. Your saved progress is still available.')
   }
 }

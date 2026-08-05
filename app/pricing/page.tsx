@@ -1,19 +1,43 @@
 import Link from 'next/link'
-import { CheckCircle2, CircleSlash2, Search, ShieldCheck } from 'lucide-react'
+import { CheckCircle2, CircleSlash2, Crown, Search, ShieldCheck } from 'lucide-react'
 import { Footer } from '@/components/Footer'
 import { BILLING_EVENTS, recordBillingEvent } from '@/features/billing/analytics'
 import { getBillingPlanCatalog } from '@/features/billing/catalog'
+import { FounderSeatService } from '@/src/modules/billing/application/FounderSeatService'
+import { FOUNDER_LOCK_TERMS } from '@/src/modules/billing/domain/catalog'
 
 export const metadata = {
   title: 'Pricing | SEO la Quest',
   description: 'SEO la Quest plan availability and manual scan entitlements.',
 }
 
-export default function PricingPage() {
+/**
+ * Cached for a minute rather than rendered per request. The founder seat count
+ * is the one live number on this page, and a marketing page should not pay a
+ * database round trip per visitor to keep it to-the-second accurate.
+ */
+export const revalidate = 60
+
+/**
+ * A marketing page must render even when the database does not answer, so a
+ * failed count degrades to "no counter" rather than to an error page. The cap
+ * itself is enforced at checkout, never here.
+ */
+async function founderSeatsOrNull() {
+  try {
+    return await FounderSeatService.snapshot()
+  } catch {
+    return null
+  }
+}
+
+export default async function PricingPage() {
   recordBillingEvent({ name: BILLING_EVENTS.pricingViewed, surface: 'pricing' })
   const plans = getBillingPlanCatalog()
   const free = plans.find((plan) => plan.code === 'FREE')!
   const beta = plans.find((plan) => plan.code === 'BETA')!
+  const founder = plans.find((plan) => plan.code === 'FOUNDER')!
+  const founderSeats = await founderSeatsOrNull()
   const unavailablePlans = plans.filter((plan) => !plan.enabled)
 
   return (
@@ -46,6 +70,56 @@ export default function PricingPage() {
             </ul>
             <Link href="/sign-up" className="mt-7 inline-flex border-4 border-black bg-[#FF5722] px-5 py-3 font-black uppercase text-black shadow-[4px_4px_0_0_#000]">Create account to continue</Link>
           </article>
+        </section>
+
+        <section className="mt-7 border-4 border-black bg-[#FDE68A] p-7 shadow-[8px_8px_0_0_#000]">
+          <div className="flex flex-wrap items-start justify-between gap-4">
+            <div>
+              <span className="inline-flex items-center gap-2 border-3 border-black bg-black px-3 py-1.5 text-[11px] font-black uppercase tracking-wider text-[#FDE68A]">
+                <Crown size={14} /> Founder — price locked for life
+              </span>
+              <h2 className="mt-4 text-3xl font-black uppercase">{founder.name}</h2>
+              <p className="mt-2 text-4xl font-black">{founder.priceLabel}</p>
+            </div>
+
+            {founderSeats ? (
+              <div className="min-w-[220px] border-3 border-black bg-white p-4">
+                <p className="text-xs font-black uppercase">
+                  {founderSeats.soldOut
+                    ? `All ${founderSeats.limit} founder seats claimed`
+                    : `${founderSeats.remaining} / ${founderSeats.limit} founder seats remaining`}
+                </p>
+                <div className="mt-2 h-3 w-full border-2 border-black bg-[#F4F0EA]">
+                  <div
+                    className="h-full bg-[#FF5722]"
+                    style={{
+                      width: `${Math.min(100, Math.round(((founderSeats.limit - founderSeats.remaining) / founderSeats.limit) * 100))}%`,
+                    }}
+                  />
+                </div>
+              </div>
+            ) : null}
+          </div>
+
+          <ul className="mt-5 space-y-3 font-bold">
+            {founder.benefits.map((benefit) => (
+              <li key={benefit} className="flex gap-2"><CheckCircle2 className="shrink-0" /> {benefit}</li>
+            ))}
+          </ul>
+
+          <ul className="mt-5 space-y-2 border-3 border-black bg-white p-4 text-sm font-bold">
+            {FOUNDER_LOCK_TERMS.map((term) => <li key={term}>{term}</li>)}
+          </ul>
+
+          {founderSeats?.soldOut ? (
+            <p className="mt-7 inline-flex border-4 border-black bg-zinc-200 px-5 py-3 font-black uppercase text-zinc-600 shadow-[4px_4px_0_0_#000]">
+              Founder seats sold out
+            </p>
+          ) : (
+            <Link href="/sign-up" className="mt-7 inline-flex border-4 border-black bg-[#FF5722] px-5 py-3 font-black uppercase text-black shadow-[4px_4px_0_0_#000]">
+              Claim a founder seat
+            </Link>
+          )}
         </section>
 
         <aside className="mt-10 border-4 border-black bg-black p-6 font-bold text-white shadow-[6px_6px_0_0_#06B6D4]">

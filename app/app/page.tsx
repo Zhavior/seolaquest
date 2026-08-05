@@ -1,12 +1,14 @@
 import nextDynamic from 'next/dynamic'
 import type { Metadata } from 'next'
 import { Suspense } from 'react'
-import Loading from '../(app)/loading'
+import AppLoading from './loading'
 import { type DashboardKeyword, type DashboardLead, type DashboardUser } from '@/features/dashboard/types'
 import { requireCurrentUser } from '@/lib/auth'
 import prisma from '@/lib/prisma'
+import { EntitlementService } from '@/src/modules/billing/application/EntitlementService'
 
 const DashboardClient = nextDynamic(() => import('@/features/dashboard/components/DashboardClient'))
+const FirstQuestBanner = nextDynamic(() => import('@/features/dashboard/components/FirstQuestBanner'))
 
 export const dynamic = 'force-dynamic'
 
@@ -17,7 +19,7 @@ export const metadata: Metadata = {
 
 export default function AppHomePage() {
   return (
-    <Suspense fallback={<Loading />}>
+    <Suspense fallback={<AppLoading />}>
       <DashboardShellData />
     </Suspense>
   )
@@ -26,7 +28,7 @@ export default function AppHomePage() {
 async function DashboardShellData() {
   const user = await requireCurrentUser()
 
-  const [keywords, leads, billingSubscription] = await Promise.all([
+  const [keywords, leads, billingSubscription, entitlements] = await Promise.all([
     prisma.trackedKeyword.findMany({
       where: { userId: user.id },
       orderBy: { createdAt: 'desc' },
@@ -50,6 +52,7 @@ async function DashboardShellData() {
       where: { userId: user.id },
       select: { plan: true, status: true },
     }),
+    EntitlementService.forUser(user.id),
   ])
 
   const dashboardUser: DashboardUser = {
@@ -61,6 +64,11 @@ async function DashboardShellData() {
     questsRemaining: user.questsRemaining,
     maxCredits: user.maxCredits,
     planLabel: billingSubscription ? `${billingSubscription.plan} / ${billingSubscription.status}` : 'NO ACTIVE PLAN',
+    entitlements: {
+      canUsePaidScans: entitlements.canUsePaidScans,
+      canGenerateAIReplies: entitlements.canGenerateAIReplies,
+      canExportToCRM: entitlements.canExportToCRM,
+    },
   }
 
   const dashboardKeywords: DashboardKeyword[] = keywords
@@ -70,13 +78,16 @@ async function DashboardShellData() {
   }))
 
   return (
-    <DashboardClient
-      key="dashboard-shell"
-      dbUser={dashboardUser}
-      dbKeywords={dashboardKeywords}
-      dbLeads={dashboardLeads}
-      dbAnalytics={[]}
-      dbLeaderboard={[]}
-    />
+    <>
+      <FirstQuestBanner />
+      <DashboardClient
+        key="dashboard-shell"
+        dbUser={dashboardUser}
+        dbKeywords={dashboardKeywords}
+        dbLeads={dashboardLeads}
+        dbAnalytics={[]}
+        dbLeaderboard={[]}
+      />
+    </>
   )
 }

@@ -15,11 +15,16 @@ export default function ShellLayout({
   children,
 }: ShellLayoutProps) {
   return (
-    <div className="min-h-screen bg-[#FAF7F2] text-black flex flex-col font-sans selection:bg-yellow-400 selection:text-black">
+    // `overflow-x-clip` throughout, never `overflow-x-hidden`. Both contain
+    // horizontal overflow, but `hidden` makes the element a scroll container,
+    // and a scroll-container ancestor is what `position: sticky` resolves
+    // against — so the row on the second line below would silently stop the
+    // sidebar rail from pinning. `clip` contains overflow without that effect.
+    <div className="min-h-screen max-w-full overflow-x-clip bg-[#FAF7F2] text-black flex flex-col font-sans selection:bg-yellow-400 selection:text-black">
       {statusBar}
-      <div className="flex flex-1">
+      <div className="flex flex-1 min-w-0 max-w-full overflow-x-clip">
         {sidebar}
-        <div className="flex-1 min-w-0 p-4 md:p-6">
+        <div className="flex-1 min-w-0 max-w-full overflow-x-clip p-2 sm:p-4 md:p-6">
           {children}
         </div>
       </div>

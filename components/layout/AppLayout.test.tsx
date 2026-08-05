@@ -1,6 +1,13 @@
 import type { ReactNode } from 'react'
 import { render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
+
+const signOutMock = vi.fn()
+
+vi.mock('@clerk/nextjs', () => ({
+  useClerk: () => ({ signOut: signOutMock }),
+}))
 
 vi.mock('next/navigation', () => ({
   usePathname: () => '/dashboard',
@@ -27,16 +34,19 @@ describe('Neobrutalist AppLayout Component', () => {
     // Brand and Identity
     expect(screen.getByText('COQUEST')).toBeInTheDocument()
     expect(screen.getByText('REINALD')).toBeInTheDocument()
-    expect(screen.getByText('LVL 10')).toBeInTheDocument()
+    expect(screen.getAllByText('LVL 10').length).toBeGreaterThan(0)
 
-    // Mana Vault HUD
-    expect(screen.getByText(/Vault:/i)).toBeInTheDocument()
+    // Telemetry HUD
     expect(screen.getByText('70/100 MP')).toBeInTheDocument()
-    expect(screen.getByText('LEGEND')).toBeInTheDocument()
+    expect(screen.getByText('12 QUESTS')).toBeInTheDocument()
+    expect(screen.getByText('XP 1,250')).toBeInTheDocument()
 
-    // Health Dot & Billing CTA
-    expect(screen.getByText('RADAR ACTIVE')).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: /RECHARGE/i })).toHaveAttribute('href', '/billing')
+    // Billing CTA
+    // Deep-linked to the Founder offer so Recharge lands on the card, not the page top.
+    expect(screen.getByRole('link', { name: /Recharge/i })).toHaveAttribute(
+      'href',
+      '/billing?offer=founder',
+    )
   })
 
   it('renders Neobrutalist Sidebar (Quest Compass) elements', () => {
@@ -63,7 +73,24 @@ describe('Neobrutalist AppLayout Component', () => {
     expect(
       screen.getByText('Scouts currently patrolling r/SaaS and Twitter streams.')
     ).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: /LOG OUT/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /LOG OUT/i })).toBeInTheDocument()
+  })
+
+  it('ends the Clerk session instead of only linking to /sign-in', async () => {
+    signOutMock.mockClear()
+
+    render(
+      <AppLayout>
+        <div>Content Shell</div>
+      </AppLayout>
+    )
+
+    const logOut = screen.getByRole('button', { name: /LOG OUT/i })
+    expect(logOut).not.toHaveAttribute('href')
+
+    await userEvent.click(logOut)
+
+    expect(signOutMock).toHaveBeenCalledWith({ redirectUrl: '/' })
   })
 
   it('renders children within main container', () => {

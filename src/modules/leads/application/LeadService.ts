@@ -8,6 +8,10 @@ import {
   normalizeCrmWebhookUrl,
   UnsafeCrmWebhookUrlError,
 } from '@/src/modules/core/security/crmWebhookUrl'
+import {
+  applyXpGain,
+  XP_PER_CLAIMED_QUEST,
+} from '@/src/modules/progression/domain/progression'
 import { CrmDeliveryService } from './CrmDeliveryService'
 import { z } from 'zod'
 
@@ -17,15 +21,15 @@ const openAiReplySchema = z.object({
   })).min(1),
 })
 
-function levelAfterClaim(user: { xp: number; level: number; xpRequired: number }) {
-  let { xp, level, xpRequired } = user
-  xp += 10
-  if (xp >= xpRequired) {
-    level += 1
-    xp -= xpRequired
-    xpRequired = Math.floor(xpRequired * 1.5)
+function levelAfterClaim(user: { xp: number; level: number; xpRequired: number; xpMultiplier?: number }) {
+  const result = applyXpGain(user, XP_PER_CLAIMED_QUEST)
+  return {
+    xp: result.xp,
+    level: result.level,
+    xpRequired: result.xpRequired,
+    xpMultiplier: result.xpMultiplier,
+    didLevelUp: result.didLevelUp,
   }
-  return { xp, level, xpRequired }
 }
 
 export class LeadService {
@@ -135,6 +139,10 @@ export class LeadService {
         })
       })
 
+      // Stays a bare Error: this method's own catch below converts it to
+      // `{ ok: false, message }`, so it never reaches withApiHandler's error branch and
+      // the taxonomy is never consulted. The status code an AppError carried would be dead
+      // weight. Deliberately does not include the upstream body — that is logged, not returned.
       if (!response.ok) {
         throw new Error('OpenAI API request failed')
       }

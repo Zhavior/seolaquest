@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useRef, use } from 'react'
+import React, { useState, use } from 'react'
 import { motion, Variants } from 'framer-motion'
 import { FlaskConical, Sparkles, AlertTriangle, RefreshCw } from 'lucide-react'
 
@@ -42,20 +42,16 @@ export function VerificationPanel({ model }: { model: BillingUnavailableViewMode
   )
 }
 
-function BillingApp({ model }: { model: BillingReadyViewModel }) {
+function BillingApp({ model, highlightPlan }: { model: BillingReadyViewModel; highlightPlan?: PlanCode | null }) {
   const [activeEffect, setActiveEffect] = useState<'none' | 'peasant' | 'swordsman' | 'knight' | 'sorcerer' | 'dragon'>('none')
   
   // Use server model data as initial state for optimistic UI updates
-  const [userCredits, setUserCredits] = useState(model.credits.balance)
+  const [userCredits] = useState(model.credits.balance)
   
   const [purchasingPotion, setPurchasedPotion] = useState<string | null>(null)
   const [, setBrewStatus] = useState<'idle' | 'brewing' | 'redirecting'>('idle')
-  const [potionSuccess, setPotionSuccess] = useState<string | null>(null)
-  const [refillNotification, setRefillNotification] = useState<number | null>(null)
-  const [isRefilling, setIsRefilling] = useState(false)
-  const [damageTexts, setDamageTexts] = useState<DamageEntry[]>([])
+  const [damageTexts] = useState<DamageEntry[]>([])
   const [purchasingPlan, setPurchasingPlan] = useState<PlanCode | null>(null)
-  const damageIdRef = useRef(0)
 
   const { sfxEnabled, setSfxEnabled, sfxBlip, sfxCoin } = useBillingSfx()
 
@@ -75,16 +71,7 @@ function BillingApp({ model }: { model: BillingReadyViewModel }) {
     setTimeout(() => setActiveEffect('none'), 2400)
   }
 
-  const spawnDamageText = (amount: number) => {
-    const id = ++damageIdRef.current
-    const x = 40 + Math.random() * 20 // 40–60% offset from left
-    setDamageTexts(prev => [...prev, { id, amount, x }])
-    setTimeout(() => {
-      setDamageTexts(prev => prev.filter(d => d.id !== id))
-    }, 1900)
-  }
-
-  const buyPotion = async (potionId: string, questAmount: number) => {
+  const buyPotion = async (potionId: string) => {
     if (model.availability.creditTopUps.state !== 'available') {
         // We will just optimistically run for now or respect the state.
         // Actually, let's keep the exact UI flow from page 2.tsx
@@ -102,24 +89,11 @@ function BillingApp({ model }: { model: BillingReadyViewModel }) {
         return
       }
     } catch {
-      // Fallback to local demo brew visual if checkout key is not configured
+      // Checkout unavailable
     }
 
-    setTimeout(() => {
-      setPurchasedPotion(null)
-      setPotionSuccess(potionId)
-      setUserCredits(prev => Math.min(MAX_MANA, prev + questAmount))
-      setRefillNotification(questAmount)
-      setIsRefilling(true)
-      setBrewStatus('idle')
-      spawnDamageText(questAmount)
-
-      setTimeout(() => setIsRefilling(false), 800)
-      setTimeout(() => {
-        setPotionSuccess(null)
-        setRefillNotification(null)
-      }, 2500)
-    }, 600)
+    setPurchasedPotion(null)
+    setBrewStatus('idle')
   }
 
   const selectPlan = async (plan: PlanCode) => {
@@ -220,9 +194,9 @@ function BillingApp({ model }: { model: BillingReadyViewModel }) {
             userCredits={userCredits}
             MAX_MANA={MAX_MANA}
             isLowMana={isLowMana}
-            isRefilling={isRefilling}
+            isRefilling={false}
             damageTexts={damageTexts}
-            refillNotification={refillNotification}
+            refillNotification={null}
             sfxEnabled={sfxEnabled}
             setSfxEnabled={setSfxEnabled}
             sfxBlip={sfxBlip}
@@ -233,7 +207,7 @@ function BillingApp({ model }: { model: BillingReadyViewModel }) {
             itemVariants={item}
             buyPotion={buyPotion}
             purchasingPotion={purchasingPotion}
-            potionSuccess={potionSuccess}
+            potionSuccess={null}
             potionCheckoutEnabled={model.availability.checkout.state === 'available'}
             sfxBlip={sfxBlip}
           />
@@ -243,6 +217,8 @@ function BillingApp({ model }: { model: BillingReadyViewModel }) {
             currentPlan={model.subscription.plan}
             purchasingPlan={purchasingPlan}
             checkoutAvailability={model.availability.checkout}
+            founderPass={model.founderPass}
+            highlightPlan={highlightPlan}
             onSelectPlan={async (code) => {
               setPurchasingPlan(code)
               triggerEffect('knight')
@@ -261,12 +237,19 @@ function BillingApp({ model }: { model: BillingReadyViewModel }) {
   )
 }
 
-export function BillingPageClient({ modelPromise }: { modelPromise: Promise<BillingViewModel> }) {
+export function BillingPageClient({
+  modelPromise,
+  highlightPlan,
+}: {
+  modelPromise: Promise<BillingViewModel>
+  /** Deep-link target from `/billing?offer=…`, used to scroll to and ring one plan. */
+  highlightPlan?: PlanCode | null
+}) {
   const model = use(modelPromise)
-  
+
   if (model.status === 'loading' || model.status === 'unavailable') {
     return <VerificationPanel model={model} />
   }
 
-  return <BillingApp model={model} />
+  return <BillingApp model={model} highlightPlan={highlightPlan} />
 }

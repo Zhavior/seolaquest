@@ -6,7 +6,7 @@ import { sfx } from '@/lib/sfx'
 
 export function BlogHeader() {
   return (
-    <header className="sticky top-0 z-40 w-full border-b-4 border-black bg-[#FFE600] px-4 sm:px-8 py-3.5 shadow-[0_4px_0_0_#000]">
+    <header className="sticky top-0 inset-x-0 z-50 w-full max-w-full border-b-4 border-black bg-[#FFE600] px-4 sm:px-8 py-3.5 shadow-[0_4px_0_0_#000] pt-safe">
       <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
         
         {/* Brand Logo */}

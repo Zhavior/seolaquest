@@ -16,6 +16,10 @@ import {
 const PROVIDER_TIMEOUT_MS = 8_000
 export const MAX_PROVIDER_CONCURRENCY = 6
 
+// Reddit reading is implemented but not shipped yet. X is the only source we scan
+// today; add 'REDDIT' back here to turn it on without touching the parsers.
+export const ENABLED_PROVIDERS: readonly ScanProvider[] = ['X']
+
 type Keyword = { id: string; phrase: string }
 type ProviderTask = { provider: ScanProvider; keyword: Keyword }
 type CompletedAttempt = {
@@ -267,10 +271,9 @@ export class ScanProviderService {
     }
 
     const twitterToken = process.env.TWITTER_BEARER_TOKEN?.trim()
-    const tasks = keywords.flatMap((keyword): ProviderTask[] => [
-      { provider: 'REDDIT', keyword },
-      { provider: 'X', keyword },
-    ])
+    const tasks = keywords.flatMap((keyword): ProviderTask[] =>
+      ENABLED_PROVIDERS.map((provider) => ({ provider, keyword })),
+    )
     const results = await mapWithConcurrency(
       tasks,
       MAX_PROVIDER_CONCURRENCY,

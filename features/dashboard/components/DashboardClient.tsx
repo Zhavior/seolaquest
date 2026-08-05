@@ -116,6 +116,7 @@ export default function DashboardClient({
             scanLogs={state.scanLogs}
             scanStep={state.scanStep}
             scanOutcome={state.scanOutcome}
+            onAbortScan={state.abortActiveScan}
           />
         ) : null}
       </AnimatePresence>
@@ -232,7 +233,7 @@ export default function DashboardClient({
 
         {/* Hero Section & Stats */}
         <div className={`${isOverview ? 'grid' : 'hidden'} grid-cols-1 gap-6 sm:gap-8 sm:grid`}>
-          <BattleAreaCanvas />
+          <BattleAreaCanvas userLevel={state.user.level} />
           <DashboardStats
             item={reveal}
             user={state.user}

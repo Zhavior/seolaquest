@@ -10,6 +10,16 @@ export const LAST_ONBOARDING_STEP = 6
 export const preferredSources = ['REDDIT', 'X'] as const
 export type PreferredSource = (typeof preferredSources)[number]
 
+// Reddit is built but not released yet, so X is the only source a setup can pick.
+// Existing REDDIT rows still validate; move REDDIT back into the selectable list to ship it.
+export const selectablePreferredSources = ['X'] as const satisfies readonly PreferredSource[]
+export const comingSoonPreferredSources = ['REDDIT'] as const satisfies readonly PreferredSource[]
+export const DEFAULT_PREFERRED_SOURCE: PreferredSource = 'X'
+
+export function isSelectablePreferredSource(value: PreferredSource | null): boolean {
+  return value !== null && (selectablePreferredSources as readonly PreferredSource[]).includes(value)
+}
+
 const profileIconKeys = PROFILE_ICON_OPTIONS.map((option) => option.key) as [
   ProfileIconKey,
   ...ProfileIconKey[],

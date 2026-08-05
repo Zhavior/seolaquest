@@ -1,5 +1,6 @@
 import React from 'react'
 import { Target, Compass, Gem } from 'lucide-react'
+import { QuestPanel, questSurface } from '@/components/quest'
 
 const features = [
   {
@@ -34,18 +35,23 @@ export function LandingFeatures() {
         {features.map((feature) => {
           const Icon = feature.icon
           return (
-            <article
-              key={feature.title}
-              className="border-4 border-black bg-white p-6 shadow-[6px_6px_0_0_#000] transition-transform duration-150 ease-out will-change-transform hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[8px_8px_0_0_#000] motion-reduce:transition-none motion-reduce:hover:translate-x-0 motion-reduce:hover:translate-y-0"
-            >
-              <div className="mb-4 inline-flex h-11 w-11 items-center justify-center border-2 border-black bg-[#fff3b0] shadow-[2px_2px_0_0_#000]">
+            <QuestPanel as="article" key={feature.title} interactive padding="none" className="p-6">
+              <span
+                aria-hidden="true"
+                className={questSurface({
+                  border: 2,
+                  shadow: 'xs',
+                  tone: 'none',
+                  className: 'mb-4 inline-flex h-11 w-11 items-center justify-center bg-[#fff3b0]',
+                })}
+              >
                 <Icon className="h-4 w-4" />
-              </div>
+              </span>
               <h3 className="text-2xl font-black uppercase">{feature.title}</h3>
               <p className="mt-3 text-base font-bold leading-relaxed text-zinc-700">
                 {feature.body}
               </p>
-            </article>
+            </QuestPanel>
           )
         })}
       </div>

@@ -72,6 +72,9 @@ function isStripeResourceMissing(error: unknown) {
 
 function configuredStripeClient(): DeletionStripeClient {
   const key = process.env.STRIPE_SECRET_KEY?.trim()
+  // Worker-side configuration failure with no HTTP boundary in front of it: this runs in
+  // the cron/job lane, where the durable queue records the message and schedules a retry.
+  // An AppError's status code would never be read by anything.
   if (!key) throw new Error('STRIPE_NOT_CONFIGURED')
   assertStripeSecretKeyMatchesExpectedMode(key)
   // The durable queue owns retries. Bound each provider call so the deletion

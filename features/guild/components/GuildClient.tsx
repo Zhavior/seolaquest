@@ -2,6 +2,13 @@
 
 import { motion, Variants } from 'framer-motion'
 import { Swords, Shield, Sparkles } from 'lucide-react'
+import {
+  QuestPageHeader,
+  QuestPageShell,
+  QuestPanel,
+  QuestStatusPill,
+  QuestTicker,
+} from '@/components/quest'
 import GuildLeaderboardPodium from '@/features/guild/components/GuildLeaderboardPodium'
 import GuildLedgerTable from '@/features/guild/components/GuildLedgerTable'
 import HunterStatModal from '@/features/guild/components/HunterStatModal'
@@ -31,80 +38,46 @@ export default function GuildClient({ stats }: { stats: GuildStats }) {
   }
 
   return (
-    <div className="min-h-[100dvh] w-full bg-[#FDFBF7] relative select-none">
-      {/* Authentic Parchment / Commander's Map Paper Overlay */}
-      <div 
-        className="absolute inset-0 pointer-events-none z-0 opacity-[0.07]" 
-        style={{ 
-          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
-          mixBlendMode: 'multiply'
-        }}
-      />
-
-      <div className="min-h-[100dvh] w-full max-w-[1400px] mx-auto p-4 md:p-8 font-black relative z-10">
-        
-        {/* Subtle Background Swords Emblem */}
-        <div className="hidden md:block absolute top-0 right-0 -mr-24 -mt-24 opacity-[0.06] pointer-events-none">
-          <Swords className="w-[650px] h-[650px] text-black" />
-        </div>
-
-        <motion.div 
+    <>
+      <QuestPageShell watermark={<Swords className="h-[650px] w-[650px] text-black" />} gap="none">
+        <motion.div
           variants={container}
           initial="hidden"
           animate="show"
           className="space-y-8 relative z-10"
         >
           {/* Neo-Brutalist Ticker Banner */}
-          <motion.div variants={item} className="w-full overflow-hidden border-4 border-black bg-[#FFE600] py-2 flex whitespace-nowrap shadow-[4px_4px_0_0_#000]">
-            <motion.div 
-              animate={{ x: [0, -1000] }} 
-              transition={{ repeat: Infinity, duration: 25, ease: "linear" }}
-              className="flex gap-10 text-lg md:text-xl uppercase tracking-widest font-black"
-            >
-              {[...Array(10)].map((_, i) => (
-                <span key={i} className="flex items-center gap-3">
-                  <Sparkles className="w-5 h-5 text-black" /> ⚔️ TENANT ACTIVITY LEDGER <Sparkles className="w-5 h-5 text-black" /> 🛡️ MEASURED ROWS ONLY
-                </span>
-              ))}
-            </motion.div>
+          <motion.div variants={item}>
+            <QuestTicker label="Tenant activity ledger. Measured rows only.">
+              <Sparkles className="h-5 w-5 text-black" /> ⚔️ TENANT ACTIVITY LEDGER{' '}
+              <Sparkles className="h-5 w-5 text-black" /> 🛡️ MEASURED ROWS ONLY
+            </QuestTicker>
           </motion.div>
 
           {/* Header */}
-          <motion.div variants={item} className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 mt-6">
-            <div>
-              <div className="flex items-center gap-3 mb-1">
-                <Shield className="w-8 h-8 text-[#FF5722]" />
-                <span className="bg-black text-[#FFE600] uppercase text-xs font-black tracking-widest px-3 py-1 border-2 border-black -rotate-1">
-                  COMMANDER&apos;S MAP & ANALYTICS
-                </span>
-              </div>
-              <h1 className="text-4xl sm:text-5xl md:text-7xl uppercase tracking-tight text-white drop-shadow-[6px_6px_0_rgba(0,0,0,1)]" style={{ WebkitTextStroke: '2px black' }}>
-                Guild Hall
-              </h1>
-              <p className="text-xl md:text-2xl mt-2 uppercase bg-black text-white inline-block px-4 py-1 -rotate-1 border-2 border-black">
-                Tenant Activity & Outcome Ledger
-              </p>
-            </div>
-            
-            <div className="flex items-center gap-3 border-4 border-black bg-white px-5 py-3 shadow-[6px_6px_0_0_#000]">
-              <span className="relative flex h-4 w-4">
-                <span className="relative inline-flex rounded-full h-4 w-4 bg-zinc-400 border-2 border-black"></span>
-              </span>
-              <div className="flex flex-col">
-                <span className="text-xs uppercase text-gray-500 font-bold">Provider Status</span>
-                <span className="text-lg uppercase font-black leading-none text-black">Not shown here</span>
-              </div>
-            </div>
+          <motion.div variants={item}>
+            <QuestPageHeader
+              className="mt-6"
+              icon={<Shield className="h-8 w-8" />}
+              eyebrow={<>COMMANDER&apos;S MAP &amp; ANALYTICS</>}
+              title="Guild Hall"
+              subtitle="Tenant Activity & Outcome Ledger"
+              status={<QuestStatusPill state="idle" label="Provider status" value="Not shown here" />}
+            />
           </motion.div>
 
           {/* 🏛️ 1. Guild Leaderboard Podium (Top 3 Arcade Podium & Timeframe Selector) */}
           {state.topThree.length === 0 && state.tableHunters.length === 0 ? (
-            <motion.div variants={item} className="mt-8 border-4 border-black bg-white p-8 shadow-[6px_6px_0_0_#000]">
-              <h2 className="text-2xl font-black uppercase">Guild rankings unavailable</h2>
-              <p className="mt-2 max-w-2xl text-sm font-bold leading-relaxed text-zinc-600">
-                CoQuest does not publish cross-account rankings until a consented public-profile model exists. Your private,
-                tenant-scoped activity remains visible below.
-              </p>
+            <motion.div variants={item}>
+              <QuestPanel padding="lg" className="mt-8" aria-labelledby="guild-rankings-heading">
+                <h2 id="guild-rankings-heading" className="text-2xl font-black uppercase">
+                  Guild rankings unavailable
+                </h2>
+                <p className="mt-2 max-w-2xl text-sm font-bold leading-relaxed text-zinc-600">
+                  CoQuest does not publish cross-account rankings until a consented public-profile model exists. Your private,
+                  tenant-scoped activity remains visible below.
+                </p>
+              </QuestPanel>
             </motion.div>
           ) : (
             <>
@@ -172,13 +145,13 @@ export default function GuildClient({ stats }: { stats: GuildStats }) {
             achievementsList={state.achievementsList}
           />
         </motion.div>
-      </div>
+      </QuestPageShell>
 
       <HunterStatModal
         hunter={state.selectedHunter}
         isAnonymousMode={state.isAnonymousMode}
         onClose={() => state.setSelectedHunter(null)}
       />
-    </div>
+    </>
   )
 }

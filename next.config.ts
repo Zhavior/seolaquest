@@ -11,7 +11,7 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
   reactStrictMode: true,
   experimental: {
-    optimizePackageImports: ["lucide-react", "framer-motion", "@clerk/nextjs"],
+    optimizePackageImports: ["lucide-react", "framer-motion"],
   },
   images: {
     formats: ["image/avif", "image/webp"],

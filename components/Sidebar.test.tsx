@@ -1,6 +1,13 @@
 import type { ReactNode } from 'react'
 import { render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
+
+const signOutMock = vi.fn()
+
+vi.mock('@clerk/nextjs', () => ({
+  useClerk: () => ({ signOut: signOutMock }),
+}))
 
 vi.mock('next/navigation', () => ({
   usePathname: () => '/app',
@@ -38,7 +45,27 @@ describe('CoQuest OS Sidebar', () => {
     expect(screen.getByText('BAZAAR & SUPPLIES')).toBeInTheDocument()
     expect(screen.getByText('ARMORY & SPELLS')).toBeInTheDocument()
     expect(screen.getByText('Party Status')).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: /LOG OUT/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /LOG OUT/i })).toBeInTheDocument()
+  })
+
+  it('ends the Clerk session instead of only linking to /sign-in', async () => {
+    signOutMock.mockClear()
+
+    render(
+      <Sidebar
+        collapsed={false}
+        mobileOpen={false}
+        onCloseMobile={() => {}}
+        onToggleCollapsed={() => {}}
+      />
+    )
+
+    const logOut = screen.getByRole('button', { name: /LOG OUT/i })
+    expect(logOut).not.toHaveAttribute('href')
+
+    await userEvent.click(logOut)
+
+    expect(signOutMock).toHaveBeenCalledWith({ redirectUrl: '/' })
   })
 
   it('renders mobile open state and handles close', () => {

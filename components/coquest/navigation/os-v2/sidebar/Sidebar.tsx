@@ -3,6 +3,8 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { LogOut, X, Sparkles, PanelLeftOpen } from 'lucide-react'
+import LogOutButton from '@/components/auth/LogOutButton'
+import { sfx } from '@/lib/sfx'
 
 import { type UserSummary } from '../CoQuestShell'
 import { navigation } from '../../os/shared/navigation'
@@ -38,13 +40,27 @@ function NavigationContent({
 }) {
   const pathname = usePathname()
 
+  const handleToggle = () => {
+    if (onToggleCollapsed) {
+      onToggleCollapsed()
+    } else {
+      if (collapsed) {
+        sfx.playSidebarExpand()
+      } else {
+        sfx.playSidebarCollapse()
+      }
+    }
+  }
+
   if (collapsed && !mobile) {
     return (
       <div className="flex flex-col items-center justify-between h-full p-2 space-y-4 font-black">
         <div className="space-y-3 w-full flex flex-col items-center">
           <button
             type="button"
-            onClick={onToggleCollapsed}
+            onClick={handleToggle}
+            onMouseEnter={() => sfx.playSidebarHover()}
+            onFocus={() => sfx.playSidebarHover()}
             title="Expand Sidebar (Cmd+B)"
             aria-label="Expand navigation"
             className="grid size-10 place-items-center border-3 border-black bg-[#FFE600] shadow-[3px_3px_0_0_#000] hover:-translate-y-0.5 transition-all mb-2"
@@ -65,6 +81,9 @@ function NavigationContent({
               <Link
                 key={item.href}
                 href={item.href}
+                onMouseEnter={() => sfx.playSidebarHover()}
+                onFocus={() => sfx.playSidebarHover()}
+                onClick={() => sfx.playCoinDrop()}
                 title={`${item.label} (${item.hotkey || ''})`}
                 className={`relative group grid size-11 place-items-center border-3 border-black transition-all ${
                   isActive
@@ -94,13 +113,15 @@ function NavigationContent({
             <span className="h-2.5 w-2.5 rounded-full bg-black border border-white animate-pulse" />
           </div>
 
-          <Link
-            href="/sign-in"
+          <LogOutButton
             title="Log Out"
+            aria-label="Log out"
+            onMouseEnter={() => sfx.playSidebarHover()}
+            onBeforeSignOut={() => sfx.playCoinDrop()}
             className="grid size-11 place-items-center border-3 border-black bg-[#FF5722] text-white shadow-[3px_3px_0_0_#000] hover:-translate-y-0.5 transition-all"
           >
             <LogOut className="size-5" strokeWidth={3} />
-          </Link>
+          </LogOutButton>
         </div>
       </div>
     )
@@ -123,14 +144,14 @@ function NavigationContent({
           </div>
         ) : (
           <div className="flex items-center justify-between border-b-3 border-black pb-2.5 mb-1">
-            {/* No `uppercase` here: the lowercase "la" is part of the brand, and the
-                utility would render it "SEO LA QUEST". Mobile uses the short "SEOLQ". */}
             <span className="text-xs font-black text-black tracking-[0.15em]">
               SEO la Quest
             </span>
             <button
               type="button"
-              onClick={onToggleCollapsed}
+              onClick={handleToggle}
+              onMouseEnter={() => sfx.playSidebarHover()}
+              onFocus={() => sfx.playSidebarHover()}
               title="Collapse Sidebar (Cmd+B)"
               aria-label="Collapse navigation"
               className="text-[9px] font-black uppercase bg-[#FFE600] text-black border-2 border-black px-1.5 py-0.5 shadow-[1.5px_1.5px_0_0_#000] -rotate-2 hover:bg-[#FFD600]"
@@ -162,7 +183,12 @@ function NavigationContent({
                     <Link
                       key={item.href}
                       href={item.href}
-                      onClick={onNavigate}
+                      onMouseEnter={() => sfx.playSidebarHover()}
+                      onFocus={() => sfx.playSidebarHover()}
+                      onClick={() => {
+                        sfx.playCoinDrop()
+                        onNavigate?.()
+                      }}
                       className={`flex items-center justify-between p-3 border-3 border-black font-black text-xs uppercase tracking-wider transition-all ${
                         isActive
                           ? `${colorClass} shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] -translate-x-0.5 -translate-y-0.5`
@@ -211,10 +237,13 @@ function NavigationContent({
           </div>
         </div>
 
-        <Link
-          href="/sign-in"
-          onClick={onNavigate}
-          className="flex items-center justify-between p-3 border-3 border-black font-black text-xs uppercase tracking-wider bg-[#FF5722] text-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] active:translate-x-0 active:translate-y-0 active:shadow-none transition-all"
+        <LogOutButton
+          onMouseEnter={() => sfx.playSidebarHover()}
+          onBeforeSignOut={() => {
+            sfx.playCoinDrop()
+            onNavigate?.()
+          }}
+          className="w-full flex items-center justify-between p-3 border-3 border-black font-black text-xs uppercase tracking-wider bg-[#FF5722] text-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] active:translate-x-0 active:translate-y-0 active:shadow-none transition-all"
         >
           <div className="flex items-center gap-2.5">
             <LogOut className="size-4 shrink-0" strokeWidth={3} />
@@ -223,7 +252,7 @@ function NavigationContent({
           <span className="font-mono text-[9px] font-black text-black bg-[#FFE600] border border-black px-1.5">
             ESC
           </span>
-        </Link>
+        </LogOutButton>
       </div>
     </div>
   )

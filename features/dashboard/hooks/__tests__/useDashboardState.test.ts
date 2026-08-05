@@ -23,6 +23,12 @@ vi.mock('@/lib/sfx', () => ({
     playSwordSlash: vi.fn(),
     playElixirDrink: vi.fn(),
     playHoverBlip: vi.fn(),
+    playRadarBlip: vi.fn(),
+    playCriticalWarning: vi.fn(),
+    playLevelUp: vi.fn(),
+    playSidebarHover: vi.fn(),
+    playSidebarExpand: vi.fn(),
+    playSidebarCollapse: vi.fn(),
   },
 }))
 

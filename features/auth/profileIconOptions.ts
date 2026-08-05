@@ -1,14 +1,14 @@
 export const PROFILE_ICON_OPTIONS = [
-  { key: 'rocket', emoji: '🚀', label: 'Rocket' },
-  { key: 'target', emoji: '🎯', label: 'Target' },
-  { key: 'lightning', emoji: '⚡', label: 'Lightning' },
-  { key: 'crystalBall', emoji: '🔮', label: 'Crystal Ball' },
-  { key: 'shield', emoji: '🛡️', label: 'Shield' },
-  { key: 'crown', emoji: '👑', label: 'Crown' },
-  { key: 'fire', emoji: '🔥', label: 'Fire' },
-  { key: 'sword', emoji: '⚔️', label: 'Sword' },
-  { key: 'star', emoji: '⭐', label: 'Star' },
-  { key: 'robot', emoji: '🤖', label: 'Robot' },
+  { key: 'rocket', label: 'Rocket', code: '[VNG]' },
+  { key: 'target', label: 'Target', code: '[TGT]' },
+  { key: 'lightning', label: 'Lightning', code: '[ZAP]' },
+  { key: 'crystalBall', label: 'Crystal Ball', code: '[ORC]' },
+  { key: 'shield', label: 'Shield', code: '[SHD]' },
+  { key: 'crown', label: 'Crown', code: '[CRN]' },
+  { key: 'fire', label: 'Fire', code: '[PYR]' },
+  { key: 'sword', label: 'Sword', code: '[BLD]' },
+  { key: 'star', label: 'Star', code: '[STR]' },
+  { key: 'robot', label: 'Robot', code: '[CYB]' },
 ] as const
 
 export type ProfileIconKey = (typeof PROFILE_ICON_OPTIONS)[number]['key']

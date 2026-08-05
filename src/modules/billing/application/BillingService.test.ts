@@ -19,6 +19,9 @@ const mocks = vi.hoisted(() => ({
   txIntentFindUniqueOrThrow: vi.fn(),
   txIntentCreate: vi.fn(),
   txIntentUpdate: vi.fn(),
+  txSubscriptionCount: vi.fn(),
+  txIntentCount: vi.fn(),
+  txExecuteRaw: vi.fn(),
 }))
 
 vi.mock('server-only', () => ({}))
@@ -60,13 +63,16 @@ vi.mock('@/src/modules/lifecycle/application/DeletionBillingBarrier', () => ({
         billingSubscription: {
           findUnique: mocks.txSubscriptionFindUnique,
           upsert: mocks.txSubscriptionUpsert,
+          count: mocks.txSubscriptionCount,
         },
         checkoutIntent: {
           findUnique: mocks.txIntentFindUnique,
           findUniqueOrThrow: mocks.txIntentFindUniqueOrThrow,
           create: mocks.txIntentCreate,
           update: mocks.txIntentUpdate,
+          count: mocks.txIntentCount,
         },
+        $executeRaw: mocks.txExecuteRaw,
       },
       { request: null, audit: null },
     ),
@@ -255,5 +261,87 @@ describe('BillingService checkout replay safety', () => {
       message: 'Checkout could not be started. No charge was made.',
     })
     expect(mocks.sessionsCreate).not.toHaveBeenCalled()
+  })
+})
+
+describe('BillingService Founder Pass seat cap', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+    vi.stubEnv('ENABLE_BETA_CHECKOUT', 'true')
+    vi.stubEnv('SUBSCRIPTION_CHECKOUT_ENABLED', 'true')
+    vi.stubEnv('ENABLE_SCAN_WORKER', 'true')
+    vi.stubEnv('DURABLE_WORKER_ENABLED', 'true')
+    vi.stubEnv('STRIPE_PRICE_FOUNDER', 'price_founder')
+    vi.stubEnv('NEXTAUTH_URL', 'https://app.example.com')
+    vi.stubEnv('STRIPE_LIVEMODE', 'false')
+    vi.stubEnv('STRIPE_SECRET_KEY', 'sk_test_founder_seats')
+
+    mocks.requireCurrentUser.mockResolvedValue({ id: 'user_1', email: 'hunter@example.com' })
+    mocks.findSubscription.mockResolvedValue(null)
+    mocks.txSubscriptionFindUnique.mockResolvedValue({
+      userId: 'user_1',
+      stripeCustomerId: 'cus_1',
+      stripeSubscriptionId: null,
+      status: 'inactive',
+    })
+    mocks.subscriptionsList.mockResolvedValue({ data: [] })
+    mocks.txIntentFindUnique.mockResolvedValue(null)
+    mocks.txIntentCreate.mockResolvedValue({
+      id: 'intent_founder',
+      stripeCheckoutSessionId: null,
+      stripeCheckoutUrl: null,
+    })
+    mocks.txIntentUpdate.mockResolvedValue({})
+    mocks.txIntentCount.mockResolvedValue(0)
+    mocks.sessionsCreate.mockResolvedValue({ id: 'cs_f1', url: 'https://checkout.stripe.com/cs_f1' })
+  })
+
+  afterEach(() => vi.unstubAllEnvs())
+
+  it('sells a founder seat while the cap has room', async () => {
+    mocks.txSubscriptionCount.mockResolvedValue(49)
+
+    await expect(BillingService.createCheckout('FOUNDER')).resolves.toEqual({
+      ok: true,
+      url: 'https://checkout.stripe.com/cs_f1',
+    })
+  })
+
+  it('refuses a sold-out founder seat before creating any Stripe object', async () => {
+    mocks.txSubscriptionCount.mockResolvedValue(50)
+
+    await expect(BillingService.createCheckout('FOUNDER')).resolves.toEqual({
+      ok: false,
+      message: 'All 50 Founder Pass seats are taken. No charge was made.',
+    })
+    // Nothing to compensate: no customer, no Session, no intent.
+    expect(mocks.customersCreate).not.toHaveBeenCalled()
+    expect(mocks.sessionsCreate).not.toHaveBeenCalled()
+    expect(mocks.txIntentCreate).not.toHaveBeenCalled()
+  })
+
+  it('takes the seat lock before counting, so two buyers cannot share the last seat', async () => {
+    const order: string[] = []
+    mocks.txExecuteRaw.mockImplementation(async () => {
+      order.push('lock')
+      return 1
+    })
+    mocks.txSubscriptionCount.mockImplementation(async () => {
+      order.push('count')
+      return 49
+    })
+
+    await BillingService.createCheckout('FOUNDER')
+
+    expect(order[0]).toBe('lock')
+    expect(order).toContain('count')
+  })
+
+  it('leaves other plans untouched by the seat cap', async () => {
+    vi.stubEnv('STRIPE_PRICE_BETA', 'price_beta')
+    mocks.txSubscriptionCount.mockResolvedValue(50)
+
+    await expect(BillingService.createCheckout('BETA')).resolves.toMatchObject({ ok: true })
+    expect(mocks.txExecuteRaw).not.toHaveBeenCalled()
   })
 })

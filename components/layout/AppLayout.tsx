@@ -23,8 +23,13 @@ import {
   PanelLeftOpen,
   Menu,
   X,
+  Sun,
+  Moon,
   type LucideIcon,
 } from 'lucide-react';
+
+import LogOutButton from '@/components/auth/LogOutButton';
+import { sfx } from '@/lib/sfx';
 
 export interface AppLayoutProps {
   children: React.ReactNode;
@@ -54,6 +59,34 @@ export function AppLayout({ children, user }: AppLayoutProps) {
   const pathname = usePathname();
   const [sfxEnabled, setSfxEnabled] = useState(true);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [isGreyMode, setIsGreyMode] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('coquest_theme') === 'grey'
+    }
+    return false
+  })
+
+  useEffect(() => {
+    if (isGreyMode) {
+      document.documentElement.classList.add('grey-mode')
+      document.body?.classList.add('grey-mode')
+    }
+  }, [isGreyMode])
+
+  const toggleThemeMode = () => {
+    const nextMode = !isGreyMode
+    setIsGreyMode(nextMode)
+    if (nextMode) {
+      document.documentElement.classList.add('grey-mode')
+      document.body?.classList.add('grey-mode')
+      localStorage.setItem('coquest_theme', 'grey')
+    } else {
+      document.documentElement.classList.remove('grey-mode')
+      document.body?.classList.remove('grey-mode')
+      localStorage.setItem('coquest_theme', 'parchment')
+    }
+  }
+
   const [collapsed, setCollapsed] = useState(() => {
     if (typeof window === 'undefined') return false
     try {
@@ -64,10 +97,15 @@ export function AppLayout({ children, user }: AppLayoutProps) {
     }
   });
 
-  // Toggle collapse state with persistence
+  // Toggle collapse state with persistence and audio feedback
   const toggleCollapsed = () => {
     setCollapsed((prev) => {
       const next = !prev;
+      if (next) {
+        sfx.playSidebarCollapse();
+      } else {
+        sfx.playSidebarExpand();
+      }
       try {
         localStorage.setItem('coquest_sidebar_collapsed', String(next));
       } catch {
@@ -93,7 +131,6 @@ export function AppLayout({ children, user }: AppLayoutProps) {
   const userLevel = user?.level || 10;
   const currentMp = user?.mp ?? 70;
   const maxMp = user?.maxMp ?? 100;
-  const planTier = user?.planTier || "LEGEND";
 
   const navSections: NavSection[] = [
     {
@@ -136,15 +173,15 @@ export function AppLayout({ children, user }: AppLayoutProps) {
       />
 
       {/* 1. TOP UNIVERSAL HUD */}
-      <header className="w-full border-b-4 border-black bg-white px-4 py-2.5 shadow-[0px_4px_0px_0px_rgba(0,0,0,1)] sticky top-0 z-50 flex items-center justify-between relative">
+      <header className="sticky top-0 inset-x-0 z-50 w-full max-w-full border-b-4 border-black bg-white px-3 sm:px-4 py-2 shadow-[0px_4px_0px_0px_rgba(0,0,0,1)] flex items-center justify-between pt-safe">
         
         {/* Left: Brand, Toggle & Adventurer Identity */}
-        <div className="flex items-center gap-3 md:gap-4">
+        <div className="flex items-center gap-2.5 sm:gap-4">
           <button
             type="button"
             onClick={() => setMobileOpen(true)}
             aria-label="Open navigation"
-            className="grid size-9 shrink-0 place-items-center border-3 border-black bg-[#FFE600] shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none md:hidden"
+            className="grid min-h-[44px] min-w-[44px] size-11 shrink-0 place-items-center border-3 border-black bg-[#FFE600] shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none md:hidden"
           >
             <Menu className="size-5 text-black" strokeWidth={3} />
           </button>
@@ -154,7 +191,7 @@ export function AppLayout({ children, user }: AppLayoutProps) {
             onClick={toggleCollapsed}
             title={collapsed ? "Expand Sidebar (Cmd+B)" : "Collapse Sidebar (Cmd+B)"}
             aria-label={collapsed ? "Expand navigation" : "Collapse navigation"}
-            className="hidden md:grid size-9 shrink-0 place-items-center border-3 border-black bg-[#FFE600] shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[4.5px_4.5px_0px_0px_rgba(0,0,0,1)] active:translate-x-0 active:translate-y-0 active:shadow-none transition-all"
+            className="hidden md:grid size-10 shrink-0 place-items-center border-3 border-black bg-[#FFE600] shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[4.5px_4.5px_0px_0px_rgba(0,0,0,1)] active:translate-x-0 active:translate-y-0 active:shadow-none transition-all"
           >
             {collapsed ? (
               <PanelLeftOpen className="size-5 text-black" strokeWidth={3} />
@@ -165,12 +202,12 @@ export function AppLayout({ children, user }: AppLayoutProps) {
 
           <Link
             href="/dashboard"
-            className="font-black text-xl md:text-2xl tracking-[0.16em] uppercase border-3 border-black bg-[#FFE600] px-3.5 py-1 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:bg-[#FFD600] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[4.5px_4.5px_0px_0px_rgba(0,0,0,1)] active:translate-x-0 active:translate-y-0 active:shadow-none transition-all flex items-center gap-1.5"
+            className="font-black text-lg sm:text-xl md:text-2xl tracking-[0.14em] uppercase border-3 border-black bg-[#FFE600] px-2.5 sm:px-3.5 py-1 min-h-[44px] flex items-center shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:bg-[#FFD600] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[4.5px_4.5px_0px_0px_rgba(0,0,0,1)] active:translate-x-0 active:translate-y-0 active:shadow-none transition-all gap-1.5"
           >
             <span>COQUEST</span>
           </Link>
 
-          <div className="hidden sm:flex items-center gap-2.5 border-3 border-black bg-white px-3 py-1 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]">
+          <div className="hidden sm:flex items-center gap-2 border-3 border-black bg-white px-3 py-1 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]">
             <div className="grid size-6 place-items-center border-2 border-black bg-[#FFE600]">
               <User className="size-3.5 shrink-0 text-black" strokeWidth={3} />
             </div>
@@ -181,61 +218,125 @@ export function AppLayout({ children, user }: AppLayoutProps) {
           </div>
         </div>
 
-        {/* Center: Mana Vault Indicators */}
-        <div className="flex items-center gap-3.5 border-3 border-black bg-black text-white px-4 py-1.5 shadow-[4px_4px_0px_0px_#06B6D4]">
-          <div className="flex items-center gap-2">
-            <Zap className="size-4 text-[#06B6D4] animate-pulse" strokeWidth={3} />
-            <span className="text-xs font-black uppercase tracking-wider text-cyan-300 hidden md:inline">
-              Mana Vault:
-            </span>
+        {/* Center/Right HUD Cluster: EXP Bar + MP Bar + Quests (Responsive) */}
+        <div className="flex shrink-0 items-center gap-1.5 sm:gap-2.5">
+          
+          {/* MOBILE COMPACT TELEMETRY BADGES (< md) */}
+          <div className="flex items-center gap-1 md:hidden">
+            <Link
+              href="/app/runs"
+              title="12 Active Quests"
+              className="flex items-center gap-1 border-2 border-black bg-[#FF5722] text-white px-2 min-h-[38px] text-[10px] font-black uppercase shadow-[1.5px_1.5px_0_0_#000]"
+            >
+              <Scroll className="size-3.5" strokeWidth={3} />
+              <span>12</span>
+            </Link>
+
+            <div className="flex items-center gap-1 border-2 border-black bg-[#06B6D4] text-white px-2 min-h-[38px] text-[10px] font-black uppercase shadow-[1.5px_1.5px_0_0_#000]">
+              <Zap className="size-3.5 text-[#FFE600] animate-pulse" strokeWidth={3} />
+              <span>{currentMp}</span>
+            </div>
+
+            <div className="flex items-center gap-1 border-2 border-black bg-[#FFE600] text-black px-2 min-h-[38px] text-[10px] font-black uppercase shadow-[1.5px_1.5px_0_0_#000]">
+              <Sparkles className="size-3.5 text-black" strokeWidth={3} />
+              <span>L{userLevel}</span>
+            </div>
           </div>
 
-          <div className="flex items-center gap-1">
-            {Array.from({ length: 10 }).map((_, i) => {
-              const activeCount = Math.round((currentMp / maxMp) * 10);
-              const isActive = i < activeCount;
-              return (
-                <span
-                  key={i}
-                  className={`inline-block h-4 w-2.5 border border-white transition-all ${
-                    isActive
-                      ? "bg-gradient-to-t from-cyan-500 to-[#A3E635] shadow-[0_0_8px_#06B6D4]"
-                      : "bg-slate-800 opacity-40"
-                  }`}
-                />
-              );
-            })}
+          {/* DESKTOP EXP & MP METERS (md+) */}
+          <div className="hidden items-center gap-3 md:flex">
+            
+            {/* Active Quests Badge */}
+            <Link
+              href="/app/runs"
+              title="View Active Quests"
+              className="flex items-center gap-1.5 border-[3px] border-black bg-[#FF5722] text-white px-3 py-1.5 shadow-[3px_3px_0_0_#000] hover:-translate-y-0.5 transition-transform"
+            >
+              <Scroll className="size-3.5 shrink-0" strokeWidth={3} />
+              <span className="font-mono text-[11px] font-black uppercase tracking-wider">
+                12 QUESTS
+              </span>
+            </Link>
+
+            {/* EXP Progress Meter */}
+            <div className="flex items-center gap-2 border-[3px] border-black bg-white px-3 py-1.5 shadow-[3px_3px_0_0_#000]">
+              <div className="flex items-center gap-1">
+                <Sparkles className="size-3.5 text-[#F59E0B]" strokeWidth={3} />
+                <span className="border-2 border-black bg-[#FFE600] px-1.5 py-0.2 font-mono text-[9px] font-black uppercase text-black">
+                  LVL {userLevel}
+                </span>
+              </div>
+              <div className="flex items-center gap-0.5">
+                {Array.from({ length: 8 }).map((_, i) => (
+                  <span
+                    key={i}
+                    className={`inline-block h-3 w-1.5 border border-black ${
+                      i < 5 ? 'bg-[#FFE600]' : 'bg-zinc-200'
+                    }`}
+                  />
+                ))}
+              </div>
+              <span className="font-mono text-[10px] font-black uppercase tracking-wider text-black">
+                XP 1,250
+              </span>
+            </div>
+
+            {/* MP Mana Meter */}
+            <div className="flex items-center gap-2 border-[3px] border-black bg-white px-3 py-1.5 shadow-[3px_3px_0_0_#000]">
+              <Zap aria-hidden="true" className="size-3.5 shrink-0 text-[#06B6D4] animate-pulse" strokeWidth={3} />
+              <div className="flex items-center gap-0.5">
+                {Array.from({ length: 8 }).map((_, i) => (
+                  <span
+                    key={i}
+                    className={`inline-block h-3 w-1.5 border border-black ${
+                      i < 6 ? 'bg-[#06B6D4]' : 'bg-zinc-200'
+                    }`}
+                  />
+                ))}
+              </div>
+              <span className="font-mono text-[10px] font-black uppercase tracking-wider text-black">
+                {currentMp}/{maxMp} MP
+              </span>
+            </div>
           </div>
 
-          <span className="font-mono text-xs font-black border-l-2 border-dashed border-[#06B6D4] pl-3 text-[#FFE600] tracking-wider">
-            {currentMp}/{maxMp} MP
-          </span>
-          <span className="hidden lg:inline-block bg-[#FFE600] text-black border border-black px-2 py-0.5 text-[9px] font-black tracking-widest uppercase -rotate-1">
-            {planTier}
-          </span>
-        </div>
-
-        {/* Right: Quick Recharge Action & SFX Toggle */}
-        <div className="flex items-center gap-3">
+          {/* Sun / Moon Theme Mode Toggle Button */}
           <button
-            onClick={() => setSfxEnabled((v) => !v)}
-            className="hidden xl:flex items-center gap-1.5 bg-black text-[#FFE600] border-2 border-white px-2.5 py-1 text-[10px] uppercase font-black shadow-[2px_2px_0_0_#fff] hover:-translate-y-0.5 hover:shadow-[3px_3px_0_0_#fff] active:translate-y-0.5 active:shadow-none transition-all"
+            type="button"
+            onClick={toggleThemeMode}
+            aria-label={isGreyMode ? 'Switch to Parchment Light Mode' : 'Switch to Slate Grey Dark Mode'}
+            title={isGreyMode ? 'Parchment Light Mode' : 'Slate Grey Dark Mode'}
+            className="min-h-[44px] min-w-[44px] size-11 grid place-items-center border-[3px] border-black bg-white shadow-[2.5px_2.5px_0_0_#000] transition-transform duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[1px_1px_0_0_#000] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none shrink-0"
           >
-            {sfxEnabled ? <Volume2 className="w-3.5 h-3.5" /> : <VolumeX className="w-3.5 h-3.5" />}
-            SFX {sfxEnabled ? 'ON' : 'OFF'}
+            {isGreyMode ? (
+              <Sun className="size-4 sm:size-5 text-amber-500 fill-amber-400" strokeWidth={3} />
+            ) : (
+              <Moon className="size-4 sm:size-5 text-black fill-black/20" strokeWidth={3} />
+            )}
           </button>
 
-          <div className="hidden lg:flex items-center gap-2 border-2 border-black bg-[#A3E635] px-3 py-1 text-xs font-black tracking-wider shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] -rotate-1">
-            <span className="h-2.5 w-2.5 rounded-full bg-black animate-pulse" />
-            <span>RADAR ACTIVE</span>
-          </div>
-
-          <Link
-            href="/billing"
-            className="border-3 border-black bg-[#06B6D4] text-white px-4 py-1.5 text-xs font-black uppercase tracking-wider shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[5px_5px_0px_0px_rgba(0,0,0,1)] active:translate-x-0 active:translate-y-0 active:shadow-none transition-all flex items-center gap-1.5"
+          {/* SFX Toggle */}
+          <button
+            type="button"
+            onClick={() => setSfxEnabled((v) => !v)}
+            aria-label={sfxEnabled ? 'Mute sound effects' : 'Unmute sound effects'}
+            className="hidden min-h-[44px] min-w-[44px] size-11 place-items-center border-[3px] border-black bg-white shadow-[3px_3px_0_0_#000] transition-transform duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[1px_1px_0_0_#000] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none xl:grid shrink-0"
           >
-            <Zap className="size-4 text-[#FFE600]" strokeWidth={3} />
-            <span>+ RECHARGE</span>
+            {sfxEnabled ? (
+              <Volume2 className="size-5 text-black" strokeWidth={3} />
+            ) : (
+              <VolumeX className="size-5 text-black" strokeWidth={3} />
+            )}
+          </button>
+
+          {/* Recharge CTA — lands on the Founder offer, not the top of the page */}
+          <Link
+            href="/billing?offer=founder"
+            className="inline-flex min-h-[44px] shrink-0 items-center gap-1 border-[3px] border-black bg-[#ff5a36] px-2.5 sm:px-4 py-1 font-black uppercase tracking-wider text-black shadow-[2.5px_2.5px_0_0_#000] transition-transform duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[1px_1px_0_0_#000] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none text-xs sm:text-sm"
+          >
+            <Zap aria-hidden="true" className="size-4 text-black" strokeWidth={3} />
+            <span className="hidden sm:inline">Recharge</span>
+            <span className="sm:hidden text-xs font-black">+</span>
           </Link>
         </div>
       </header>
@@ -279,6 +380,9 @@ export function AppLayout({ children, user }: AppLayoutProps) {
                     <Link
                       key={item.path}
                       href={item.path}
+                      onMouseEnter={() => sfx.playSidebarHover()}
+                      onFocus={() => sfx.playSidebarHover()}
+                      onClick={() => sfx.playCoinDrop()}
                       title={`${item.label} (${item.hotkey || ''})`}
                       className={`relative group grid size-11 place-items-center border-3 border-black transition-all ${
                         isActive
@@ -308,13 +412,15 @@ export function AppLayout({ children, user }: AppLayoutProps) {
                   <span className="h-2.5 w-2.5 rounded-full bg-black border border-white animate-pulse" />
                 </div>
 
-                <Link
-                  href="/sign-in"
+                <LogOutButton
                   title="Log Out"
+                  aria-label="Log out"
+                  onMouseEnter={() => sfx.playSidebarHover()}
+                  onBeforeSignOut={() => sfx.playCoinDrop()}
                   className="grid size-11 place-items-center border-3 border-black bg-[#FF5722] text-white shadow-[3px_3px_0_0_#000] hover:-translate-y-0.5 transition-all"
                 >
                   <LogOut className="size-5" strokeWidth={3} />
-                </Link>
+                </LogOutButton>
               </div>
             </div>
           ) : (
@@ -328,6 +434,8 @@ export function AppLayout({ children, user }: AppLayoutProps) {
                   <button
                     type="button"
                     onClick={toggleCollapsed}
+                    onMouseEnter={() => sfx.playSidebarHover()}
+                    onFocus={() => sfx.playSidebarHover()}
                     title="Collapse Sidebar (Cmd+B)"
                     aria-label="Collapse navigation"
                     className="text-[9px] font-black uppercase bg-[#FFE600] text-black border-2 border-black px-1.5 py-0.5 shadow-[1.5px_1.5px_0_0_#000] -rotate-2 hover:bg-[#FFD600]"
@@ -354,6 +462,9 @@ export function AppLayout({ children, user }: AppLayoutProps) {
                           <Link
                             key={item.path}
                             href={item.path}
+                            onMouseEnter={() => sfx.playSidebarHover()}
+                            onFocus={() => sfx.playSidebarHover()}
+                            onClick={() => sfx.playCoinDrop()}
                             className={`flex items-center justify-between p-3 border-3 border-black font-black text-xs uppercase tracking-wider transition-all ${
                               isActive
                                 ? `${item.color} shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] -translate-x-0.5 -translate-y-0.5`
@@ -401,9 +512,8 @@ export function AppLayout({ children, user }: AppLayoutProps) {
                   </div>
                 </div>
 
-                <Link
-                  href="/sign-in"
-                  className="flex items-center justify-between p-3 border-3 border-black font-black text-xs uppercase tracking-wider bg-[#FF5722] text-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] active:translate-x-0 active:translate-y-0 active:shadow-none transition-all"
+                <LogOutButton
+                  className="w-full flex items-center justify-between p-3 border-3 border-black font-black text-xs uppercase tracking-wider bg-[#FF5722] text-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] active:translate-x-0 active:translate-y-0 active:shadow-none transition-all"
                 >
                   <div className="flex items-center gap-2.5">
                     <LogOut className="size-4 shrink-0" strokeWidth={3} />
@@ -412,7 +522,7 @@ export function AppLayout({ children, user }: AppLayoutProps) {
                   <span className="font-mono text-[9px] font-black text-black bg-[#FFE600] border border-black px-1.5">
                     ESC
                   </span>
-                </Link>
+                </LogOutButton>
               </div>
             </div>
           )}
@@ -489,25 +599,84 @@ export function AppLayout({ children, user }: AppLayoutProps) {
               </div>
 
               <div className="mt-5 space-y-3 pt-2">
-                <Link
-                  href="/sign-in"
-                  onClick={() => setMobileOpen(false)}
-                  className="flex items-center justify-between p-3 border-3 border-black font-black text-xs uppercase tracking-wider bg-[#FF5722] text-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-x-0 active:translate-y-0 transition-all"
+                <LogOutButton
+                  onBeforeSignOut={() => setMobileOpen(false)}
+                  className="w-full flex items-center justify-between p-3 border-3 border-black font-black text-xs uppercase tracking-wider bg-[#FF5722] text-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-x-0 active:translate-y-0 transition-all"
                 >
                   <div className="flex items-center gap-2.5">
                     <LogOut className="size-4 shrink-0" strokeWidth={3} />
                     <span>LOG OUT</span>
                   </div>
-                </Link>
+                </LogOutButton>
               </div>
             </aside>
           </div>
         )}
 
         {/* PAGE CONTENT CONTAINER */}
-        <main className="flex-1 min-w-0 p-4 md:p-8">
+        <main className="w-full max-w-full overflow-x-clip flex-1 min-w-0 p-3 sm:p-4 md:p-8 pb-24 md:pb-8 box-border">
           {children}
         </main>
+
+        {/* STICKY MOBILE QUICK-NAV BAR (< md) */}
+        <nav
+          aria-label="Mobile quick navigation"
+          className="fixed bottom-0 inset-x-0 w-full max-w-full z-50 bg-white border-t-4 border-black px-2 py-1 shadow-[0_-4px_0_0_rgba(0,0,0,1)] flex items-center justify-around md:hidden pb-safe"
+        >
+          <Link
+            href="/dashboard"
+            onClick={() => sfx.playCoinDrop()}
+            className={`flex flex-col items-center justify-center min-h-[44px] min-w-[56px] px-2 py-1 font-black text-[9px] uppercase tracking-wider transition-colors ${
+              pathname === "/dashboard" || pathname === "/app" ? "text-black bg-[#FFE600] border-2 border-black -rotate-1 shadow-[1.5px_1.5px_0_0_#000]" : "text-zinc-600 hover:text-black"
+            }`}
+          >
+            <LayoutDashboard className="size-4 shrink-0" strokeWidth={3} />
+            <span>HQ</span>
+          </Link>
+
+          <Link
+            href="/signals"
+            onClick={() => sfx.playCoinDrop()}
+            className={`flex flex-col items-center justify-center min-h-[44px] min-w-[56px] px-2 py-1 font-black text-[9px] uppercase tracking-wider transition-colors ${
+              pathname === "/signals" || pathname === "/app/runs" ? "text-black bg-[#FFE600] border-2 border-black -rotate-1 shadow-[1.5px_1.5px_0_0_#000]" : "text-zinc-600 hover:text-black"
+            }`}
+          >
+            <Scroll className="size-4 shrink-0" strokeWidth={3} />
+            <span>QUESTS</span>
+          </Link>
+
+          <Link
+            href="/guild"
+            onClick={() => sfx.playCoinDrop()}
+            className={`flex flex-col items-center justify-center min-h-[44px] min-w-[56px] px-2 py-1 font-black text-[9px] uppercase tracking-wider transition-colors ${
+              pathname === "/guild" || pathname === "/app/guild" ? "text-black bg-[#FFE600] border-2 border-black -rotate-1 shadow-[1.5px_1.5px_0_0_#000]" : "text-zinc-600 hover:text-black"
+            }`}
+          >
+            <Shield className="size-4 shrink-0" strokeWidth={3} />
+            <span>GUILD</span>
+          </Link>
+
+          <Link
+            href="/settings"
+            onClick={() => sfx.playCoinDrop()}
+            className={`flex flex-col items-center justify-center min-h-[44px] min-w-[56px] px-2 py-1 font-black text-[9px] uppercase tracking-wider transition-colors ${
+              pathname === "/settings" || pathname === "/app/settings" ? "text-black bg-[#FFE600] border-2 border-black -rotate-1 shadow-[1.5px_1.5px_0_0_#000]" : "text-zinc-600 hover:text-black"
+            }`}
+          >
+            <Settings className="size-4 shrink-0" strokeWidth={3} />
+            <span>ARMORY</span>
+          </Link>
+
+          <button
+            type="button"
+            onClick={() => setMobileOpen(true)}
+            aria-label="Open full menu"
+            className="flex flex-col items-center justify-center min-h-[44px] min-w-[56px] px-2 py-1 font-black text-[9px] uppercase tracking-wider text-zinc-600 hover:text-black"
+          >
+            <Menu className="size-4 shrink-0 text-black" strokeWidth={3} />
+            <span>MENU</span>
+          </button>
+        </nav>
 
       </div>
     </div>

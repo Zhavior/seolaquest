@@ -4,6 +4,7 @@ import { Suspense } from 'react'
 import { BILLING_EVENTS, recordBillingEvent } from '@/features/billing/analytics'
 import { BillingPageClient } from '@/features/billing/components/BillingPageClient'
 import { buildBillingViewModel } from '@/features/billing/viewModel'
+import { isPlanCode, type PlanCode } from '@/src/modules/billing/domain/catalog'
 import BillingLoading from './loading'
 
 export const metadata: Metadata = {
@@ -15,11 +16,22 @@ type BillingPageProps = {
   searchParams: Promise<{
     checkout?: string | string[]
     session_id?: string | string[]
+    offer?: string | string[]
   }>
 }
 
 function firstValue(value: string | string[] | undefined) {
   return Array.isArray(value) ? value[0] : value
+}
+
+/**
+ * `?offer=…` only chooses which card to scroll to and ring. It is deliberately
+ * validated against the catalog rather than passed through, so a crafted link
+ * cannot inject an arbitrary value into the grid.
+ */
+function highlightedPlan(value: string | string[] | undefined): PlanCode | null {
+  const offer = firstValue(value)?.trim().toUpperCase()
+  return offer && isPlanCode(offer) ? offer : null
 }
 
 export default async function BillingPage({ searchParams }: BillingPageProps) {
@@ -69,7 +81,7 @@ export default async function BillingPage({ searchParams }: BillingPageProps) {
   // We wrap in Suspense. We can use the existing loading.tsx component as the fallback.
   return (
     <Suspense fallback={<BillingLoading />}>
-      <BillingPageClient modelPromise={modelPromise} />
+      <BillingPageClient modelPromise={modelPromise} highlightPlan={highlightedPlan(query.offer)} />
     </Suspense>
   )
 }

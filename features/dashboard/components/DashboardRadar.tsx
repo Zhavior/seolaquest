@@ -92,7 +92,7 @@ export function DashboardRadar({
                 Manual Scan
               </span>
               <span className="mt-1 bg-black text-[#FFE600] px-3 py-0.5 text-xs font-black uppercase tracking-wide border border-black -rotate-1">
-                {isPending ? 'PULSING GRID...' : 'TRIGGER PULSE (-5 MP)'}
+                {isPending ? 'PULSING GRID...' : 'TRIGGER PULSE (-1 MP)'}
               </span>
             </div>
           </motion.button>

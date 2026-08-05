@@ -3,7 +3,9 @@ import 'server-only'
 import prisma from '@/lib/prisma'
 import { requireCurrentUser } from '@/lib/auth'
 import { EntitlementService } from '@/src/modules/billing/application/EntitlementService'
-import { type PlanCode } from '@/src/modules/billing/domain/catalog'
+import { FOUNDER_LOCK_TERMS, type PlanCode } from '@/src/modules/billing/domain/catalog'
+import { FounderSeatService } from '@/src/modules/billing/application/FounderSeatService'
+import { founderPriceConfigured } from '@/src/modules/billing/infrastructure/stripeCatalog'
 import { assertStripeSecretKeyMatchesExpectedMode } from '@/src/modules/billing/infrastructure/stripeEnvironment'
 import { getBillingPlanCatalog, type BillingPlanView } from './catalog'
 
@@ -25,6 +27,17 @@ export type BillingAvailability = {
   state: BillingAvailabilityState
   label: string
   reason: string
+}
+
+export type FounderPassView = {
+  limit: number
+  claimed: number
+  reserved: number
+  remaining: number
+  soldOut: boolean
+  sellable: boolean
+  priceConfigured: boolean
+  lockTerms: readonly string[]
 }
 
 export type CheckoutReturnNotice = {
@@ -86,6 +99,7 @@ export type BillingReadyViewModel = {
     creditTopUps: BillingAvailability
   }
   catalog: BillingPlanView[]
+  founderPass: FounderPassView
   checkoutReturn: CheckoutReturnNotice
   support: {
     email: string
@@ -321,7 +335,15 @@ export async function buildBillingViewModel(input: {
     const user = await requireCurrentUser()
     const sessionId = input.checkout === 'verifying' ? validCheckoutSessionId(input.sessionId) : null
     const recentIntentCutoff = new Date(now.getTime() - 30 * 60_000)
-    const [entitlements, subscription, heartbeat, activeKeywordCount, matchingIntent, recentIntent] = await Promise.all([
+    const [
+      entitlements,
+      subscription,
+      heartbeat,
+      activeKeywordCount,
+      matchingIntent,
+      recentIntent,
+      founderSeatSnapshot,
+    ] = await Promise.all([
       EntitlementService.forUser(user.id),
       prisma.billingSubscription.findUnique({
         where: { userId: user.id },
@@ -354,6 +376,7 @@ export async function buildBillingViewModel(input: {
         orderBy: { updatedAt: 'desc' },
         select: { status: true, kind: true },
       }),
+      FounderSeatService.snapshot(prisma, now),
     ])
 
     const checkout = checkoutConfiguration()
@@ -477,6 +500,17 @@ export async function buildBillingViewModel(input: {
         },
       },
       catalog: getBillingPlanCatalog(),
+      founderPass: {
+        ...founderSeatSnapshot,
+        // Seats can remain while the offer itself is unsellable — the Founder
+        // Price has to be configured before the card may claim to be buyable.
+        sellable:
+          founderPriceConfigured()
+          && !founderSeatSnapshot.soldOut
+          && checkoutAvailability.state === 'available',
+        priceConfigured: founderPriceConfigured(),
+        lockTerms: FOUNDER_LOCK_TERMS,
+      },
       checkoutReturn: checkoutReturnNotice({
         checkout: input.checkout ?? (recentIntent ? 'verifying' : undefined),
         matchingIntent: input.checkout === 'verifying'

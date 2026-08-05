@@ -11,7 +11,7 @@ const TIERS = [
     features: [
       '3 tracked keywords',
       '1 AI adventurer',
-      'Reddit scanning',
+      'X scanning',
       'War Room (read-only export)',
       'Archive (7 days)',
     ],
@@ -29,7 +29,7 @@ const TIERS = [
     features: [
       '25 tracked keywords',
       '5 AI adventurers',
-      'Reddit + X + Web',
+      'X scanning (Reddit + Web soon)',
       'War Room (full CRM)',
       'Archive (90 days)',
       'Mana top-up marketplace',
