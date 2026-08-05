@@ -9,11 +9,17 @@ vi.mock('@/lib/auth', () => ({ getCurrentUser: mocks.getCurrentUser }))
 vi.mock('@/lib/aiBlogger', () => ({
   generateAndSaveBlogPost: mocks.generateAndSaveBlogPost,
 }))
+// Rate limiting is covered by RateLimiter.test.ts; these cases exercise route behaviour.
+vi.mock('@/src/modules/core/security/RateLimiter', () => ({
+  RateLimiterService: { enforce: vi.fn() },
+}))
 
 import { POST } from './route'
 
+const routeContext = { params: {} }
+
 function request(body: unknown) {
-  return new Request('https://coquest.test/api/v1/blog/generate', {
+  return new Request('https://seolaquest.test/api/v1/blog/generate', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),
@@ -39,10 +45,10 @@ describe('blog generation boundary', () => {
 
   it('rejects unauthenticated and non-admin callers before generation', async () => {
     mocks.getCurrentUser.mockResolvedValueOnce(null)
-    expect((await POST(request({ topic: 'A safe topic' }))).status).toBe(401)
+    expect((await POST(request({ topic: 'A safe topic' }), routeContext)).status).toBe(401)
 
     mocks.getCurrentUser.mockResolvedValueOnce({ id: 'user-customer' })
-    expect((await POST(request({ topic: 'A safe topic' }))).status).toBe(403)
+    expect((await POST(request({ topic: 'A safe topic' }), routeContext)).status).toBe(403)
     expect(mocks.generateAndSaveBlogPost).not.toHaveBeenCalled()
   })
 
@@ -50,7 +56,7 @@ describe('blog generation boundary', () => {
     vi.stubEnv('NODE_ENV', 'production')
     vi.stubEnv('BLOG_PUBLISHING_ENABLED', 'false')
 
-    const response = await POST(request({ topic: 'A safe topic' }))
+    const response = await POST(request({ topic: 'A safe topic' }), routeContext)
 
     expect(response.status).toBe(503)
     expect(mocks.generateAndSaveBlogPost).not.toHaveBeenCalled()
@@ -61,7 +67,7 @@ describe('blog generation boundary', () => {
       topic: 'A safe topic',
       category: 'SaaS',
       apiKey: 'caller-controlled-key',
-    }))
+    }), routeContext)
     const body = await response.json()
 
     expect(response.status).toBe(200)
@@ -77,7 +83,7 @@ describe('blog generation boundary', () => {
   })
 
   it('rejects invalid payloads without invoking generation', async () => {
-    const response = await POST(request({ topic: 'x' }))
+    const response = await POST(request({ topic: 'x' }), routeContext)
 
     expect(response.status).toBe(400)
     expect(mocks.generateAndSaveBlogPost).not.toHaveBeenCalled()

@@ -60,7 +60,7 @@ export function HQSocialProof() {
                 </tr>
               </thead>
               <tbody>
-                {GUILD_ROSTER.map(({ rank, name, class: cls, leads, badge }, i) => (
+                {GUILD_ROSTER.map(({ name, class: cls, leads, badge }, i) => (
                   <tr
                     key={name}
                     className="border-b-2 border-black last:border-b-0 hover:bg-black hover:text-white transition-colors group"
@@ -96,7 +96,7 @@ export function HQSocialProof() {
               className="border-4 border-black p-5 shadow-[5px_5px_0_0_#000]"
               style={{ background: '#f4ebd8' }}
             >
-              <p className="font-bold text-sm sm:text-base leading-relaxed mb-3">"{quote}"</p>
+              <p className="font-bold text-sm sm:text-base leading-relaxed mb-3">&ldquo;{quote}&rdquo;</p>
               <footer className="flex items-center gap-2">
                 <span
                   className="border-2 border-black px-2 py-0.5 text-[9px] font-black uppercase tracking-widest"

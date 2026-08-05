@@ -4,7 +4,7 @@ import { requireCurrentUser } from '@/lib/auth'
 export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
-  title: 'Mage Tower | HypeQuest',
+  title: 'Mage Tower | SEO la Quest',
   description: 'Review your guild master profile, class identity, and account state.',
 }
 

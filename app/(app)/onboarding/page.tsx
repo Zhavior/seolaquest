@@ -14,7 +14,20 @@ export default async function OnboardingPage() {
     <OnboardingForm
       initialDraft={{
         displayName: user.name ?? '',
-        profileIconKey: (user.profileIconKey as any) ?? 'target',
+        profileIconKey: (
+          [
+            'target',
+            'star',
+            'rocket',
+            'lightning',
+            'crystalBall',
+            'shield',
+            'crown',
+            'fire',
+            'sword',
+            'robot',
+          ] as const
+        ).find((icon) => icon === user.profileIconKey) ?? 'target',
         businessDescription: user.businessDescription ?? '',
         targetCustomer: user.targetCustomer ?? '',
         firstKeyword: user.firstKeyword ?? '',

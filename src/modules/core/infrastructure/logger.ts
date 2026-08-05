@@ -53,7 +53,11 @@ export const LOG_REDACT_PATHS = [
   'headers.authorization',
 ] as const
 
-export const logger = pino({
+import { AsyncLocalStorage } from 'async_hooks'
+
+export const loggerContext = new AsyncLocalStorage<Record<string, unknown>>()
+
+export const baseLogger = pino({
   level: process.env.LOG_LEVEL || 'info',
   redact: {
     paths: [...LOG_REDACT_PATHS],
@@ -75,5 +79,22 @@ export const logger = pino({
       },
   formatters: {
     level: (label) => ({ level: label }),
+  },
+})
+
+export const logger = new Proxy(baseLogger, {
+  get(target, property) {
+    const value = Reflect.get(target, property)
+    if (typeof value === 'function' && ['fatal', 'error', 'warn', 'info', 'debug', 'trace'].includes(property as string)) {
+      return (...args: unknown[]) => {
+        const store = loggerContext.getStore() || {}
+        const [first, ...rest] = args
+        if (typeof first === 'object' && first !== null && !Array.isArray(first)) {
+          return value.apply(target, [{ ...store, ...first }, ...rest])
+        }
+        return value.apply(target, [{ ...store }, ...args])
+      }
+    }
+    return value
   },
 })

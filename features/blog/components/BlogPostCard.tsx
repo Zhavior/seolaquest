@@ -10,7 +10,7 @@ interface BlogPostCardProps {
   index?: number
 }
 
-export function BlogPostCard({ post, index = 0 }: BlogPostCardProps) {
+export function BlogPostCard({ post }: BlogPostCardProps) {
   return (
     <div
       onMouseEnter={() => sfx.playHoverBlip()}

@@ -3,6 +3,7 @@ import { z } from 'zod'
 import { generateAndSaveBlogPost } from '@/lib/aiBlogger'
 import { getCurrentUser } from '@/lib/auth'
 import { logger } from '@/src/modules/core/infrastructure/logger'
+import { withApiHandler } from '@/src/modules/core/infrastructure/api-handler'
 
 const GenerateBlogPostSchema = z.object({
   topic: z.string().trim().min(3).max(160),
@@ -21,7 +22,7 @@ function configuredAdminIds() {
   )
 }
 
-export async function POST(req: Request) {
+export const POST = withApiHandler(async (req) => {
   try {
     const user = await getCurrentUser()
     if (!user) {
@@ -76,4 +77,4 @@ export async function POST(req: Request) {
       { status: 500 }
     )
   }
-}
+})

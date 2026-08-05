@@ -64,7 +64,7 @@ describe('GET /api/v1/scans/[id]', () => {
     mocks.getStatus.mockResolvedValue(null)
     const response = await read('22222222-2222-4222-8222-222222222222')
     expect(response.status).toBe(404)
-    await expect(response.json()).resolves.toEqual({ error: 'Scan not found' })
+    await expect(response.json()).resolves.toEqual({ error: 'Scan not found', code: 'NOT_FOUND' })
   })
 
   it('rejects malformed IDs before touching tenant data', async () => {
@@ -77,6 +77,6 @@ describe('GET /api/v1/scans/[id]', () => {
     mocks.getStatus.mockRejectedValue(new Error('raw provider token and database details'))
     const response = await read()
     expect(response.status).toBe(500)
-    await expect(response.json()).resolves.toEqual({ error: 'Scan status unavailable' })
+    await expect(response.json()).resolves.toEqual({ error: 'Internal Server Error' })
   })
 })

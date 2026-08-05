@@ -485,7 +485,7 @@ export async function buildBillingViewModel(input: {
         paid: entitlements.paid,
       }),
       support: {
-        email: 'support@coquest.ai',
+        email: 'support@seolaquest.com',
         receiptCopy: 'Use Stripe billing management for invoices or receipts available on your account. Email delivery depends on the Stripe checkout and invoice settings in effect at payment time.',
         refundCopy: 'Consumed credits are not automatically restored. Contact support for billing disputes or refund requests; applicable consumer rights are not waived.',
       },

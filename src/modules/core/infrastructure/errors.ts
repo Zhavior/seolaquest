@@ -38,3 +38,22 @@ export class NotFoundError extends AppError {
     super(message, 404, 'NOT_FOUND')
   }
 }
+
+export class ConflictError extends AppError {
+  constructor(message = 'Conflict detected', details?: unknown) {
+    super(message, 409, 'CONFLICT', details)
+  }
+}
+
+export class DomainError extends AppError {
+  constructor(message: string, code = 'DOMAIN_RULE_VIOLATION', details?: unknown) {
+    super(message, 422, code, details)
+  }
+}
+
+export class RateLimitError extends AppError {
+  constructor(message = 'Rate limit exceeded', details?: unknown) {
+    super(message, 429, 'RATE_LIMIT_EXCEEDED', details)
+  }
+}
+

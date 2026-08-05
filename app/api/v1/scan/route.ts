@@ -1,8 +1,9 @@
 import { NextResponse } from 'next/server'
 import { getCurrentUser } from '@/lib/auth'
 import { ScanRunService } from '@/src/modules/leads/application/ScanRunService'
+import { withApiHandler } from '@/src/modules/core/infrastructure/api-handler'
 
-export async function POST() {
+export const POST = withApiHandler(async () => {
   try {
     const user = await getCurrentUser()
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -39,4 +40,4 @@ export async function POST() {
   } catch {
     return NextResponse.json({ success: false, queued: false, error: 'Scan request failed' }, { status: 500 })
   }
-}
+})

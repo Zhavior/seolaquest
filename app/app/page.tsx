@@ -11,7 +11,7 @@ const DashboardClient = nextDynamic(() => import('@/features/dashboard/component
 export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
-  title: 'Battle Area | HypeQuest',
+  title: 'Battle Area | SEO la Quest',
   description: 'Command your Battle Area, manage keyword campaigns, and review active lead intelligence.',
 }
 

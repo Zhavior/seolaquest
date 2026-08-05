@@ -21,9 +21,9 @@ export function HQFooter() {
             ⚔
           </span>
           <div>
-            <div className="font-black uppercase tracking-widest text-sm">HypeQuest</div>
+            <div className="font-black uppercase tracking-widest text-sm">SEO la Quest</div>
             <div className="text-[9px] font-bold uppercase tracking-widest text-black/40">
-              © {new Date().getFullYear()} HypeQuest. All rights reserved.
+              © {new Date().getFullYear()} SEO la Quest. All rights reserved.
             </div>
           </div>
         </div>

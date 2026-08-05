@@ -3,21 +3,21 @@ import { ArrowRight, Database, FlaskConical, Search, ShieldCheck } from 'lucide-
 const WORKFLOW = [
   {
     icon: Search,
-    stage: 'Stage 01: Preparation',
-    title: 'Configure keywords',
-    body: 'Choose the phrases, demand signals, and search angles your guild wants to track first.',
+    stage: 'Stage 01: Define',
+    title: 'Tune the signal lens',
+    body: 'Choose the exact phrases, demand signals, and search angles that matter now.',
   },
   {
     icon: Database,
-    stage: 'Stage 02: Cast Scan',
-    title: 'Start a manual scan',
-    body: 'Spend credits intentionally, trigger a scan, and surface candidate conversations worth reviewing.',
+    stage: 'Stage 02: Stream',
+    title: 'Watch matches arrive',
+    body: 'Signals appear as a live feed, so the interface feels active instead of batch-processed.',
   },
   {
     icon: ShieldCheck,
-    stage: 'Stage 03: Loot Inventory',
-    title: 'Review stored matches',
-    body: 'Inspect source matches as evidence to review, not instant intent, revenue, or automated outreach.',
+    stage: 'Stage 03: Inspect',
+    title: 'Open the evidence panel',
+    body: 'Review source matches, confidence notes, and thread context before you move forward.',
   },
 ]
 
@@ -26,18 +26,18 @@ export default function ManaEngineDemo() {
     <section className="relative z-10 mx-auto max-w-7xl px-4 py-20 sm:px-6 sm:py-32">
       <div className="mx-auto mb-12 max-w-4xl text-center">
         <div className="mb-4 inline-flex -rotate-1 items-center gap-2 border-4 border-black bg-[#4169e1] px-4 py-1.5 text-xs font-black uppercase tracking-widest text-white shadow-[4px_4px_0_0_rgba(0,0,0,1)]">
-          <FlaskConical size={16} /> Interface workflow
+          <FlaskConical size={16} /> Live signal workflow
         </div>
 
         <h2 className="text-3xl font-black uppercase leading-none tracking-tight text-black sm:text-5xl md:text-7xl">
-          How the <span className="text-[#4169e1] underline decoration-[#ffd700] decoration-wavy">Mana metaphor</span> maps to work
+          Signals stream into decisions
         </h2>
 
         <div className="mx-auto mt-6 flex max-w-3xl items-center gap-3 border-4 border-black bg-[#fff1bf] p-3 text-left font-mono text-[11px] font-bold uppercase tracking-[0.08em] text-black shadow-[4px_4px_0_0_#000] sm:text-xs">
           <span className="shrink-0 border-2 border-black bg-[#FFE600] px-2 py-1 font-black">
-            SYSTEM NOTICE
+            LIVE MODE
           </span>
-          <span>Demo mode active // Product boundaries shown explicitly without sales hype.</span>
+          <span>Streaming preview active // updates pulse in real time inside the demo console.</span>
         </div>
       </div>
 

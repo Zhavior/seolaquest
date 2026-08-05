@@ -1,10 +1,11 @@
 import { NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
 import { getCurrentUser } from '@/lib/auth'
+import { withApiHandler } from '@/src/modules/core/infrastructure/api-handler'
 
 export const dynamic = 'force-dynamic'
 
-export async function GET() {
+export const GET = withApiHandler(async () => {
   try {
     const user = await getCurrentUser()
     if (!user) {
@@ -32,4 +33,4 @@ export async function GET() {
       { status: 500 },
     )
   }
-}
+})

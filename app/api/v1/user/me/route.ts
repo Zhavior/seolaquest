@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { getCurrentUser } from '@/lib/auth'
 import { logger } from '@/src/modules/core/infrastructure/logger'
+import { withApiHandler } from '@/src/modules/core/infrastructure/api-handler'
 
 function toCurrentUserDto(user: {
   name: string | null
@@ -14,7 +15,7 @@ function toCurrentUserDto(user: {
   }
 }
 
-export async function GET() {
+export const GET = withApiHandler(async () => {
   try {
     const user = await getCurrentUser()
     if (!user) {
@@ -26,4 +27,4 @@ export async function GET() {
     logger.error({ err: error, outcomeCode: 'USER_PROFILE_READ_FAILED' }, 'User profile read failed')
     return NextResponse.json({ error: 'Failed to fetch user profile' }, { status: 500 })
   }
-}
+})

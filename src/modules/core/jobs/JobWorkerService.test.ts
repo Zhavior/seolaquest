@@ -15,7 +15,7 @@ describe('boundedBatchSize', () => {
     expect(boundedBatchSize(undefined)).toBe(4)
   })
   it('returns default batch size for null', () => {
-    expect(boundedBatchSize(null as any)).toBe(4)
+    expect(boundedBatchSize(null as unknown as number | undefined)).toBe(4)
   })
   it('returns default batch size for NaN', () => {
     expect(boundedBatchSize(NaN)).toBe(4)
@@ -95,7 +95,13 @@ const mockedCrmDeliveryService = vi.mocked(CrmDeliveryService)
 describe('JobWorkerService', () => {
   beforeEach(() => {
     vi.resetAllMocks()
-    mockedScheduler.enqueueDueSchedules.mockResolvedValue(0)
+    mockedScheduler.enqueueDueSchedules.mockResolvedValue({
+      due: 0,
+      queued: 0,
+      existing: 0,
+      skipped: 0,
+      reconciled: { created: 0, disabled: 0 },
+    })
     mockedReconciliation.reconcile.mockResolvedValue({
       candidates: 0,
       refunded: 0,
@@ -116,7 +122,7 @@ describe('JobWorkerService', () => {
       ok: true,
       workerId: 'worker-1',
       preparation: {
-        scheduled: 0,
+        scheduled: expect.objectContaining({ due: 0 }),
         reconciled: {
           candidates: 0,
           refunded: 0,
@@ -130,7 +136,7 @@ describe('JobWorkerService', () => {
         isolatedFailures: 0,
       },
       stopReason: 'NO_JOBS',
-      scheduled: 0,
+      scheduled: expect.objectContaining({ due: 0 }),
       reconciled: {
         candidates: 0,
         refunded: 0,

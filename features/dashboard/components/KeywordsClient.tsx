@@ -49,7 +49,7 @@ export function KeywordsClient({ initialKeywords }: KeywordsClientProps) {
         <h1 className="text-3xl md:text-4xl font-black uppercase tracking-wider flex items-center gap-3">
           <Search className="w-8 h-8 stroke-[3px]" /> Keyword Monitors
         </h1>
-        <p className="font-bold text-sm mt-1">Track target phrases across the sources currently connected to HypeQuest.</p>
+        <p className="font-bold text-sm mt-1">Track target phrases across the sources currently connected to SEO la Quest.</p>
       </div>
 
       {/* ADD KEYWORD FORM */}

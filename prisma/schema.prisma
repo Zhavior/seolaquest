@@ -46,6 +46,7 @@ model User {
   scanRuns               ScanRun[]
   crmDeliveries          CrmExportDelivery[]
   accountDeletionRequest AccountDeletionRequest?
+  auditTrails            AuditTrail[]
 
   @@index([createdAt])
 }
@@ -367,4 +368,22 @@ model OperationalHeartbeat {
   lastSucceededAt DateTime?
   lastErrorCode   String?
   updatedAt       DateTime  @updatedAt
+}
+
+model AuditTrail {
+  id          String   @id @default(uuid())
+  userId      String?
+  user        User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  action      String
+  entityType  String
+  entityId    String?
+  status      String
+  metadata    Json?
+  ipAddress   String?
+  userAgent   String?
+  createdAt   DateTime @default(now())
+
+  @@index([userId, createdAt])
+  @@index([action, createdAt])
+  @@index([entityType, entityId])
 }

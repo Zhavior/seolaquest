@@ -21,7 +21,7 @@ vi.mock('@clerk/nextjs/server', () => ({
 
 import { PUBLIC_ROUTE_PATTERNS } from './proxy'
 
-const ORIGIN = 'https://hypequest.example'
+const ORIGIN = 'https://seolaquest.example'
 
 async function invokeProxy(path: string) {
   const protect = vi.fn()

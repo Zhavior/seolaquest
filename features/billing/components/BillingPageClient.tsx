@@ -1,12 +1,10 @@
 'use client'
 
 import React, { useState, useRef, use } from 'react'
-import { motion, Variants, AnimatePresence } from 'framer-motion'
-import { FlaskConical, Sparkles, Zap, AlertTriangle, ExternalLink, CheckCircle2, RefreshCw } from 'lucide-react'
-import Link from 'next/link'
+import { motion, Variants } from 'framer-motion'
+import { FlaskConical, Sparkles, AlertTriangle, RefreshCw } from 'lucide-react'
 
 import { useBillingSfx } from '@/features/billing/hooks/useBillingSfx'
-import { useCountdown } from '@/features/billing/hooks/useCountdown'
 import { useTypewriter } from '@/features/billing/hooks/useTypewriter'
 
 import { BillingHero, DamageEntry } from '@/features/billing/components/BillingHero'
@@ -51,12 +49,12 @@ function BillingApp({ model }: { model: BillingReadyViewModel }) {
   const [userCredits, setUserCredits] = useState(model.credits.balance)
   
   const [purchasingPotion, setPurchasedPotion] = useState<string | null>(null)
+  const [, setBrewStatus] = useState<'idle' | 'brewing' | 'redirecting'>('idle')
   const [potionSuccess, setPotionSuccess] = useState<string | null>(null)
   const [refillNotification, setRefillNotification] = useState<number | null>(null)
   const [isRefilling, setIsRefilling] = useState(false)
-  const [brewStatus, setBrewStatus] = useState<BrewStatus>('idle')
   const [damageTexts, setDamageTexts] = useState<DamageEntry[]>([])
-  const [purchasingPlan, setPurchasingPlan] = useState<any>(null)
+  const [purchasingPlan, setPurchasingPlan] = useState<PlanCode | null>(null)
   const damageIdRef = useRef(0)
 
   const { sfxEnabled, setSfxEnabled, sfxBlip, sfxCoin } = useBillingSfx()
@@ -64,7 +62,6 @@ function BillingApp({ model }: { model: BillingReadyViewModel }) {
   const MAX_MANA = Math.max(model.credits.highestRecordedBalance, 10000)
   const isLowMana = userCredits <= model.credits.estimatedScanCost * 5 // e.g. < 5 credits
 
-  const countdown = useCountdown(299)
 
   const dialogue = isLowMana
     ? `Psst… Hunter Santos! You're dangerously low on Mana (${userCredits} MP). Grab two Greater Elixirs and I'll toss in +500 Bonus Mana FREE!`
@@ -246,11 +243,12 @@ function BillingApp({ model }: { model: BillingReadyViewModel }) {
             currentPlan={model.subscription.plan}
             purchasingPlan={purchasingPlan}
             checkoutAvailability={model.availability.checkout}
-            onSelectPlan={(code) => {
+            onSelectPlan={async (code) => {
               setPurchasingPlan(code)
               triggerEffect('knight')
               sfxBlip()
-              // Handle actual checkout action
+              await selectPlan(code)
+              setPurchasingPlan(null)
             }}
           />
 

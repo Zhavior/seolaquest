@@ -5,8 +5,15 @@ const mocks = vi.hoisted(() => ({
 }))
 
 vi.mock('@/lib/auth', () => ({ getCurrentUser: mocks.getCurrentUser }))
+// Rate limiting is covered by RateLimiter.test.ts; these cases exercise route behaviour.
+vi.mock('@/src/modules/core/security/RateLimiter', () => ({
+  RateLimiterService: { enforce: vi.fn() },
+}))
 
 import { GET } from './route'
+
+const request = () => new Request('http://localhost/api/v1/user/me')
+const context = { params: {} }
 
 describe('GET /api/v1/user/me', () => {
   beforeEach(() => {
@@ -16,7 +23,7 @@ describe('GET /api/v1/user/me', () => {
   it('returns 401 without a current user', async () => {
     mocks.getCurrentUser.mockResolvedValue(null)
 
-    const response = await GET()
+    const response = await GET(request(), context)
 
     expect(response.status).toBe(401)
   })
@@ -34,7 +41,7 @@ describe('GET /api/v1/user/me', () => {
       xp: 9000,
     })
 
-    const response = await GET()
+    const response = await GET(request(), context)
 
     expect(response.status).toBe(200)
     await expect(response.json()).resolves.toEqual({

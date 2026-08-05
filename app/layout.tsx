@@ -12,8 +12,8 @@ const inter = Inter({
 })
 
 export const metadata: Metadata = {
-  applicationName: 'CoQuest',
-  title: 'CoQuest | Customer Research',
+  applicationName: 'SEO la Quest',
+  title: 'SEO la Quest | Customer Research',
   description: 'A customer research workspace for tracking keywords, running manual source scans, and reviewing matched public posts.',
 }
 

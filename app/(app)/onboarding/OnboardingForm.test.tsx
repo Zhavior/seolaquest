@@ -29,6 +29,7 @@ import type { OnboardingDraft } from '@/features/auth/onboarding'
 function draft(overrides: Partial<OnboardingDraft> = {}): OnboardingDraft {
   return {
     displayName: 'Boyd',
+    profileIconKey: 'target',
     businessDescription: 'Accessible websites',
     targetCustomer: 'Local service businesses',
     firstKeyword: 'need a website',
