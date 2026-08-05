@@ -3,48 +3,66 @@
   "routes": [
     {
       "path": "/",
-      "title": "CoQuest | Customer Research",
-      "requiredLandmarks": ["main"]
+      "title": "SEO la Quest | Customer Research",
+      "requiredLandmarks": [
+        "main"
+      ]
     },
     {
       "path": "/pricing",
-      "title": "Pricing | CoQuest",
-      "requiredLandmarks": ["main"]
+      "title": "Pricing | SEO la Quest",
+      "requiredLandmarks": [
+        "main"
+      ]
     },
     {
       "path": "/blog",
       "title": "CoQuest Blog & Content Engine | Arcade Playbooks & Guild Lore",
-      "requiredLandmarks": ["main"]
+      "requiredLandmarks": [
+        "main"
+      ]
     },
     {
       "path": "/status",
       "title": "System Architecture Status | CoQuest",
-      "requiredLandmarks": ["main"]
+      "requiredLandmarks": [
+        "main"
+      ]
     },
     {
       "path": "/privacy",
-      "title": "Privacy & Data Handling | CoQuest",
-      "requiredLandmarks": ["main"]
+      "title": "Privacy & Data Handling | SEO la Quest",
+      "requiredLandmarks": [
+        "main"
+      ]
     },
     {
       "path": "/terms",
       "title": "Terms | CoQuest",
-      "requiredLandmarks": ["main"]
+      "requiredLandmarks": [
+        "main"
+      ]
     },
     {
       "path": "/api-terms",
-      "title": "API Availability | CoQuest",
-      "requiredLandmarks": ["main"]
+      "title": "API Availability | SEO la Quest",
+      "requiredLandmarks": [
+        "main"
+      ]
     },
     {
       "path": "/sign-in",
       "title": "Sign In | CoQuest",
-      "requiredLandmarks": ["main"]
+      "requiredLandmarks": [
+        "main"
+      ]
     },
     {
       "path": "/sign-up",
       "title": "Create Account | CoQuest",
-      "requiredLandmarks": ["main"]
+      "requiredLandmarks": [
+        "main"
+      ]
     }
   ]
 }

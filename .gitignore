@@ -50,3 +50,10 @@ next-env.d.ts
 # local provider/runtime state
 /supabase/.temp/
 /prisma/*.db
+
+# macOS/cloud-sync duplicates ("Foo 2.tsx"). These appear in bulk whenever the
+# working tree changes under a syncing folder, and one of them previously
+# landed in .git/refs and broke fetch. The lint script already skips this same
+# pattern; keeping them untracked stops `git add -A` from sweeping them in.
+* 2.*
+* [0-9].*

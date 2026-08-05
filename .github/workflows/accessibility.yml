@@ -26,4 +26,11 @@ jobs:
         run: npx playwright install --with-deps chromium
 
       - name: Run rendered accessibility release gate
+        # The gate builds and boots a real production server, so Clerk needs a
+        # publishable key at build time and a secret key at runtime. /sign-in
+        # and /sign-up are Clerk components: without these the server throws on
+        # every render and never becomes ready. Use test-mode keys.
+        env:
+          NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
+          CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
         run: npm run test:a11y
