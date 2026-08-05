@@ -214,6 +214,12 @@ async function launchBrowser(chromePath, axeSource) {
   const profileDirectory = await mkdtemp(join(tmpdir(), 'coquest-a11y-chrome-'))
   const chrome = spawn(chromePath, [
     '--headless=new',
+    // GitHub's Ubuntu runners disable unprivileged user namespaces, so Chrome's
+    // sandbox cannot start and the browser aborts before it ever writes
+    // DevToolsActivePort. Dropping the sandbox is safe here and only here: the
+    // gate loads our own production build on localhost and nothing else. Local
+    // runs keep the sandbox, so this stays a CI-only concession.
+    ...(process.env.CI ? ['--no-sandbox', '--disable-dev-shm-usage'] : []),
     '--disable-background-networking',
     '--disable-component-update',
     '--disable-default-apps',
