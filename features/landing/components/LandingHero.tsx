@@ -242,10 +242,10 @@ export function LandingHero() {
               sfx.playHoverBlip()
               setActiveMobileTab('brief')
             }}
-            className={`flex-1 border-2 px-3 py-2 text-[11px] font-black uppercase tracking-[0.16em] transition-all ${
+            className={`min-h-11 flex-1 border-2 px-3 py-2 text-[11px] font-black uppercase tracking-[0.16em] transition-all ${
               activeMobileTab === 'brief'
                 ? 'border-outline bg-accent text-on-accent shadow-brutal-sm'
-                : 'border-transparent bg-transparent text-ink/55'
+                : 'border-transparent bg-transparent text-ink/70'
             }`}
           >
             Quest brief
@@ -260,10 +260,10 @@ export function LandingHero() {
               sfx.playRadarBlip()
               setActiveMobileTab('matches')
             }}
-            className={`flex-1 border-2 px-3 py-2 text-[11px] font-black uppercase tracking-[0.16em] transition-all ${
+            className={`min-h-11 flex-1 border-2 px-3 py-2 text-[11px] font-black uppercase tracking-[0.16em] transition-all ${
               activeMobileTab === 'matches'
                 ? 'border-outline bg-accent text-on-accent shadow-brutal-sm'
-                : 'border-transparent bg-transparent text-ink/55'
+                : 'border-transparent bg-transparent text-ink/70'
             }`}
           >
             Matches (2)
