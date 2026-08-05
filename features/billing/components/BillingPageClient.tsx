@@ -42,7 +42,7 @@ export function VerificationPanel({ model }: { model: BillingUnavailableViewMode
   )
 }
 
-function BillingApp({ model }: { model: BillingReadyViewModel }) {
+function BillingApp({ model, highlightPlan }: { model: BillingReadyViewModel; highlightPlan?: PlanCode | null }) {
   const [activeEffect, setActiveEffect] = useState<'none' | 'peasant' | 'swordsman' | 'knight' | 'sorcerer' | 'dragon'>('none')
   
   // Use server model data as initial state for optimistic UI updates
@@ -243,6 +243,8 @@ function BillingApp({ model }: { model: BillingReadyViewModel }) {
             currentPlan={model.subscription.plan}
             purchasingPlan={purchasingPlan}
             checkoutAvailability={model.availability.checkout}
+            founderPass={model.founderPass}
+            highlightPlan={highlightPlan}
             onSelectPlan={async (code) => {
               setPurchasingPlan(code)
               triggerEffect('knight')
@@ -261,12 +263,19 @@ function BillingApp({ model }: { model: BillingReadyViewModel }) {
   )
 }
 
-export function BillingPageClient({ modelPromise }: { modelPromise: Promise<BillingViewModel> }) {
+export function BillingPageClient({
+  modelPromise,
+  highlightPlan,
+}: {
+  modelPromise: Promise<BillingViewModel>
+  /** Deep-link target from `/billing?offer=…`, used to scroll to and ring one plan. */
+  highlightPlan?: PlanCode | null
+}) {
   const model = use(modelPromise)
-  
+
   if (model.status === 'loading' || model.status === 'unavailable') {
     return <VerificationPanel model={model} />
   }
 
-  return <BillingApp model={model} />
+  return <BillingApp model={model} highlightPlan={highlightPlan} />
 }

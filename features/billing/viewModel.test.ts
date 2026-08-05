@@ -7,6 +7,8 @@ const mocks = vi.hoisted(() => ({
   findHeartbeat: vi.fn(),
   countKeywords: vi.fn(),
   findCheckoutIntent: vi.fn(),
+  countSubscriptions: vi.fn(),
+  countCheckoutIntents: vi.fn(),
   assertStripeMode: vi.fn(),
 }))
 
@@ -20,10 +22,10 @@ vi.mock('@/src/modules/billing/infrastructure/stripeEnvironment', () => ({
 }))
 vi.mock('@/lib/prisma', () => ({
   default: {
-    billingSubscription: { findUnique: mocks.findSubscription },
+    billingSubscription: { findUnique: mocks.findSubscription, count: mocks.countSubscriptions },
     operationalHeartbeat: { findUnique: mocks.findHeartbeat },
     trackedKeyword: { count: mocks.countKeywords },
-    checkoutIntent: { findFirst: mocks.findCheckoutIntent },
+    checkoutIntent: { findFirst: mocks.findCheckoutIntent, count: mocks.countCheckoutIntents },
   },
 }))
 
@@ -54,6 +56,8 @@ function enableReadyCheckoutAndWorker() {
 describe('server-owned billing view model', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    mocks.countSubscriptions.mockResolvedValue(0)
+    mocks.countCheckoutIntents.mockResolvedValue(0)
     vi.stubEnv('ENABLE_BETA_CHECKOUT', 'false')
     vi.stubEnv('SUBSCRIPTION_CHECKOUT_ENABLED', 'false')
     vi.stubEnv('ENABLE_SCAN_WORKER', 'false')
@@ -263,6 +267,44 @@ describe('server-owned billing view model', () => {
         state: 'cancelled',
         message: expect.stringContaining('No success is being claimed'),
       },
+    })
+  })
+
+  it('offers the Founder Pass only when seats, price, and checkout are all ready', async () => {
+    enableReadyCheckoutAndWorker()
+    vi.stubEnv('STRIPE_PRICE_FOUNDER', 'price_founder')
+    mocks.countSubscriptions.mockResolvedValue(30)
+    mocks.countCheckoutIntents.mockResolvedValue(4)
+
+    await expect(buildBillingViewModel({ now: NOW })).resolves.toMatchObject({
+      founderPass: {
+        limit: 50,
+        claimed: 30,
+        reserved: 4,
+        remaining: 16,
+        soldOut: false,
+        priceConfigured: true,
+        sellable: true,
+      },
+    })
+  })
+
+  it('stops offering the Founder Pass once every seat is taken', async () => {
+    enableReadyCheckoutAndWorker()
+    vi.stubEnv('STRIPE_PRICE_FOUNDER', 'price_founder')
+    mocks.countSubscriptions.mockResolvedValue(50)
+
+    await expect(buildBillingViewModel({ now: NOW })).resolves.toMatchObject({
+      founderPass: { remaining: 0, soldOut: true, sellable: false },
+    })
+  })
+
+  it('does not offer the Founder Pass while its Stripe price is unconfigured', async () => {
+    enableReadyCheckoutAndWorker()
+    vi.stubEnv('STRIPE_PRICE_FOUNDER', '')
+
+    await expect(buildBillingViewModel({ now: NOW })).resolves.toMatchObject({
+      founderPass: { soldOut: false, priceConfigured: false, sellable: false },
     })
   })
 })

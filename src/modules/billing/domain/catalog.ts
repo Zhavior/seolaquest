@@ -1,4 +1,4 @@
-export type PlanCode = 'FREE' | 'BETA' | 'PRO' | 'AGENCY'
+export type PlanCode = 'FREE' | 'FOUNDER' | 'BETA' | 'PRO' | 'AGENCY'
 export type PotionId = 'minor_vial' | 'greater_elixir' | 'dragon_cauldron'
 
 export type PlanDefinition = {
@@ -23,6 +23,13 @@ export const PLAN_CATALOG: Record<PlanCode, PlanDefinition> = {
     name: 'Free Scout',
     priceLabel: '$0',
     scanLimit: 0,
+    enabled: true,
+  },
+  FOUNDER: {
+    code: 'FOUNDER',
+    name: 'Founder Pass',
+    priceLabel: '$29/mo — locked for life',
+    scanLimit: 3_000,
     enabled: true,
   },
   BETA: {
@@ -71,6 +78,26 @@ export const POTION_CATALOG: Record<PotionId, PotionDefinition> = {
     quests: 6000,
   },
 }
+
+/**
+ * How many Founder Pass subscriptions may ever exist at the locked rate.
+ *
+ * The lock is a promise to honour today's price indefinitely, so the only thing
+ * bounding its cost is the seat count. It is a hard cap enforced at checkout,
+ * not a marketing number — see FounderSeatService.
+ */
+export const FOUNDER_SEAT_LIMIT = 50
+
+/**
+ * The conditions the price lock is sold under. These are shown on the payment
+ * page itself, not buried in a policy page, because they are what makes the
+ * "never goes up" promise sustainable — and what a founder is agreeing to.
+ */
+export const FOUNDER_LOCK_TERMS = [
+  'Your rate stays at the founder price for as long as the subscription stays active, even after public pricing rises.',
+  'Cancelling releases the seat and the locked rate. Resubscribing later uses whatever the public price is then.',
+  'The lock covers the software subscription, not usage: it includes a fixed monthly mana allowance, with top-up packs sold separately.',
+] as const
 
 export function isPlanCode(value: string): value is PlanCode {
   return Object.prototype.hasOwnProperty.call(PLAN_CATALOG, value)

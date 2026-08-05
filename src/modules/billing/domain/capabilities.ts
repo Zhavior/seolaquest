@@ -31,6 +31,11 @@ const PLAN_CAPABILITIES: Record<PlanCode, CapabilityMatrix> = {
     AI_REPLY_GENERATE: false,
     CRM_EXPORT: false,
   },
+  FOUNDER: {
+    SCAN_MANUAL: true,
+    AI_REPLY_GENERATE: true,
+    CRM_EXPORT: true,
+  },
   BETA: {
     SCAN_MANUAL: true,
     AI_REPLY_GENERATE: true,

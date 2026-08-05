@@ -262,9 +262,9 @@ export default function StatusBar({
             )}
           </button>
 
-          {/* Recharge Action CTA */}
+          {/* Recharge Action CTA — lands on the Founder offer, not the top of the page */}
           <Link
-            href="/app/billing"
+            href="/app/billing?offer=founder"
             className="inline-flex h-9 sm:min-h-11 shrink-0 items-center gap-1 border-[3px] border-black bg-[#ff5a36] px-2.5 sm:px-4 py-1 font-black uppercase tracking-wider text-black shadow-[2.5px_2.5px_0_0_#000] transition-transform duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[1px_1px_0_0_#000] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none text-xs sm:text-sm"
           >
             <Zap aria-hidden="true" className="size-3.5 sm:size-4 text-black" strokeWidth={3} />

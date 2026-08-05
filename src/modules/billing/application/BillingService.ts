@@ -11,6 +11,8 @@ import {
   isPaidPlanCode,
   isPotionId,
 } from '@/src/modules/billing/domain/catalog'
+import { isNonterminalSubscriptionStatus } from '@/src/modules/billing/domain/subscriptionStatus'
+import { FounderSeatService } from '@/src/modules/billing/application/FounderSeatService'
 import { stripePriceIdForPlan } from '@/src/modules/billing/infrastructure/stripeCatalog'
 import { assertStripeSecretKeyMatchesExpectedMode } from '@/src/modules/billing/infrastructure/stripeEnvironment'
 import {
@@ -19,14 +21,6 @@ import {
 } from '@/src/modules/lifecycle/application/DeletionBillingBarrier'
 
 type CheckoutIntentKind = 'SUBSCRIPTION' | 'POTION'
-const NONTERMINAL_SUBSCRIPTION_STATUSES = new Set([
-  'active',
-  'trialing',
-  'incomplete',
-  'past_due',
-  'unpaid',
-  'paused',
-])
 
 type CheckoutResult = {
   ok: boolean
@@ -197,7 +191,7 @@ export class BillingService {
     const preliminarySubscription = await prisma.billingSubscription.findUnique({ where: { userId: user.id } })
     if (
       preliminarySubscription?.stripeSubscriptionId &&
-      NONTERMINAL_SUBSCRIPTION_STATUSES.has(preliminarySubscription.status)
+      isNonterminalSubscriptionStatus(preliminarySubscription.status)
     ) {
       return { ok: false, message: 'A subscription is already active. Use Manage billing to change it.' }
     }
@@ -218,9 +212,23 @@ export class BillingService {
         const existingSubscription = await tx.billingSubscription.findUnique({ where: { userId: user.id } })
         if (
           existingSubscription?.stripeSubscriptionId &&
-          NONTERMINAL_SUBSCRIPTION_STATUSES.has(existingSubscription.status)
+          isNonterminalSubscriptionStatus(existingSubscription.status)
         ) {
           return { ok: false, message: 'A subscription is already active. Use Manage billing to change it.' }
+        }
+
+        // The Founder Pass seat cap. Taken before any Stripe object exists, so a
+        // sold-out attempt needs no compensation. The lock is what makes the
+        // count-then-decide safe: without it two hunters can both read the last
+        // free seat, and the price lock makes overselling permanent.
+        if (plan.code === 'FOUNDER') {
+          await FounderSeatService.lockSeatPool(tx)
+          if (!(await FounderSeatService.hasSeatAvailable(tx, user.id))) {
+            return {
+              ok: false,
+              message: `All ${FounderSeatService.limit} Founder Pass seats are taken. No charge was made.`,
+            }
+          }
         }
 
         const customer = await getOrCreateCustomer(stripe, user, tx)
@@ -230,7 +238,7 @@ export class BillingService {
           status: 'all',
           limit: 100,
         })
-        if (liveSubscriptions.data.some((subscription) => NONTERMINAL_SUBSCRIPTION_STATUSES.has(subscription.status))) {
+        if (liveSubscriptions.data.some((subscription) => isNonterminalSubscriptionStatus(subscription.status))) {
           return { ok: false, message: 'Stripe already has a nonterminal subscription for this account. Use Manage billing.' }
         }
 
@@ -243,7 +251,13 @@ export class BillingService {
         }, tx)
         if (intent.stripeCheckoutUrl) {
           const existing = await reusableCheckoutUrl(stripe, intent, tx)
-          if (existing.state === 'reuse') return { ok: true, url: existing.url }
+          if (existing.state === 'reuse') {
+            // Handing back a still-open Session keeps the seat in play, so the
+            // reservation has to be extended with it. The path below that mints
+            // a new Session writes the intent anyway, which re-stamps it.
+            if (plan.code === 'FOUNDER') await FounderSeatService.touchReservation(tx, intent.id)
+            return { ok: true, url: existing.url }
+          }
           if (existing.state === 'verifying') {
             return { ok: false, message: 'Your completed Checkout is being verified. No new charge was started.' }
           }

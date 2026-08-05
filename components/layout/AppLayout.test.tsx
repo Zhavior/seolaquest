@@ -42,7 +42,11 @@ describe('Neobrutalist AppLayout Component', () => {
     expect(screen.getByText('XP 1,250')).toBeInTheDocument()
 
     // Billing CTA
-    expect(screen.getByRole('link', { name: /Recharge/i })).toHaveAttribute('href', '/billing')
+    // Deep-linked to the Founder offer so Recharge lands on the card, not the page top.
+    expect(screen.getByRole('link', { name: /Recharge/i })).toHaveAttribute(
+      'href',
+      '/billing?offer=founder',
+    )
   })
 
   it('renders Neobrutalist Sidebar (Quest Compass) elements', () => {

@@ -32,6 +32,15 @@ function benefitsForPlan(code: PlanCode, scanLimit: number) {
     return ['Not for sale and grants no entitlement.']
   }
 
+  if (code === 'FOUNDER') {
+    return [
+      `${scanLimit.toLocaleString()} mana per month, refreshed on each paid invoice.`,
+      'Your rate never rises while the subscription stays active.',
+      'Seats are capped, and the cap is enforced at checkout.',
+      ...COMMON_PAID_BENEFITS,
+    ]
+  }
+
   return [
     `${scanLimit} scan credits per qualifying paid invoice.`,
     ...COMMON_PAID_BENEFITS,

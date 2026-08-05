@@ -4,6 +4,7 @@ import { describe, expect, it, vi } from 'vitest'
 
 import { getBillingPlanCatalog } from '@/features/billing/catalog'
 import type { BillingReadyViewModel } from '@/features/billing/viewModel'
+import { FOUNDER_LOCK_TERMS } from '@/src/modules/billing/domain/catalog'
 import { BillingPageClient } from './BillingPageClient'
 
 vi.mock('@/features/billing/actions', () => ({
@@ -54,6 +55,16 @@ function readyModel(): BillingReadyViewModel {
       creditTopUps: { state: 'disabled', label: 'Credit top-ups not for sale', reason: 'Refund reversals are not ready.' },
     },
     catalog: getBillingPlanCatalog(),
+    founderPass: {
+      limit: 50,
+      claimed: 14,
+      reserved: 2,
+      remaining: 34,
+      soldOut: false,
+      sellable: true,
+      priceConfigured: true,
+      lockTerms: [...FOUNDER_LOCK_TERMS],
+    },
     checkoutReturn: {
       state: 'pending',
       title: 'Checkout returned — verification pending',
