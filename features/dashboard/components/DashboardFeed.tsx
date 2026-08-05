@@ -18,6 +18,8 @@ import {
   ExternalLink,
   GraduationCap,
   SlidersHorizontal,
+  LayoutGrid,
+  List,
 } from 'lucide-react'
 import { isSampleQuest, SAMPLE_QUEST_PLATFORM } from '@/src/modules/onboarding/domain/sampleQuests'
 import type { DashboardLead } from '@/features/dashboard/types'
@@ -39,30 +41,37 @@ type DashboardFeedProps = {
 
 type LootTier = 'COMMON' | 'RARE' | 'EPIC' | 'LEGENDARY'
 
-const tierStyles: Record<LootTier, { label: string; wrap: string; badge: string; accent: string }> = {
+const tierStyles: Record<
+  LootTier,
+  { label: string; wrap: string; badge: string; border: string; accent: string }
+> = {
   COMMON: {
     label: 'COMMON DROP',
-    wrap: 'bg-[#FFF8D9]',
-    badge: 'bg-[#E7E1D4] text-[#3F352A]',
-    accent: 'bg-[#3F352A]',
+    wrap: 'bg-[#F8FAFC]',
+    badge: 'bg-[#E2E8F0] text-slate-800 border-slate-400',
+    border: 'border-l-8 border-l-slate-400',
+    accent: 'bg-slate-700 hover:bg-slate-800 text-white',
   },
   RARE: {
     label: 'RARE SIGNAL',
-    wrap: 'bg-[#FFF5CC]',
-    badge: 'bg-[#FFE600] text-black',
-    accent: 'bg-[#D5A100]',
+    wrap: 'bg-[#F0F9FF]',
+    badge: 'bg-[#BAE6FD] text-blue-900 border-blue-400',
+    border: 'border-l-8 border-l-blue-500',
+    accent: 'bg-blue-600 hover:bg-blue-700 text-white',
   },
   EPIC: {
     label: 'EPIC INTENT',
-    wrap: 'bg-[#F7E9FF]',
-    badge: 'bg-[#D9B8FF] text-[#2B1245]',
-    accent: 'bg-[#7C3AED]',
+    wrap: 'bg-[#FAF5FF]',
+    badge: 'bg-[#E9D5FF] text-purple-900 border-purple-400',
+    border: 'border-l-8 border-l-purple-600',
+    accent: 'bg-purple-600 hover:bg-purple-700 text-white',
   },
   LEGENDARY: {
     label: 'LEGENDARY LEAD',
-    wrap: 'bg-[#FFE3C7]',
-    badge: 'bg-[#FF5C00] text-white',
-    accent: 'bg-[#FF5C00]',
+    wrap: 'bg-[#FFFBEB]',
+    badge: 'bg-[#FDE68A] text-amber-950 border-amber-500',
+    border: 'border-l-8 border-l-amber-500',
+    accent: 'bg-amber-500 hover:bg-amber-600 text-black font-black',
   },
 }
 
@@ -179,9 +188,9 @@ function EmptyRadarState({ handlePresetClick }: { handlePresetClick: (phrase: st
           <Radar className="relative z-10 h-12 w-12 text-black" />
         </div>
 
-        <div className="inline-flex items-center gap-2 border-2 border-black bg-black px-3 py-1.5 text-xs font-black uppercase tracking-widest text-[#FFE600] shadow-[3px_3px_0_0_#000]">
+        <div className="inline-flex items-center gap-2 border-2 border-black bg-black px-3 py-1.5 text-xs font-mono font-black uppercase tracking-widest text-[#FFE600] shadow-[3px_3px_0_0_#000]">
           <ShieldAlert className="h-4 w-4" />
-          No active signals in queue
+          [ RADAR CLEAR // NO ACTIVE SIGNALS IN SECTOR ]
         </div>
 
         <h3 className="mt-6 text-3xl md:text-4xl font-black uppercase tracking-tight text-black leading-none">
@@ -233,6 +242,7 @@ function DashboardFeedComponent({
 }: DashboardFeedProps) {
   const [searchQuery, setSearchQuery] = useState('')
   const [activeDetailLead, setActiveDetailLead] = useState<DashboardLead | null>(null)
+  const [viewMode, setViewMode] = useState<'grid' | 'compact'>('grid')
 
   const displayedLeads = useMemo(() => {
     if (!searchQuery.trim()) return filteredLeads
@@ -301,6 +311,39 @@ function DashboardFeedComponent({
             </div>
           </div>
         </div>
+
+        {/* View Mode Toggle Controls */}
+        <div className="flex items-center gap-1 border-3 border-black bg-white p-1 shadow-[3px_3px_0_0_#000] shrink-0 self-start xl:self-auto">
+          <button
+            type="button"
+            onClick={() => setViewMode('grid')}
+            aria-label="Grid view"
+            aria-pressed={viewMode === 'grid'}
+            className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-black uppercase transition ${
+              viewMode === 'grid'
+                ? 'bg-[#FFE600] text-black border-2 border-black shadow-[1.5px_1.5px_0_0_#000]'
+                : 'text-gray-600 hover:text-black'
+            }`}
+          >
+            <LayoutGrid className="h-3.5 w-3.5" />
+            <span className="hidden sm:inline">Grid View</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setViewMode('compact')}
+            aria-label="Compact list view"
+            aria-pressed={viewMode === 'compact'}
+            className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-black uppercase transition ${
+              viewMode === 'compact'
+                ? 'bg-[#FFE600] text-black border-2 border-black shadow-[1.5px_1.5px_0_0_#000]'
+                : 'text-gray-600 hover:text-black'
+            }`}
+          >
+            <List className="h-3.5 w-3.5" />
+            <span className="hidden sm:inline">Compact List</span>
+          </button>
+        </div>
       </div>
 
       {/* Primary Search Row & Horizontally Scrollable Tactical Filters */}
@@ -354,227 +397,251 @@ function DashboardFeedComponent({
 
       {displayedLeads.length ? (
         <>
-          {/* MOBILE PRESENTATION LAYER (1-column compact card stack with progressive disclosure) */}
-          <div className="grid grid-cols-1 gap-4 md:hidden">
-            {displayedLeads.map((lead) => {
-              const tier = getLeadTier(lead)
-              const tierStyle = tierStyles[tier]
-              const platformTone = getPlatformTone(lead.platform)
-              const intentScore = getIntentScore(lead)
-              const freshness = formatTimestamp(lead.sourceCreatedAt)
+          {/* COMPACT LIST VIEW MODE (High-efficiency triage for 50+ leads) */}
+          {viewMode === 'compact' ? (
+            <div className="space-y-2.5">
+              {displayedLeads.map((lead) => {
+                const tier = getLeadTier(lead)
+                const tierStyle = tierStyles[tier]
+                const platformTone = getPlatformTone(lead.platform)
+                const intentScore = getIntentScore(lead)
+                const freshness = formatTimestamp(lead.sourceCreatedAt)
 
-              return (
-                <article
-                  key={`mobile-${lead.id}`}
-                  className="flex flex-col border-4 border-black bg-white shadow-[4px_4px_0_0_#000] overflow-hidden"
-                >
-                  {/* Compact Header: Max 4 Key Data Points */}
-                  <div className={`border-b-3 border-black p-3 ${tierStyle.wrap} flex items-center justify-between gap-2`}>
-                    <div className="flex items-center gap-2 min-w-0">
-                      <span className={`inline-flex items-center gap-1 border-2 border-black px-2 py-0.5 text-[10px] font-black uppercase ${tierStyle.badge} shadow-[1.5px_1.5px_0_0_#000]`}>
+                return (
+                  <article
+                    key={`compact-${lead.id}`}
+                    onClick={() => setActiveDetailLead(lead)}
+                    className={`cursor-pointer border-3 border-black bg-white p-3 ${tierStyle.border} shadow-[3px_3px_0_0_#000] hover:-translate-y-0.5 transition flex flex-col md:flex-row md:items-center justify-between gap-3`}
+                  >
+                    <div className="flex items-center gap-3 min-w-0 flex-1">
+                      <span className={`inline-flex items-center gap-1 border-2 border-black px-2 py-0.5 text-[10px] font-black uppercase shrink-0 ${tierStyle.badge} shadow-[1px_1px_0_0_#000]`}>
+                        {intentScore}% MATCH
+                      </span>
+
+                      <span className={`inline-flex items-center gap-1 border border-black px-2 py-0.5 text-[10px] font-black uppercase shrink-0 ${platformTone.chip}`}>
                         {platformTone.icon}
                         {platformTone.label}
                       </span>
-                      <span className="text-[10px] font-black uppercase border border-black bg-black text-[#FFE600] px-1.5 py-0.5 shrink-0">
-                        {intentScore}% MATCH
-                      </span>
-                    </div>
-                    <span className="text-[10px] font-black uppercase text-black/70 shrink-0">
-                      {freshness}
-                    </span>
-                  </div>
 
-                  {/* Body Content */}
-                  <div className="p-3 space-y-2">
-                    <p className="text-sm font-black uppercase line-clamp-2 leading-snug text-black">
-                      “{lead.content}”
-                    </p>
-                    {lead.author && (
-                      <p className="text-[11px] font-bold text-black/60 uppercase">
-                        Source: @{lead.author}
-                      </p>
-                    )}
-                  </div>
-
-                  {/* Single Primary CTA for Mobile Card */}
-                  <div className="border-t-3 border-black bg-[#FFF8D9] p-2.5 flex items-center justify-between gap-2">
-                    <button
-                      type="button"
-                      onClick={() => setActiveDetailLead(lead)}
-                      className="flex-1 inline-flex min-h-[40px] items-center justify-center gap-2 border-3 border-black bg-[#FFE600] px-3 py-2 text-xs font-black uppercase shadow-[2px_2px_0_0_#000] active:translate-y-0.5 hover:bg-yellow-300"
-                    >
-                      <SlidersHorizontal className="h-3.5 w-3.5" />
-                      Inspect & Action
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleClaimBounty(lead)}
-                      disabled={isPending}
-                      className={`inline-flex min-h-[40px] items-center justify-center gap-1.5 border-3 border-black px-3 py-2 text-xs font-black uppercase text-white shadow-[2px_2px_0_0_#000] ${tierStyle.accent}`}
-                    >
-                      <Sword className="h-3.5 w-3.5" />
-                      Claim
-                    </button>
-                  </div>
-                </article>
-              )
-            })}
-          </div>
-
-          {/* DESKTOP PRESENTATION LAYER (Rich multi-column grid retained for md/lg+) */}
-          <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {displayedLeads.map((lead, index) => {
-              const tier = getLeadTier(lead)
-              const tierStyle = tierStyles[tier]
-              const platformTone = getPlatformTone(lead.platform)
-              const intentScore = getIntentScore(lead)
-              const estimatedArr = getEstimatedArr(lead)
-              const keywords = getKeywords(lead)
-              const freshness = formatTimestamp(lead.sourceCreatedAt)
-
-              return (
-                <motion.article
-                  key={`desktop-${lead.id}`}
-                  layout
-                  initial={{ opacity: 0, y: 20, scale: 0.95 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.9, y: 20 }}
-                  transition={{ type: 'spring', stiffness: 300, damping: 25, delay: index * 0.04 }}
-                  className="group flex h-full flex-col overflow-hidden bg-white border-4 border-black shadow-[6px_6px_0_0_#000] transition hover:-translate-x-1 hover:-translate-y-1 hover:shadow-[10px_10px_0_0_#000]"
-                >
-                  <div className={`border-b-4 border-black px-4 py-3 ${tierStyle.wrap}`}>
-                    <div className="flex flex-wrap items-center justify-between gap-3">
-                      <div className="flex flex-wrap items-center gap-2">
-                        <span className={`inline-flex items-center gap-1 border-2 border-black px-2.5 py-1 text-xs font-black uppercase ${tierStyle.badge} shadow-[2px_2px_0_0_#000]`}>
-                          {tier === 'LEGENDARY' ? <Crown className="h-4 w-4" /> : <Sparkles className="h-4 w-4" />}
-                          {tierStyle.label}
-                        </span>
-
-                        <span className={`inline-flex items-center gap-2 border-2 border-black px-2.5 py-1 text-xs font-black uppercase shadow-[2px_2px_0_0_#000] ${platformTone.chip}`}>
-                          {platformTone.icon}
-                          {platformTone.label}
-                        </span>
-                      </div>
-
-                      <span className="text-xs font-black uppercase tracking-wider text-black/70">
-                        {freshness}
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="flex flex-1 flex-col gap-5 p-5">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <div className="inline-flex items-center gap-2 border-2 border-black bg-[#FFE600] px-3 py-1 text-xs font-black uppercase shadow-[2px_2px_0_0_#000]">
-                        <Crosshair className="h-4 w-4" />
-                        {intentScore}% intent match
-                      </div>
-
-                      <div className="inline-flex items-center gap-2 border-2 border-black bg-[#06B6D4] px-3 py-1 text-xs font-black uppercase shadow-[2px_2px_0_0_#000] text-black">
-                        <Coins className="h-4 w-4" />
-                        ${estimatedArr.toLocaleString()} ARR est.
-                      </div>
-                    </div>
-
-                    <div className="space-y-4">
-                      <p className="text-lg font-black uppercase leading-relaxed text-black">
+                      <p className="text-xs sm:text-sm font-bold text-gray-900 truncate flex-1">
                         “{lead.content}”
                       </p>
-
-                      <div className="border-l-4 border-black bg-[#FFF8D9] p-4 border-2 border-black shadow-[3px_3px_0_0_#000]">
-                        <p className="text-xs font-black uppercase tracking-wider text-black/60">
-                          Tactical read
-                        </p>
-                        <p className="mt-2 text-xs font-bold leading-relaxed text-black/90">
-                          {intentScore >= 90
-                            ? 'Urgent buyer language detected. Active switch decision with strong commercial intent.'
-                            : intentScore >= 80
-                              ? 'Comparison or replacement intent is present. Good candidate for a fast reply.'
-                              : intentScore >= 70
-                                ? 'Problem-aware prospect with relevant keywords. Worth drafting early.'
-                                : 'Early-stage market pain mention. Lower urgency, but useful for visibility.'}
-                        </p>
-                      </div>
                     </div>
 
-                    <div className="flex flex-wrap gap-2 mt-auto pt-2">
-                      {keywords.length ? (
-                        keywords.map((keyword) => (
-                          <span
-                            key={`${lead.id}-${keyword}`}
-                            className="border-2 border-black bg-[#FFE082] px-2.5 py-1 text-xs font-black uppercase shadow-[2px_2px_0_0_#000]"
-                          >
-                            #{keyword}
-                          </span>
-                        ))
-                      ) : (
-                        <span className="border-2 border-black bg-white px-2.5 py-1 text-xs font-black uppercase shadow-[2px_2px_0_0_#000]">
-                          #general-intent
-                        </span>
-                      )}
-                    </div>
-                  </div>
+                    <div className="flex items-center gap-2 shrink-0 border-t pt-2 md:border-t-0 md:pt-0 border-black/20">
+                      <span className="text-[10px] font-mono font-black text-gray-500 uppercase mr-1">
+                        {freshness}
+                      </span>
 
-                  <div className="border-t-4 border-black bg-[#FFF8D9] p-5">
-                    <div className="flex flex-col gap-4">
-                      <a
-                        href={lead.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 text-xs font-black uppercase text-black underline-offset-4 transition hover:underline"
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          generateAIReply(lead)
+                        }}
+                        disabled={isPending}
+                        className="inline-flex min-h-[34px] items-center gap-1 border-2 border-black bg-[#FFE600] px-2.5 py-1 text-[11px] font-black uppercase shadow-[1.5px_1.5px_0_0_#000] hover:bg-yellow-300 disabled:opacity-60"
                       >
-                        {isSampleQuest(lead) ? 'Add a real keyword' : 'Inspect source thread'}
-                        <ChevronRight className="h-4 w-4" />
-                      </a>
+                        <Sparkles className="h-3 w-3" />
+                        Draft
+                      </button>
 
-                      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                        <button
-                          type="button"
-                          onClick={() => generateAIReply(lead)}
-                          disabled={isPending}
-                          className="inline-flex min-h-[44px] items-center justify-center gap-2 border-3 border-black bg-[#FFE600] px-4 py-3 text-xs font-black uppercase shadow-[3px_3px_0_0_#000] transition active:translate-x-[2px] active:translate-y-[2px] active:shadow-none disabled:cursor-not-allowed disabled:opacity-60 hover:bg-yellow-300"
-                        >
-                          <Sparkles className="h-4 w-4" />
-                          Cast AI draft
-                        </button>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          handleClaimBounty(lead)
+                        }}
+                        disabled={isPending}
+                        className={`inline-flex min-h-[34px] items-center gap-1 border-2 border-black px-2.5 py-1 text-[11px] font-black uppercase shadow-[1.5px_1.5px_0_0_#000] disabled:opacity-60 ${tierStyle.accent}`}
+                      >
+                        <Sword className="h-3 w-3" />
+                        Claim
+                      </button>
 
-                        <button
-                          type="button"
-                          onClick={() => handleClaimBounty(lead)}
-                          disabled={isPending}
-                          className={`inline-flex min-h-[44px] items-center justify-center gap-2 border-3 border-black px-4 py-3 text-xs font-black uppercase text-white shadow-[3px_3px_0_0_#000] transition active:translate-x-[2px] active:translate-y-[2px] active:shadow-none disabled:cursor-not-allowed disabled:opacity-60 ${tierStyle.accent}`}
-                        >
-                          <Sword className="h-4 w-4" />
-                          Claim lead
-                        </button>
-                      </div>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          setActiveDetailLead(lead)
+                        }}
+                        className="inline-flex min-h-[34px] items-center justify-center border-2 border-black bg-white px-2 py-1 text-[10px] font-black uppercase shadow-[1.5px_1.5px_0_0_#000] hover:bg-gray-100"
+                        aria-label="Inspect signal"
+                      >
+                        <SlidersHorizontal className="h-3 w-3" />
+                      </button>
+                    </div>
+                  </article>
+                )
+              })}
+            </div>
+          ) : (
+            /* RICH GRID VIEW MODE (Clean Card Anatomy with RPG Rarity Left Borders) */
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {displayedLeads.map((lead, index) => {
+                const tier = getLeadTier(lead)
+                const tierStyle = tierStyles[tier]
+                const platformTone = getPlatformTone(lead.platform)
+                const intentScore = getIntentScore(lead)
+                const estimatedArr = getEstimatedArr(lead)
+                const keywords = getKeywords(lead)
+                const freshness = formatTimestamp(lead.sourceCreatedAt)
 
-                      <div className="grid grid-cols-[1fr_auto] gap-3">
-                        <button
-                          type="button"
-                          onClick={() => exportToCRM(lead)}
-                          disabled={isPending}
-                          className="inline-flex min-h-[44px] items-center justify-center gap-2 border-3 border-black bg-white px-4 py-3 text-xs font-black uppercase shadow-[3px_3px_0_0_#000] transition active:translate-x-[2px] active:translate-y-[2px] active:shadow-none hover:bg-[#FFE600] disabled:cursor-not-allowed disabled:opacity-60"
-                        >
-                          <Coins className="h-4 w-4" />
-                          Export to CRM
-                        </button>
+                return (
+                  <motion.article
+                    key={`desktop-${lead.id}`}
+                    layout
+                    initial={{ opacity: 0, y: 20, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.9, y: 20 }}
+                    transition={{ type: 'spring', stiffness: 300, damping: 25, delay: index * 0.04 }}
+                    className={`group flex h-full flex-col overflow-hidden bg-white border-4 border-black ${tierStyle.border} shadow-[6px_6px_0_0_#000] transition hover:-translate-x-1 hover:-translate-y-1 hover:shadow-[10px_10px_0_0_#000]`}
+                  >
+                    {/* Header Bar */}
+                    <div className={`border-b-3 border-black px-4 py-2.5 ${tierStyle.wrap}`}>
+                      <div className="flex flex-wrap items-center justify-between gap-2">
+                        <div className="flex flex-wrap items-center gap-1.5">
+                          <span className={`inline-flex items-center gap-1 border-2 border-black px-2 py-0.5 text-[11px] font-black uppercase ${tierStyle.badge} shadow-[1.5px_1.5px_0_0_#000]`}>
+                            {tier === 'LEGENDARY' ? <Crown className="h-3.5 w-3.5" /> : <Sparkles className="h-3.5 w-3.5" />}
+                            {tierStyle.label}
+                          </span>
 
-                        <button
-                          type="button"
-                          onClick={() => dismissLead(lead.id)}
-                          disabled={isPending}
-                          aria-label={`Discard ${lead.author || 'lead'}`}
-                          className="inline-flex min-h-[44px] items-center justify-center border-3 border-black bg-[#F3E5E5] px-4 py-3 text-xs font-black uppercase shadow-[3px_3px_0_0_#000] transition active:translate-x-[2px] active:translate-y-[2px] active:shadow-none hover:bg-[#F7C7C7] disabled:cursor-not-allowed disabled:opacity-60"
-                        >
-                          Dismiss
-                        </button>
+                          <span className={`inline-flex items-center gap-1 border-2 border-black px-2 py-0.5 text-[11px] font-black uppercase shadow-[1.5px_1.5px_0_0_#000] ${platformTone.chip}`}>
+                            {platformTone.icon}
+                            {platformTone.label}
+                          </span>
+                        </div>
+
+                        <span className="text-[11px] font-mono font-black uppercase tracking-wider text-black/70">
+                          {freshness}
+                        </span>
                       </div>
                     </div>
-                  </div>
-                </motion.article>
-              )
-            })}
-          </div>
+
+                    {/* Card Content Body */}
+                    <div className="flex flex-1 flex-col justify-between p-4 sm:p-5 gap-4">
+                      <div className="space-y-3">
+                        {/* Intent & ARR Badges */}
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span className="inline-flex items-center gap-1.5 border-2 border-black bg-[#FFE600] px-2.5 py-1 text-xs font-black uppercase shadow-[2px_2px_0_0_#000]">
+                            <Crosshair className="h-3.5 w-3.5" />
+                            {intentScore}% intent match
+                          </span>
+
+                          <span className="inline-flex items-center gap-1.5 border-2 border-black bg-[#06B6D4] px-2.5 py-1 text-xs font-black uppercase shadow-[2px_2px_0_0_#000] text-black">
+                            <Coins className="h-3.5 w-3.5" />
+                            ${estimatedArr.toLocaleString()} ARR est.
+                          </span>
+                        </div>
+
+                        {/* Sentence-Case Lead Quote with Line Clamp 3 */}
+                        <p className="text-base font-bold leading-relaxed text-gray-900 line-clamp-3">
+                          “{lead.content}”
+                        </p>
+
+                        {/* Muted Tactical Read Block */}
+                        <div className="border-l-4 border-l-black bg-slate-100 p-3 border-2 border-black shadow-[2px_2px_0_0_#000]">
+                          <p className="text-[10px] font-black uppercase tracking-wider text-slate-500">
+                            Tactical read
+                          </p>
+                          <p className="mt-1 text-xs font-bold leading-relaxed text-slate-800">
+                            {intentScore >= 90
+                              ? 'Urgent buyer language detected. Active switch decision with strong commercial intent.'
+                              : intentScore >= 80
+                                ? 'Comparison or replacement intent present. Good candidate for a fast reply.'
+                                : intentScore >= 70
+                                  ? 'Problem-aware prospect with relevant keywords. Worth drafting early.'
+                                  : 'Early-stage market pain mention. Lower urgency, but useful for visibility.'}
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Keywords Row */}
+                      <div className="flex flex-wrap gap-1.5">
+                        {keywords.length ? (
+                          keywords.map((keyword) => (
+                            <span
+                              key={`${lead.id}-${keyword}`}
+                              className="border-2 border-black bg-[#FFE082] px-2 py-0.5 text-[10px] font-mono font-black uppercase shadow-[1.5px_1.5px_0_0_#000]"
+                            >
+                              #{keyword}
+                            </span>
+                          ))
+                        ) : (
+                          <span className="border-2 border-black bg-white px-2 py-0.5 text-[10px] font-mono font-black uppercase shadow-[1.5px_1.5px_0_0_#000]">
+                            #general-intent
+                          </span>
+                        )}
+                      </div>
+
+                      {/* Action Buttons Row - Positioned INSIDE Card Flex Container */}
+                      <div className="mt-auto pt-3 border-t-2 border-black space-y-2">
+                        <div className="grid grid-cols-2 gap-2">
+                          <button
+                            type="button"
+                            onClick={() => generateAIReply(lead)}
+                            disabled={isPending}
+                            className="inline-flex min-h-[40px] items-center justify-center gap-1.5 border-3 border-black bg-[#FFE600] px-3 py-2 text-xs font-black uppercase shadow-[2.5px_2.5px_0_0_#000] hover:bg-yellow-300 disabled:opacity-60 transition active:translate-x-[1px] active:translate-y-[1px]"
+                          >
+                            <Sparkles className="h-3.5 w-3.5" />
+                            Cast AI draft
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => handleClaimBounty(lead)}
+                            disabled={isPending}
+                            className={`inline-flex min-h-[40px] items-center justify-center gap-1.5 border-3 border-black px-3 py-2 text-xs font-black uppercase shadow-[2.5px_2.5px_0_0_#000] disabled:opacity-60 transition active:translate-x-[1px] active:translate-y-[1px] ${tierStyle.accent}`}
+                          >
+                            <Sword className="h-3.5 w-3.5" />
+                            Claim lead
+                          </button>
+                        </div>
+
+                        {/* Collapsed Secondary Action Controls */}
+                        <div className="flex items-center justify-between gap-2">
+                          <a
+                            href={lead.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1 text-[11px] font-black uppercase text-black underline-offset-4 hover:underline"
+                          >
+                            {isSampleQuest(lead) ? 'Add keyword' : 'Inspect thread'}
+                            <ChevronRight className="h-3.5 w-3.5" />
+                          </a>
+
+                          <div className="flex items-center gap-1.5">
+                            <button
+                              type="button"
+                              onClick={() => exportToCRM(lead)}
+                              disabled={isPending}
+                              title="Export lead to CRM"
+                              className="inline-flex min-h-[32px] items-center gap-1 border-2 border-black bg-white px-2 py-1 text-[10px] font-black uppercase shadow-[1.5px_1.5px_0_0_#000] hover:bg-[#FFE600] disabled:opacity-60"
+                            >
+                              <Coins className="h-3 w-3" />
+                              CRM
+                            </button>
+
+                            <button
+                              type="button"
+                              onClick={() => dismissLead(lead.id)}
+                              disabled={isPending}
+                              title="Dismiss lead from queue"
+                              aria-label={`Dismiss ${lead.author || 'lead'}`}
+                              className="inline-flex min-h-[32px] items-center gap-1 border-2 border-black bg-slate-100 px-2 py-1 text-[10px] font-black uppercase shadow-[1.5px_1.5px_0_0_#000] hover:bg-rose-100 text-rose-800 disabled:opacity-60"
+                            >
+                              <X className="h-3 w-3" />
+                              Dismiss
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </motion.article>
+                )
+              })}
+            </div>
+          )}
         </>
       ) : (
         <EmptyRadarState handlePresetClick={handlePresetClick} />
