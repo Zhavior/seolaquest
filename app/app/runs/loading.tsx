@@ -1,9 +1,21 @@
+import { QuestListSkeleton, QuestRouteSkeleton } from '@/components/quest'
+
+/**
+ * Route-level fallback: the full Quest Board shape, shown while the segment
+ * streams in on navigation or first load.
+ */
 export default function ScanRunsLoading() {
   return (
-    <div aria-label="Loading scan runs" className="space-y-4">
-      {[0, 1, 2].map((item) => (
-        <div key={item} className="h-52 animate-pulse border-4 border-black bg-zinc-200 shadow-[6px_6px_0_0_#000]" />
-      ))}
-    </div>
+    <QuestRouteSkeleton label="Quest Board">
+      <ScanRunListSkeleton />
+    </QuestRouteSkeleton>
   )
+}
+
+/**
+ * Inner fallback for the run ledger only. The page renders its own chrome
+ * synchronously and suspends just this list, so the header must not repeat.
+ */
+export function ScanRunListSkeleton() {
+  return <QuestListSkeleton count={3} height="h-52" label="Loading scan runs" />
 }

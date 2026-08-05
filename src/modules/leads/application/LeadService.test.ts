@@ -93,7 +93,7 @@ describe('LeadService tenant boundaries', () => {
 
     await expect(LeadService.claimQuest('lead-1')).resolves.toEqual({
       ok: true,
-      user: { xp: 5, level: 2, xpRequired: 150 },
+      user: { xp: 5, level: 2, xpRequired: 150, xpMultiplier: 1.1, didLevelUp: true },
     })
     expect(mocks.leadUpdateMany).toHaveBeenCalledWith({
       where: { id: 'lead-1', userId: 'user-1', status: 'NEW' },
@@ -105,7 +105,7 @@ describe('LeadService tenant boundaries', () => {
     })
     expect(mocks.userUpdate).toHaveBeenCalledWith({
       where: { id: 'user-1' },
-      data: { xp: 5, level: 2, xpRequired: 150 },
+      data: { xp: 5, level: 2, xpRequired: 150, xpMultiplier: 1.1, didLevelUp: true },
     })
     expect(mocks.queryRaw).toHaveBeenCalledTimes(1)
     expect(mocks.queryRaw.mock.invocationCallOrder[0]).toBeLessThan(
@@ -134,8 +134,8 @@ describe('LeadService tenant boundaries', () => {
     ])
 
     expect(results).toEqual([
-      { ok: true, user: { xp: 10, level: 1, xpRequired: 100 } },
-      { ok: true, user: { xp: 20, level: 1, xpRequired: 100 } },
+      { ok: true, user: { xp: 10, level: 1, xpRequired: 100, xpMultiplier: 1, didLevelUp: false } },
+      { ok: true, user: { xp: 20, level: 1, xpRequired: 100, xpMultiplier: 1, didLevelUp: false } },
     ])
     expect(mocks.queryRaw).toHaveBeenCalledTimes(2)
     expect(mocks.leadUpdateMany).toHaveBeenCalledWith(expect.objectContaining({

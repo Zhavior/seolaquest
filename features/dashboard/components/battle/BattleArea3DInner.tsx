@@ -274,10 +274,12 @@ function SceneController({
   activeBiome,
   agentsTargetX,
   activeMonster,
+  userLevel = 1,
 }: {
   activeBiome: BiomeType
   agentsTargetX: number
   activeMonster: { name: string; relevance: number } | null
+  userLevel?: number
 }) {
   return (
     <>
@@ -304,9 +306,9 @@ function SceneController({
       <ArcadeCampfire />
 
       {/* 3D Arcade Agents */}
-      <ArcadeAgent role="Warrior" level={12} position={[-6.2, 0, 0.8]} targetX={agentsTargetX - 1.2} />
-      <ArcadeAgent role="Mage" level={14} position={[-5, 0, -0.8]} targetX={agentsTargetX} />
-      <ArcadeAgent role="Hunter" level={11} position={[-3.8, 0, 0.8]} targetX={agentsTargetX + 1.2} />
+      <ArcadeAgent role="Warrior" level={Math.max(1, userLevel)} position={[-6.2, 0, 0.8]} targetX={agentsTargetX - 1.2} />
+      <ArcadeAgent role="Mage" level={Math.max(1, userLevel + 1)} position={[-5, 0, -0.8]} targetX={agentsTargetX} />
+      <ArcadeAgent role="Hunter" level={Math.max(1, userLevel)} position={[-3.8, 0, 0.8]} targetX={agentsTargetX + 1.2} />
 
       {/* 3D Arcade Boss Monster */}
       {activeMonster && (
@@ -316,7 +318,7 @@ function SceneController({
   )
 }
 
-export function BattleArea3DInner() {
+export function BattleArea3DInner({ userLevel = 1 }: { userLevel?: number }) {
   const latestLog = useQuestStore((s) => s.expedition.logs[0] || '⚔️ Arcade Expedition Ready')
   const expeditionStatus = useQuestStore((s) => s.expedition.status)
   const [activeBiome, setActiveBiome] = useState<BiomeType>('reddit-forest')
@@ -376,6 +378,7 @@ export function BattleArea3DInner() {
           activeBiome={activeBiome}
           agentsTargetX={agentsTargetX}
           activeMonster={activeMonster}
+          userLevel={userLevel}
         />
       </Canvas>
 

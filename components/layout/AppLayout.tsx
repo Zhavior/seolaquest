@@ -59,16 +59,19 @@ export function AppLayout({ children, user }: AppLayoutProps) {
   const pathname = usePathname();
   const [sfxEnabled, setSfxEnabled] = useState(true);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [isGreyMode, setIsGreyMode] = useState(false);
+  const [isGreyMode, setIsGreyMode] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('coquest_theme') === 'grey'
+    }
+    return false
+  })
 
   useEffect(() => {
-    const savedTheme = localStorage.getItem('coquest_theme')
-    if (savedTheme === 'grey') {
-      setIsGreyMode(true)
+    if (isGreyMode) {
       document.documentElement.classList.add('grey-mode')
       document.body?.classList.add('grey-mode')
     }
-  }, [])
+  }, [isGreyMode])
 
   const toggleThemeMode = () => {
     const nextMode = !isGreyMode
@@ -128,7 +131,6 @@ export function AppLayout({ children, user }: AppLayoutProps) {
   const userLevel = user?.level || 10;
   const currentMp = user?.mp ?? 70;
   const maxMp = user?.maxMp ?? 100;
-  const planTier = user?.planTier || "LEGEND";
 
   const navSections: NavSection[] = [
     {

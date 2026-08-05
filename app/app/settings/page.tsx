@@ -2,7 +2,7 @@ import { Suspense } from 'react'
 import nextDynamic from 'next/dynamic'
 import type { Metadata } from 'next'
 import { requireCurrentUser } from '@/lib/auth'
-import Loading from '../loading'
+import SettingsLoading from './loading'
 
 const SettingsClient = nextDynamic(() =>
   import('@/features/settings/components/SettingsClient')
@@ -17,7 +17,7 @@ export const metadata: Metadata = {
 
 export default function SettingsPage() {
   return (
-    <Suspense fallback={<Loading />}>
+    <Suspense fallback={<SettingsLoading />}>
       <SettingsData />
     </Suspense>
   )

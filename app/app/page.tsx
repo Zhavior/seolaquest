@@ -1,7 +1,7 @@
 import nextDynamic from 'next/dynamic'
 import type { Metadata } from 'next'
 import { Suspense } from 'react'
-import Loading from '../(app)/loading'
+import AppLoading from './loading'
 import { type DashboardKeyword, type DashboardLead, type DashboardUser } from '@/features/dashboard/types'
 import { requireCurrentUser } from '@/lib/auth'
 import prisma from '@/lib/prisma'
@@ -19,7 +19,7 @@ export const metadata: Metadata = {
 
 export default function AppHomePage() {
   return (
-    <Suspense fallback={<Loading />}>
+    <Suspense fallback={<AppLoading />}>
       <DashboardShellData />
     </Suspense>
   )

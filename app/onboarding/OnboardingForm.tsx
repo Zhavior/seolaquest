@@ -1,6 +1,6 @@
 'use client'
 
-import { FormEvent, useEffect, useMemo, useRef, useState, useTransition, type ReactNode, type RefObject } from 'react'
+import React, { FormEvent, useEffect, useMemo, useRef, useState, useTransition, type ReactNode, type RefObject } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { SignOutButton } from '@clerk/nextjs'
@@ -14,7 +14,6 @@ import {
   Crown,
   Flame,
   Hammer,
-  LayoutGrid,
   Rocket,
   ScrollText,
   Search,
@@ -114,22 +113,78 @@ function getPresetIconComponent(presetId: string) {
 export default function OnboardingForm({ initialDraft }: Props) {
   const router = useRouter()
   const [step, setStep] = useState(() => clampOnboardingStep(initialDraft.onboardingStep))
-  const [displayName, setDisplayName] = useState(initialDraft.displayName)
-  const [profileIconKey, setProfileIconKey] = useState<ProfileIconKey>(
-    initialDraft.profileIconKey ?? DEFAULT_PROFILE_ICON_KEY,
-  )
-  const [businessDescription, setBusinessDescription] = useState(initialDraft.businessDescription)
-  const [targetCustomer, setTargetCustomer] = useState(initialDraft.targetCustomer)
-  const [firstKeyword, setFirstKeyword] = useState(initialDraft.firstKeyword)
-  const [preferredSource, setPreferredSource] = useState<PreferredSource>(() =>
-    isSelectablePreferredSource(initialDraft.preferredSource)
-      ? (initialDraft.preferredSource as PreferredSource)
-      : DEFAULT_PREFERRED_SOURCE,
-  )
+  const [displayName, setDisplayName] = useState(() => {
+    if (initialDraft.displayName) return initialDraft.displayName
+    if (typeof window !== 'undefined') {
+      try {
+        const raw = localStorage.getItem('seolaquest_onboarding_draft')
+        if (raw) return JSON.parse(raw).displayName || ''
+      } catch {}
+    }
+    return ''
+  })
+  const [profileIconKey, setProfileIconKey] = useState<ProfileIconKey>(() => {
+    if (initialDraft.profileIconKey) return initialDraft.profileIconKey
+    if (typeof window !== 'undefined') {
+      try {
+        const raw = localStorage.getItem('seolaquest_onboarding_draft')
+        if (raw) {
+          const key = JSON.parse(raw).profileIconKey
+          if (key) return key as ProfileIconKey
+        }
+      } catch {}
+    }
+    return DEFAULT_PROFILE_ICON_KEY
+  })
+  const [businessDescription, setBusinessDescription] = useState(() => {
+    if (initialDraft.businessDescription) return initialDraft.businessDescription
+    if (typeof window !== 'undefined') {
+      try {
+        const raw = localStorage.getItem('seolaquest_onboarding_draft')
+        if (raw) return JSON.parse(raw).businessDescription || ''
+      } catch {}
+    }
+    return ''
+  })
+  const [targetCustomer, setTargetCustomer] = useState(() => {
+    if (initialDraft.targetCustomer) return initialDraft.targetCustomer
+    if (typeof window !== 'undefined') {
+      try {
+        const raw = localStorage.getItem('seolaquest_onboarding_draft')
+        if (raw) return JSON.parse(raw).targetCustomer || ''
+      } catch {}
+    }
+    return ''
+  })
+  const [firstKeyword, setFirstKeyword] = useState(() => {
+    if (initialDraft.firstKeyword) return initialDraft.firstKeyword
+    if (typeof window !== 'undefined') {
+      try {
+        const raw = localStorage.getItem('seolaquest_onboarding_draft')
+        if (raw) return JSON.parse(raw).firstKeyword || ''
+      } catch {}
+    }
+    return ''
+  })
+  const [preferredSource, setPreferredSource] = useState<PreferredSource>(() => {
+    if (isSelectablePreferredSource(initialDraft.preferredSource)) {
+      return initialDraft.preferredSource as PreferredSource
+    }
+    if (typeof window !== 'undefined') {
+      try {
+        const raw = localStorage.getItem('seolaquest_onboarding_draft')
+        if (raw) {
+          const source = JSON.parse(raw).preferredSource
+          if (isSelectablePreferredSource(source)) return source as PreferredSource
+        }
+      } catch {}
+    }
+    return DEFAULT_PREFERRED_SOURCE
+  })
 
   const [error, setError] = useState('')
   const [signedOut, setSignedOut] = useState(false)
-  const [soundOn, setSoundOn] = useState(true)
+  const [soundOn, setSoundOn] = useState(() => sfx.isEnabled())
   const [celebrating, setCelebrating] = useState(false)
   const [pending, startTransition] = useTransition()
 
@@ -155,28 +210,6 @@ export default function OnboardingForm({ initialDraft }: Props) {
   useEffect(() => {
     stepHeadingRef.current?.focus({ preventScroll: true })
   }, [step])
-
-  useEffect(() => {
-    setSoundOn(sfx.isEnabled())
-
-    // Rehydrate local draft fallback if initial state has empty fields
-    if (typeof window !== 'undefined') {
-      try {
-        const raw = localStorage.getItem('seolaquest_onboarding_draft')
-        if (raw) {
-          const saved = JSON.parse(raw)
-          if (saved.displayName && !initialDraft.displayName) setDisplayName(saved.displayName)
-          if (saved.profileIconKey && !initialDraft.profileIconKey) setProfileIconKey(saved.profileIconKey)
-          if (saved.businessDescription && !initialDraft.businessDescription) setBusinessDescription(saved.businessDescription)
-          if (saved.targetCustomer && !initialDraft.targetCustomer) setTargetCustomer(saved.targetCustomer)
-          if (saved.firstKeyword && !initialDraft.firstKeyword) setFirstKeyword(saved.firstKeyword)
-          if (saved.preferredSource && !initialDraft.preferredSource) setPreferredSource(saved.preferredSource)
-        }
-      } catch {
-        // Ignore storage errors
-      }
-    }
-  }, [])
 
   // Auto-save draft inputs to localStorage
   useEffect(() => {
@@ -546,14 +579,9 @@ export default function OnboardingForm({ initialDraft }: Props) {
 
                   {/* Character Avatar Box */}
                   <div className="mt-2 flex items-center gap-3 border-3 border-black bg-white p-2.5 shadow-[2px_2px_0_0_#000]">
-                    {(() => {
-                      const IconComp = getProfileIconComponent(profileIconKey)
-                      return (
-                        <div className="flex h-12 w-12 items-center justify-center border-3 border-black bg-[#FDE68A] text-black shrink-0">
-                          <IconComp className="h-6 w-6 stroke-[2.5]" />
-                        </div>
-                      )
-                    })()}
+                    <div className="flex h-12 w-12 items-center justify-center border-3 border-black bg-[#FDE68A] text-black shrink-0">
+                      {React.createElement(getProfileIconComponent(profileIconKey), { className: 'h-6 w-6 stroke-[2.5]' })}
+                    </div>
 
                     <div className="min-w-0">
                       <div className="flex items-center gap-1.5">
@@ -663,8 +691,6 @@ function GuildRegistryStation({
   classSpec: { title: string; perk: string; color: string }
   error?: string
 }) {
-  const selectedIcon = PROFILE_ICON_OPTIONS.find((option) => option.key === profileIconKey) ?? PROFILE_ICON_OPTIONS[0]
-
   return (
     <div className="grid gap-4 sm:grid-cols-[1.1fr_0.9fr]">
       <div>
@@ -731,14 +757,9 @@ function GuildRegistryStation({
           <p className="text-[11px] font-black uppercase text-gray-600">Sigil Class Spec</p>
 
           <div className="mt-2 flex items-center gap-3 border-3 border-black bg-white p-2.5 shadow-[2px_2px_0_0_#000]">
-            {(() => {
-              const SelectedIconComp = getProfileIconComponent(profileIconKey)
-              return (
-                <div className="flex h-12 w-12 items-center justify-center border-3 border-black bg-[#FDE68A] text-black shrink-0">
-                  <SelectedIconComp className="h-6 w-6 stroke-[2.5]" />
-                </div>
-              )
-            })()}
+            <div className="flex h-12 w-12 items-center justify-center border-3 border-black bg-[#FDE68A] text-black shrink-0">
+              {React.createElement(getProfileIconComponent(profileIconKey), { className: 'h-6 w-6 stroke-[2.5]' })}
+            </div>
 
             <div className="min-w-0">
               <p className="break-words font-black uppercase text-sm truncate text-black">
@@ -1028,14 +1049,9 @@ function ContractReviewStation({
       </p>
 
       <div className="mb-3 flex items-center gap-3 border-3 border-black bg-[#F4F0EA] p-2.5">
-        {(() => {
-          const SelectedIconComp = getProfileIconComponent(selectedIcon.key)
-          return (
-            <div className="flex h-10 w-10 items-center justify-center border-3 border-black bg-white text-black shrink-0">
-              <SelectedIconComp className="h-5 w-5 stroke-[2.5]" />
-            </div>
-          )
-        })()}
+        <div className="flex h-10 w-10 items-center justify-center border-3 border-black bg-white text-black shrink-0">
+          {React.createElement(getProfileIconComponent(selectedIcon.key), { className: 'h-5 w-5 stroke-[2.5]' })}
+        </div>
 
         <div>
           <p className="text-[10px] font-black uppercase text-gray-600">Hunter Class</p>

@@ -1,16 +1,23 @@
 'use client'
 
 import { useState, useEffect, useCallback, type ReactNode } from 'react'
-import { Menu } from 'lucide-react'
 
-import CommandPalette from '../os/palette/CommandPalette'
+import dynamic from 'next/dynamic'
+
 import ShellLayout from './layout/ShellLayout'
-import MobileAppShell, { MOBILE_NAV_ID } from './mobile/MobileAppShell'
+import MobileAppShell from './mobile/MobileAppShell'
 import MobileBottomNav from './mobile/MobileBottomNav'
 import Sidebar, { SidebarNavigation } from './sidebar/Sidebar'
 import StatusBar from './statusbar/StatusBar'
 import Workspace from './workspace/Workspace'
 import { sfx } from '@/lib/sfx'
+
+/**
+ * The palette renders `null` until Cmd/Ctrl+K opens it, so it contributes
+ * nothing above the fold. Loading it as its own client chunk keeps it — and the
+ * whole navigation index it closes over — out of the shell's critical path.
+ */
+const CommandPalette = dynamic(() => import('../os/palette/CommandPalette'), { ssr: false })
 
 export interface UserSummary {
   name?: string | null

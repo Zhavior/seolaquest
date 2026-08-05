@@ -21,9 +21,15 @@ const openAiReplySchema = z.object({
   })).min(1),
 })
 
-function levelAfterClaim(user: { xp: number; level: number; xpRequired: number }) {
-  const { xp, level, xpRequired } = applyXpGain(user, XP_PER_CLAIMED_QUEST)
-  return { xp, level, xpRequired }
+function levelAfterClaim(user: { xp: number; level: number; xpRequired: number; xpMultiplier?: number }) {
+  const result = applyXpGain(user, XP_PER_CLAIMED_QUEST)
+  return {
+    xp: result.xp,
+    level: result.level,
+    xpRequired: result.xpRequired,
+    xpMultiplier: result.xpMultiplier,
+    didLevelUp: result.didLevelUp,
+  }
 }
 
 export class LeadService {

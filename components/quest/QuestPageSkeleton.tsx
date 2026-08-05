@@ -1,5 +1,5 @@
 import clsx from 'clsx'
-import { questSurface } from './questStyles'
+import { QuestSkeletonBlock } from './QuestSkeleton'
 
 export interface QuestPageSkeletonProps {
   /** Number of body blocks below the header placeholder. */
@@ -10,6 +10,9 @@ export interface QuestPageSkeletonProps {
 /**
  * Suspense placeholder matching the quest page rhythm (parchment background,
  * bordered blocks with the flat offset shadow).
+ *
+ * For a route-level `loading.tsx`, prefer `QuestRouteSkeleton` — it adds the
+ * page chrome and header placeholder so the fallback matches the real screen.
  */
 export function QuestPageSkeleton({ blocks = 2, className }: QuestPageSkeletonProps) {
   const heights = ['h-32', 'h-64', 'h-40', 'h-40']
@@ -22,14 +25,7 @@ export function QuestPageSkeleton({ blocks = 2, className }: QuestPageSkeletonPr
     >
       <span className="sr-only">Loading</span>
       {Array.from({ length: blocks }).map((_, i) => (
-        <div
-          key={i}
-          aria-hidden="true"
-          className={questSurface({
-            tone: 'none',
-            className: clsx('animate-pulse bg-zinc-200 motion-reduce:animate-none', heights[i % heights.length]),
-          })}
-        />
+        <QuestSkeletonBlock key={i} height={heights[i % heights.length]} />
       ))}
     </div>
   )

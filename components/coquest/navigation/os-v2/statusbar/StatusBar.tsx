@@ -36,16 +36,19 @@ export default function StatusBar({
   onToggleCollapsed,
 }: StatusBarProps) {
   const [sfxEnabled, setSfxEnabled] = useState(true)
-  const [isGreyMode, setIsGreyMode] = useState(false)
+  const [isGreyMode, setIsGreyMode] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('coquest_theme') === 'grey'
+    }
+    return false
+  })
 
   useEffect(() => {
-    const savedTheme = localStorage.getItem('coquest_theme')
-    if (savedTheme === 'grey') {
-      setIsGreyMode(true)
+    if (isGreyMode) {
       document.documentElement.classList.add('grey-mode')
       document.body?.classList.add('grey-mode')
     }
-  }, [])
+  }, [isGreyMode])
 
   const toggleThemeMode = () => {
     const nextMode = !isGreyMode

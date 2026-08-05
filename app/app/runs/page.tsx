@@ -4,7 +4,7 @@ import type { Metadata } from 'next'
 import { Scroll, Sparkles } from 'lucide-react'
 import { listCurrentUserScanRuns } from '@/features/scans/queries'
 import { QuestPageHeader, QuestPageShell, QuestStatusPill, QuestTicker } from '@/components/quest'
-import ScanRunsLoading from './loading'
+import { ScanRunListSkeleton } from './loading'
 
 const ScanRunList = dynamic(() => import('@/features/scans/components/ScanRunList').then((m) => m.ScanRunList))
 
@@ -30,7 +30,7 @@ export default function ScanRunsPage() {
         status={<QuestStatusPill label="Durable ledger" value="Active [Monitored]" />}
       />
 
-      <Suspense fallback={<ScanRunsLoading />}>
+      <Suspense fallback={<ScanRunListSkeleton />}>
         <ScanRunListData />
       </Suspense>
     </QuestPageShell>

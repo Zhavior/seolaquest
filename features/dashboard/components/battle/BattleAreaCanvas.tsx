@@ -15,13 +15,13 @@ const BattleArea3DInner = dynamic(
   }
 )
 
-export default function BattleAreaCanvas() {
+export default function BattleAreaCanvas({ userLevel }: { userLevel?: number }) {
   return (
     <section
       aria-label="3D Expedition Battle Area Viewport"
       className="relative h-[320px] w-full overflow-hidden border-4 border-black bg-emerald-950 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] md:h-[400px]"
     >
-      <BattleArea3DInner />
+      <BattleArea3DInner userLevel={userLevel} />
     </section>
   )
 }

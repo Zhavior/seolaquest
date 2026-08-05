@@ -3,7 +3,7 @@ import ProfileClient from '@/features/profile/components/ProfileClient'
 import prisma from '@/lib/prisma'
 import { requireCurrentUser } from '@/lib/auth'
 import { Suspense } from 'react'
-import Loading from '../loading'
+import ProfileLoading from './loading'
 
 export const dynamic = 'force-dynamic'
 
@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 
 export default function ProfilePage() {
   return (
-    <Suspense fallback={<Loading />}>
+    <Suspense fallback={<ProfileLoading />}>
       <ProfileData />
     </Suspense>
   )

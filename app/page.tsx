@@ -1,6 +1,7 @@
 import React from 'react'
 import dynamic from 'next/dynamic'
 import { Footer } from '@/components/Footer'
+import { AxionServices } from '@/components/AxionServices'
 
 import { LandingNav } from '@/features/landing/components/LandingNav'
 import { LandingHero } from '@/features/landing/components/LandingHero'
@@ -55,6 +56,7 @@ export default function LandingPage() {
 
       <main className="relative z-10">
         <LandingHero />
+        <AxionServices />
         <ManaEngineDemo />
         <LandingFeatures />
         <GuildLeaderboardWins />

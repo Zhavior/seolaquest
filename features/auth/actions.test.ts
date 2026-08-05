@@ -170,6 +170,7 @@ describe('Phase 2 onboarding actions', () => {
         xp: 50,
         level: 1,
         xpRequired: 100,
+        xpMultiplier: 1,
       },
     })
   })

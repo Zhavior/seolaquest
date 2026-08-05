@@ -293,6 +293,7 @@ export async function completeOnboardingAction(): Promise<CompleteOnboardingResu
           xp: reward.xp,
           level: reward.level,
           xpRequired: reward.xpRequired,
+          xpMultiplier: reward.xpMultiplier,
         },
       })
 

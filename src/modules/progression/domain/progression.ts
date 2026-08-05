@@ -13,9 +13,14 @@ export type ProgressionState = {
   xp: number
   level: number
   xpRequired: number
+  xpMultiplier?: number
 }
 
-export type ProgressionResult = ProgressionState & {
+export type ProgressionResult = {
+  xp: number
+  level: number
+  xpRequired: number
+  xpMultiplier: number
   didLevelUp: boolean
   levelsGained: number
 }
@@ -60,5 +65,7 @@ export function applyXpGain(state: ProgressionState, amount: number): Progressio
     levelsGained += 1
   }
 
-  return { xp, level, xpRequired, didLevelUp: levelsGained > 0, levelsGained }
+  const xpMultiplier = Number((1.0 + (level - 1) * 0.1).toFixed(2))
+
+  return { xp, level, xpRequired, xpMultiplier, didLevelUp: levelsGained > 0, levelsGained }
 }

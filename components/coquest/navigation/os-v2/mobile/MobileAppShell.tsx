@@ -16,7 +16,6 @@ const TRAY_HEIGHT = '4.75rem'
  * area it pads itself with — the desktop sidebar sticks against the same value.
  */
 const TOP_BAR_OFFSET = 'calc(68px + env(safe-area-inset-top, 0px))'
-const TOP_BAR_OFFSET_SM = 'calc(84px + env(safe-area-inset-top, 0px))'
 
 const FOCUSABLE =
   'a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])'

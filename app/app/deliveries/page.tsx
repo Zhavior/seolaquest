@@ -4,7 +4,7 @@ import nextDynamic from 'next/dynamic'
 import { Radio, Sparkles } from 'lucide-react'
 import { listCurrentUserDeliveries } from '@/features/deliveries/queries'
 import { QuestPageHeader, QuestPageShell, QuestStatusPill, QuestTicker } from '@/components/quest'
-import DeliveriesLoading from './loading'
+import { DeliveryListSkeleton } from './loading'
 
 const DeliveryList = nextDynamic(() =>
   import('@/features/deliveries/components/DeliveryList').then((m) => m.DeliveryList)
@@ -34,7 +34,7 @@ export default function DeliveriesPage() {
         status={<QuestStatusPill label="Dispatch engine" value="Active [Monitored]" />}
       />
 
-      <Suspense fallback={<DeliveriesLoading />}>
+      <Suspense fallback={<DeliveryListSkeleton />}>
         <DeliveryListData />
       </Suspense>
     </QuestPageShell>
