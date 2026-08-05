@@ -319,7 +319,7 @@ export function LandingHero() {
             </Link>
 
             <Link
-              href="/landing#demo"
+              href="/#demo"
               onMouseEnter={handleHoverBlip}
               onFocus={handleHoverBlip}
               onPointerDown={handleRadarBlip}

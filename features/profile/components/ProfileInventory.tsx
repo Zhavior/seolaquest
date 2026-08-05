@@ -30,7 +30,7 @@ export function ProfileInventory({ inventorySlots }: { inventorySlots: Inventory
               {slot.rarity !== 'EMPTY' ? (
                 <>
                   <div className="flex items-start">
-                    <span className="text-[10px] font-black bg-black text-white px-1 border border-black">
+                    <span className="text-xs font-black bg-black text-white px-1 border border-black">
                       {slot.rarity}
                     </span>
                   </div>
@@ -39,7 +39,7 @@ export function ProfileInventory({ inventorySlots }: { inventorySlots: Inventory
                     {Icon && <Icon aria-hidden="true" className="w-7 h-7 stroke-[2.5]" />}
                   </div>
 
-                  <div className="text-[10px] font-black truncate text-center">
+                  <div className="text-xs font-black truncate text-center">
                     {slot.name}
                   </div>
                   <span className="sr-only">{slot.stat}</span>

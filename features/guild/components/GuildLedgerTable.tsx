@@ -33,7 +33,48 @@ export default function GuildLedgerTable({ hunters, isAnonymousMode, onSelectHun
           <p className="mt-2 font-bold text-gray-600">Public rankings require explicit participant opt-in.</p>
         </div>
       ) : (
-        <div className="overflow-x-auto border-4 border-black bg-white shadow-[6px_6px_0_0_#000]">
+        <>
+        {/* Phones get stacked cards; the table needs 620px and would only scroll sideways. */}
+        <ul className="space-y-3 md:hidden">
+          {hunters.map((hunter) => (
+            <li
+              key={hunter.id}
+              className="border-4 border-black bg-white p-4 shadow-[6px_6px_0_0_#000]"
+            >
+              <div className="flex items-start gap-3">
+                <span className="shrink-0 border-2 border-black bg-[#FFE600] px-2 py-1 text-sm font-black shadow-[2px_2px_0_0_#000]">
+                  #{hunter.rank}
+                </span>
+                <div className="min-w-0 flex-1 text-sm font-black uppercase">
+                  {onSelectHunter ? (
+                    <button
+                      type="button"
+                      onClick={() => onSelectHunter(hunter)}
+                      className="min-h-11 text-left font-black underline decoration-2 underline-offset-4"
+                    >
+                      View {displayName(hunter)} details
+                    </button>
+                  ) : (
+                    <span className="break-words">{displayName(hunter)}</span>
+                  )}
+                </div>
+              </div>
+
+              <dl className="mt-3 grid grid-cols-2 gap-3 border-t-2 border-black pt-3">
+                <div className="min-w-0">
+                  <dt className="text-xs font-black uppercase text-gray-500">Processed leads</dt>
+                  <dd className="mt-1 text-lg font-black">{hunter.bountiesSlayed.toLocaleString()}</dd>
+                </div>
+                <div className="min-w-0">
+                  <dt className="text-xs font-black uppercase text-gray-500">Active streak</dt>
+                  <dd className="mt-1 text-lg font-black">{hunter.activeStreak} days</dd>
+                </div>
+              </dl>
+            </li>
+          ))}
+        </ul>
+
+        <div className="hidden overflow-x-auto border-4 border-black bg-white shadow-[6px_6px_0_0_#000] md:block">
           <table className="min-w-[620px] w-full border-collapse text-left">
             <thead>
               <tr className="border-b-4 border-black bg-black text-xs font-black uppercase text-white">
@@ -61,6 +102,7 @@ export default function GuildLedgerTable({ hunters, isAnonymousMode, onSelectHun
             </tbody>
           </table>
         </div>
+        </>
       )}
     </section>
   )

@@ -62,7 +62,7 @@ export function DashboardKeywords({
           <div className="min-w-0">
             <div className="mb-3 inline-flex items-center gap-2 border-4 border-black bg-[#13D7C2] px-3 py-2 shadow-[4px_4px_0px_#000]">
               <Radar className="h-4 w-4 text-black" />
-              <span className="text-[10px] font-black uppercase tracking-[0.16em] text-black">
+              <span className="text-xs font-black uppercase tracking-[0.12em] text-black">
                 Signal Queue
               </span>
             </div>
@@ -186,10 +186,10 @@ export function DashboardKeywords({
                     </div>
 
                     <div className="mt-4 flex items-center justify-between gap-2">
-                      <span className="border-2 border-black bg-black px-2 py-1 text-[10px] font-black uppercase tracking-[0.12em] text-[#FFE600]">
+                      <span className="border-2 border-black bg-black px-2 py-1 text-xs font-black uppercase tracking-[0.08em] text-[#FFE600]">
                         Active
                       </span>
-                      <span className="text-[11px] font-black uppercase text-black/55">
+                      <span className="truncate text-xs font-black uppercase text-black/55">
                         {selectedHeroClass}
                       </span>
                     </div>

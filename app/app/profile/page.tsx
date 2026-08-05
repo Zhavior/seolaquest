@@ -17,7 +17,7 @@ function Field({
 }) {
   return (
     <div className="border-4 border-black bg-white p-4 shadow-[4px_4px_0_0_#000]">
-      <p className="mb-2 text-[10px] font-black uppercase tracking-[0.18em] text-black/60">
+      <p className="mb-2 text-xs font-black uppercase tracking-[0.12em] text-black/60">
         {label}
       </p>
       <p className="text-sm font-black uppercase tracking-[0.06em] text-black">
@@ -42,7 +42,7 @@ export default async function ProfilePage() {
   return (
     <section className="space-y-5">
       <div className="border-4 border-black bg-[#FFE600] p-5 shadow-[6px_6px_0_0_#000]">
-        <p className="mb-2 text-[10px] font-black uppercase tracking-[0.22em] text-black/65">
+        <p className="mb-2 text-xs font-black uppercase tracking-[0.14em] text-black/65">
           Guild Master dossier
         </p>
         <h1 className="text-2xl font-black uppercase tracking-[0.06em] text-black">

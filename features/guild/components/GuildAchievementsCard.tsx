@@ -18,7 +18,7 @@ export function GuildAchievementsCard({
           <Trophy className="w-8 h-8 text-black" />
         </div>
         <div>
-          <h2 className="text-3xl md:text-4xl uppercase font-black">Guild Achievements</h2>
+          <h2 className="text-2xl sm:text-3xl md:text-4xl uppercase font-black">Guild Achievements</h2>
           <p className="text-sm font-bold text-gray-600 uppercase">Unlockable Trophies & Badges</p>
         </div>
       </div>

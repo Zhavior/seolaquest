@@ -27,7 +27,8 @@ describe('CoQuest OS Sidebar', () => {
       />
     )
 
-    expect(screen.getByText('Command Compass')).toBeInTheDocument()
+    // Desktop rail carries the full brand; the mobile top bar uses the short "SEOLQ".
+    expect(screen.getByText('SEO la Quest')).toBeInTheDocument()
     expect(screen.getByText('LIVING HQ')).toBeInTheDocument()
     expect(screen.getByText('QUEST BOARD')).toBeInTheDocument()
     expect(screen.getByText('QUEST LOG')).toBeInTheDocument()
@@ -51,7 +52,7 @@ describe('CoQuest OS Sidebar', () => {
       />
     )
 
-    expect(screen.getAllByText('Command Compass')[0]).toBeInTheDocument()
+    expect(screen.getAllByText('SEO la Quest')[0]).toBeInTheDocument()
   })
 
   it('renders collapsed state with expand toggle button', () => {

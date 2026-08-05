@@ -173,7 +173,7 @@ function BillingApp({ model }: { model: BillingReadyViewModel }) {
       />
 
       <div className="min-h-[100dvh] w-full max-w-[1400px] mx-auto p-4 md:p-8 font-black overflow-hidden relative z-10">
-        <div className="absolute top-0 left-0 -ml-32 -mt-32 opacity-5 pointer-events-none">
+        <div className="hidden md:block absolute top-0 left-0 -ml-32 -mt-32 opacity-5 pointer-events-none">
           <FlaskConical className="w-[600px] h-[600px] text-black" />
         </div>
         

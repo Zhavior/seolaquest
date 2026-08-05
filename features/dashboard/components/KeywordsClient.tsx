@@ -102,7 +102,7 @@ export function KeywordsClient({ initialKeywords }: KeywordsClientProps) {
                   <span className="bg-[#FFE600] font-black text-xs px-2 py-0.5 border border-black">
                     {kw.heroClass}
                   </span>
-                  <span className="bg-black text-white font-black text-[10px] uppercase px-2 py-0.5">
+                  <span className="bg-black text-white font-black text-xs uppercase px-2 py-0.5">
                     {kw.platform}
                   </span>
                 </div>

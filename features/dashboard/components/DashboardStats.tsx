@@ -356,7 +356,7 @@ export function DashboardStats({
                       <p className="text-sm font-black uppercase text-black">{perk.title}</p>
                       <p className="mt-1 text-xs font-bold text-black/75">{perk.detail}</p>
                     </div>
-                    <span className="border-2 border-black bg-black px-2 py-0.5 text-[10px] font-black uppercase text-[#FFE600]">
+                    <span className="shrink-0 border-2 border-black bg-black px-2 py-0.5 text-xs font-black uppercase text-[#FFE600]">
                       {perk.unlocked ? 'UNLOCKED' : 'LOCKED'}
                     </span>
                   </div>

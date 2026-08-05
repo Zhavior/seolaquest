@@ -18,7 +18,7 @@ export function GuildMonsterCard({ item, userLevel, monstersDefeated }: GuildMon
             <div className="mb-3 inline-flex items-center gap-2 border-2 border-white bg-black px-4 py-1 text-sm font-black uppercase text-[#FFE600] shadow-[3px_3px_0_0_#fff]">
               <Shield className="h-4 w-4" /> Stored level {userLevel}
             </div>
-            <h2 className="text-3xl font-black uppercase text-white md:text-5xl" style={{ WebkitTextStroke: '1.5px black' }}>Processed leads</h2>
+            <h2 className="text-2xl font-black uppercase text-white sm:text-3xl md:text-5xl" style={{ WebkitTextStroke: '1.5px black' }}>Processed leads</h2>
           </div>
           <Database className="h-20 w-20 text-black opacity-20 md:h-28 md:w-28" />
         </div>

@@ -234,7 +234,7 @@ function DashboardFeedComponent({
               </span>
             </div>
 
-            <h2 className="text-4xl md:text-5xl uppercase tracking-tight text-white drop-shadow-[5px_5px_0_rgba(0,0,0,1)] mt-1" style={{ WebkitTextStroke: '2px black' }}>
+            <h2 className="text-3xl sm:text-4xl md:text-5xl uppercase tracking-tight text-white drop-shadow-[5px_5px_0_rgba(0,0,0,1)] mt-1" style={{ WebkitTextStroke: '2px black' }}>
               Battle-Ready Signal Queue
             </h2>
 

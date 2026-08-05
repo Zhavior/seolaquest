@@ -21,6 +21,10 @@ const sections = [
   { key: 'system', label: 'SYSTEM & VAULT' },
 ] as const
 
+/**
+ * Nav body without any positioning chrome. Exported as `SidebarNavigation` so
+ * the mobile shell can render it inside its own off-canvas drawer.
+ */
 function NavigationContent({
   collapsed = false,
   mobile = false,
@@ -112,15 +116,17 @@ function NavigationContent({
               type="button"
               onClick={onNavigate}
               aria-label="Close navigation"
-              className="grid size-8 place-items-center border-2 border-black bg-[#FFE600] shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-[1px] active:translate-y-[1px]"
+              className="grid size-11 place-items-center border-2 border-black bg-[#FFE600] shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-[1px] active:translate-y-[1px]"
             >
-              <X className="size-4 text-black" strokeWidth={3} />
+              <X className="size-5 text-black" strokeWidth={3} />
             </button>
           </div>
         ) : (
           <div className="flex items-center justify-between border-b-3 border-black pb-2.5 mb-1">
-            <span className="text-xs font-black text-black uppercase tracking-[0.2em]">
-              Command Compass
+            {/* No `uppercase` here: the lowercase "la" is part of the brand, and the
+                utility would render it "SEO LA QUEST". Mobile uses the short "SEOLQ". */}
+            <span className="text-xs font-black text-black tracking-[0.15em]">
+              SEO la Quest
             </span>
             <button
               type="button"
@@ -222,6 +228,8 @@ function NavigationContent({
     </div>
   )
 }
+
+export { NavigationContent as SidebarNavigation }
 
 export default function Sidebar({
   collapsed = false,
