@@ -23,6 +23,8 @@ import {
   PanelLeftOpen,
   Menu,
   X,
+  Sun,
+  Moon,
   type LucideIcon,
 } from 'lucide-react';
 
@@ -56,6 +58,31 @@ export function AppLayout({ children, user }: AppLayoutProps) {
   const pathname = usePathname();
   const [sfxEnabled, setSfxEnabled] = useState(true);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [isGreyMode, setIsGreyMode] = useState(false);
+
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('coquest_theme')
+    if (savedTheme === 'grey') {
+      setIsGreyMode(true)
+      document.documentElement.classList.add('grey-mode')
+      document.body?.classList.add('grey-mode')
+    }
+  }, [])
+
+  const toggleThemeMode = () => {
+    const nextMode = !isGreyMode
+    setIsGreyMode(nextMode)
+    if (nextMode) {
+      document.documentElement.classList.add('grey-mode')
+      document.body?.classList.add('grey-mode')
+      localStorage.setItem('coquest_theme', 'grey')
+    } else {
+      document.documentElement.classList.remove('grey-mode')
+      document.body?.classList.remove('grey-mode')
+      localStorage.setItem('coquest_theme', 'parchment')
+    }
+  }
+
   const [collapsed, setCollapsed] = useState(() => {
     if (typeof window === 'undefined') return false
     try {
@@ -177,7 +204,7 @@ export function AppLayout({ children, user }: AppLayoutProps) {
             <span>COQUEST</span>
           </Link>
 
-          <div className="hidden sm:flex items-center gap-2.5 border-3 border-black bg-white px-3 py-1 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]">
+          <div className="hidden sm:flex items-center gap-2 border-3 border-black bg-white px-3 py-1 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]">
             <div className="grid size-6 place-items-center border-2 border-black bg-[#FFE600]">
               <User className="size-3.5 shrink-0 text-black" strokeWidth={3} />
             </div>
@@ -188,61 +215,125 @@ export function AppLayout({ children, user }: AppLayoutProps) {
           </div>
         </div>
 
-        {/* Center: Mana Vault Indicators */}
-        <div className="flex items-center gap-3.5 border-3 border-black bg-black text-white px-4 py-1.5 shadow-[4px_4px_0px_0px_#06B6D4]">
-          <div className="flex items-center gap-2">
-            <Zap className="size-4 text-[#06B6D4] animate-pulse" strokeWidth={3} />
-            <span className="text-xs font-black uppercase tracking-wider text-cyan-300 hidden md:inline">
-              Mana Vault:
-            </span>
+        {/* Center/Right HUD Cluster: EXP Bar + MP Bar + Quests (Responsive) */}
+        <div className="flex shrink-0 items-center gap-1.5 sm:gap-2.5">
+          
+          {/* MOBILE COMPACT TELEMETRY BADGES (< md) */}
+          <div className="flex items-center gap-1 md:hidden">
+            <Link
+              href="/app/runs"
+              title="12 Active Quests"
+              className="flex items-center gap-1 border-2 border-black bg-[#FF5722] text-white px-2 py-1 text-[10px] font-black uppercase shadow-[1.5px_1.5px_0_0_#000]"
+            >
+              <Scroll className="size-3" strokeWidth={3} />
+              <span>12</span>
+            </Link>
+
+            <div className="flex items-center gap-1 border-2 border-black bg-[#06B6D4] text-white px-2 py-1 text-[10px] font-black uppercase shadow-[1.5px_1.5px_0_0_#000]">
+              <Zap className="size-3 text-[#FFE600] animate-pulse" strokeWidth={3} />
+              <span>{currentMp}</span>
+            </div>
+
+            <div className="flex items-center gap-1 border-2 border-black bg-[#FFE600] text-black px-2 py-1 text-[10px] font-black uppercase shadow-[1.5px_1.5px_0_0_#000]">
+              <Sparkles className="size-3 text-black" strokeWidth={3} />
+              <span>L{userLevel}</span>
+            </div>
           </div>
 
-          <div className="flex items-center gap-1">
-            {Array.from({ length: 10 }).map((_, i) => {
-              const activeCount = Math.round((currentMp / maxMp) * 10);
-              const isActive = i < activeCount;
-              return (
-                <span
-                  key={i}
-                  className={`inline-block h-4 w-2.5 border border-white transition-all ${
-                    isActive
-                      ? "bg-gradient-to-t from-cyan-500 to-[#A3E635] shadow-[0_0_8px_#06B6D4]"
-                      : "bg-slate-800 opacity-40"
-                  }`}
-                />
-              );
-            })}
+          {/* DESKTOP EXP & MP METERS (md+) */}
+          <div className="hidden items-center gap-3 md:flex">
+            
+            {/* Active Quests Badge */}
+            <Link
+              href="/app/runs"
+              title="View Active Quests"
+              className="flex items-center gap-1.5 border-[3px] border-black bg-[#FF5722] text-white px-3 py-1.5 shadow-[3px_3px_0_0_#000] hover:-translate-y-0.5 transition-transform"
+            >
+              <Scroll className="size-3.5 shrink-0" strokeWidth={3} />
+              <span className="font-mono text-[11px] font-black uppercase tracking-wider">
+                12 QUESTS
+              </span>
+            </Link>
+
+            {/* EXP Progress Meter */}
+            <div className="flex items-center gap-2 border-[3px] border-black bg-white px-3 py-1.5 shadow-[3px_3px_0_0_#000]">
+              <div className="flex items-center gap-1">
+                <Sparkles className="size-3.5 text-[#F59E0B]" strokeWidth={3} />
+                <span className="border-2 border-black bg-[#FFE600] px-1.5 py-0.2 font-mono text-[9px] font-black uppercase text-black">
+                  LVL {userLevel}
+                </span>
+              </div>
+              <div className="flex items-center gap-0.5">
+                {Array.from({ length: 8 }).map((_, i) => (
+                  <span
+                    key={i}
+                    className={`inline-block h-3 w-1.5 border border-black ${
+                      i < 5 ? 'bg-[#FFE600]' : 'bg-zinc-200'
+                    }`}
+                  />
+                ))}
+              </div>
+              <span className="font-mono text-[10px] font-black uppercase tracking-wider text-black">
+                XP 1,250
+              </span>
+            </div>
+
+            {/* MP Mana Meter */}
+            <div className="flex items-center gap-2 border-[3px] border-black bg-white px-3 py-1.5 shadow-[3px_3px_0_0_#000]">
+              <Zap aria-hidden="true" className="size-3.5 shrink-0 text-[#06B6D4] animate-pulse" strokeWidth={3} />
+              <div className="flex items-center gap-0.5">
+                {Array.from({ length: 8 }).map((_, i) => (
+                  <span
+                    key={i}
+                    className={`inline-block h-3 w-1.5 border border-black ${
+                      i < 6 ? 'bg-[#06B6D4]' : 'bg-zinc-200'
+                    }`}
+                  />
+                ))}
+              </div>
+              <span className="font-mono text-[10px] font-black uppercase tracking-wider text-black">
+                {currentMp}/{maxMp} MP
+              </span>
+            </div>
           </div>
 
-          <span className="font-mono text-xs font-black border-l-2 border-dashed border-[#06B6D4] pl-3 text-[#FFE600] tracking-wider">
-            {currentMp}/{maxMp} MP
-          </span>
-          <span className="hidden lg:inline-block bg-[#FFE600] text-black border border-black px-2 py-0.5 text-[9px] font-black tracking-widest uppercase -rotate-1">
-            {planTier}
-          </span>
-        </div>
-
-        {/* Right: Quick Recharge Action & SFX Toggle */}
-        <div className="flex items-center gap-3">
+          {/* Sun / Moon Theme Mode Toggle Button */}
           <button
-            onClick={() => setSfxEnabled((v) => !v)}
-            className="hidden xl:flex items-center gap-1.5 bg-black text-[#FFE600] border-2 border-white px-2.5 py-1 text-[10px] uppercase font-black shadow-[2px_2px_0_0_#fff] hover:-translate-y-0.5 hover:shadow-[3px_3px_0_0_#fff] active:translate-y-0.5 active:shadow-none transition-all"
+            type="button"
+            onClick={toggleThemeMode}
+            aria-label={isGreyMode ? 'Switch to Parchment Light Mode' : 'Switch to Slate Grey Dark Mode'}
+            title={isGreyMode ? 'Parchment Light Mode' : 'Slate Grey Dark Mode'}
+            className="size-8 sm:size-9 grid place-items-center border-[3px] border-black bg-white shadow-[2.5px_2.5px_0_0_#000] transition-transform duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[1px_1px_0_0_#000] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none shrink-0"
           >
-            {sfxEnabled ? <Volume2 className="w-3.5 h-3.5" /> : <VolumeX className="w-3.5 h-3.5" />}
-            SFX {sfxEnabled ? 'ON' : 'OFF'}
+            {isGreyMode ? (
+              <Sun className="size-4 text-amber-500 fill-amber-400" strokeWidth={3} />
+            ) : (
+              <Moon className="size-4 text-black fill-black/20" strokeWidth={3} />
+            )}
           </button>
 
-          <div className="hidden lg:flex items-center gap-2 border-2 border-black bg-[#A3E635] px-3 py-1 text-xs font-black tracking-wider shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] -rotate-1">
-            <span className="h-2.5 w-2.5 rounded-full bg-black animate-pulse" />
-            <span>RADAR ACTIVE</span>
-          </div>
+          {/* SFX Toggle */}
+          <button
+            type="button"
+            onClick={() => setSfxEnabled((v) => !v)}
+            aria-label={sfxEnabled ? 'Mute sound effects' : 'Unmute sound effects'}
+            className="hidden size-9 place-items-center border-[3px] border-black bg-white shadow-[3px_3px_0_0_#000] transition-transform duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[1px_1px_0_0_#000] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none xl:grid shrink-0"
+          >
+            {sfxEnabled ? (
+              <Volume2 className="size-4 text-black" strokeWidth={3} />
+            ) : (
+              <VolumeX className="size-4 text-black" strokeWidth={3} />
+            )}
+          </button>
 
+          {/* Recharge CTA */}
           <Link
             href="/billing"
-            className="border-3 border-black bg-[#06B6D4] text-white px-4 py-1.5 text-xs font-black uppercase tracking-wider shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[5px_5px_0px_0px_rgba(0,0,0,1)] active:translate-x-0 active:translate-y-0 active:shadow-none transition-all flex items-center gap-1.5"
+            className="inline-flex h-9 sm:min-h-11 shrink-0 items-center gap-1 border-[3px] border-black bg-[#ff5a36] px-2.5 sm:px-4 py-1 font-black uppercase tracking-wider text-black shadow-[2.5px_2.5px_0_0_#000] transition-transform duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[1px_1px_0_0_#000] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none text-xs sm:text-sm"
           >
-            <Zap className="size-4 text-[#FFE600]" strokeWidth={3} />
-            <span>+ RECHARGE</span>
+            <Zap aria-hidden="true" className="size-3.5 sm:size-4 text-black" strokeWidth={3} />
+            <span className="hidden sm:inline">Recharge</span>
+            <span className="sm:hidden text-[10px] font-black">+</span>
           </Link>
         </div>
       </header>
