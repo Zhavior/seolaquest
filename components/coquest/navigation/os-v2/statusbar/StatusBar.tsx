@@ -135,21 +135,21 @@ export default function StatusBar({
             <Link
               href="/app/runs"
               title={`${remainingQuests} Active Quests`}
-              className="flex items-center gap-1 border-2 border-black bg-[#FF5722] text-white px-2 py-1 text-[10px] font-black uppercase shadow-[1.5px_1.5px_0_0_#000]"
+              className="flex items-center gap-1 border-2 border-black bg-[#FF5722] text-white px-1.5 py-0.5 text-[9px] font-black uppercase shadow-[1px_1px_0_0_#000]"
             >
-              <Scroll className="size-3" strokeWidth={3} />
+              <Scroll className="size-2.5 shrink-0" strokeWidth={3} />
               <span>{remainingQuests}</span>
             </Link>
 
             {/* Mobile MP */}
-            <div className="flex items-center gap-1 border-2 border-black bg-[#06B6D4] text-white px-2 py-1 text-[10px] font-black uppercase shadow-[1.5px_1.5px_0_0_#000]">
-              <Zap className="size-3 text-[#FFE600] animate-pulse" strokeWidth={3} />
+            <div className="flex items-center gap-1 border-2 border-black bg-[#06B6D4] text-white px-1.5 py-0.5 text-[9px] font-black uppercase shadow-[1px_1px_0_0_#000]">
+              <Zap className="size-2.5 text-[#FFE600] animate-pulse shrink-0" strokeWidth={3} />
               <span>{currentMp}</span>
             </div>
 
             {/* Mobile Level & EXP */}
-            <div className="flex items-center gap-1 border-2 border-black bg-[#FFE600] text-black px-2 py-1 text-[10px] font-black uppercase shadow-[1.5px_1.5px_0_0_#000]">
-              <Sparkles className="size-3 text-black" strokeWidth={3} />
+            <div className="flex items-center gap-1 border-2 border-black bg-[#FFE600] text-black px-1.5 py-0.5 text-[9px] font-black uppercase shadow-[1px_1px_0_0_#000]">
+              <Sparkles className="size-2.5 text-black shrink-0" strokeWidth={3} />
               <span>L{levelInfo.level}</span>
             </div>
           </div>

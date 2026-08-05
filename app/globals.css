@@ -15,12 +15,35 @@
 }
 
 @layer base {
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
+
+  html, body {
+    max-width: 100vw;
+    overflow-x: hidden;
+  }
+
+  img, svg, video, canvas {
+    max-width: 100%;
+  }
+
   html {
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     font-synthesis: none;
     scroll-behavior: smooth;
+  }
+}
+
+/* Hardened Mobile Responsive Rules (< 640px) */
+@media (max-width: 639px) {
+  .shadow-\[6px_6px_0_0_\#000\],
+  .shadow-\[8px_8px_0_0_\#000\],
+  .shadow-\[12px_12px_0_0_\#000\],
+  .shadow-\[10px_10px_0_0_\#000\] {
+    box-shadow: 3px 3px 0 0 #000 !important;
   }
 }
 
