@@ -142,15 +142,23 @@ export function DashboardHeader({
             </button>
           )}
 
-          <Link
-            href="/app/guild"
+          <button
+            type="button"
+            onClick={() => {
+              sfx.playCoinDrop()
+              const el = document.getElementById('battle-ready-signals')
+              if (el) {
+                el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+              } else {
+                window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' })
+              }
+            }}
             onMouseEnter={() => sfx.playSidebarHover()}
-            onClick={() => sfx.playCoinDrop()}
             className="inline-flex items-center gap-2 border-3 border-black bg-white px-4 py-2.5 text-xs md:text-sm font-black uppercase tracking-wider text-black shadow-[4px_4px_0_0_#000] hover:bg-[#FAF7F2] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[6px_6px_0_0_#000] active:translate-x-0 active:translate-y-0 transition-all"
           >
-            <Shield className="size-4" strokeWidth={3} />
-            <span>GUILD HALL</span>
-          </Link>
+            <Scroll className="size-4" strokeWidth={3} />
+            <span>BATTLE SIGNALS</span>
+          </button>
         </div>
       </div>
 

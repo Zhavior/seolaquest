@@ -236,6 +236,7 @@ function DashboardFeedComponent({
 
   return (
     <motion.section
+      id="battle-ready-signals"
       variants={item}
       initial="hidden"
       animate="show"
