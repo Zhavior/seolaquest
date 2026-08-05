@@ -429,7 +429,7 @@ export function BattleArea3DInner() {
         </button>
 
         <span className="border-2 border-black bg-black px-3 py-1 font-mono text-xs font-black uppercase text-[#06B6D4] shadow-[3px_3px_0_0_#000]">
-          INSERT COIN (5 MP)
+          FREE PLAY // DEMO
         </span>
         <button
           type="button"

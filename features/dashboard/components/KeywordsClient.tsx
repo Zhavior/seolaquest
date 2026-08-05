@@ -141,7 +141,7 @@ export function KeywordsClient({ initialKeywords }: KeywordsClientProps) {
             className={questButton({ tone: 'lime', className: 'py-3.5 hover:bg-lime-400' })}
           >
             <Plus aria-hidden="true" className="h-5 w-5 stroke-[3px]" />{' '}
-            {isAdding ? 'ARMING MONITOR...' : 'START MONITORING (+5 MP)'}
+            {isAdding ? 'ARMING MONITOR...' : 'START MONITORING'}
           </motion.button>
         </motion.form>
 

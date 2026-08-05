@@ -7,6 +7,18 @@ export type DashboardUser = {
   questsRemaining?: number
   maxCredits?: number
   planLabel?: string
+  /**
+   * What the account's plan actually permits, resolved server-side by
+   * EntitlementService. The UI gates on these instead of on player level so a
+   * paying customer is never told a feature they bought is locked.
+   */
+  entitlements?: DashboardEntitlements
+}
+
+export type DashboardEntitlements = {
+  canUsePaidScans: boolean
+  canGenerateAIReplies: boolean
+  canExportToCRM: boolean
 }
 
 export type DashboardKeyword = { id: string; phrase: string; active: boolean }

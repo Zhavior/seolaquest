@@ -17,10 +17,14 @@ type DashboardHeaderProps = {
 export function DashboardHeader({
   item,
   remainingQuests,
+  maxCredits,
   runMockScanner,
 }: DashboardHeaderProps) {
-  const maxQuests = 15
-  const questProgressPercent = Math.min(100, Math.round((remainingQuests / maxQuests) * 100))
+  // The bar is a share of the account's own credit high-water mark, not a made-up
+  // ceiling. A brand new account has no allocation yet, so it reads as empty.
+  const maxQuests = maxCredits
+  const questProgressPercent =
+    maxQuests > 0 ? Math.min(100, Math.round((remainingQuests / maxQuests) * 100)) : 0
 
   return (
     <motion.section

@@ -17,8 +17,6 @@ import {
   Scroll,
 } from 'lucide-react'
 import { type UserSummary } from '../CoQuestShell'
-import { player } from '../../os/shared/player'
-import { getLevelInfo } from '../../os/shared/progression'
 import { sfx } from '@/lib/sfx'
 
 interface StatusBarProps {
@@ -63,16 +61,24 @@ export default function StatusBar({
     }
   }
 
-  const userName = user?.name || player.name || 'REINALD'
-  const playerXp = user?.xp ?? player.xp
-  const levelInfo = getLevelInfo(playerXp)
-  const xpPercent = levelInfo.progress
+  const userName = user?.name || 'HUNTER'
+
+  // Progression mirrors the server's model exactly: `xp` is progress inside the
+  // current level and `xpRequired` is that level's bar, so the HUD never claims a
+  // level the database disagrees with.
+  const playerLevel = user?.level ?? 1
+  const playerXp = user?.xp ?? 0
+  const xpRequired = user?.xpRequired ?? 100
+  const xpPercent = xpRequired > 0 ? Math.min(100, Math.round((playerXp / xpRequired) * 100)) : 0
   const activeXpSegments = Math.round((xpPercent / 100) * 8)
 
-  const currentMp = 70
-  const maxMp = 100
-  const activeManaSegments = Math.round((currentMp / maxMp) * 8)
-  const remainingQuests = user?.questsRemaining ?? 12
+  // MP is the scan-credit balance: one credit is spent per queued scan and
+  // refunded if that scan fails. `maxCredits` is a high-water mark, so it can sit
+  // at 0 for an account that has never been granted an allocation.
+  const currentMp = user?.questsRemaining ?? 0
+  const maxMp = Math.max(user?.maxCredits ?? 0, currentMp)
+  const activeManaSegments = maxMp > 0 ? Math.round((currentMp / maxMp) * 8) : 0
+  const openQuests = user?.openQuests ?? 0
 
   return (
     <header
@@ -134,11 +140,11 @@ export default function StatusBar({
             {/* Mobile Quests Count */}
             <Link
               href="/app/runs"
-              title={`${remainingQuests} Active Quests`}
+              title={`${openQuests} signals waiting for action`}
               className="flex items-center gap-1 border-2 border-black bg-[#FF5722] text-white px-1.5 py-0.5 text-[9px] font-black uppercase shadow-[1px_1px_0_0_#000]"
             >
               <Scroll className="size-2.5 shrink-0" strokeWidth={3} />
-              <span>{remainingQuests}</span>
+              <span>{openQuests}</span>
             </Link>
 
             {/* Mobile MP */}
@@ -150,7 +156,7 @@ export default function StatusBar({
             {/* Mobile Level & EXP */}
             <div className="flex items-center gap-1 border-2 border-black bg-[#FFE600] text-black px-1.5 py-0.5 text-[9px] font-black uppercase shadow-[1px_1px_0_0_#000]">
               <Sparkles className="size-2.5 text-black shrink-0" strokeWidth={3} />
-              <span>L{levelInfo.level}</span>
+              <span>L{playerLevel}</span>
             </div>
           </div>
 
@@ -160,21 +166,24 @@ export default function StatusBar({
             {/* Active Quests Pill */}
             <Link
               href="/app/runs"
-              title="View Active Quests"
+              title={`${openQuests} signals waiting for action`}
               className="flex items-center gap-1.5 border-[3px] border-black bg-[#FF5722] text-white px-3 py-1.5 shadow-[3px_3px_0_0_#000] hover:-translate-y-0.5 transition-transform"
             >
               <Scroll className="size-3.5 shrink-0" strokeWidth={3} />
               <span className="font-mono text-[11px] font-black uppercase tracking-wider">
-                {remainingQuests} QUESTS
+                {openQuests} QUESTS
               </span>
             </Link>
 
             {/* EXP / Level Progress Bar */}
-            <div className="flex items-center gap-2 border-[3px] border-black bg-white px-3 py-1.5 shadow-[3px_3px_0_0_#000]">
+            <div
+              title={`${playerXp} of ${xpRequired} XP toward level ${playerLevel + 1}`}
+              className="flex items-center gap-2 border-[3px] border-black bg-white px-3 py-1.5 shadow-[3px_3px_0_0_#000]"
+            >
               <div className="flex items-center gap-1">
                 <Sparkles className="size-3.5 text-[#F59E0B]" strokeWidth={3} />
                 <span className="border-2 border-black bg-[#FFE600] px-1.5 py-0.2 font-mono text-[9px] font-black uppercase text-black">
-                  LVL {levelInfo.level}
+                  LVL {playerLevel}
                 </span>
               </div>
               <div className="flex items-center gap-0.5">
@@ -188,12 +197,15 @@ export default function StatusBar({
                 ))}
               </div>
               <span className="font-mono text-[10px] font-black uppercase tracking-wider text-black">
-                XP {playerXp.toLocaleString()}
+                XP {playerXp.toLocaleString()}/{xpRequired.toLocaleString()}
               </span>
             </div>
 
             {/* MP / Mana Vault Meter */}
-            <div className="flex items-center gap-2 border-[3px] border-black bg-white px-3 py-1.5 shadow-[3px_3px_0_0_#000]">
+            <div
+              title={`${currentMp} scan credits left — each scan costs 1 MP`}
+              className="flex items-center gap-2 border-[3px] border-black bg-white px-3 py-1.5 shadow-[3px_3px_0_0_#000]"
+            >
               <Zap aria-hidden="true" className="size-3.5 shrink-0 text-[#06B6D4] animate-pulse" strokeWidth={3} />
               <div className="flex items-center gap-0.5">
                 {Array.from({ length: 8 }).map((_, i) => (

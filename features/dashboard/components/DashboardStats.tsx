@@ -210,7 +210,12 @@ export function DashboardStats({
   recentLevelUp,
   leads,
 }: DashboardStatsProps) {
-  const questsRemaining = user.questsRemaining ?? 3
+  const questsRemaining = user.questsRemaining ?? 0
+  const entitlements = user.entitlements ?? {
+    canUsePaidScans: false,
+    canGenerateAIReplies: false,
+    canExportToCRM: false,
+  }
   const hasLeadData = leads.length > 0
   const { hottestLeadScore, projectedArr, highIntentCount } = getTopLeadMetrics(leads)
 
@@ -333,23 +338,29 @@ export function DashboardStats({
               {[
                 {
                   title: 'Instant reply combos',
-                  detail: 'Chain response presets for faster outbound momentum.',
-                  unlocked: user.level >= 2,
+                  detail: entitlements.canGenerateAIReplies
+                    ? 'Draft a reply straight from any signal card.'
+                    : 'Included with a paid plan. Draft replies from any signal card.',
+                  state: entitlements.canGenerateAIReplies ? 'UNLOCKED' : 'LOCKED',
                 },
                 {
                   title: 'CRM auto-routing',
-                  detail: 'Send top-tier leads directly into the right pipeline lane.',
-                  unlocked: user.level >= 3,
+                  detail: entitlements.canExportToCRM
+                    ? 'Push any signal to your CRM webhook from the signal card.'
+                    : 'Included with a paid plan. Push signals to your CRM webhook.',
+                  state: entitlements.canExportToCRM ? 'UNLOCKED' : 'LOCKED',
                 },
                 {
+                  // Not a plan gate and not a level gate: Reddit and LinkedIn are
+                  // not built yet, so no account can have this today.
                   title: 'Multi-feed scanner',
-                  detail: 'Blend X, Reddit, and future provider signals into one pass.',
-                  unlocked: user.level >= 4,
+                  detail: 'X is the only live source. Reddit and LinkedIn are still in build.',
+                  state: 'IN BUILD',
                 },
               ].map((perk) => (
                 <div
                   key={perk.title}
-                  className={`p-4 border-3 border-black shadow-[3px_3px_0_0_#000] ${perk.unlocked ? 'bg-[#A3E635]' : 'bg-[#FFF8D9]'}`}
+                  className={`p-4 border-3 border-black shadow-[3px_3px_0_0_#000] ${perk.state === 'UNLOCKED' ? 'bg-[#A3E635]' : 'bg-[#FFF8D9]'}`}
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div>
@@ -357,7 +368,7 @@ export function DashboardStats({
                       <p className="mt-1 text-xs font-bold text-black/75">{perk.detail}</p>
                     </div>
                     <span className="shrink-0 border-2 border-black bg-black px-2 py-0.5 text-xs font-black uppercase text-[#FFE600]">
-                      {perk.unlocked ? 'UNLOCKED' : 'LOCKED'}
+                      {perk.state}
                     </span>
                   </div>
                 </div>

@@ -18,10 +18,14 @@ export interface UserSummary {
   level?: number
   xp?: number
   xpRequired?: number
+  /** Spendable scan credits. The HUD renders this as the MP bar. */
   questsRemaining?: number
   spellsCast?: number
   questsExported?: number
+  /** High-water mark for credits, used as the MP bar's denominator. */
   maxCredits?: number
+  /** Live signals still awaiting a claim or dismissal. */
+  openQuests?: number
   profileIconKey?: string | null
 }
 

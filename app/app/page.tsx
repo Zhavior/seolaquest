@@ -5,6 +5,7 @@ import Loading from '../(app)/loading'
 import { type DashboardKeyword, type DashboardLead, type DashboardUser } from '@/features/dashboard/types'
 import { requireCurrentUser } from '@/lib/auth'
 import prisma from '@/lib/prisma'
+import { EntitlementService } from '@/src/modules/billing/application/EntitlementService'
 
 const DashboardClient = nextDynamic(() => import('@/features/dashboard/components/DashboardClient'))
 
@@ -26,7 +27,7 @@ export default function AppHomePage() {
 async function DashboardShellData() {
   const user = await requireCurrentUser()
 
-  const [keywords, leads, billingSubscription] = await Promise.all([
+  const [keywords, leads, billingSubscription, entitlements] = await Promise.all([
     prisma.trackedKeyword.findMany({
       where: { userId: user.id },
       orderBy: { createdAt: 'desc' },
@@ -50,6 +51,7 @@ async function DashboardShellData() {
       where: { userId: user.id },
       select: { plan: true, status: true },
     }),
+    EntitlementService.forUser(user.id),
   ])
 
   const dashboardUser: DashboardUser = {
@@ -61,6 +63,11 @@ async function DashboardShellData() {
     questsRemaining: user.questsRemaining,
     maxCredits: user.maxCredits,
     planLabel: billingSubscription ? `${billingSubscription.plan} / ${billingSubscription.status}` : 'NO ACTIVE PLAN',
+    entitlements: {
+      canUsePaidScans: entitlements.canUsePaidScans,
+      canGenerateAIReplies: entitlements.canGenerateAIReplies,
+      canExportToCRM: entitlements.canExportToCRM,
+    },
   }
 
   const dashboardKeywords: DashboardKeyword[] = keywords
