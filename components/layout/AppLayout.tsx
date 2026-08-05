@@ -23,11 +23,16 @@ import {
   PanelLeftOpen,
   Menu,
   X,
+  Sun,
+  Moon,
   type LucideIcon,
 } from 'lucide-react';
+import clsx from 'clsx';
 
 import LogOutButton from '@/components/auth/LogOutButton';
 import { ThemeToggle } from '@/components/theme/ThemeToggle';
+import { useTheme } from '@/components/theme/ThemeProvider';
+import { THEMES, THEME_META, type Theme } from '@/components/theme/theme-config';
 import { sfx } from '@/lib/sfx';
 
 export interface AppLayoutProps {
@@ -54,7 +59,94 @@ interface NavSection {
   }[];
 }
 
+/** Sidebar-only theme switcher — three labelled swatch buttons under System & Vault. */
+function SidebarThemePicker() {
+  const { theme, setTheme } = useTheme()
+
+  const meta: { key: Theme; label: string; bg: string; ring: string; textClass: string }[] = [
+    {
+      key: 'parchment',
+      label: 'LIGHT',
+      bg: '#E8E0D0',
+      ring: '#B0A090',
+      textClass: 'text-[#4A3F2F]',
+    },
+    {
+      key: 'grey',
+      label: 'GREY',
+      bg: '#2D3340',
+      ring: '#4A5260',
+      textClass: 'text-[#C8D0DC]',
+    },
+    {
+      key: 'blue',
+      label: 'BLUE',
+      bg: '#0F1E45',
+      ring: '#2A4080',
+      textClass: 'text-[#7EB8F0]',
+    },
+  ]
+
+  return (
+    <div className="mt-4 border-t-2 border-outline pt-4">
+      <p className="text-[9px] font-black uppercase tracking-[0.2em] text-ink-muted mb-2 px-0.5 flex items-center gap-1.5">
+        <Sparkles className="size-2.5 text-ink-muted" />
+        Interface Theme
+      </p>
+      <div
+        role="radiogroup"
+        aria-label="Interface theme"
+        className="grid grid-cols-3 gap-1.5"
+      >
+        {meta.map(({ key, label, bg, ring, textClass }) => {
+          const active = theme === key
+          return (
+            <button
+              key={key}
+              type="button"
+              role="radio"
+              aria-checked={active}
+              aria-label={THEME_META[key].label}
+              title={THEME_META[key].label}
+              onClick={() => {
+                if (key !== theme) {
+                  setTheme(key)
+                  sfx.playSidebarCollapse()
+                }
+              }}
+              className={clsx(
+                'relative flex flex-col items-center gap-1.5 py-2 px-1 border-2 font-black text-[9px] uppercase tracking-widest leading-none transition-all duration-150',
+                'active:translate-y-[1px]',
+                active
+                  ? 'shadow-brutal-sm -translate-y-0.5'
+                  : 'opacity-60 hover:opacity-90 hover:-translate-y-0.5',
+              )}
+              style={{
+                backgroundColor: bg,
+                borderColor: active ? ring : 'rgba(0,0,0,0.35)',
+                outline: active ? `2px solid ${ring}` : 'none',
+                outlineOffset: '1px',
+              }}
+            >
+              {/* colour swatch pill */}
+              <span
+                className="block w-full h-3 rounded-sm border border-black/20"
+                style={{ backgroundColor: bg, filter: 'brightness(0.85) saturate(1.1)' }}
+              />
+              <span className={clsx('leading-none', textClass)}>{label}</span>
+              {active && (
+                <span className="absolute -top-1 -right-1 size-2 rounded-full bg-accent border border-outline" />
+              )}
+            </button>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
+
 export function AppLayout({ children, user }: AppLayoutProps) {
+
   const pathname = usePathname();
   const [sfxEnabled, setSfxEnabled] = useState(true);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -133,7 +225,7 @@ export function AppLayout({ children, user }: AppLayoutProps) {
   const allNavItems = navSections.flatMap((s) => s.items);
 
   return (
-    <div className="min-h-screen bg-surface text-ink flex flex-col font-black relative select-none selection:bg-accent selection:text-on-accent">
+    <div className="h-dvh bg-surface text-ink flex flex-col font-black relative select-none selection:bg-accent selection:text-on-accent overflow-hidden overscroll-none">
       
       {/* Authentic Parchment / Commander's Paper Overlay */}
       <div 
@@ -144,170 +236,121 @@ export function AppLayout({ children, user }: AppLayoutProps) {
         }}
       />
 
-      {/* 1. TOP UNIVERSAL HUD */}
-      <header className="sticky top-0 inset-x-0 z-50 w-full max-w-full border-b-4 border-outline bg-card px-3 sm:px-4 py-2 shadow-[0px_4px_0px_0px_rgba(0,0,0,1)] flex items-center justify-between pt-safe">
-        
-        {/* Left: Brand, Toggle & Adventurer Identity */}
-        <div className="flex items-center gap-2.5 sm:gap-4">
+      {/* TOP HUD */}
+      <header className="sticky top-0 inset-x-0 z-50 w-full border-b-4 border-outline bg-card shadow-[0px_4px_0px_0px_rgba(0,0,0,1)] flex items-center justify-between px-3 sm:px-4 h-14 pt-safe">
+
+        {/* LEFT: sidebar toggle + brand + user */}
+        <div className="flex items-center gap-2">
+
+          {/* Mobile hamburger */}
           <button
             type="button"
             onClick={() => setMobileOpen(true)}
             aria-label="Open navigation"
-            className="grid min-h-[44px] min-w-[44px] size-11 shrink-0 place-items-center border-3 border-outline bg-accent shadow-brutal-sm active:translate-x-[1px] active:translate-y-[1px] active:shadow-none md:hidden"
+            className="grid size-10 shrink-0 place-items-center border-2 border-outline bg-accent shadow-brutal-sm active:translate-x-[1px] active:translate-y-[1px] active:shadow-none md:hidden"
           >
-            <Menu className="size-5 text-on-accent" strokeWidth={3} />
+            <Menu className="size-4 text-on-accent" strokeWidth={3} />
           </button>
 
+          {/* Desktop sidebar toggle */}
           <button
             type="button"
             onClick={toggleCollapsed}
-            title={collapsed ? "Expand Sidebar (Cmd+B)" : "Collapse Sidebar (Cmd+B)"}
-            aria-label={collapsed ? "Expand navigation" : "Collapse navigation"}
-            className="hidden md:grid size-10 shrink-0 place-items-center border-3 border-outline bg-accent shadow-brutal-sm hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-brutal active:translate-x-0 active:translate-y-0 active:shadow-none transition-all"
+            title={collapsed ? 'Expand Sidebar (Cmd+B)' : 'Collapse Sidebar (Cmd+B)'}
+            aria-label={collapsed ? 'Expand navigation' : 'Collapse navigation'}
+            className="hidden md:grid size-10 shrink-0 place-items-center border-2 border-outline bg-card shadow-brutal-sm hover:-translate-y-0.5 hover:shadow-brutal active:translate-y-0 active:shadow-none transition-all"
           >
             {collapsed ? (
-              <PanelLeftOpen className="size-5 text-ink" strokeWidth={3} />
+              <PanelLeftOpen className="size-4 text-ink" strokeWidth={3} />
             ) : (
-              <PanelLeftClose className="size-5 text-ink" strokeWidth={3} />
+              <PanelLeftClose className="size-4 text-ink" strokeWidth={3} />
             )}
           </button>
 
+          {/* Brand wordmark */}
           <Link
             href="/dashboard"
-            className="font-black text-lg sm:text-xl md:text-2xl tracking-[0.14em] uppercase border-3 border-outline bg-accent px-2.5 sm:px-3.5 py-1 min-h-[44px] flex items-center shadow-brutal-sm hover:bg-highlight-strong hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-brutal active:translate-x-0 active:translate-y-0 active:shadow-none transition-all gap-1.5"
+            className="font-black text-base sm:text-lg tracking-[0.14em] uppercase border-2 border-outline bg-accent px-3 py-1.5 h-10 flex items-center shadow-brutal-sm hover:bg-highlight-strong hover:-translate-y-0.5 hover:shadow-brutal active:translate-y-0 active:shadow-none transition-all"
           >
-            <span>COQUEST</span>
+            COQUEST
           </Link>
 
-          <div className="hidden sm:flex items-center gap-2 border-3 border-outline bg-card px-3 py-1 shadow-brutal-sm">
-            <div className="grid size-6 place-items-center border-2 border-outline bg-accent">
-              <User className="size-3.5 shrink-0 text-on-accent" strokeWidth={3} />
+          {/* User identity chip — sm+ */}
+          <div className="hidden sm:flex items-center gap-2 border-2 border-outline bg-card px-2.5 h-10 shadow-brutal-sm">
+            <div className="grid size-5 place-items-center border-2 border-outline bg-accent">
+              <User className="size-3 shrink-0 text-on-accent" strokeWidth={3} />
             </div>
-            <span className="font-black text-xs uppercase tracking-wider text-ink">{userName}</span>
-            <span className="bg-black text-[#FFE600] text-[10px] font-black px-2 py-0.5 tracking-widest uppercase border border-outline -rotate-1">
+            <span className="font-black text-[11px] uppercase tracking-wider text-ink">{userName}</span>
+            <span className="bg-black text-[#FFE600] text-[9px] font-black px-1.5 py-0.5 tracking-widest uppercase border border-outline">
               LVL {userLevel}
             </span>
           </div>
         </div>
 
-        {/* Center/Right HUD Cluster: EXP Bar + MP Bar + Quests (Responsive) */}
-        <div className="flex shrink-0 items-center gap-1.5 sm:gap-2.5">
-          
-          {/* MOBILE COMPACT TELEMETRY BADGES (< md) */}
-          <div className="flex items-center gap-1 md:hidden">
-            <Link
-              href="/app/runs"
-              title="12 Active Quests"
-              className="flex items-center gap-1 border-2 border-outline bg-accent-2 text-white px-2 min-h-[38px] text-[10px] font-black uppercase shadow-brutal-sm"
-            >
-              <Scroll className="size-3.5" strokeWidth={3} />
-              <span>12</span>
-            </Link>
+        {/* RIGHT: compact stat pills + actions */}
+        <div className="flex shrink-0 items-center gap-1.5">
 
-            <div className="flex items-center gap-1 border-2 border-outline bg-info text-white px-2 min-h-[38px] text-[10px] font-black uppercase shadow-brutal-sm">
-              <Zap className="size-3.5 text-[#FFE600] animate-pulse" strokeWidth={3} />
-              <span>{currentMp}</span>
-            </div>
+          {/* Quest count */}
+          <Link
+            href="/app/runs"
+            title="Active Quests"
+            className="hidden sm:flex items-center gap-1.5 border-2 border-outline bg-accent-2 text-white px-2.5 h-10 text-[11px] font-black uppercase tracking-wider shadow-brutal-sm hover:-translate-y-0.5 hover:shadow-brutal active:translate-y-0 active:shadow-none transition-all"
+          >
+            <Scroll className="size-3.5 shrink-0" strokeWidth={3} />
+            <span>12 QUESTS</span>
+          </Link>
 
-            <div className="flex items-center gap-1 border-2 border-outline bg-accent text-on-accent px-2 min-h-[38px] text-[10px] font-black uppercase shadow-brutal-sm">
-              <Sparkles className="size-3.5 text-on-accent" strokeWidth={3} />
-              <span>L{userLevel}</span>
-            </div>
+          {/* MP pill */}
+          <div className="hidden sm:flex items-center gap-1.5 border-2 border-outline bg-card px-2.5 h-10 text-[11px] font-black uppercase tracking-wider shadow-brutal-sm">
+            <Zap className="size-3.5 shrink-0 text-[#06B6D4] animate-pulse" strokeWidth={3} />
+            <span className="text-ink">{currentMp}<span className="text-ink-muted">/{maxMp}</span> MP</span>
           </div>
 
-          {/* DESKTOP EXP & MP METERS (md+) */}
-          <div className="hidden items-center gap-3 md:flex">
-            
-            {/* Active Quests Badge */}
-            <Link
-              href="/app/runs"
-              title="View Active Quests"
-              className="flex items-center gap-1.5 border-[3px] border-outline bg-accent-2 text-white px-3 py-1.5 shadow-brutal-sm hover:-translate-y-0.5 transition-transform"
-            >
-              <Scroll className="size-3.5 shrink-0" strokeWidth={3} />
-              <span className="font-mono text-[11px] font-black uppercase tracking-wider">
-                12 QUESTS
-              </span>
-            </Link>
+          {/* Mobile: combined badge */}
+          <Link
+            href="/app/runs"
+            className="flex sm:hidden items-center gap-1 border-2 border-outline bg-accent-2 text-white px-2 h-10 text-[10px] font-black uppercase shadow-brutal-sm"
+          >
+            <Scroll className="size-3.5" strokeWidth={3} />
+            <span>12</span>
+          </Link>
 
-            {/* EXP Progress Meter */}
-            <div className="flex items-center gap-2 border-[3px] border-outline bg-card px-3 py-1.5 shadow-brutal-sm">
-              <div className="flex items-center gap-1">
-                <Sparkles className="size-3.5 text-[#F59E0B]" strokeWidth={3} />
-                <span className="border-2 border-outline bg-accent px-1.5 py-0.2 font-mono text-[9px] font-black uppercase text-on-accent">
-                  LVL {userLevel}
-                </span>
-              </div>
-              <div className="flex items-center gap-0.5">
-                {Array.from({ length: 8 }).map((_, i) => (
-                  <span
-                    key={i}
-                    className={`inline-block h-3 w-1.5 border border-outline ${
-                      i < 5 ? 'bg-accent' : 'bg-inset'
-                    }`}
-                  />
-                ))}
-              </div>
-              <span className="font-mono text-[10px] font-black uppercase tracking-wider text-ink">
-                XP 1,250
-              </span>
-            </div>
+          {/* Thin divider — desktop */}
+          <div className="hidden sm:block w-px h-6 bg-outline mx-0.5" />
 
-            {/* MP Mana Meter */}
-            <div className="flex items-center gap-2 border-[3px] border-outline bg-card px-3 py-1.5 shadow-brutal-sm">
-              <Zap aria-hidden="true" className="size-3.5 shrink-0 text-[#06B6D4] animate-pulse" strokeWidth={3} />
-              <div className="flex items-center gap-0.5">
-                {Array.from({ length: 8 }).map((_, i) => (
-                  <span
-                    key={i}
-                    className={`inline-block h-3 w-1.5 border border-outline ${
-                      i < 6 ? 'bg-info' : 'bg-inset'
-                    }`}
-                  />
-                ))}
-              </div>
-              <span className="font-mono text-[10px] font-black uppercase tracking-wider text-ink">
-                {currentMp}/{maxMp} MP
-              </span>
-            </div>
-          </div>
-
-          <ThemeToggle className="shrink-0 border-[3px]" />
-
-          {/* SFX Toggle */}
+          {/* SFX toggle */}
           <button
             type="button"
             onClick={() => setSfxEnabled((v) => !v)}
             aria-label={sfxEnabled ? 'Mute sound effects' : 'Unmute sound effects'}
-            className="hidden min-h-[44px] min-w-[44px] size-11 place-items-center border-[3px] border-outline bg-card shadow-brutal-sm transition-transform duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-brutal-sm active:translate-x-[2px] active:translate-y-[2px] active:shadow-none xl:grid shrink-0"
+            className="grid size-10 shrink-0 place-items-center border-2 border-outline bg-card shadow-brutal-sm hover:-translate-y-0.5 hover:shadow-brutal active:translate-y-0 active:shadow-none transition-all"
           >
             {sfxEnabled ? (
-              <Volume2 className="size-5 text-ink" strokeWidth={3} />
+              <Volume2 className="size-4 text-ink" strokeWidth={3} />
             ) : (
-              <VolumeX className="size-5 text-ink" strokeWidth={3} />
+              <VolumeX className="size-4 text-ink-muted" strokeWidth={3} />
             )}
           </button>
 
-          {/* Recharge CTA — lands on the Founder offer, not the top of the page */}
+          {/* Recharge CTA */}
           <Link
             href="/billing?offer=founder"
-            className="inline-flex min-h-[44px] shrink-0 items-center gap-1 border-[3px] border-outline bg-accent-2 px-2.5 sm:px-4 py-1 font-black uppercase tracking-wider text-on-accent shadow-brutal-sm transition-transform duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-brutal-sm active:translate-x-[2px] active:translate-y-[2px] active:shadow-none text-xs sm:text-sm"
+            className="flex shrink-0 items-center gap-1.5 border-2 border-outline bg-accent-2 px-3 h-10 font-black uppercase tracking-wider text-white text-[11px] shadow-brutal-sm hover:-translate-y-0.5 hover:shadow-brutal active:translate-y-0 active:shadow-none transition-all"
           >
-            <Zap aria-hidden="true" className="size-4 text-on-accent" strokeWidth={3} />
-            <span className="hidden sm:inline">Recharge</span>
-            <span className="sm:hidden text-xs font-black">+</span>
+            <Zap className="size-3.5 shrink-0" strokeWidth={3} />
+            <span className="hidden sm:inline">RECHARGE</span>
+            <span className="sm:hidden">+</span>
           </Link>
         </div>
       </header>
 
-      {/* 2. MAIN BODY (SIDEBAR + CONTENT AREA) */}
-      <div className="flex flex-1 relative z-10">
+      <div className="flex flex-1 min-h-0 overflow-hidden relative z-10">
         
         {/* DESKTOP SMART COLLAPSIBLE SIDEBAR */}
         <aside
           aria-label="Sidebar navigation"
           role="navigation"
-          className={`border-r-4 border-outline bg-card p-4 hidden md:flex flex-col justify-between shadow-[4px_0px_0px_0px_rgba(0,0,0,1)] sticky top-[61px] h-[calc(100vh-61px)] overflow-y-auto shrink-0 transition-[width,padding] duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+          className={`border-r-4 border-outline bg-card p-4 hidden md:flex flex-col justify-between shadow-[4px_0px_0px_0px_rgba(0,0,0,1)] h-full overflow-y-auto shrink-0 transition-[width,padding] duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${
             collapsed ? "w-20 px-2" : "w-72 px-4"
           }`}
         >
@@ -454,6 +497,9 @@ export function AppLayout({ children, user }: AppLayoutProps) {
                 ))}
               </div>
 
+              {/* ── INTERFACE THEME SWITCHER ── */}
+              <SidebarThemePicker />
+
               {/* Bottom Sidebar Mini-Party Status Card & Log Out */}
               <div className="mt-5 space-y-3 pt-2">
                 <div className="border-3 border-outline bg-success p-3.5 shadow-brutal relative overflow-hidden">
@@ -573,7 +619,7 @@ export function AppLayout({ children, user }: AppLayoutProps) {
         )}
 
         {/* PAGE CONTENT CONTAINER */}
-        <main className="w-full max-w-full overflow-x-clip flex-1 min-w-0 p-3 sm:p-4 md:p-8 pb-24 md:pb-8 box-border">
+        <main className="w-full max-w-full overflow-x-hidden overflow-y-auto overscroll-contain flex-1 min-h-0 min-w-0 p-3 sm:p-4 md:p-8 pb-24 md:pb-8 box-border">
           {children}
         </main>
 

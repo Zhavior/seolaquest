@@ -269,7 +269,7 @@ export default function Sidebar({
       <aside
         aria-label="Sidebar navigation"
         role="navigation"
-        className={`border-r-4 border-outline bg-card p-0 hidden md:flex flex-col justify-between shadow-[4px_0px_0px_0px_rgba(0,0,0,1)] sticky top-[61px] h-[calc(100vh-61px)] overflow-y-auto shrink-0 transition-[width,padding] duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+        className={`border-r-4 border-outline bg-card p-0 hidden md:flex flex-col justify-between shadow-[4px_0px_0px_0px_rgba(0,0,0,1)] h-full overflow-y-auto shrink-0 transition-[width,padding] duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${
           collapsed ? 'w-20' : 'w-72'
         }`}
       >
