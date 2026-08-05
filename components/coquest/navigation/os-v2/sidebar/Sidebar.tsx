@@ -21,6 +21,10 @@ const sections = [
   { key: 'system', label: 'SYSTEM & VAULT' },
 ] as const
 
+/**
+ * Nav body without any positioning chrome. Exported as `SidebarNavigation` so
+ * the mobile shell can render it inside its own off-canvas drawer.
+ */
 function NavigationContent({
   collapsed = false,
   mobile = false,
@@ -222,6 +226,8 @@ function NavigationContent({
     </div>
   )
 }
+
+export { NavigationContent as SidebarNavigation }
 
 export default function Sidebar({
   collapsed = false,

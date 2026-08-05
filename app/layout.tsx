@@ -1,6 +1,6 @@
 import './globals.css'
 import { ClerkProvider } from '@clerk/nextjs'
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import { Inter } from 'next/font/google'
 import { SkipLink } from '@/components/SkipLink'
 
@@ -15,6 +15,14 @@ export const metadata: Metadata = {
   applicationName: 'SEO la Quest',
   title: 'SEO la Quest | Customer Research',
   description: 'A customer research workspace for tracking keywords, running manual source scans, and reviewing matched public posts.',
+}
+
+// `viewport-fit=cover` is what makes env(safe-area-inset-*) resolve to real
+// values on notched devices — the mobile shell's safe padding depends on it.
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  viewportFit: 'cover',
 }
 
 export default function RootLayout({

@@ -4,6 +4,16 @@
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 }
 
+/* Safe-area padding for mobile shell chrome (notch / home indicator).
+   Requires `viewportFit: 'cover'` on the root viewport export. */
+@utility pt-safe {
+  padding-top: env(safe-area-inset-top, 0px);
+}
+
+@utility pb-safe {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
 @layer base {
   html {
     text-rendering: optimizeLegibility;

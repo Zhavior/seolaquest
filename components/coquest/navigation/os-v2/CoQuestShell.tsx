@@ -1,10 +1,13 @@
 'use client'
 
-import { useState, useEffect, type ReactNode } from 'react'
+import { useState, useEffect, useCallback, type ReactNode } from 'react'
+import { Menu } from 'lucide-react'
 
 import CommandPalette from '../os/palette/CommandPalette'
 import ShellLayout from './layout/ShellLayout'
-import Sidebar from './sidebar/Sidebar'
+import MobileAppShell, { MOBILE_NAV_ID } from './mobile/MobileAppShell'
+import MobileBottomNav from './mobile/MobileBottomNav'
+import Sidebar, { SidebarNavigation } from './sidebar/Sidebar'
 import StatusBar from './statusbar/StatusBar'
 import Workspace from './workspace/Workspace'
 
@@ -41,6 +44,9 @@ export default function CoQuestShell({
   })
   const [mobileOpen, setMobileOpen] = useState(false)
 
+  const openMobile = useCallback(() => setMobileOpen(true), [])
+  const closeMobile = useCallback(() => setMobileOpen(false), [])
+
   const toggleCollapsed = () => {
     setCollapsed((prev) => {
       const next = !prev
@@ -69,25 +75,42 @@ export default function CoQuestShell({
     <ShellLayout
       collapsed={collapsed}
       sidebar={
-        <Sidebar
-          user={user}
-          collapsed={collapsed}
-          mobileOpen={mobileOpen}
-          onCloseMobile={() => setMobileOpen(false)}
-          onToggleCollapsed={toggleCollapsed}
-        />
+        // Desktop rail only — the mobile drawer is owned by MobileAppShell.
+        <Sidebar user={user} collapsed={collapsed} onToggleCollapsed={toggleCollapsed} />
       }
       statusBar={
         <StatusBar
           user={user}
           collapsed={collapsed}
-          onOpenNavigation={() => setMobileOpen(true)}
+          onOpenNavigation={openMobile}
           onToggleCollapsed={toggleCollapsed}
         />
       }
     >
       <CommandPalette />
-      <Workspace>{children}</Workspace>
+      <MobileAppShell
+        mobileOpen={mobileOpen}
+        onCloseMobile={closeMobile}
+        sidebar={<SidebarNavigation mobile onNavigate={closeMobile} />}
+        header={
+          <div className="flex items-center gap-3 py-2">
+            <button
+              type="button"
+              onClick={openMobile}
+              aria-label="Open navigation"
+              aria-controls={MOBILE_NAV_ID}
+              aria-expanded={mobileOpen}
+              className="grid size-9 shrink-0 place-items-center border-3 border-black bg-[#FFE600] shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none"
+            >
+              <Menu className="size-5 text-black" strokeWidth={3} />
+            </button>
+            <span className="text-xs font-black uppercase tracking-[0.2em]">Command Compass</span>
+          </div>
+        }
+        bottomBar={<MobileBottomNav mobileOpen={mobileOpen} onOpenNavigation={openMobile} />}
+      >
+        <Workspace>{children}</Workspace>
+      </MobileAppShell>
     </ShellLayout>
   )
 }
