@@ -47,6 +47,14 @@ describe('OnboardingForm', () => {
     mocks.complete.mockResolvedValue({
       ok: true,
       keyword: { id: 'kw/id stable', phrase: 'need a website' },
+      reward: {
+        xpAwarded: 50,
+        xp: 50,
+        level: 1,
+        xpRequired: 100,
+        didLevelUp: false,
+        sampleQuestsSeeded: 3,
+      },
     })
   })
 
@@ -87,7 +95,11 @@ describe('OnboardingForm', () => {
     expect(screen.getByText(/preview — saved setup, not live results/i)).toBeVisible()
 
     await user.click(screen.getByRole('button', { name: /complete setup/i }))
-    await waitFor(() => expect(mocks.push).toHaveBeenCalledWith('/app?keywordId=kw%2Fid%20stable'))
+    await waitFor(() =>
+      expect(mocks.push).toHaveBeenCalledWith(
+        '/app?keywordId=kw%2Fid+stable&questComplete=first-quest&xp=50&samples=3',
+      ),
+    )
   })
 
   it('offers a safe sign-in return link if the session expires', async () => {

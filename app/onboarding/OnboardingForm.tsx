@@ -205,7 +205,17 @@ export default function OnboardingForm({ initialDraft }: Props) {
       const result = await completeOnboardingAction()
       if (!result.ok) return handleFailure(result)
 
-      router.push(`/app?keywordId=${encodeURIComponent(result.keyword.id)}`)
+      // The reward is already committed server-side; these params only tell the
+      // dashboard which celebration to show on arrival.
+      const celebration = new URLSearchParams({
+        keywordId: result.keyword.id,
+        questComplete: 'first-quest',
+        xp: String(result.reward.xpAwarded),
+        samples: String(result.reward.sampleQuestsSeeded),
+      })
+      if (result.reward.didLevelUp) celebration.set('levelUp', String(result.reward.level))
+
+      router.push(`/app?${celebration.toString()}`)
       router.refresh()
     })
   }

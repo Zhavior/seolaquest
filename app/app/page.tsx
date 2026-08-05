@@ -8,6 +8,7 @@ import prisma from '@/lib/prisma'
 import { EntitlementService } from '@/src/modules/billing/application/EntitlementService'
 
 const DashboardClient = nextDynamic(() => import('@/features/dashboard/components/DashboardClient'))
+const FirstQuestBanner = nextDynamic(() => import('@/features/dashboard/components/FirstQuestBanner'))
 
 export const dynamic = 'force-dynamic'
 
@@ -77,13 +78,16 @@ async function DashboardShellData() {
   }))
 
   return (
-    <DashboardClient
-      key="dashboard-shell"
-      dbUser={dashboardUser}
-      dbKeywords={dashboardKeywords}
-      dbLeads={dashboardLeads}
-      dbAnalytics={[]}
-      dbLeaderboard={[]}
-    />
+    <>
+      <FirstQuestBanner />
+      <DashboardClient
+        key="dashboard-shell"
+        dbUser={dashboardUser}
+        dbKeywords={dashboardKeywords}
+        dbLeads={dashboardLeads}
+        dbAnalytics={[]}
+        dbLeaderboard={[]}
+      />
+    </>
   )
 }

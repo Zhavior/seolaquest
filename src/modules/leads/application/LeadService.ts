@@ -8,6 +8,10 @@ import {
   normalizeCrmWebhookUrl,
   UnsafeCrmWebhookUrlError,
 } from '@/src/modules/core/security/crmWebhookUrl'
+import {
+  applyXpGain,
+  XP_PER_CLAIMED_QUEST,
+} from '@/src/modules/progression/domain/progression'
 import { CrmDeliveryService } from './CrmDeliveryService'
 import { z } from 'zod'
 
@@ -18,13 +22,7 @@ const openAiReplySchema = z.object({
 })
 
 function levelAfterClaim(user: { xp: number; level: number; xpRequired: number }) {
-  let { xp, level, xpRequired } = user
-  xp += 10
-  if (xp >= xpRequired) {
-    level += 1
-    xp -= xpRequired
-    xpRequired = Math.floor(xpRequired * 1.5)
-  }
+  const { xp, level, xpRequired } = applyXpGain(user, XP_PER_CLAIMED_QUEST)
   return { xp, level, xpRequired }
 }
 

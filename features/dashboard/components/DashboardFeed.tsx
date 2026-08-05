@@ -16,8 +16,10 @@ import {
   X,
   RefreshCw,
   ExternalLink,
+  GraduationCap,
   SlidersHorizontal,
 } from 'lucide-react'
+import { isSampleQuest, SAMPLE_QUEST_PLATFORM } from '@/src/modules/onboarding/domain/sampleQuests'
 import type { DashboardLead } from '@/features/dashboard/types'
 import { XTwitterIcon, RedditIcon } from '@/components/PlatformIcons'
 
@@ -66,6 +68,16 @@ const tierStyles: Record<LootTier, { label: string; wrap: string; badge: string;
 
 function getPlatformTone(platform: string) {
   const normalized = platform.toUpperCase()
+
+  // Seeded tutorial rows get their own chip. They must never be mistaken for a
+  // real source, so this is checked before the platform matchers below.
+  if (normalized === SAMPLE_QUEST_PLATFORM) {
+    return {
+      label: 'TUTORIAL SAMPLE',
+      icon: <GraduationCap className="h-4 w-4 text-black" />,
+      chip: 'bg-[#FDE68A] text-black',
+    }
+  }
 
   if (normalized.includes('REDDIT')) {
     return {
@@ -510,7 +522,7 @@ function DashboardFeedComponent({
                         rel="noopener noreferrer"
                         className="inline-flex items-center gap-2 text-xs font-black uppercase text-black underline-offset-4 transition hover:underline"
                       >
-                        Inspect source thread
+                        {isSampleQuest(lead) ? 'Add a real keyword' : 'Inspect source thread'}
                         <ChevronRight className="h-4 w-4" />
                       </a>
 
@@ -663,7 +675,9 @@ function DashboardFeedComponent({
                     rel="noopener noreferrer"
                     className="flex items-center justify-between border-2 border-black bg-white p-3 text-xs font-black uppercase shadow-[2px_2px_0_0_#000] hover:bg-[#FFE600]"
                   >
-                    <span>Inspect source thread</span>
+                    <span>
+                      {isSampleQuest(activeDetailLead) ? 'Add a real keyword' : 'Inspect source thread'}
+                    </span>
                     <ExternalLink className="h-4 w-4" />
                   </a>
 
