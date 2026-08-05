@@ -10,7 +10,7 @@
 export type KeywordPreset = {
   id: string
   name: string
-  emoji: string
+  code: string
   /** Dropped straight into the keyword field. */
   phrase: string
   /**
@@ -26,14 +26,14 @@ export const KEYWORD_PRESETS: KeywordPreset[] = [
   {
     id: 'recommendation-blade',
     name: 'Recommendation Blade',
-    emoji: '⚔️',
+    code: '[SWRD]',
     phrase: 'can anyone recommend',
     hint: 'People asking their network for a referral right now.',
   },
   {
     id: 'alternative-arrow',
     name: 'Alternative Arrow',
-    emoji: '🏹',
+    code: '[TGT]',
     phrase: 'alternative to ',
     needsCompletion: true,
     hint: 'Add a competitor. Finds people already shopping for a replacement.',
@@ -41,28 +41,28 @@ export const KEYWORD_PRESETS: KeywordPreset[] = [
   {
     id: 'frustration-hammer',
     name: 'Frustration Hammer',
-    emoji: '🔨',
+    code: '[HMR]',
     phrase: 'frustrated with',
     hint: 'People venting about a tool they still pay for.',
   },
   {
     id: 'switching-shield',
     name: 'Switching Shield',
-    emoji: '🛡️',
+    code: '[SHD]',
     phrase: 'thinking of switching',
     hint: 'People mid-decision, before they have committed.',
   },
   {
     id: 'budget-orb',
     name: 'Budget Orb',
-    emoji: '🔮',
+    code: '[ORB]',
     phrase: 'is it worth the money',
     hint: 'People weighing a purchase out loud.',
   },
   {
     id: 'hiring-dagger',
     name: 'Hiring Dagger',
-    emoji: '🗡️',
+    code: '[DGR]',
     phrase: 'looking to hire',
     hint: 'Teams that already have budget approved.',
   },

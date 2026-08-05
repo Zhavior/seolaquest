@@ -7,14 +7,27 @@ import { SignOutButton } from '@clerk/nextjs'
 import {
   ArrowLeft,
   ArrowRight,
+  Bot,
+  Briefcase,
   Check,
+  Coins,
+  Crown,
+  Flame,
+  Hammer,
+  LayoutGrid,
+  Rocket,
   ScrollText,
   Search,
+  Shield,
   ShieldCheck,
   Sparkles,
+  Star,
   Swords,
+  Target,
+  Trophy,
   Volume2,
   VolumeX,
+  Zap,
 } from 'lucide-react'
 import {
   completeOnboardingAction,
@@ -48,6 +61,56 @@ type Props = {
   initialDraft: OnboardingDraft
 }
 
+// RPG Sigil Class Specs for Gamified Selector
+const SIGIL_CLASS_SPECS: Record<string, { title: string; perk: string; color: string }> = {
+  target: { title: 'Sharpshooter', perk: '+15% Intent Focus', color: 'bg-[#FDE68A]' },
+  star: { title: 'Stargazer', perk: '+10% Discovery Rate', color: 'bg-[#FEF08A]' },
+  rocket: { title: 'Vanguard', perk: '+20% Speed Scan', color: 'bg-[#BAE6FD]' },
+  lightning: { title: 'Stormbringer', perk: '+25% Signal Burst', color: 'bg-[#FEF08A]' },
+  crystalBall: { title: 'Oracle', perk: '+15% Prediction Power', color: 'bg-[#DDD6FE]' },
+  shield: { title: 'Guardian', perk: '+10% Lead Defense', color: 'bg-[#BBF7D0]' },
+  crown: { title: 'Sovereign', perk: '+30% Guild Authority', color: 'bg-[#FDE68A]' },
+  fire: { title: 'Pyromancer', perk: '+20% Hot Signal Tracking', color: 'bg-[#FECACA]' },
+  sword: { title: 'Blade Master', perk: '+25% Strike Accuracy', color: 'bg-[#E9D5FF]' },
+  robot: { title: 'Cyber Scout', perk: '+20% Auto Automation', color: 'bg-[#CFFAFE]' },
+}
+
+// RPG Weapon Presets Rarity Mapping
+const WEAPON_RARITY: Record<string, { label: string; bg: string; text: string }> = {
+  'rec-blade': { label: 'RARE [II]', bg: 'bg-blue-100', text: 'text-blue-800' },
+  'comp-spear': { label: 'EPIC [III]', bg: 'bg-purple-100', text: 'text-purple-800' },
+  'budget-orb': { label: 'UNCOMMON [I]', bg: 'bg-emerald-100', text: 'text-emerald-800' },
+  'direct-bow': { label: 'LEGENDARY [MAX]', bg: 'bg-amber-100', text: 'text-amber-800' },
+}
+
+function getProfileIconComponent(key: ProfileIconKey) {
+  switch (key) {
+    case 'rocket': return Rocket
+    case 'target': return Target
+    case 'lightning': return Zap
+    case 'crystalBall': return Sparkles
+    case 'shield': return Shield
+    case 'crown': return Crown
+    case 'fire': return Flame
+    case 'sword': return Swords
+    case 'star': return Star
+    case 'robot': return Bot
+    default: return Target
+  }
+}
+
+function getPresetIconComponent(presetId: string) {
+  switch (presetId) {
+    case 'recommendation-blade': return Swords
+    case 'alternative-arrow': return Target
+    case 'frustration-hammer': return Hammer
+    case 'switching-shield': return ShieldCheck
+    case 'budget-orb': return Coins
+    case 'hiring-dagger': return Briefcase
+    default: return Swords
+  }
+}
+
 export default function OnboardingForm({ initialDraft }: Props) {
   const router = useRouter()
   const [step, setStep] = useState(() => clampOnboardingStep(initialDraft.onboardingStep))
@@ -63,11 +126,13 @@ export default function OnboardingForm({ initialDraft }: Props) {
       ? (initialDraft.preferredSource as PreferredSource)
       : DEFAULT_PREFERRED_SOURCE,
   )
+
   const [error, setError] = useState('')
   const [signedOut, setSignedOut] = useState(false)
   const [soundOn, setSoundOn] = useState(true)
   const [celebrating, setCelebrating] = useState(false)
   const [pending, startTransition] = useTransition()
+
   const stepHeadingRef = useRef<HTMLHeadingElement>(null)
   const keywordInputRef = useRef<HTMLInputElement>(null)
 
@@ -85,15 +150,54 @@ export default function OnboardingForm({ initialDraft }: Props) {
     [profileIconKey],
   )
 
+  const currentClassSpec = SIGIL_CLASS_SPECS[profileIconKey] ?? SIGIL_CLASS_SPECS.target
+
   useEffect(() => {
     stepHeadingRef.current?.focus({ preventScroll: true })
   }, [step])
 
-  // The toggle mirrors the shared player preference, so muting here stays muted
-  // in the app shell rather than resetting at the end of setup.
   useEffect(() => {
     setSoundOn(sfx.isEnabled())
+
+    // Rehydrate local draft fallback if initial state has empty fields
+    if (typeof window !== 'undefined') {
+      try {
+        const raw = localStorage.getItem('seolaquest_onboarding_draft')
+        if (raw) {
+          const saved = JSON.parse(raw)
+          if (saved.displayName && !initialDraft.displayName) setDisplayName(saved.displayName)
+          if (saved.profileIconKey && !initialDraft.profileIconKey) setProfileIconKey(saved.profileIconKey)
+          if (saved.businessDescription && !initialDraft.businessDescription) setBusinessDescription(saved.businessDescription)
+          if (saved.targetCustomer && !initialDraft.targetCustomer) setTargetCustomer(saved.targetCustomer)
+          if (saved.firstKeyword && !initialDraft.firstKeyword) setFirstKeyword(saved.firstKeyword)
+          if (saved.preferredSource && !initialDraft.preferredSource) setPreferredSource(saved.preferredSource)
+        }
+      } catch {
+        // Ignore storage errors
+      }
+    }
   }, [])
+
+  // Auto-save draft inputs to localStorage
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    try {
+      localStorage.setItem(
+        'seolaquest_onboarding_draft',
+        JSON.stringify({
+          displayName,
+          profileIconKey,
+          businessDescription,
+          targetCustomer,
+          firstKeyword,
+          preferredSource,
+          step,
+        }),
+      )
+    } catch {
+      // Ignore storage errors
+    }
+  }, [displayName, profileIconKey, businessDescription, targetCustomer, firstKeyword, preferredSource, step])
 
   function toggleSound() {
     const next = sfx.toggle()
@@ -142,7 +246,7 @@ export default function OnboardingForm({ initialDraft }: Props) {
   function currentInput(): SaveOnboardingStepInput | null {
     if (step === 1) {
       return {
-        step,
+        step: 1,
         value: {
           displayName: normalizedDisplayName,
           profileIconKey,
@@ -150,10 +254,10 @@ export default function OnboardingForm({ initialDraft }: Props) {
       }
     }
 
-    if (step === 2) return { step, value: normalizedBusinessDescription }
-    if (step === 3) return { step, value: normalizedTargetCustomer }
-    if (step === 4) return { step, value: normalizedFirstKeyword }
-    if (step === 5) return { step, value: preferredSource }
+    if (step === 2) return { step: 2, value: normalizedBusinessDescription }
+    if (step === 3) return { step: 3, value: normalizedTargetCustomer }
+    if (step === 4) return { step: 4, value: normalizedFirstKeyword }
+    if (step === 5) return { step: 5, value: preferredSource }
 
     return null
   }
@@ -174,8 +278,6 @@ export default function OnboardingForm({ initialDraft }: Props) {
     setFirstKeyword(preset.phrase)
     setError('')
 
-    // A stem like "alternative to " is only half a weapon. Put the caret where
-    // the hunter has to keep typing instead of making them find it.
     if (preset.needsCompletion) {
       requestAnimationFrame(() => {
         const input = keywordInputRef.current
@@ -221,6 +323,7 @@ export default function OnboardingForm({ initialDraft }: Props) {
       if (skippedStep === 2) setBusinessDescription('')
       if (skippedStep === 3) setTargetCustomer('')
 
+      sfx.playCoinDrop()
       setStep(result.nextStep)
     })
   }
@@ -232,8 +335,6 @@ export default function OnboardingForm({ initialDraft }: Props) {
       const result = await completeOnboardingAction()
       if (!result.ok) return handleFailure(result)
 
-      // Celebrate before leaving. The reward is already committed server-side;
-      // this only gives the moment somewhere to land instead of a bare redirect.
       sfx.playLevelUp()
       setCelebrating(true)
 
@@ -251,21 +352,33 @@ export default function OnboardingForm({ initialDraft }: Props) {
   }
 
   return (
-    <div className="min-h-screen bg-[#F4F0EA] px-4 py-6 sm:px-6 sm:py-10">
-      <header className="mx-auto mb-6 flex w-full max-w-3xl items-center justify-between gap-3">
+    <div className="h-screen max-h-screen overflow-hidden bg-[#F4F0EA] px-3 py-3 sm:px-6 flex flex-col justify-between text-black font-sans selection:bg-[#A3E635] selection:text-black">
+      {/* Top Header */}
+      <header className="mx-auto flex w-full max-w-6xl items-center justify-between gap-3 shrink-0 py-1">
         <Link
           href="/"
-          className="inline-flex min-h-11 items-center text-xl font-black uppercase tracking-widest underline-offset-4 hover:underline focus-visible:outline-4 focus-visible:outline-offset-4"
+          className="inline-flex min-h-11 items-center gap-2 text-xl font-black uppercase tracking-widest underline-offset-4 hover:underline focus-visible:outline-4 focus-visible:outline-offset-4 text-black"
         >
-          CoQuest
+          <Crown className="h-6 w-6 text-[#EAB308]" />
+          <span>SEO La Quest</span>
+          <span className="border-2 border-black bg-[#FFE600] px-1.5 py-0.5 text-[10px] font-black uppercase shadow-[2px_2px_0_0_#000]">
+            BETA
+          </span>
         </Link>
 
         <div className="flex items-center gap-2">
+          {/* Level & XP Gauge Badge */}
+          <div className="hidden sm:inline-flex items-center gap-2 border-3 border-black bg-[#FFE600] px-3 py-1.5 text-xs font-black uppercase shadow-[3px_3px_0_0_#000]">
+            <Trophy className="h-4 w-4 text-black" />
+            <span>Hunter Lvl 1</span>
+            <span className="border-l-2 border-black pl-2 text-gray-800">0 / 100 XP</span>
+          </div>
+
           <button
             type="button"
             onClick={toggleSound}
             aria-pressed={soundOn}
-            className="inline-flex min-h-11 items-center gap-2 border-3 border-black bg-white px-3 py-2 text-sm font-black uppercase shadow-[3px_3px_0_0_#000] focus-visible:outline-4 focus-visible:outline-offset-4"
+            className="inline-flex min-h-11 items-center gap-2 border-3 border-black bg-white px-3 py-1.5 text-xs font-black uppercase shadow-[3px_3px_0_0_#000] focus-visible:outline-4 focus-visible:outline-offset-4 text-black"
           >
             {soundOn ? <Volume2 aria-hidden size={16} /> : <VolumeX aria-hidden size={16} />}
             <span className="hidden sm:inline">{soundOn ? 'Sound on' : 'Sound off'}</span>
@@ -274,7 +387,7 @@ export default function OnboardingForm({ initialDraft }: Props) {
           <SignOutButton redirectUrl="/">
             <button
               type="button"
-              className="min-h-11 border-3 border-black bg-white px-3 py-2 text-sm font-black uppercase shadow-[3px_3px_0_0_#000] focus-visible:outline-4 focus-visible:outline-offset-4"
+              className="min-h-11 border-3 border-black bg-white px-3 py-1.5 text-xs font-black uppercase shadow-[3px_3px_0_0_#000] focus-visible:outline-4 focus-visible:outline-offset-4 text-black"
             >
               Sign out
             </button>
@@ -282,316 +395,216 @@ export default function OnboardingForm({ initialDraft }: Props) {
         </div>
       </header>
 
-      <main className="mx-auto w-full max-w-3xl border-4 border-black bg-white p-5 shadow-[8px_8px_0_0_#000] sm:p-8">
-        <div className="flex flex-wrap items-start justify-between gap-3">
-          <div className="inline-flex items-center gap-2 border-3 border-black bg-[#A3E635] px-3 py-2 text-sm font-black uppercase shadow-[3px_3px_0_0_#000]">
-            <ScrollText aria-hidden size={18} /> Level 1 quest
+      {/* Main Single-Screen Gamified Card */}
+      <main className="mx-auto w-full max-w-6xl flex-1 min-h-0 flex flex-col justify-between border-4 border-black bg-white p-4 shadow-[8px_8px_0_0_#000] overflow-hidden">
+        {/* Quest Title & Gamified Badges */}
+        <div className="shrink-0">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <div className="flex items-center gap-2">
+              <span className="inline-flex items-center gap-1.5 border-3 border-black bg-[#A3E635] px-2.5 py-1 text-xs font-black uppercase shadow-[2px_2px_0_0_#000]">
+                <ScrollText aria-hidden size={16} /> Level 1 quest
+              </span>
+              <span className="inline-flex items-center gap-1.5 border-3 border-black bg-[#FFE600] px-2.5 py-1 text-xs font-black uppercase shadow-[2px_2px_0_0_#000] animate-pulse">
+                <Sparkles aria-hidden size={16} /> Bounty Reward +{QUEST_XP_REWARD} XP
+              </span>
+            </div>
+
+            <span className="inline-flex items-center gap-1 border-2 border-black bg-[#FDE68A] px-2 py-0.5 text-xs font-black uppercase shadow-[2px_2px_0_0_#000]">
+              <Flame size={14} className="text-amber-600" /> Stage {step} of {LAST_ONBOARDING_STEP}
+            </span>
           </div>
 
-          <div className="inline-flex items-center gap-2 border-3 border-black bg-[#FFE600] px-3 py-2 text-sm font-black uppercase shadow-[3px_3px_0_0_#000]">
-            <Sparkles aria-hidden size={18} /> Reward +{QUEST_XP_REWARD} XP
-          </div>
+          <h1 className="mt-1.5 text-2xl font-black uppercase sm:text-3xl tracking-tight text-black flex items-center gap-2">
+            <Swords className="h-6 w-6 text-[#EAB308]" />
+            {QUEST_TITLE}
+          </h1>
+          <p className="mt-0.5 max-w-3xl text-xs font-bold text-gray-700">
+            Six objectives. Each stage saves automatically when cleared, so you can resume anytime.
+          </p>
+
+          <QuestLog
+            step={step}
+            progress={questProgress}
+            onSelectStep={(s) => {
+              setStep(s)
+              sfx.playHoverBlip()
+            }}
+          />
         </div>
 
-        <h1 className="mt-5 text-3xl font-black uppercase sm:text-4xl">{QUEST_TITLE}</h1>
+        {/* Global Error Notice */}
+        {error ? (
+          <p
+            id="onboarding-error"
+            className="mt-2 border-3 border-black bg-[#FCA5A5] p-2 text-xs font-black shrink-0 text-black shadow-[2px_2px_0_0_#000]"
+            role="alert"
+          >
+            ⚠️ {error}
+          </p>
+        ) : null}
 
-        <p className="mt-2 max-w-2xl font-bold text-gray-700">
-          Six objectives. Each one is saved the moment you clear it, so you can close this page and
-          pick the quest back up later.
-        </p>
+        {signedOut ? (
+          <Link
+            href="/sign-in?redirect_url=%2Fonboarding"
+            className="mt-2 block border-3 border-black bg-[#FDE68A] p-2 text-xs font-black underline hover:bg-[#FCD34D] shrink-0 text-black shadow-[2px_2px_0_0_#000]"
+          >
+            Your session ended. Sign in to resume your saved setup.
+          </Link>
+        ) : null}
 
-        <QuestLog step={step} progress={questProgress} />
+        {/* Main Stage Grid (Form + RPG Adventurer Card) */}
+        <form className="mt-2 flex-1 min-h-0 flex flex-col justify-between overflow-hidden" onSubmit={submit}>
+          <div className="grid grid-cols-1 gap-4 lg:grid-cols-12 flex-1 min-h-0 items-stretch overflow-hidden">
+            {/* Form Stage Panel (8 Cols) */}
+            <div className="lg:col-span-8 flex flex-col justify-between min-h-0 overflow-hidden">
+              <div className="flex-1 min-h-0 overflow-y-auto">
+                {step === 1 && (
+                  <StepPanel focusRef={stepHeadingRef} objective={currentObjective}>
+                    <GuildRegistryStation
+                      displayName={displayName}
+                      setDisplayName={setDisplayName}
+                      profileIconKey={profileIconKey}
+                      setProfileIconKey={setProfileIconKey}
+                      classSpec={currentClassSpec}
+                      error={error}
+                    />
+                  </StepPanel>
+                )}
 
-        <form className="mt-6" onSubmit={submit}>
-          {error ? (
-            <p
-              id="onboarding-error"
-              className="mb-4 border-3 border-black bg-[#FCA5A5] p-3 font-black"
-              role="alert"
-            >
-              {error}
-            </p>
-          ) : null}
+                {step === 2 && (
+                  <StepPanel focusRef={stepHeadingRef} objective={currentObjective}>
+                    <TradeLicenseStation
+                      businessDescription={businessDescription}
+                      setBusinessDescription={setBusinessDescription}
+                      onSkip={skipCurrentStep}
+                      error={error}
+                    />
+                  </StepPanel>
+                )}
 
-          {signedOut ? (
-            <Link
-              href="/sign-in?redirect_url=%2Fonboarding"
-              className="mb-4 block border-3 border-black bg-[#FDE68A] p-3 font-black underline hover:bg-[#FCD34D]"
-            >
-              Your session ended. Sign in to resume your saved setup.
-            </Link>
-          ) : null}
+                {step === 3 && (
+                  <StepPanel focusRef={stepHeadingRef} objective={currentObjective}>
+                    <QuarryBountyStation
+                      targetCustomer={targetCustomer}
+                      setTargetCustomer={setTargetCustomer}
+                      onSkip={skipCurrentStep}
+                      error={error}
+                    />
+                  </StepPanel>
+                )}
 
-          {step === 1 && (
-            <StepPanel focusRef={stepHeadingRef} objective={currentObjective}>
-              <div className="grid gap-5 sm:grid-cols-[1.1fr_0.9fr]">
+                {step === 4 && (
+                  <StepPanel focusRef={stepHeadingRef} objective={currentObjective}>
+                    <WeaponArmoryStation
+                      firstKeyword={firstKeyword}
+                      setFirstKeyword={setFirstKeyword}
+                      equipPreset={equipPreset}
+                      keywordInputRef={keywordInputRef}
+                      error={error}
+                    />
+                  </StepPanel>
+                )}
+
+                {step === 5 && (
+                  <StepPanel focusRef={stepHeadingRef} objective={currentObjective}>
+                    <HuntingRealmStation
+                      preferredSource={preferredSource}
+                      setPreferredSource={setPreferredSource}
+                      firstKeyword={firstKeyword}
+                    />
+                  </StepPanel>
+                )}
+
+                {step === 6 && (
+                  <StepPanel focusRef={stepHeadingRef} objective={currentObjective}>
+                    <ContractReviewStation
+                      displayName={normalizedDisplayName}
+                      selectedIcon={selectedIcon}
+                      classSpec={currentClassSpec}
+                      businessDescription={normalizedBusinessDescription}
+                      targetCustomer={normalizedTargetCustomer}
+                      preferredSource={preferredSource}
+                      firstKeyword={normalizedFirstKeyword}
+                    />
+                  </StepPanel>
+                )}
+              </div>
+            </div>
+
+            {/* RPG Hunter Card Sidebar (4 Cols) */}
+            <aside className="lg:col-span-4 flex flex-col justify-between shrink-0">
+              <div className="border-3 border-black bg-[#F4F0EA] p-3.5 shadow-[4px_4px_0_0_#000] h-full flex flex-col justify-between relative">
                 <div>
-                  <label htmlFor="display-name" className="block font-black uppercase">
-                    Display name
-                  </label>
-
-                  <input
-                    id="display-name"
-                    name="displayName"
-                    autoComplete="name"
-                    required
-                    maxLength={60}
-                    aria-invalid={Boolean(error)}
-                    aria-describedby={error ? 'onboarding-error' : undefined}
-                    value={displayName}
-                    onChange={(event) => setDisplayName(event.target.value)}
-                    className="mt-2 w-full border-3 border-black bg-[#F4F0EA] p-3 text-base font-bold focus-visible:outline-4 focus-visible:outline-offset-2"
-                    placeholder="Signal Sage"
-                  />
-
-                  <p className="mt-4 text-xs font-black uppercase">Choose your sigil</p>
-
-                  <div className="mt-2 grid grid-cols-2 gap-3 sm:grid-cols-3">
-                    {PROFILE_ICON_OPTIONS.map((option) => {
-                      const active = option.key === profileIconKey
-
-                      return (
-                        <button
-                          key={option.key}
-                          type="button"
-                          onClick={() => {
-                            sfx.playHoverBlip()
-                            setProfileIconKey(option.key)
-                            setError('')
-                          }}
-                          aria-pressed={active}
-                          className={[
-                            'border-3 p-3 text-left transition',
-                            active
-                              ? 'border-black bg-[#A3E635] shadow-[4px_4px_0_0_#000]'
-                              : 'border-black bg-white hover:bg-[#F4F0EA]',
-                          ].join(' ')}
-                        >
-                          <div className="text-3xl">{option.emoji}</div>
-                          <div className="mt-2 text-xs font-black uppercase">{option.label}</div>
-                        </button>
-                      )
-                    })}
+                  <div className="flex items-center justify-between border-b-2 border-black pb-1.5 mb-2">
+                    <p className="text-[11px] font-black uppercase text-gray-800 flex items-center gap-1">
+                      <ShieldCheck size={14} className="text-[#EAB308]" /> Adventurer Seal
+                    </p>
+                    <span className="border-2 border-black bg-[#A3E635] px-1.5 py-0.5 text-[9px] font-black uppercase">
+                      RANK 1
+                    </span>
                   </div>
+
+                  {/* Character Avatar Box */}
+                  <div className="mt-2 flex items-center gap-3 border-3 border-black bg-white p-2.5 shadow-[2px_2px_0_0_#000]">
+                    {(() => {
+                      const IconComp = getProfileIconComponent(profileIconKey)
+                      return (
+                        <div className="flex h-12 w-12 items-center justify-center border-3 border-black bg-[#FDE68A] text-black shrink-0">
+                          <IconComp className="h-6 w-6 stroke-[2.5]" />
+                        </div>
+                      )
+                    })()}
+
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-1.5">
+                        <p className="break-words font-black uppercase truncate text-sm text-black">
+                          {normalizedDisplayName || 'Your Hunter'}
+                        </p>
+                        <span className="text-[9px] font-mono font-black bg-black text-white px-1 py-0.2">
+                          {selectedIcon.code}
+                        </span>
+                      </div>
+                      <p className="text-[11px] font-black text-amber-700">
+                        {currentClassSpec.title}
+                      </p>
+                      <span className="inline-block mt-0.5 rounded bg-amber-100 border border-amber-300 px-1 py-0.2 text-[9px] font-bold text-amber-900">
+                        {currentClassSpec.perk}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Character Stats & Equipment */}
+                  <dl className="mt-3 space-y-1.5 border-t-2 border-black pt-2 text-xs">
+                    <div className="flex justify-between gap-2">
+                      <dt className="font-black uppercase text-gray-600">Trade Domain:</dt>
+                      <dd className="font-bold truncate max-w-[130px] text-right text-black">{normalizedBusinessDescription || 'Skipped'}</dd>
+                    </div>
+                    <div className="flex justify-between gap-2">
+                      <dt className="font-black uppercase text-gray-600">Quarry Prey:</dt>
+                      <dd className="font-bold truncate max-w-[130px] text-right text-black">{normalizedTargetCustomer || 'Skipped'}</dd>
+                    </div>
+                    <div className="flex justify-between gap-2">
+                      <dt className="font-black uppercase text-gray-600">Equipped Weapon:</dt>
+                      <dd className="font-bold truncate max-w-[130px] text-right text-emerald-800">{normalizedFirstKeyword || 'Unarmed'}</dd>
+                    </div>
+                    <div className="flex justify-between gap-2">
+                      <dt className="font-black uppercase text-gray-600">Hunting Realm:</dt>
+                      <dd className="font-bold text-right text-black">{preferredSource === 'X' ? 'X (Live Feed)' : 'Reddit (Locked)'}</dd>
+                    </div>
+                  </dl>
                 </div>
 
-                <div className="border-3 border-black bg-[#F4F0EA] p-4">
-                  <p className="text-xs font-black uppercase text-gray-600">Hunter card</p>
-
-                  <div className="mt-3 flex items-center gap-3 border-3 border-black bg-white p-3">
-                    <div className="flex h-14 w-14 items-center justify-center border-3 border-black bg-[#FDE68A] text-3xl">
-                      {selectedIcon.emoji}
-                    </div>
-
-                    <div>
-                      <p className="break-words font-black uppercase">
-                        {normalizedDisplayName || 'Your hunter'}
-                      </p>
-                      <p className="text-sm font-bold text-gray-600">Level 1 · {selectedIcon.label}</p>
-                    </div>
-                  </div>
-
-                  <p className="mt-4 text-sm font-bold text-gray-700">
-                    This is your workspace identity. Richer avatars can be unlocked later.
+                <div className="mt-3 border-t-2 border-black pt-2 bg-amber-100/60 p-2 border-2 border-amber-400 text-center">
+                  <p className="text-[10px] font-black uppercase text-amber-900 flex items-center justify-center gap-1">
+                    <Coins size={12} /> Claim Payout +{QUEST_XP_REWARD} XP
                   </p>
                 </div>
               </div>
-            </StepPanel>
-          )}
+            </aside>
+          </div>
 
-          {step === 2 && (
-            <StepPanel focusRef={stepHeadingRef} objective={currentObjective}>
-              <label htmlFor="business-description" className="block font-black uppercase">
-                Business or product
-              </label>
-
-              <textarea
-                id="business-description"
-                name="businessDescription"
-                rows={5}
-                maxLength={500}
-                aria-invalid={Boolean(error)}
-                aria-describedby={error ? 'onboarding-error' : undefined}
-                value={businessDescription}
-                onChange={(event) => setBusinessDescription(event.target.value)}
-                className="mt-2 w-full border-3 border-black bg-[#F4F0EA] p-3 text-base font-bold focus-visible:outline-4 focus-visible:outline-offset-2"
-              />
-
-              <button
-                type="button"
-                onClick={skipCurrentStep}
-                className="mt-3 text-sm font-black uppercase underline underline-offset-4"
-              >
-                Skip for now
-              </button>
-            </StepPanel>
-          )}
-
-          {step === 3 && (
-            <StepPanel focusRef={stepHeadingRef} objective={currentObjective}>
-              <label htmlFor="target-customer" className="block font-black uppercase">
-                Target customer
-              </label>
-
-              <textarea
-                id="target-customer"
-                name="targetCustomer"
-                rows={4}
-                maxLength={300}
-                aria-invalid={Boolean(error)}
-                aria-describedby={error ? 'onboarding-error' : undefined}
-                value={targetCustomer}
-                onChange={(event) => setTargetCustomer(event.target.value)}
-                className="mt-2 w-full border-3 border-black bg-[#F4F0EA] p-3 text-base font-bold focus-visible:outline-4 focus-visible:outline-offset-2"
-              />
-
-              <button
-                type="button"
-                onClick={skipCurrentStep}
-                className="mt-3 text-sm font-black uppercase underline underline-offset-4"
-              >
-                Skip for now
-              </button>
-            </StepPanel>
-          )}
-
-          {step === 4 && (
-            <StepPanel focusRef={stepHeadingRef} objective={currentObjective}>
-              <p className="flex items-center gap-2 text-xs font-black uppercase">
-                <Swords aria-hidden size={16} /> Weapon rack — tap one to equip it
-              </p>
-
-              <div className="mt-3 grid gap-3 sm:grid-cols-2">
-                {KEYWORD_PRESETS.map((preset) => {
-                  const equipped = normalizedFirstKeyword === preset.phrase.trim()
-
-                  return (
-                    <button
-                      key={preset.id}
-                      type="button"
-                      onClick={() => equipPreset(preset)}
-                      aria-pressed={equipped}
-                      className={[
-                        'border-3 border-black p-3 text-left transition',
-                        equipped
-                          ? 'bg-[#A3E635] shadow-[4px_4px_0_0_#000]'
-                          : 'bg-white hover:bg-[#F4F0EA]',
-                      ].join(' ')}
-                    >
-                      <p className="flex items-center gap-2 text-sm font-black uppercase">
-                        <span aria-hidden className="text-lg">{preset.emoji}</span>
-                        {preset.name}
-                      </p>
-                      <p className="mt-1 font-mono text-xs font-bold text-gray-700">
-                        “{preset.phrase.trim()}”
-                      </p>
-                      <p className="mt-2 text-xs font-bold text-gray-600">{preset.hint}</p>
-                    </button>
-                  )
-                })}
-              </div>
-
-              <label htmlFor="first-keyword" className="mt-6 block font-black uppercase">
-                Equipped keyword
-              </label>
-
-              <input
-                id="first-keyword"
-                name="firstKeyword"
-                ref={keywordInputRef}
-                required
-                maxLength={80}
-                aria-invalid={Boolean(error)}
-                aria-describedby={error ? 'onboarding-error' : undefined}
-                value={firstKeyword}
-                onChange={(event) => setFirstKeyword(event.target.value)}
-                className="mt-2 w-full border-3 border-black bg-[#F4F0EA] p-3 text-base font-bold focus-visible:outline-4 focus-visible:outline-offset-2"
-                placeholder="looking for a local piano teacher"
-              />
-
-              <p className="mt-2 text-sm font-bold text-gray-700">
-                Edit it freely — a preset is a starting point, not a lock. One strong phrase beats a
-                long sentence.
-              </p>
-            </StepPanel>
-          )}
-
-          {step === 5 && (
-            <StepPanel focusRef={stepHeadingRef} objective={currentObjective}>
-              <fieldset>
-                <legend className="font-black uppercase">Preferred source</legend>
-
-                <div className="mt-3 grid gap-3 sm:grid-cols-2">
-                  <SourceOption
-                    value="X"
-                    selected={preferredSource === 'X'}
-                    onChange={setPreferredSource}
-                    title="X"
-                    description="Live source for real-time posts with buying intent."
-                  />
-
-                  <SourceOption
-                    value="REDDIT"
-                    selected={false}
-                    onChange={setPreferredSource}
-                    title="Reddit"
-                    description="Broad discovery across subreddits. Not available to select yet."
-                    badge="Locked"
-                  />
-                </div>
-              </fieldset>
-            </StepPanel>
-          )}
-
-          {step === 6 && (
-            <StepPanel focusRef={stepHeadingRef} objective={currentObjective}>
-              <p className="mb-3 text-xs font-black uppercase">
-                Preview — saved setup, not live results
-              </p>
-
-              <div className="mb-3 flex items-center gap-3 border-3 border-black bg-[#F4F0EA] p-3">
-                <div className="flex h-12 w-12 items-center justify-center border-3 border-black bg-white text-2xl">
-                  {selectedIcon.emoji}
-                </div>
-
-                <div>
-                  <p className="text-xs font-black uppercase text-gray-600">Hunter</p>
-                  <p className="break-words font-bold">{normalizedDisplayName || 'Your hunter'}</p>
-                </div>
-              </div>
-
-              <dl className="grid gap-3 sm:grid-cols-2">
-                <ReviewItem label="Sigil" value={selectedIcon.label} />
-                <ReviewItem label="Trade" value={normalizedBusinessDescription || 'Skipped for now'} />
-                <ReviewItem label="Quarry" value={normalizedTargetCustomer || 'Skipped for now'} />
-                <ReviewItem
-                  label="Hunting ground"
-                  value={preferredSource === 'X' ? 'X' : 'Reddit (locked)'}
-                />
-                <div className="sm:col-span-2">
-                  <ReviewItem label="Equipped weapon" value={normalizedFirstKeyword} />
-                </div>
-              </dl>
-
-              <div className="mt-4 flex items-start gap-3 border-3 border-black bg-[#ECFCCB] p-3">
-                <ShieldCheck className="mt-0.5 shrink-0" aria-hidden />
-                <p className="font-bold">
-                  Signing creates your first tracked keyword and turns on your schedule. It does not
-                  send messages, post content, or import old leads.
-                </p>
-              </div>
-
-              <div className="mt-4 flex items-start gap-3 border-3 border-black bg-[#FFE600] p-3">
-                <Sparkles className="mt-0.5 shrink-0" aria-hidden />
-                <p className="font-bold">
-                  Claiming this contract pays +{QUEST_XP_REWARD} XP and stocks your queue with three
-                  tutorial signals to practise on.
-                </p>
-              </div>
-            </StepPanel>
-          )}
-
-          <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          {/* Action Navigation Footer */}
+          <div className="mt-3 pt-2.5 border-t-3 border-black flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between shrink-0">
             <button
               type="button"
               onClick={() => {
@@ -599,7 +612,7 @@ export default function OnboardingForm({ initialDraft }: Props) {
                 setStep((current) => Math.max(1, current - 1))
               }}
               disabled={pending || step === 1}
-              className="inline-flex min-h-11 items-center justify-center gap-2 border-3 border-black bg-white px-4 py-2 font-black uppercase shadow-[4px_4px_0_0_#000] disabled:cursor-not-allowed disabled:opacity-50"
+              className="inline-flex min-h-11 items-center justify-center gap-2 border-3 border-black bg-white px-4 py-2 text-sm font-black uppercase shadow-[3px_3px_0_0_#000] disabled:cursor-not-allowed disabled:opacity-50 text-black"
             >
               <ArrowLeft aria-hidden size={18} /> Back
             </button>
@@ -608,7 +621,7 @@ export default function OnboardingForm({ initialDraft }: Props) {
               <button
                 type="submit"
                 disabled={pending}
-                className="inline-flex min-h-11 items-center justify-center gap-2 border-3 border-black bg-[#FDE68A] px-4 py-2 font-black uppercase shadow-[4px_4px_0_0_#000] disabled:cursor-not-allowed disabled:opacity-50"
+                className="inline-flex min-h-11 items-center justify-center gap-2 border-3 border-black bg-[#FDE68A] px-5 py-2 text-sm font-black uppercase shadow-[3px_3px_0_0_#000] disabled:cursor-not-allowed disabled:opacity-50 text-black hover:bg-[#FCD34D]"
               >
                 Continue <ArrowRight aria-hidden size={18} />
               </button>
@@ -617,7 +630,7 @@ export default function OnboardingForm({ initialDraft }: Props) {
                 type="button"
                 onClick={complete}
                 disabled={pending}
-                className="inline-flex min-h-11 items-center justify-center gap-2 border-3 border-black bg-[#A3E635] px-4 py-2 font-black uppercase shadow-[4px_4px_0_0_#000] disabled:cursor-not-allowed disabled:opacity-50"
+                className="inline-flex min-h-11 items-center justify-center gap-2 border-3 border-black bg-[#A3E635] px-6 py-2.5 text-sm font-black uppercase shadow-[4px_4px_0_0_#000] disabled:cursor-not-allowed disabled:opacity-50 text-black hover:bg-[#86EFAC]"
               >
                 <Check aria-hidden size={18} /> Complete setup
               </button>
@@ -631,28 +644,461 @@ export default function OnboardingForm({ initialDraft }: Props) {
   )
 }
 
-/**
- * The objective rail. Cleared objectives stay visible so progress reads as
- * ground taken rather than a bar that merely moves.
- */
-function QuestLog({ step, progress }: { step: number; progress: number }) {
+/* ==========================================================================
+   STAGE FORM PANELS
+   ========================================================================== */
+
+function GuildRegistryStation({
+  displayName,
+  setDisplayName,
+  profileIconKey,
+  setProfileIconKey,
+  classSpec,
+  error,
+}: {
+  displayName: string
+  setDisplayName: (val: string) => void
+  profileIconKey: ProfileIconKey
+  setProfileIconKey: (key: ProfileIconKey) => void
+  classSpec: { title: string; perk: string; color: string }
+  error?: string
+}) {
+  const selectedIcon = PROFILE_ICON_OPTIONS.find((option) => option.key === profileIconKey) ?? PROFILE_ICON_OPTIONS[0]
+
   return (
-    <section aria-label="Quest objectives" className="mt-6 border-3 border-black bg-[#F4F0EA] p-3">
-      <div className="flex items-center justify-between gap-3">
-        <p className="text-xs font-black uppercase">
-          Objective {step} of {LAST_ONBOARDING_STEP}
+    <div className="grid gap-4 sm:grid-cols-[1.1fr_0.9fr]">
+      <div>
+        <label htmlFor="display-name" className="block font-black uppercase text-xs text-black">
+          Display name
+        </label>
+
+        <input
+          id="display-name"
+          name="displayName"
+          autoComplete="name"
+          required
+          maxLength={60}
+          aria-invalid={Boolean(error)}
+          aria-describedby={error ? 'onboarding-error' : undefined}
+          value={displayName}
+          onChange={(event) => setDisplayName(event.target.value)}
+          className="mt-1.5 w-full border-3 border-black bg-[#F4F0EA] p-2.5 text-sm font-bold text-black focus-visible:outline-4 focus-visible:outline-offset-2"
+          placeholder="Signal Sage"
+        />
+
+        <p className="mt-3 text-xs font-black uppercase text-black flex items-center gap-1">
+          <Zap size={14} className="text-amber-500" /> Choose your hunter sigil & class
         </p>
-        <p className="text-xs font-black uppercase text-gray-600">{progress}% cleared</p>
+
+        <div className="mt-1.5 grid grid-cols-2 gap-2 sm:grid-cols-3">
+          {PROFILE_ICON_OPTIONS.map((option) => {
+            const active = option.key === profileIconKey
+            const spec = SIGIL_CLASS_SPECS[option.key] ?? SIGIL_CLASS_SPECS.target
+            const IconComp = getProfileIconComponent(option.key)
+
+            return (
+              <button
+                key={option.key}
+                type="button"
+                onClick={() => {
+                  sfx.playHoverBlip()
+                  setProfileIconKey(option.key)
+                }}
+                aria-pressed={active}
+                className={[
+                  'border-3 p-2 text-left transition relative overflow-hidden',
+                  active
+                    ? 'border-black bg-[#A3E635] shadow-[3px_3px_0_0_#000]'
+                    : 'border-black bg-white hover:bg-[#F4F0EA]',
+                ].join(' ')}
+              >
+                <div className="flex items-center justify-between">
+                  <IconComp className="h-5 w-5 stroke-[2.5] text-black" />
+                  <span className="text-[9px] font-mono font-black border border-black px-1 bg-white text-black">
+                    {option.code}
+                  </span>
+                </div>
+                <div className="mt-1 text-[11px] font-black uppercase truncate text-black">{option.label}</div>
+                <div className="text-[9px] font-bold text-gray-600 truncate">{spec.title}</div>
+              </button>
+            )
+          })}
+        </div>
       </div>
 
-      <div className="mt-2 h-4 w-full border-3 border-black bg-white">
+      <div className="border-3 border-black bg-[#F4F0EA] p-3.5 flex flex-col justify-between">
+        <div>
+          <p className="text-[11px] font-black uppercase text-gray-600">Sigil Class Spec</p>
+
+          <div className="mt-2 flex items-center gap-3 border-3 border-black bg-white p-2.5 shadow-[2px_2px_0_0_#000]">
+            {(() => {
+              const SelectedIconComp = getProfileIconComponent(profileIconKey)
+              return (
+                <div className="flex h-12 w-12 items-center justify-center border-3 border-black bg-[#FDE68A] text-black shrink-0">
+                  <SelectedIconComp className="h-6 w-6 stroke-[2.5]" />
+                </div>
+              )
+            })()}
+
+            <div className="min-w-0">
+              <p className="break-words font-black uppercase text-sm truncate text-black">
+                {displayName || 'Your hunter'}
+              </p>
+              <p className="text-xs font-bold text-amber-700">{classSpec.title}</p>
+              <span className="inline-block mt-0.5 rounded bg-emerald-100 border border-emerald-300 px-1 py-0.2 text-[10px] font-black text-emerald-800">
+                ⚡ {classSpec.perk}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <p className="mt-3 text-xs font-bold text-gray-700">
+          This is your workspace adventurer identity. Richer avatar classes can be unlocked later.
+        </p>
+      </div>
+    </div>
+  )
+}
+
+function TradeLicenseStation({
+  businessDescription,
+  setBusinessDescription,
+  onSkip,
+  error,
+}: {
+  businessDescription: string
+  setBusinessDescription: (val: string) => void
+  onSkip: () => void
+  error?: string
+}) {
+  return (
+    <div>
+      <label htmlFor="business-description" className="block font-black uppercase text-xs text-black">
+        Business or product
+      </label>
+
+      <textarea
+        id="business-description"
+        name="businessDescription"
+        rows={4}
+        maxLength={500}
+        aria-invalid={Boolean(error)}
+        aria-describedby={error ? 'onboarding-error' : undefined}
+        value={businessDescription}
+        onChange={(event) => setBusinessDescription(event.target.value)}
+        className="mt-1.5 w-full border-3 border-black bg-[#F4F0EA] p-2.5 text-sm font-bold text-black focus-visible:outline-4 focus-visible:outline-offset-2"
+        placeholder="Describe what your business or product does..."
+      />
+
+      <button
+        type="button"
+        onClick={onSkip}
+        className="mt-2 text-xs font-black uppercase underline underline-offset-4 text-black"
+      >
+        Skip for now
+      </button>
+    </div>
+  )
+}
+
+function QuarryBountyStation({
+  targetCustomer,
+  setTargetCustomer,
+  onSkip,
+  error,
+}: {
+  targetCustomer: string
+  setTargetCustomer: (val: string) => void
+  onSkip: () => void
+  error?: string
+}) {
+  return (
+    <div>
+      <label htmlFor="target-customer" className="block font-black uppercase text-xs text-black">
+        Target customer
+      </label>
+
+      <textarea
+        id="target-customer"
+        name="targetCustomer"
+        rows={3}
+        maxLength={300}
+        aria-invalid={Boolean(error)}
+        aria-describedby={error ? 'onboarding-error' : undefined}
+        value={targetCustomer}
+        onChange={(event) => setTargetCustomer(event.target.value)}
+        className="mt-1.5 w-full border-3 border-black bg-[#F4F0EA] p-2.5 text-sm font-bold text-black focus-visible:outline-4 focus-visible:outline-offset-2"
+        placeholder="Describe the customer you want to find..."
+      />
+
+      <button
+        type="button"
+        onClick={onSkip}
+        className="mt-2 text-xs font-black uppercase underline underline-offset-4 text-black"
+      >
+        Skip for now
+      </button>
+    </div>
+  )
+}
+
+function WeaponArmoryStation({
+  firstKeyword,
+  setFirstKeyword,
+  equipPreset,
+  keywordInputRef,
+  error,
+}: {
+  firstKeyword: string
+  setFirstKeyword: (val: string) => void
+  equipPreset: (preset: (typeof KEYWORD_PRESETS)[number]) => void
+  keywordInputRef: RefObject<HTMLInputElement | null>
+  error?: string
+}) {
+  return (
+    <div>
+      <p className="flex items-center gap-2 text-xs font-black uppercase text-black">
+        <Swords aria-hidden size={16} /> Weapon rack — tap one to equip it
+      </p>
+
+      <div className="mt-2 grid gap-2 sm:grid-cols-2">
+        {KEYWORD_PRESETS.map((preset) => {
+          const equipped = firstKeyword.replace(/\s+/g, ' ').trim() === preset.phrase.trim()
+          const rarity = WEAPON_RARITY[preset.id] ?? { label: 'COMMON', bg: 'bg-gray-100', text: 'text-gray-800' }
+          const PresetIcon = getPresetIconComponent(preset.id)
+
+          return (
+            <button
+              key={preset.id}
+              type="button"
+              onClick={() => equipPreset(preset)}
+              aria-pressed={equipped}
+              className={[
+                'border-3 border-black p-2.5 text-left transition relative',
+                equipped
+                  ? 'bg-[#A3E635] shadow-[3px_3px_0_0_#000]'
+                  : 'bg-white hover:bg-[#F4F0EA]',
+              ].join(' ')}
+            >
+              <div className="flex items-center justify-between">
+                <p className="flex items-center gap-1.5 text-xs font-black uppercase text-black">
+                  <PresetIcon className="h-4 w-4 stroke-[2.5] text-black shrink-0" />
+                  <span className="font-mono text-[10px] bg-black text-white px-1 font-black">{preset.code}</span>
+                  <span>{preset.name}</span>
+                </p>
+                <span className={`text-[9px] font-black px-1 py-0.5 rounded border border-black ${rarity.bg} ${rarity.text}`}>
+                  {rarity.label}
+                </span>
+              </div>
+              <p className="mt-1 font-mono text-[11px] font-bold text-gray-700 truncate">
+                “{preset.phrase.trim()}”
+              </p>
+              <p className="mt-1 text-[10px] font-bold text-gray-600">{preset.hint}</p>
+            </button>
+          )
+        })}
+      </div>
+
+      <label htmlFor="first-keyword" className="mt-3 block font-black uppercase text-xs text-black">
+        Equipped keyword
+      </label>
+
+      <input
+        id="first-keyword"
+        name="firstKeyword"
+        ref={keywordInputRef}
+        required
+        maxLength={80}
+        aria-invalid={Boolean(error)}
+        aria-describedby={error ? 'onboarding-error' : undefined}
+        value={firstKeyword}
+        onChange={(event) => setFirstKeyword(event.target.value)}
+        className="mt-1.5 w-full border-3 border-black bg-[#F4F0EA] p-2.5 text-sm font-bold text-black focus-visible:outline-4 focus-visible:outline-offset-2"
+        placeholder="looking for a local piano teacher"
+      />
+
+      <p className="mt-1.5 text-xs font-bold text-gray-700">
+        Edit it freely — a preset is a starting point, not a lock.
+      </p>
+    </div>
+  )
+}
+
+function HuntingRealmStation({
+  preferredSource,
+  setPreferredSource,
+  firstKeyword,
+}: {
+  preferredSource: PreferredSource
+  setPreferredSource: (src: PreferredSource) => void
+  firstKeyword?: string
+}) {
+  const [logs, setLogs] = useState<string[]>([])
+  const [progress, setProgress] = useState(0)
+
+  useEffect(() => {
+    sfx.playRadarBlip()
+    const logSequence = [
+      `> Connecting to Hunting Grounds (${preferredSource} Live Feed)...`,
+      `> Arming weapon matrix for keyword "${firstKeyword || 'target'}...`,
+      `> Scanning Rival Guilds & signal noise...`,
+      `> Calibrating AI bounty matcher...`,
+      `> WORKSPACE ASSETS SUMMONED & READY.`,
+    ]
+
+    let currentLog = 0
+    const interval = setInterval(() => {
+      if (currentLog < logSequence.length) {
+        setLogs((prev) => [...prev, logSequence[currentLog]])
+        setProgress(Math.round(((currentLog + 1) / logSequence.length) * 100))
+        currentLog++
+        sfx.playRadarBlip()
+      } else {
+        clearInterval(interval)
+      }
+    }, 450)
+
+    return () => clearInterval(interval)
+  }, [preferredSource, firstKeyword])
+
+  return (
+    <div className="space-y-3">
+      <fieldset>
+        <legend className="font-black uppercase text-xs text-black">Preferred source</legend>
+
+        <div className="mt-2 grid gap-2.5 sm:grid-cols-2">
+          <SourceOption
+            value="X"
+            selected={preferredSource === 'X'}
+            onChange={setPreferredSource}
+            title="X"
+            description="Live source for real-time posts with buying intent."
+          />
+
+          <SourceOption
+            value="REDDIT"
+            selected={false}
+            onChange={setPreferredSource}
+            title="Reddit"
+            description="Broad discovery across subreddits. Not available to select yet."
+            badge="Locked"
+          />
+        </div>
+      </fieldset>
+
+      {/* Ritual of Summoning Terminal (Labor Illusion) */}
+      <div className="border-3 border-black bg-black p-3 font-mono text-xs text-[#A3E635] shadow-[4px_4px_0_0_#000]">
+        <div className="flex items-center justify-between border-b border-gray-800 pb-1.5 mb-2 text-[10px] uppercase text-gray-400 font-bold">
+          <span>⚡ Ritual of Summoning Terminal</span>
+          <span className="text-yellow-400">{progress}% READY</span>
+        </div>
+        <div className="space-y-1 min-h-[95px]">
+          {logs.map((log, i) => (
+            <p key={i} className="flex items-center gap-1.5 font-bold">
+              <span className="text-yellow-400">✦</span> {log}
+            </p>
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function ContractReviewStation({
+  displayName,
+  selectedIcon,
+  classSpec,
+  businessDescription,
+  targetCustomer,
+  preferredSource,
+  firstKeyword,
+}: {
+  displayName: string
+  selectedIcon: (typeof PROFILE_ICON_OPTIONS)[number]
+  classSpec: { title: string; perk: string; color: string }
+  businessDescription: string
+  targetCustomer: string
+  preferredSource: PreferredSource
+  firstKeyword: string
+}) {
+  return (
+    <div>
+      <p className="mb-2 text-xs font-black uppercase text-gray-600">
+        Preview — saved setup, not live results
+      </p>
+
+      <div className="mb-3 flex items-center gap-3 border-3 border-black bg-[#F4F0EA] p-2.5">
+        {(() => {
+          const SelectedIconComp = getProfileIconComponent(selectedIcon.key)
+          return (
+            <div className="flex h-10 w-10 items-center justify-center border-3 border-black bg-white text-black shrink-0">
+              <SelectedIconComp className="h-5 w-5 stroke-[2.5]" />
+            </div>
+          )
+        })()}
+
+        <div>
+          <p className="text-[10px] font-black uppercase text-gray-600">Hunter Class</p>
+          <p className="break-words font-bold text-xs text-black">{displayName || 'Your hunter'} ({classSpec.title})</p>
+        </div>
+      </div>
+
+      <dl className="grid gap-2 sm:grid-cols-2 text-xs">
+        <ReviewItem label="Sigil" value={`${selectedIcon.code} ${selectedIcon.label} (${classSpec.perk})`} />
+        <ReviewItem label="Trade" value={businessDescription || 'Skipped for now'} />
+        <ReviewItem label="Quarry" value={targetCustomer || 'Skipped for now'} />
+        <ReviewItem
+          label="Hunting ground"
+          value={preferredSource === 'X' ? 'X' : 'Reddit (locked)'}
+        />
+        <div className="sm:col-span-2">
+          <ReviewItem label="Equipped weapon" value={firstKeyword} />
+        </div>
+      </dl>
+
+      <div className="mt-3 flex items-start gap-2.5 border-3 border-black bg-[#ECFCCB] p-2.5 text-xs text-black">
+        <ShieldCheck className="mt-0.5 shrink-0" aria-hidden size={16} />
+        <p className="font-bold">
+          Signing creates your first tracked keyword and turns on your schedule. It does not send messages or post content.
+        </p>
+      </div>
+
+      <div className="mt-2.5 flex items-start gap-2.5 border-3 border-black bg-[#FFE600] p-2.5 text-xs text-black animate-pulse">
+        <Sparkles className="mt-0.5 shrink-0" aria-hidden size={16} />
+        <p className="font-bold">
+          Claiming this contract pays +{QUEST_XP_REWARD} XP and stocks your queue with three tutorial signals.
+        </p>
+      </div>
+    </div>
+  )
+}
+
+function QuestLog({
+  step,
+  progress,
+  onSelectStep,
+}: {
+  step: number
+  progress: number
+  onSelectStep: (step: number) => void
+}) {
+  return (
+    <section aria-label="Quest objectives" className="mt-2.5 border-3 border-black bg-[#F4F0EA] p-2.5">
+      <div className="flex items-center justify-between gap-3 text-xs">
+        <p className="font-black uppercase text-black flex items-center gap-1">
+          <ScrollText size={14} /> Objective {step} of {LAST_ONBOARDING_STEP}
+        </p>
+        <p className="font-black uppercase text-gray-600">{progress}% cleared</p>
+      </div>
+
+      <div className="mt-1.5 h-3 w-full border-2 border-black bg-white">
         <div
           className="h-full bg-[#A3E635] transition-[width] duration-500"
           style={{ width: `${progress}%` }}
         />
       </div>
 
-      <ol className="mt-3 grid grid-cols-3 gap-2 sm:grid-cols-6">
+      <ol className="mt-2 grid grid-cols-3 gap-1.5 sm:grid-cols-6">
         {QUEST_OBJECTIVES.map((objective) => {
           const cleared = objective.step < step
           const active = objective.step === step
@@ -661,15 +1107,16 @@ function QuestLog({ step, progress }: { step: number; progress: number }) {
             <li
               key={objective.step}
               aria-current={active ? 'step' : undefined}
+              onClick={() => onSelectStep(objective.step)}
               className={[
-                'border-3 border-black p-2 text-center text-[10px] font-black uppercase',
-                cleared ? 'bg-[#A3E635]' : active ? 'bg-[#FDE68A] shadow-[3px_3px_0_0_#000]' : 'bg-white',
+                'cursor-pointer border-2 border-black p-1.5 text-center text-[10px] font-black uppercase transition',
+                cleared ? 'bg-[#A3E635]' : active ? 'bg-[#FDE68A] shadow-[2px_2px_0_0_#000]' : 'bg-white hover:bg-gray-50',
               ].join(' ')}
             >
-              <span className="block text-sm">
-                {cleared ? <Check aria-hidden className="mx-auto h-4 w-4" /> : objective.step}
+              <span className="block text-xs text-black">
+                {cleared ? <Check aria-hidden className="mx-auto h-3.5 w-3.5" /> : objective.step}
               </span>
-              <span className="mt-1 block truncate">{objective.label}</span>
+              <span className="mt-0.5 block truncate text-black">{objective.label}</span>
             </li>
           )
         })}
@@ -679,17 +1126,31 @@ function QuestLog({ step, progress }: { step: number; progress: number }) {
 }
 
 function QuestCompleteOverlay() {
+  useEffect(() => {
+    sfx.playLevelUp()
+    const timer = setTimeout(() => sfx.playBountyUnlock(), 300)
+    return () => clearTimeout(timer)
+  }, [])
+
   return (
     <div
       role="status"
       aria-live="assertive"
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-4"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-md px-4"
     >
-      <div className="w-full max-w-md border-4 border-black bg-[#A3E635] p-6 text-center shadow-[10px_10px_0_0_#000]">
-        <Sparkles aria-hidden className="mx-auto h-10 w-10 animate-pulse" strokeWidth={3} />
-        <p className="mt-3 text-2xl font-black uppercase leading-tight">Quest complete</p>
-        <p className="mt-2 text-4xl font-black">+{QUEST_XP_REWARD} XP</p>
-        <p className="mt-3 font-bold text-black/80">Arming your first hunt…</p>
+      <div className="w-full max-w-md border-4 border-black bg-[#A3E635] p-6 text-center shadow-[12px_12px_0_0_#000] text-black relative overflow-hidden">
+        <Trophy className="mx-auto h-16 w-16 stroke-[2.5] text-black animate-bounce mb-2" />
+        <span className="inline-block border-2 border-black bg-black text-white px-2 py-0.5 text-[10px] font-mono font-black uppercase mb-2">
+          [RANK_1_UNLOCKED]
+        </span>
+        <p className="text-3xl font-black uppercase tracking-wider">VICTORY!</p>
+        <p className="mt-1 text-xl font-black uppercase leading-tight">Quest Complete — Charter Sealed</p>
+        <div className="my-3 inline-block border-3 border-black bg-[#FFE600] px-4 py-2 font-black text-3xl shadow-[4px_4px_0_0_#000] animate-pulse">
+          +50 XP AWARDED
+        </div>
+        <p className="mt-2 font-black text-xs uppercase bg-black text-white p-2 border-2 border-black">
+          ⚡ Summoning Workspace & Seeding Tutorial Signals…
+        </p>
       </div>
     </div>
   )
@@ -702,11 +1163,11 @@ function StepPanel({
 }: {
   objective: { step: number; title: string; objective: string; optional?: boolean }
   children: ReactNode
-  focusRef: RefObject<HTMLHeadingElement | null>
+  focusRef?: RefObject<HTMLHeadingElement | null>
 }) {
   return (
-    <section className="border-3 border-black bg-white p-4 sm:p-5">
-      <p className="text-xs font-black uppercase text-gray-600">
+    <section className="border-3 border-black bg-white p-3.5 sm:p-4">
+      <p className="text-[11px] font-black uppercase text-gray-600">
         Objective {objective.step}
         {objective.optional ? ' — optional' : ''}
       </p>
@@ -714,13 +1175,13 @@ function StepPanel({
       <h2
         ref={focusRef}
         tabIndex={-1}
-        className="mt-1 text-2xl font-black uppercase focus:outline-none"
+        className="mt-0.5 text-xl font-black uppercase text-black focus:outline-none"
       >
         {objective.title}
       </h2>
 
-      <p className="mt-2 max-w-2xl font-bold text-gray-700">{objective.objective}</p>
-      <div className="mt-5">{children}</div>
+      <p className="mt-1 text-xs font-bold text-gray-700">{objective.objective}</p>
+      <div className="mt-3">{children}</div>
     </section>
   )
 }
@@ -744,7 +1205,7 @@ function SourceOption({
 
   return (
     <label
-      className={`block border-3 border-black p-4 ${
+      className={`block border-3 border-black p-3 ${
         disabled
           ? 'cursor-not-allowed bg-[#E7E2DA] opacity-70'
           : selected
@@ -764,25 +1225,25 @@ function SourceOption({
         }}
         className="sr-only"
       />
-      <p className="flex flex-wrap items-center gap-2 text-lg font-black uppercase">
-        <Search aria-hidden size={18} />
+      <p className="flex flex-wrap items-center gap-2 text-base font-black uppercase text-black">
+        <Search aria-hidden size={16} />
         {title}
         {badge ? (
-          <span className="border-2 border-black bg-[#F7D046] px-2 py-0.5 text-xs font-black uppercase">
+          <span className="border-2 border-black bg-[#F7D046] px-1.5 py-0.5 text-[10px] font-black uppercase text-black">
             {badge}
           </span>
         ) : null}
       </p>
-      <p className="mt-2 font-bold text-gray-700">{description}</p>
+      <p className="mt-1 text-xs font-bold text-gray-700">{description}</p>
     </label>
   )
 }
 
 function ReviewItem({ label, value }: { label: string; value: string }) {
   return (
-    <div className="border-2 border-black bg-[#F4F0EA] p-3">
-      <dt className="text-xs font-black uppercase text-gray-600">{label}</dt>
-      <dd className="mt-1 break-words font-bold">{value}</dd>
+    <div className="border-2 border-black bg-[#F4F0EA] p-2.5">
+      <dt className="text-[10px] font-black uppercase text-gray-600">{label}</dt>
+      <dd className="mt-0.5 break-words font-bold text-xs text-black">{value}</dd>
     </div>
   )
 }
