@@ -18,7 +18,7 @@ export default function MissionCardCompact({
   return (
     <section className="rounded-none border-4 border-black bg-[#FFF8D9] p-4 shadow-[6px_6px_0_0_#000]">
 
-      <p className="text-[10px] font-black uppercase tracking-[0.18em] text-black/60">
+      <p className="text-xs font-black uppercase tracking-[0.12em] text-black/60">
         Today&apos;s Mission
       </p>
 

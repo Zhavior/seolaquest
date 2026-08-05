@@ -104,7 +104,9 @@ export default function CoQuestShell({
             >
               <Menu className="size-5 text-black" strokeWidth={3} />
             </button>
-            <span className="text-xs font-black uppercase tracking-[0.2em]">Command Compass</span>
+            {/* Short brand mark — this bar is inside the `md:hidden` mobile header,
+                so the desktop sidebar's full "SEO la Quest" never competes with it. */}
+            <span className="text-xs font-black uppercase tracking-[0.2em]">SEOLQ</span>
           </div>
         }
         bottomBar={<MobileBottomNav mobileOpen={mobileOpen} onOpenNavigation={openMobile} />}

@@ -44,7 +44,7 @@ export default function GuildClient({ stats }: { stats: GuildStats }) {
       <div className="min-h-[100dvh] w-full max-w-[1400px] mx-auto p-4 md:p-8 font-black relative z-10">
         
         {/* Subtle Background Swords Emblem */}
-        <div className="absolute top-0 right-0 -mr-24 -mt-24 opacity-[0.06] pointer-events-none">
+        <div className="hidden md:block absolute top-0 right-0 -mr-24 -mt-24 opacity-[0.06] pointer-events-none">
           <Swords className="w-[650px] h-[650px] text-black" />
         </div>
 
@@ -78,7 +78,7 @@ export default function GuildClient({ stats }: { stats: GuildStats }) {
                   COMMANDER&apos;S MAP & ANALYTICS
                 </span>
               </div>
-              <h1 className="text-5xl md:text-7xl uppercase tracking-tight text-white drop-shadow-[6px_6px_0_rgba(0,0,0,1)]" style={{ WebkitTextStroke: '2px black' }}>
+              <h1 className="text-4xl sm:text-5xl md:text-7xl uppercase tracking-tight text-white drop-shadow-[6px_6px_0_rgba(0,0,0,1)]" style={{ WebkitTextStroke: '2px black' }}>
                 Guild Hall
               </h1>
               <p className="text-xl md:text-2xl mt-2 uppercase bg-black text-white inline-block px-4 py-1 -rotate-1 border-2 border-black">

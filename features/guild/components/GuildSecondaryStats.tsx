@@ -15,7 +15,7 @@ export function GuildSecondaryStats({ item, spellsCast, questsExported }: GuildS
       <motion.div variants={item} className="flex-1 border-4 border-black bg-[#06B6D4] p-6 shadow-[6px_6px_0_0_#000]">
         <div className="flex items-start justify-between">
           <div>
-            <h2 className="text-3xl font-black uppercase text-white" style={{ WebkitTextStroke: '1px black' }}>AI drafts</h2>
+            <h2 className="text-2xl md:text-3xl font-black uppercase text-white" style={{ WebkitTextStroke: '1px black' }}>AI drafts</h2>
             <span className="mt-1 inline-block border border-black bg-white/90 px-2 py-0.5 text-xs font-bold uppercase">Successful generations recorded</span>
           </div>
           <FileText className="h-8 w-8" />
@@ -29,7 +29,7 @@ export function GuildSecondaryStats({ item, spellsCast, questsExported }: GuildS
       <motion.div variants={item} className="flex-1 border-4 border-black bg-[#A3E635] p-6 shadow-[6px_6px_0_0_#000]">
         <div className="flex items-start justify-between">
           <div>
-            <h2 className="text-3xl font-black uppercase text-white" style={{ WebkitTextStroke: '1px black' }}>CRM deliveries</h2>
+            <h2 className="text-2xl md:text-3xl font-black uppercase text-white" style={{ WebkitTextStroke: '1px black' }}>CRM deliveries</h2>
             <span className="mt-1 inline-block border border-black bg-white/90 px-2 py-0.5 text-xs font-bold uppercase">Server-recorded completed exports</span>
           </div>
           <Share2 className="h-8 w-8" />

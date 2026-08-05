@@ -74,7 +74,7 @@ function DetailItem({ label, value, mono = false }: { label: string; value: stri
 function Count({ label, value }: { label: string; value: number }) {
   return (
     <div className="border-r-2 border-black p-3 last:border-r-0">
-      <dt className="text-[0.65rem] font-black uppercase text-zinc-500 sm:text-xs">{label}</dt>
+      <dt className="text-xs font-black uppercase text-zinc-500">{label}</dt>
       <dd className="mt-1 text-2xl font-black">{value}</dd>
     </div>
   )

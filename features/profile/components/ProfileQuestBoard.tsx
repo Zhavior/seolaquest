@@ -79,7 +79,7 @@ export function ProfileQuestBoard({
                   <span className="flex items-center gap-1 text-red-600">
                     <Clock className="w-3.5 h-3.5" /> {quest.dueDate}
                   </span>
-                  <span className={`px-1.5 py-0.2 border border-black text-[10px] font-black ${
+                  <span className={`shrink-0 px-1.5 py-0.5 border border-black text-xs font-black ${
                     quest.priority === 'HIGH' ? 'bg-red-400 text-black' : quest.priority === 'MED' ? 'bg-yellow-300 text-black' : 'bg-slate-300 text-black'
                   }`}>
                     {quest.priority}

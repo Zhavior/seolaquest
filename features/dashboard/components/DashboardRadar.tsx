@@ -24,9 +24,9 @@ export function DashboardRadar({
   return (
     <motion.div
       variants={item}
-      className="xl:col-span-4 min-w-0 overflow-hidden border-4 border-black bg-[#FFF8D9] p-6 shadow-[6px_6px_0_0_#000] md:p-8 relative"
+      className="xl:col-span-4 min-w-0 overflow-hidden border-4 border-black bg-[#FFF8D9] p-4 shadow-[6px_6px_0_0_#000] sm:p-6 md:p-8 relative"
     >
-      <div className="flex items-center justify-between mb-4">
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
         <span className="bg-black text-[#FFE600] uppercase text-xs font-black tracking-widest px-3 py-1 border-2 border-black -rotate-1">
           RADAR CONTROL CENTRE & SIGNAL PULSE
         </span>
@@ -35,7 +35,7 @@ export function DashboardRadar({
         </span>
       </div>
 
-      <div className="relative flex min-h-[420px] flex-col items-center justify-center overflow-hidden border-4 border-black bg-white p-6 shadow-[6px_6px_0_0_#000]">
+      <div className="relative flex min-h-[320px] flex-col items-center justify-center overflow-hidden border-4 border-black bg-white p-4 shadow-[6px_6px_0_0_#000] sm:min-h-[420px] sm:p-6">
         <AnimatePresence>
           {particles.map((p) => (
             <motion.div
@@ -63,7 +63,7 @@ export function DashboardRadar({
         </div>
 
         {/* Arcade Radar Button Container */}
-        <div className="relative flex w-full max-w-[320px] items-center justify-center py-4">
+        <div className="relative flex w-full max-w-[220px] items-center justify-center py-4 sm:max-w-[320px]">
           {hasKeywords && (
             <>
               <div className="pointer-events-none absolute inset-0 z-0 rounded-full bg-[#FF5722]/25 animate-ping" />
@@ -79,19 +79,19 @@ export function DashboardRadar({
             transition={{ type: 'spring', stiffness: 350, damping: 22 }}
             onClick={runMockScanner}
             disabled={isPending}
-            className={`relative z-10 flex aspect-square w-full max-w-[280px] min-h-[44px] cursor-crosshair flex-col items-center justify-center gap-3 rounded-full border-4 border-black text-white shadow-[8px_8px_0_0_#000] transition-all ${
+            className={`relative z-10 flex aspect-square w-full max-w-[200px] min-h-[44px] cursor-crosshair flex-col items-center justify-center gap-2 rounded-full border-4 border-black text-white shadow-[8px_8px_0_0_#000] transition-all sm:max-w-[280px] sm:gap-3 ${
               hasKeywords ? 'bg-[#FF5722] hover:bg-[#FF7043]' : 'bg-zinc-400'
             } disabled:opacity-50`}
           >
-            <Radar className="h-20 w-20 text-white drop-shadow-[3px_3px_0_rgba(0,0,0,1)]" />
+            <Radar className="h-12 w-12 text-white drop-shadow-[3px_3px_0_rgba(0,0,0,1)] sm:h-20 sm:w-20" />
             <div className="flex flex-col items-center">
               <span
-                className="px-4 text-center text-3xl font-black uppercase tracking-tight text-white drop-shadow-[4px_4px_0_rgba(0,0,0,1)]"
+                className="px-2 text-center text-xl font-black uppercase tracking-tight text-white drop-shadow-[4px_4px_0_rgba(0,0,0,1)] sm:px-4 sm:text-3xl"
                 style={{ WebkitTextStroke: '2px black' }}
               >
                 Manual Scan
               </span>
-              <span className="mt-1 bg-black text-[#FFE600] px-3 py-0.5 text-[10px] font-black uppercase tracking-widest border border-black -rotate-1">
+              <span className="mt-1 bg-black text-[#FFE600] px-3 py-0.5 text-xs font-black uppercase tracking-wide border border-black -rotate-1">
                 {isPending ? 'PULSING GRID...' : 'TRIGGER PULSE (-5 MP)'}
               </span>
             </div>

@@ -21,7 +21,7 @@ function StatChip({
 }) {
   return (
     <div className={`px-4 py-3 flex flex-col justify-center ${tone}`}>
-      <div className="text-[10px] font-black uppercase tracking-[0.16em] text-black/70">
+      <div className="text-xs font-black uppercase tracking-[0.12em] text-black/70">
         {label}
       </div>
       <div className="mt-1 text-2xl font-black text-black">

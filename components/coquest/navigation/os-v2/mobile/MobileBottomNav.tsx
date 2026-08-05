@@ -43,7 +43,7 @@ export default function MobileBottomNav({
             key={item.href}
             href={item.href}
             aria-current={isActive ? 'page' : undefined}
-            className={`flex flex-1 flex-col items-center justify-center gap-1 border-3 border-black py-1.5 text-[9px] font-black uppercase tracking-wider transition-all ${
+            className={`flex flex-1 flex-col items-center justify-center gap-1 border-3 border-black py-2 text-xs font-black uppercase tracking-wide transition-all ${
               isActive
                 ? `${colorClass} -translate-y-0.5 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]`
                 : 'bg-white active:translate-y-0 active:shadow-none'
@@ -60,7 +60,7 @@ export default function MobileBottomNav({
         onClick={onOpenNavigation}
         aria-controls={MOBILE_NAV_ID}
         aria-expanded={mobileOpen}
-        className="flex flex-1 flex-col items-center justify-center gap-1 border-3 border-black bg-[#FFE600] py-1.5 text-[9px] font-black uppercase tracking-wider active:translate-x-[1px] active:translate-y-[1px] active:shadow-none"
+        className="flex flex-1 flex-col items-center justify-center gap-1 border-3 border-black bg-[#FFE600] py-2 text-xs font-black uppercase tracking-wide active:translate-x-[1px] active:translate-y-[1px] active:shadow-none"
       >
         <MoreHorizontal className="size-4 shrink-0 text-black" strokeWidth={3} />
         <span className="text-black">MORE</span>

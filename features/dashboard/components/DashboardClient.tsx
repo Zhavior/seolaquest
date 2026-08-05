@@ -1,7 +1,7 @@
 'use client'
 
 import dynamic from 'next/dynamic'
-import { AnimatePresence, motion, type Variants } from 'framer-motion'
+import { AnimatePresence, motion, useReducedMotion, type Variants } from 'framer-motion'
 import { X, Sparkles, Shield, Crosshair } from 'lucide-react'
 import { useState } from 'react'
 
@@ -41,6 +41,16 @@ const sectionReveal: Variants = {
   },
 }
 
+/**
+ * The global `prefers-reduced-motion` rule in globals.css only reaches CSS
+ * animations. Framer drives transforms from JS, so every section reveal and the
+ * infinite ticker keep running unless we opt out here as well.
+ */
+const staticReveal: Variants = {
+  hidden: { opacity: 1, y: 0 },
+  show: { opacity: 1, y: 0 },
+}
+
 export default function DashboardClient({
   dbUser,
   dbKeywords,
@@ -66,6 +76,8 @@ export default function DashboardClient({
     state.notice
   )
   const [activeMobileTab, setActiveMobileTab] = useState<'overview' | 'signals' | 'guild'>('overview')
+  const shouldReduceMotion = useReducedMotion()
+  const reveal = shouldReduceMotion ? staticReveal : sectionReveal
 
   const isOverview = activeMobileTab === 'overview'
   const isSignals = activeMobileTab === 'signals'
@@ -83,7 +95,7 @@ export default function DashboardClient({
       />
 
       {/* Subtle Background Watermark Emblem */}
-      <div className="absolute top-0 right-0 -mr-24 -mt-24 opacity-[0.05] pointer-events-none">
+      <div className="hidden md:block absolute top-0 right-0 -mr-24 -mt-24 opacity-[0.05] pointer-events-none">
         <Crosshair className="w-[650px] h-[650px] text-black" />
       </div>
 
@@ -109,13 +121,11 @@ export default function DashboardClient({
       </AnimatePresence>
 
       <div className="relative z-10 mx-auto flex w-full max-w-[1400px] min-w-0 flex-col space-y-6 overflow-x-hidden">
-        <h1 className="sr-only">CoQuest main dashboard</h1>
-
         {/* Neo-Brutalist Ticker Banner (1:1 with Guild Hall & Billing) */}
-        <motion.div variants={sectionReveal} initial="hidden" animate="show" className="w-full overflow-hidden border-4 border-black bg-[#FFE600] py-2 flex whitespace-nowrap shadow-[4px_4px_0_0_#000]">
+        <motion.div variants={reveal} initial="hidden" animate="show" className="w-full overflow-hidden border-4 border-black bg-[#FFE600] py-2 flex whitespace-nowrap shadow-[4px_4px_0_0_#000]">
           <motion.div 
-            animate={{ x: [0, -1000] }} 
-            transition={{ repeat: Infinity, duration: 25, ease: "linear" }}
+            animate={shouldReduceMotion ? { x: 0 } : { x: [0, -1000] }}
+            transition={shouldReduceMotion ? { duration: 0 } : { repeat: Infinity, duration: 25, ease: 'linear' }}
             className="flex gap-10 text-lg md:text-xl uppercase tracking-widest font-black"
           >
             {[...Array(10)].map((_, i) => (
@@ -127,7 +137,7 @@ export default function DashboardClient({
         </motion.div>
 
         {/* Page Title Header (1:1 with Guild Hall & Billing) */}
-        <motion.div variants={sectionReveal} initial="hidden" animate="show" className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 mt-2">
+        <motion.div variants={reveal} initial="hidden" animate="show" className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 mt-2">
           <div>
             <div className="flex items-center gap-3 mb-1">
               <Shield className="w-8 h-8 text-[#FF5722]" />
@@ -135,7 +145,7 @@ export default function DashboardClient({
                 COMMANDER&apos;S MAP & BATTLE CONTROL
               </span>
             </div>
-            <h1 className="text-5xl md:text-7xl uppercase tracking-tight text-white drop-shadow-[6px_6px_0_rgba(0,0,0,1)]" style={{ WebkitTextStroke: '2px black' }}>
+            <h1 className="text-4xl sm:text-5xl md:text-7xl uppercase tracking-tight text-white drop-shadow-[6px_6px_0_rgba(0,0,0,1)]" style={{ WebkitTextStroke: '2px black' }}>
               Main Dashboard
             </h1>
             <p className="text-xl md:text-2xl mt-2 uppercase bg-black text-white inline-block px-4 py-1 -rotate-1 border-2 border-black">
@@ -156,7 +166,7 @@ export default function DashboardClient({
         </motion.div>
 
         <DashboardHeader
-          item={sectionReveal}
+          item={reveal}
           user={state.user}
           remainingQuests={state.remainingQuests}
           maxCredits={state.maxCredits}
@@ -188,7 +198,7 @@ export default function DashboardClient({
           <button
             type="button"
             onClick={() => setActiveMobileTab('overview')}
-            className={`flex-1 border-2 px-2 py-2 text-[10px] font-black uppercase tracking-[0.16em] transition-all ${
+            className={`flex-1 border-2 px-2 py-2.5 text-xs font-black uppercase tracking-[0.08em] transition-all ${
               activeMobileTab === 'overview'
                 ? 'border-black bg-[#FFE600] text-black shadow-[2px_2px_0_0_#000]'
                 : 'border-transparent bg-transparent text-black/55'
@@ -199,7 +209,7 @@ export default function DashboardClient({
           <button
             type="button"
             onClick={() => setActiveMobileTab('signals')}
-            className={`flex-1 border-2 px-2 py-2 text-[10px] font-black uppercase tracking-[0.16em] transition-all ${
+            className={`flex-1 border-2 px-2 py-2.5 text-xs font-black uppercase tracking-[0.08em] transition-all ${
               activeMobileTab === 'signals'
                 ? 'border-black bg-[#FFE600] text-black shadow-[2px_2px_0_0_#000]'
                 : 'border-transparent bg-transparent text-black/55'
@@ -210,7 +220,7 @@ export default function DashboardClient({
           <button
             type="button"
             onClick={() => setActiveMobileTab('guild')}
-            className={`flex-1 border-2 px-2 py-2 text-[10px] font-black uppercase tracking-[0.16em] transition-all ${
+            className={`flex-1 border-2 px-2 py-2.5 text-xs font-black uppercase tracking-[0.08em] transition-all ${
               activeMobileTab === 'guild'
                 ? 'border-black bg-[#FFE600] text-black shadow-[2px_2px_0_0_#000]'
                 : 'border-transparent bg-transparent text-black/55'
@@ -224,7 +234,7 @@ export default function DashboardClient({
         <div className={`${isOverview ? 'grid' : 'hidden'} grid-cols-1 gap-6 sm:gap-8 sm:grid`}>
           <BattleAreaCanvas />
           <DashboardStats
-            item={sectionReveal}
+            item={reveal}
             user={state.user}
             characterTitle={state.characterTitle}
             isScanning={state.isScannerModalOpen || state.isPending}
@@ -237,7 +247,7 @@ export default function DashboardClient({
 
         <div className={`${isSignals ? 'block' : 'hidden'} sm:block`}>
           <DashboardRadar
-            item={sectionReveal}
+            item={reveal}
             particles={state.particles}
             keywords={state.keywords}
             isPending={state.isPending}
@@ -247,7 +257,7 @@ export default function DashboardClient({
 
         <div className={`${isOverview ? 'grid' : 'hidden'} grid-cols-1 items-stretch gap-6 sm:gap-8 2xl:grid-cols-2`}>
           <DashboardKeywords
-            item={sectionReveal}
+            item={reveal}
             keywords={state.keywords}
             newKeyword={state.newKeyword}
             setNewKeyword={state.setNewKeyword}
@@ -262,7 +272,7 @@ export default function DashboardClient({
 
           <div className="hidden sm:block">
             <DashboardLeaderboard
-              item={sectionReveal}
+              item={reveal}
               dbLeaderboard={dbLeaderboard}
               dbAnalytics={dbAnalytics}
             />
@@ -271,7 +281,7 @@ export default function DashboardClient({
 
         <div className={`${isSignals ? 'block' : 'hidden'} sm:block`}>
           <DashboardFeed
-            item={sectionReveal}
+            item={reveal}
             filteredLeads={state.filteredLeads}
             filter={state.filter}
             setFilter={state.setFilter}
@@ -287,7 +297,7 @@ export default function DashboardClient({
 
         <div className={`${isGuild ? 'block' : 'hidden'} sm:hidden`}>
           <DashboardLeaderboard
-            item={sectionReveal}
+            item={reveal}
             dbLeaderboard={dbLeaderboard}
             dbAnalytics={dbAnalytics}
           />

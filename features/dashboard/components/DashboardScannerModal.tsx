@@ -37,7 +37,7 @@ export function DashboardScannerModal({
         initial={{ scale: 0.94, opacity: 0, y: 16 }}
         animate={{ scale: 1, opacity: 1, y: 0 }}
         exit={{ scale: 0.98, opacity: 0, y: 10 }}
-        className="w-full max-w-4xl overflow-hidden border-4 border-black bg-[#13D7C2] shadow-[12px_12px_0_0_#000]"
+        className="max-h-[calc(100dvh-2rem)] w-full max-w-4xl overflow-y-auto overscroll-contain border-4 border-black bg-[#13D7C2] shadow-[12px_12px_0_0_#000]"
         role="dialog"
         aria-label="Battlestation live scan"
       >
@@ -50,7 +50,7 @@ export function DashboardScannerModal({
               </div>
 
               <div className="min-w-0">
-                <p className="text-[11px] font-black uppercase tracking-[0.16em] text-black/65">
+                <p className="text-xs font-black uppercase tracking-[0.12em] text-black/65">
                   Battlestation live radar
                 </p>
                 <h2 className="truncate text-lg font-black uppercase text-black md:text-2xl">
@@ -72,9 +72,9 @@ export function DashboardScannerModal({
 
         <div className="grid gap-4 bg-[#F4EFE2] p-4 md:grid-cols-[minmax(0,1.2fr)_300px] md:p-5">
           <div className="min-w-0 border-4 border-black bg-[#0C1F2E] p-4 text-[#8CF3E7] shadow-[6px_6px_0_0_#000]">
-            <div className="mb-3 flex flex-wrap items-center gap-2 border-b-2 border-[#8CF3E7]/30 pb-3 text-[11px] font-black uppercase tracking-[0.14em]">
+            <div className="mb-3 flex flex-wrap items-center gap-2 border-b-2 border-[#8CF3E7]/30 pb-3 text-xs font-black uppercase tracking-[0.1em]">
               <span>&gt; Routing live scan through command deck...</span>
-              <span className="border border-[#8CF3E7]/50 px-2 py-1 text-[10px]">
+              <span className="border border-[#8CF3E7]/50 px-2 py-1 text-xs">
                 Live execution feed
               </span>
             </div>
@@ -108,7 +108,7 @@ export function DashboardScannerModal({
 
           <div className="space-y-4">
             <div className="border-4 border-black bg-white p-4 shadow-[6px_6px_0_0_#000]">
-              <p className="text-[10px] font-black uppercase tracking-[0.18em] text-black/55">
+              <p className="text-xs font-black uppercase tracking-[0.12em] text-black/55">
                 Scan status
               </p>
               <div className="mt-3 flex items-center gap-2 text-sm font-black uppercase text-black">
@@ -130,13 +130,13 @@ export function DashboardScannerModal({
             </div>
 
             <div className="border-4 border-black bg-[#FFF7CC] p-4 shadow-[6px_6px_0_0_#000]">
-              <p className="text-[10px] font-black uppercase tracking-[0.18em] text-black/55">
+              <p className="text-xs font-black uppercase tracking-[0.12em] text-black/55">
                 Tactical yield
               </p>
 
               <div className="mt-3 grid grid-cols-2 gap-3">
                 <div className="border-4 border-black bg-white p-3 text-center shadow-[4px_4px_0_0_#000]">
-                  <p className="text-[10px] font-black uppercase tracking-[0.14em] text-black/55">
+                  <p className="text-xs font-black uppercase tracking-[0.1em] text-black/55">
                     Leads
                   </p>
                   <p className="mt-2 text-2xl font-black uppercase text-black">
@@ -145,7 +145,7 @@ export function DashboardScannerModal({
                 </div>
 
                 <div className="border-4 border-black bg-white p-3 text-center shadow-[4px_4px_0_0_#000]">
-                  <p className="text-[10px] font-black uppercase tracking-[0.14em] text-black/55">
+                  <p className="text-xs font-black uppercase tracking-[0.1em] text-black/55">
                     Posts
                   </p>
                   <p className="mt-2 text-2xl font-black uppercase text-black">
@@ -156,7 +156,7 @@ export function DashboardScannerModal({
             </div>
 
             <div className="border-4 border-black bg-white p-4 shadow-[6px_6px_0_0_#000]">
-              <p className="text-[10px] font-black uppercase tracking-[0.18em] text-black/55">
+              <p className="text-xs font-black uppercase tracking-[0.12em] text-black/55">
                 Command notes
               </p>
 
@@ -184,7 +184,7 @@ export function DashboardScannerModal({
                   <div className="flex items-start gap-3">
                     <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-[#15803D]" />
                     <div className="min-w-0">
-                      <p className="text-[10px] font-black uppercase tracking-[0.18em] text-black/55">
+                      <p className="text-xs font-black uppercase tracking-[0.12em] text-black/55">
                         Outcome report
                       </p>
                       <p className="mt-2 text-sm font-black uppercase tracking-[0.05em] text-black">
@@ -204,7 +204,7 @@ export function DashboardScannerModal({
                   <div className="flex items-start gap-3">
                     <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-[#E11D48]" />
                     <div className="min-w-0">
-                      <p className="text-[10px] font-black uppercase tracking-[0.18em] text-black/55">
+                      <p className="text-xs font-black uppercase tracking-[0.12em] text-black/55">
                         Awaiting result
                       </p>
                       <p className="mt-2 text-sm font-black uppercase tracking-[0.05em] text-black">

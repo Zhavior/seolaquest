@@ -82,7 +82,7 @@ export function ProfileCodex({
           <label htmlFor="progress-log-content" className="font-black uppercase text-sm flex items-center gap-2">
             <MessageSquare className="w-4 h-4" /> CREATE PROGRESS LOG
           </label>
-          <span className="bg-[#FFE600] text-black border border-black text-[10px] font-black px-2 py-0.5 flex items-center gap-1">
+          <span className="bg-[#FFE600] text-black border border-black text-xs font-black px-2 py-0.5 flex items-center gap-1">
             <Flame className="w-3 h-3 text-red-500 fill-current" /> +25 XP PER LOG
           </span>
         </div>
@@ -181,7 +181,7 @@ export function ProfileCodex({
                   </span>
 
                   {isPinned && (
-                    <span className="font-black text-[10px] uppercase text-white bg-black px-2 py-0.5 border border-black flex items-center gap-1 shadow-[1px_1px_0px_0px_rgba(0,0,0,1)]">
+                    <span className="font-black text-xs uppercase text-white bg-black px-2 py-0.5 border border-black flex items-center gap-1 shadow-[1px_1px_0px_0px_rgba(0,0,0,1)]">
                       <Pin className="w-3 h-3 rotate-45" /> PINNED
                     </span>
                   )}
@@ -267,7 +267,7 @@ export function ProfileCodex({
                       <div className="space-y-1.5 max-h-36 overflow-y-auto pr-1">
                         {postComments.map((commentText, cIdx) => (
                           <div key={cIdx} className="bg-white border-2 border-black p-2 text-xs font-bold shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] flex items-start gap-2">
-                            <span className="bg-black text-white px-1.5 py-0.5 text-[9px] font-black uppercase shrink-0">
+                            <span className="bg-black text-white px-1.5 py-0.5 text-xs font-black uppercase shrink-0">
                               GUILD MEMBER
                             </span>
                             <span className="text-slate-800">{commentText}</span>
