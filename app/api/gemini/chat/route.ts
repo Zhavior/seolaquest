@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { getGeminiClient } from '@/lib/gemini'
 import { getServerEnv } from '@/lib/env'
+import { getCurrentUser } from '@/lib/auth'
 import { z } from 'zod'
 
 export const dynamic = 'force-dynamic'
@@ -20,6 +21,14 @@ const SYSTEM_INSTRUCTION =
 
 export async function POST(request: Request) {
   try {
+    // Clerk middleware already rejects anonymous callers (see proxy.ts), but the
+    // spend here lands on our Gemini account, so the route states the
+    // requirement itself rather than inheriting it from the route matcher.
+    const user = await getCurrentUser()
+    if (!user) {
+      return NextResponse.json({ error: 'UNAUTHORIZED' }, { status: 401 })
+    }
+
     const ai = getGeminiClient()
     const env = getServerEnv()
 

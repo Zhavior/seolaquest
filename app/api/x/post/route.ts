@@ -1,8 +1,26 @@
 import { NextResponse } from 'next/server'
 import { getXClient } from '@/lib/x'
+import { getCurrentUser } from '@/lib/auth'
 import { z } from 'zod'
 
 export const dynamic = 'force-dynamic'
+
+/**
+ * Posting here writes to the one connected X account, not to anything the
+ * caller owns, so being signed in is not enough to authorize it. Sign-up is
+ * public, which would otherwise make "any account" mean "anyone".
+ *
+ * Unset means nobody is allowed. The allowlist fails closed on purpose: an
+ * empty variable in production must not read as "no restriction".
+ */
+function configuredPosterIds() {
+  return new Set(
+    (process.env.X_POST_ADMIN_USER_IDS ?? '')
+      .split(',')
+      .map((value) => value.trim())
+      .filter(Boolean),
+  )
+}
 
 const postSchema = z.object({
   text: z.string().trim().min(1, 'Post text cannot be empty.').max(280, 'Post text exceeds 280 characters.'),
@@ -28,6 +46,17 @@ function checkRateLimit(): boolean {
 
 export async function POST(request: Request) {
   try {
+    const user = await getCurrentUser()
+    if (!user) {
+      return NextResponse.json({ error: 'UNAUTHORIZED' }, { status: 401 })
+    }
+    if (!configuredPosterIds().has(user.id)) {
+      return NextResponse.json({ error: 'FORBIDDEN' }, { status: 403 })
+    }
+    if (process.env.NODE_ENV === 'production' && process.env.X_POSTING_ENABLED !== 'true') {
+      return NextResponse.json({ error: 'X_POSTING_DISABLED' }, { status: 503 })
+    }
+
     const xClient = getXClient()
     if (!xClient) {
       return NextResponse.json(
