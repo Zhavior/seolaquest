@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback, type ReactNode } from 'react'
+import { useState, useEffect, useCallback, useSyncExternalStore, type ReactNode } from 'react'
 
 import dynamic from 'next/dynamic'
 
@@ -19,62 +19,83 @@ import { sfx } from '@/lib/sfx'
  */
 const CommandPalette = dynamic(() => import('../os/palette/CommandPalette'), { ssr: false })
 
-export interface UserSummary {
-  name?: string | null
-  title?: string | null
-  level?: number
-  xp?: number
-  xpRequired?: number
-  /** Spendable scan credits. The HUD renders this as the MP bar. */
-  questsRemaining?: number
-  spellsCast?: number
-  questsExported?: number
-  /** High-water mark for credits, used as the MP bar's denominator. */
-  maxCredits?: number
-  /** Live signals still awaiting a claim or dismissal. */
-  openQuests?: number
-  profileIconKey?: string | null
+const COLLAPSED_KEY = 'coquest_sidebar_collapsed'
+
+/**
+ * The collapsed rail preference is external state that lives in localStorage,
+ * so it is read through `useSyncExternalStore` rather than mirrored into React
+ * state.
+ *
+ * This is what keeps hydration honest: the server has no localStorage, so it
+ * renders `getServerSnapshot()` (expanded), and React switches to the stored
+ * value straight after hydrating instead of reporting a mismatch. Seeding
+ * `useState` from localStorage — which is what this used to do — made the very
+ * first client render disagree with the server's HTML.
+ */
+/** Fallback for browsers that refuse storage, so the rail still toggles. */
+let collapsedInMemory = false
+
+const collapsedStore = {
+  listeners: new Set<() => void>(),
+  subscribe(listener: () => void) {
+    collapsedStore.listeners.add(listener)
+    return () => {
+      collapsedStore.listeners.delete(listener)
+    }
+  },
+  getSnapshot() {
+    try {
+      return localStorage.getItem(COLLAPSED_KEY) === 'true'
+    } catch {
+      return collapsedInMemory
+    }
+  },
+  getServerSnapshot() {
+    return false
+  },
+  set(next: boolean) {
+    collapsedInMemory = next
+    try {
+      localStorage.setItem(COLLAPSED_KEY, String(next))
+    } catch {
+      // Ignore storage errors — the in-memory value carries this session.
+    }
+    collapsedStore.listeners.forEach((listener) => listener())
+  },
 }
 
 interface CoQuestShellProps {
-  user?: UserSummary
+  /**
+   * Server-rendered HUD (`ShellHud`), handed straight to the status bar. Taking
+   * it as a slot is what keeps the account record on the server.
+   */
+  hud?: ReactNode
   children: ReactNode
 }
 
 export default function CoQuestShell({
-  user,
+  hud,
   children,
 }: CoQuestShellProps) {
-  const [collapsed, setCollapsed] = useState(() => {
-    if (typeof window === 'undefined') return false
-    try {
-      const saved = localStorage.getItem('coquest_sidebar_collapsed')
-      return saved === 'true'
-    } catch {
-      return false
-    }
-  })
+  const collapsed = useSyncExternalStore(
+    collapsedStore.subscribe,
+    collapsedStore.getSnapshot,
+    collapsedStore.getServerSnapshot
+  )
   const [mobileOpen, setMobileOpen] = useState(false)
 
   const openMobile = useCallback(() => setMobileOpen(true), [])
   const closeMobile = useCallback(() => setMobileOpen(false), [])
 
-  const toggleCollapsed = () => {
-    setCollapsed((prev) => {
-      const next = !prev
-      if (next) {
-        sfx.playSidebarCollapse()
-      } else {
-        sfx.playSidebarExpand()
-      }
-      try {
-        localStorage.setItem('coquest_sidebar_collapsed', String(next))
-      } catch {
-        // Ignore storage errors
-      }
-      return next
-    })
-  }
+  const toggleCollapsed = useCallback(() => {
+    const next = !collapsedStore.getSnapshot()
+    if (next) {
+      sfx.playSidebarCollapse()
+    } else {
+      sfx.playSidebarExpand()
+    }
+    collapsedStore.set(next)
+  }, [])
 
   // Keyboard shortcut listener (Cmd+B or Ctrl+B)
   useEffect(() => {
@@ -86,18 +107,18 @@ export default function CoQuestShell({
     }
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [])
+  }, [toggleCollapsed])
 
   return (
     <ShellLayout
       collapsed={collapsed}
       sidebar={
         // Desktop rail only — the mobile drawer is owned by MobileAppShell.
-        <Sidebar user={user} collapsed={collapsed} onToggleCollapsed={toggleCollapsed} />
+        <Sidebar collapsed={collapsed} onToggleCollapsed={toggleCollapsed} />
       }
       statusBar={
         <StatusBar
-          user={user}
+          hud={hud}
           collapsed={collapsed}
           onOpenNavigation={openMobile}
           onToggleCollapsed={toggleCollapsed}

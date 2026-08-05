@@ -16,7 +16,7 @@ export default async function DeliveryPage({ params }: { params: Promise<{ id: s
   if (!delivery) notFound()
 
   return (
-    <div className="min-h-screen bg-[#F4F0EA] p-5 sm:p-8 lg:p-10">
+    <div className="min-h-screen bg-canvas p-5 sm:p-8 lg:p-10">
       <div className="mx-auto max-w-6xl">
         <DeliveryDetail delivery={delivery} />
       </div>

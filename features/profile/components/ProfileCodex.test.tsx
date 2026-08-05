@@ -29,14 +29,14 @@ describe('ProfileCodex touch targets', () => {
         deletePost={vi.fn()}
         pending={false}
         parsePostContent={() => ({ tag: '[WIN]', body: 'Interview booked' })}
-        CARD_COLORS={['bg-white']}
+        CARD_COLORS={['bg-card']}
         CATEGORY_TAGS={[{
           id: 'win',
           tag: '[WIN]',
           label: 'Win',
           icon: Trophy,
           bgColor: 'bg-lime-300',
-          textColor: 'text-black',
+          textColor: 'text-ink',
           desc: 'A win',
         }]}
       />,
@@ -76,7 +76,7 @@ describe('ProfileCodex touch targets', () => {
         deletePost={vi.fn()}
         pending={false}
         parsePostContent={() => ({ tag: null, body: 'Interview booked' })}
-        CARD_COLORS={['bg-white']}
+        CARD_COLORS={['bg-card']}
         CATEGORY_TAGS={[]}
       />,
     )
@@ -108,7 +108,7 @@ describe('ProfileCodex touch targets', () => {
         deletePost={vi.fn()}
         pending={false}
         parsePostContent={() => ({ tag: null, body: 'Interview booked' })}
-        CARD_COLORS={['bg-white']}
+        CARD_COLORS={['bg-card']}
         CATEGORY_TAGS={[]}
       />,
     )

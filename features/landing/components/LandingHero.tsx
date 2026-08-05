@@ -63,29 +63,44 @@ function AnimatedStatBar({
 
   const width = shouldReduceMotion || isInView ? fill : 0
 
-  const panelTone =
-    tone === 'yellow'
-      ? 'bg-[#FFE600]'
-      : tone === 'orange'
-        ? 'bg-[#ffede7]'
-        : 'bg-white'
+  // Each tone is a complete set. The yellow and orange panels stay light in
+  // every theme, so their text has to stay dark — reading `text-ink` off the
+  // page theme would make them vanish in grey/blue mode.
+  const TONES = {
+    yellow: {
+      panel: 'bg-accent',
+      label: 'text-on-accent/70',
+      value: 'text-on-accent',
+      track: 'bg-on-accent/15',
+      bar: 'bg-on-accent',
+    },
+    orange: {
+      panel: 'bg-highlight',
+      label: 'text-on-accent/70',
+      value: 'text-on-accent',
+      track: 'bg-on-accent/10',
+      bar: 'bg-accent-2',
+    },
+    white: {
+      panel: 'bg-card',
+      label: 'text-ink-muted',
+      value: 'text-ink',
+      track: 'bg-inset',
+      bar: 'bg-ink',
+    },
+  } as const
 
-  const barTone =
-    tone === 'yellow'
-      ? 'bg-black'
-      : tone === 'orange'
-        ? 'bg-[#ff5a36]'
-        : 'bg-black'
+  const t = TONES[tone]
 
   return (
-    <div ref={ref} className={`border-2 border-black px-3 py-3 ${panelTone}`}>
-      <p className="text-[10px] font-black uppercase tracking-[0.18em] text-zinc-600">
+    <div ref={ref} className={`border-2 border-outline px-3 py-3 ${t.panel}`}>
+      <p className={`text-[10px] font-black uppercase tracking-[0.18em] ${t.label}`}>
         {label}
       </p>
-      <p className="mt-1 text-2xl font-black uppercase text-black">{value}</p>
-      <div className="mt-3 h-2.5 overflow-hidden border-2 border-black bg-white">
+      <p className={`mt-1 text-2xl font-black uppercase ${t.value}`}>{value}</p>
+      <div className={`mt-3 h-2.5 overflow-hidden border-2 border-outline ${t.track}`}>
         <motion.div
-          className={`h-full ${barTone}`}
+          className={`h-full ${t.bar}`}
           initial={shouldReduceMotion ? false : { width: 0 }}
           animate={{ width: `${width}%` }}
           transition={
@@ -196,13 +211,13 @@ export function LandingHero() {
   const liveFeedLabel = `NEW MATCH · ${quests[feedTick].source}`
 
   const primaryCtaClassName =
-    'group relative inline-flex items-center justify-center gap-3 overflow-hidden border-4 border-black bg-black px-8 py-4 text-lg font-black uppercase tracking-[0.18em] text-white shadow-[4px_4px_0_0_#ff5a36] transition-all duration-75 hover:-translate-x-[2px] hover:-translate-y-[2px] hover:bg-[#1a1a1a] hover:shadow-[6px_6px_0_0_#ff744f] active:translate-x-[3px] active:translate-y-[3px] active:shadow-[2px_2px_0_0_#ff5a36] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#FFE600] focus-visible:ring-offset-2 focus-visible:ring-offset-[#f4ebd8] sm:px-10 sm:py-5 sm:text-xl'
+    'group relative inline-flex items-center justify-center gap-3 overflow-hidden border-4 border-outline bg-black px-8 py-4 text-lg font-black uppercase tracking-[0.18em] text-white shadow-[4px_4px_0_0_#ff5a36] transition-all duration-75 hover:-translate-x-[2px] hover:-translate-y-[2px] hover:bg-[#1a1a1a] hover:shadow-[6px_6px_0_0_#ff744f] active:translate-x-[3px] active:translate-y-[3px] active:shadow-[2px_2px_0_0_#ff5a36] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#FFE600] focus-visible:ring-offset-2 focus-visible:ring-offset-[#f4ebd8] sm:px-10 sm:py-5 sm:text-xl'
 
   const secondaryCtaClassName =
-    'group relative inline-flex items-center justify-center gap-3 overflow-hidden border-4 border-black bg-[#f8f1df] px-8 py-4 text-lg font-black uppercase tracking-[0.14em] text-black shadow-[6px_6px_0_0_#000] transition-all duration-75 hover:-translate-x-[1px] hover:-translate-y-[1px] hover:bg-white hover:shadow-[8px_8px_0_0_#000] active:translate-x-[3px] active:translate-y-[3px] active:shadow-[3px_3px_0_0_#000] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#FFE600] focus-visible:ring-offset-2 focus-visible:ring-offset-[#f4ebd8] sm:px-10 sm:py-5 sm:text-xl'
+    'group relative inline-flex items-center justify-center gap-3 overflow-hidden border-4 border-outline bg-highlight px-8 py-4 text-lg font-black uppercase tracking-[0.14em] text-on-accent shadow-brutal-lg transition-all duration-75 hover:-translate-x-[1px] hover:-translate-y-[1px] hover:bg-highlight-strong hover:shadow-brutal-lg active:translate-x-[3px] active:translate-y-[3px] active:shadow-brutal-sm focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#FFE600] focus-visible:ring-offset-2 focus-visible:ring-offset-[#f4ebd8] sm:px-10 sm:py-5 sm:text-xl'
 
   return (
-    <section className="relative z-10 overflow-hidden bg-[#f4ebd8] px-4 pb-16 pt-24 sm:px-6 sm:pb-24 sm:pt-32">
+    <section className="relative z-10 overflow-hidden bg-canvas px-4 pb-16 pt-24 sm:px-6 sm:pb-24 sm:pt-32">
       <PixelParticleBackground />
 
       <div className="pointer-events-none absolute inset-0 z-0 opacity-[0.04] mix-blend-multiply">
@@ -216,7 +231,7 @@ export function LandingHero() {
       </div>
 
       <div className="relative z-10 mx-auto max-w-7xl">
-        <div className="mb-6 flex border-4 border-black bg-white p-1 shadow-[4px_4px_0_0_#000] sm:hidden">
+        <div className="mb-6 flex border-4 border-outline bg-card p-1 shadow-brutal sm:hidden">
           <button
             type="button"
             onPointerDown={() => {
@@ -227,10 +242,10 @@ export function LandingHero() {
               sfx.playHoverBlip()
               setActiveMobileTab('brief')
             }}
-            className={`flex-1 border-2 px-3 py-2 text-[11px] font-black uppercase tracking-[0.16em] transition-all ${
+            className={`min-h-11 flex-1 border-2 px-3 py-2 text-[11px] font-black uppercase tracking-[0.16em] transition-all ${
               activeMobileTab === 'brief'
-                ? 'border-black bg-[#FFE600] text-black shadow-[2px_2px_0_0_#000]'
-                : 'border-transparent bg-transparent text-black/55'
+                ? 'border-outline bg-accent text-on-accent shadow-brutal-sm'
+                : 'border-transparent bg-transparent text-ink/70'
             }`}
           >
             Quest brief
@@ -245,10 +260,10 @@ export function LandingHero() {
               sfx.playRadarBlip()
               setActiveMobileTab('matches')
             }}
-            className={`flex-1 border-2 px-3 py-2 text-[11px] font-black uppercase tracking-[0.16em] transition-all ${
+            className={`min-h-11 flex-1 border-2 px-3 py-2 text-[11px] font-black uppercase tracking-[0.16em] transition-all ${
               activeMobileTab === 'matches'
-                ? 'border-black bg-[#FFE600] text-black shadow-[2px_2px_0_0_#000]'
-                : 'border-transparent bg-transparent text-black/55'
+                ? 'border-outline bg-accent text-on-accent shadow-brutal-sm'
+                : 'border-transparent bg-transparent text-ink/70'
             }`}
           >
             Matches (2)
@@ -264,7 +279,7 @@ export function LandingHero() {
           <motion.div
             custom={0}
             variants={fadeUp}
-            className="inline-flex items-center gap-2 border-2 border-black bg-[#FFE600] px-3 py-1.5 text-[11px] font-black uppercase tracking-[0.24em] shadow-[4px_4px_0_0_#000] sm:text-xs"
+            className="inline-flex items-center gap-2 border-2 border-outline bg-accent px-3 py-1.5 text-[11px] font-black uppercase tracking-[0.24em] shadow-brutal sm:text-xs"
           >
             <Radar className="h-3.5 w-3.5" />
             Customer intelligence for founders
@@ -273,7 +288,7 @@ export function LandingHero() {
           <motion.h1
             custom={0.08}
             variants={fadeUp}
-            className="mt-6 max-w-4xl text-4xl font-black uppercase leading-[0.95] tracking-[-0.06em] text-black sm:text-6xl lg:text-[80px]"
+            className="mt-6 max-w-4xl text-4xl font-black uppercase leading-[0.95] tracking-[-0.06em] text-ink sm:text-6xl lg:text-[80px]"
           >
             Find real buyer pain
             <span className="mt-2 block text-[#ff5a36]">before you build the wrong thing</span>
@@ -282,7 +297,7 @@ export function LandingHero() {
           <motion.p
             custom={0.16}
             variants={fadeUp}
-            className="mt-4 max-w-xl text-base font-bold leading-relaxed text-black/80 sm:text-lg"
+            className="mt-4 max-w-xl text-base font-bold leading-relaxed text-ink/80 sm:text-lg"
           >
             CoQuest helps founders and operators scan X conversations, spot recurring buyer pain,
             and turn scattered signals into clearer product direction. Reddit is coming soon.
@@ -296,7 +311,7 @@ export function LandingHero() {
             {['Scanning Reddit', 'Scanning X', 'Live signal review', 'Evidence-first workflow'].map((badge) => (
               <span
                 key={badge}
-                className="inline-flex items-center border-2 border-black/80 bg-[#f8f1df] px-3 py-1 text-[10px] font-black uppercase tracking-[0.14em] text-black shadow-[2px_2px_0_0_#000]"
+                className="inline-flex items-center border-2 border-outline/80 bg-highlight px-3 py-1 text-[10px] font-black uppercase tracking-[0.14em] text-on-accent shadow-brutal-sm"
               >
                 {badge}
               </span>
@@ -312,7 +327,7 @@ export function LandingHero() {
               className={primaryCtaClassName}
             >
               <span className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-100 group-hover:opacity-100">
-                <span className="absolute inset-y-0 left-[-20%] w-[18%] -skew-x-12 bg-[#FFE600]/45 blur-[1px]" />
+                <span className="absolute inset-y-0 left-[-20%] w-[18%] -skew-x-12 bg-accent/45 blur-[1px]" />
               </span>
               <Zap className="relative z-[1] h-5 w-5" />
               <span className="relative z-[1]">Start free</span>
@@ -326,7 +341,7 @@ export function LandingHero() {
               className={secondaryCtaClassName}
             >
               <span className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-100 group-hover:opacity-100">
-                <span className="absolute inset-0 bg-[#FFE600]/10" />
+                <span className="absolute inset-0 bg-accent/10" />
               </span>
               <Compass className="relative z-[1] h-5 w-5" />
               <span className="relative z-[1]">See the live console</span>
@@ -336,16 +351,16 @@ export function LandingHero() {
           <motion.div
             custom={0.32}
             variants={fadeUp}
-            className="mt-5 flex max-w-xl items-start gap-3 border-2 border-black bg-[#fff8ea] px-4 py-3 shadow-[3px_3px_0_0_#000]"
+            className="mt-5 flex max-w-xl items-start gap-3 border-2 border-outline bg-highlight px-4 py-3 shadow-brutal-sm"
           >
-            <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center border-2 border-black bg-[#FFE600] text-black shadow-[1px_1px_0_0_#000]">
+            <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center border-2 border-outline bg-accent text-on-accent shadow-brutal-sm">
               <BadgeCheck className="h-5 w-5" />
             </div>
             <div>
-              <p className="text-sm font-black uppercase tracking-[0.16em] text-black">
+              <p className="text-sm font-black uppercase tracking-[0.16em] text-ink">
                 Zero fake proof
               </p>
-              <p className="mt-1 text-sm font-bold leading-relaxed text-black/70">
+              <p className="mt-1 text-sm font-bold leading-relaxed text-ink/70">
                 No invented case studies, no inflated automation claims, and no pretend live scans.
               </p>
             </div>
@@ -362,10 +377,10 @@ export function LandingHero() {
           }
           className={`relative pt-1 ${activeMobileTab === 'matches' ? 'block' : 'hidden'} sm:block`}
         >
-          <div className="absolute -left-4 top-8 hidden h-16 w-16 border-4 border-black bg-[#FFE600] shadow-[5px_5px_0_0_#000] lg:block" />
+          <div className="absolute -left-4 top-8 hidden h-16 w-16 border-4 border-outline bg-accent shadow-brutal lg:block" />
 
-          <div className="relative border-4 border-black bg-white shadow-[12px_12px_0_0_#000]">
-            <div className="border-b-4 border-black bg-black px-5 py-4 text-white">
+          <div className="relative border-4 border-outline bg-card shadow-brutal-lg">
+            <div className="border-b-4 border-outline bg-black px-5 py-4 text-white">
               <div className="flex items-center justify-between gap-4">
                 <div>
                   <p className="text-[11px] font-black uppercase tracking-[0.22em] text-[#FFE600]">
@@ -385,30 +400,30 @@ export function LandingHero() {
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="h-3 w-3 border-2 border-black bg-[#ff5a36]" />
-                  <span className="h-3 w-3 border-2 border-black bg-[#FFE600]" />
-                  <span className="h-3 w-3 border-2 border-black bg-white" />
+                  <span className="h-3 w-3 border-2 border-outline bg-accent-2" />
+                  <span className="h-3 w-3 border-2 border-outline bg-accent" />
+                  <span className="h-3 w-3 border-2 border-outline bg-card" />
                 </div>
               </div>
             </div>
 
-            <div className="grid gap-4 bg-[#f4ebd8] p-5 sm:p-6">
-              <div className="border-[3px] border-black bg-white p-4 shadow-[5px_5px_0_0_#000]">
+            <div className="grid gap-4 bg-canvas p-5 sm:p-6">
+              <div className="border-[3px] border-outline bg-card p-4 shadow-brutal">
                 <div className="flex items-center justify-between gap-3">
                   <div>
-                    <p className="text-[10px] font-black uppercase tracking-[0.18em] text-zinc-500">
+                    <p className="text-[10px] font-black uppercase tracking-[0.18em] text-ink-muted">
                       Active research goal
                     </p>
-                    <h2 className="mt-1 text-xl font-black uppercase text-black">
+                    <h2 className="mt-1 text-xl font-black uppercase text-ink">
                       {activeQuest.title}
                     </h2>
                   </div>
-                  <div className="flex h-12 w-12 shrink-0 items-center justify-center border-[3px] border-black bg-[#ff5a36] text-black shadow-[4px_4px_0_0_#000]">
+                  <div className="flex h-12 w-12 shrink-0 items-center justify-center border-[3px] border-outline bg-accent-2 text-on-accent shadow-brutal">
                     <Swords className="h-6 w-6" />
                   </div>
                 </div>
 
-                <p className="mt-3 text-sm font-bold leading-relaxed text-zinc-700">
+                <p className="mt-3 text-sm font-bold leading-relaxed text-ink-muted">
                   {activeQuest.detail}
                 </p>
 
@@ -419,7 +434,7 @@ export function LandingHero() {
                 </div>
               </div>
 
-              <div className="border-[3px] border-black bg-black p-4 text-white shadow-[5px_5px_0_0_#000]">
+              <div className="border-[3px] border-outline bg-black p-4 text-white shadow-brutal">
                 <div className="flex items-center justify-between gap-3">
                   <div>
                     <p className="text-[10px] font-black uppercase tracking-[0.18em] text-[#FFE600]">
@@ -483,12 +498,12 @@ export function LandingHero() {
                                 ? { duration: 0 }
                                 : { duration: 0.2, ease: [0.22, 1, 0.36, 1] }
                             }
-                            className="mt-3 overflow-hidden border-2 border-[#FFE600] bg-[#FFE600] px-3 py-3 text-black"
+                            className="mt-3 overflow-hidden border-2 border-[#FFE600] bg-accent px-3 py-3 text-on-accent"
                           >
-                            <p className="text-[10px] font-black uppercase tracking-[0.18em] text-black/60">
+                            <p className="text-[10px] font-black uppercase tracking-[0.18em] text-on-accent/60">
                               {quest.source}
                             </p>
-                            <p className="mt-2 text-sm font-bold leading-relaxed text-black">
+                            <p className="mt-2 text-sm font-bold leading-relaxed text-on-accent">
                               {quest.snippet}
                             </p>
                           </motion.div>

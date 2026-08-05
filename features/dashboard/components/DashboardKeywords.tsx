@@ -33,7 +33,7 @@ function getKeywordTone(label: string) {
     return 'bg-[#FFF3BF]'
   }
 
-  return 'bg-white'
+  return 'bg-card'
 }
 
 export function DashboardKeywords({
@@ -55,32 +55,32 @@ export function DashboardKeywords({
     <motion.section
       id="tracked-keywords"
       variants={item}
-      className="flex min-w-0 flex-col border-4 border-black bg-[#FFF7CC] p-5 shadow-[8px_8px_0px_#000] md:p-6"
+      className="flex min-w-0 flex-col border-4 border-outline bg-highlight p-5 shadow-brutal-lg md:p-6"
     >
       <div className="flex flex-col gap-5">
-        <div className="flex flex-col gap-4 border-b-4 border-black pb-4 lg:flex-row lg:items-end lg:justify-between">
+        <div className="flex flex-col gap-4 border-b-4 border-outline pb-4 lg:flex-row lg:items-end lg:justify-between">
           <div className="min-w-0">
-            <div className="mb-3 inline-flex items-center gap-2 border-4 border-black bg-[#13D7C2] px-3 py-2 shadow-[4px_4px_0px_#000]">
-              <Radar className="h-4 w-4 text-black" />
-              <span className="text-xs font-black uppercase tracking-[0.12em] text-black">
+            <div className="mb-3 inline-flex items-center gap-2 border-4 border-outline bg-[#13D7C2] px-3 py-2 shadow-brutal">
+              <Radar className="h-4 w-4 text-on-accent" />
+              <span className="text-xs font-black uppercase tracking-[0.12em] text-on-accent">
                 Signal Queue
               </span>
             </div>
 
-            <h2 className="text-2xl font-black uppercase leading-tight text-black md:text-3xl">
+            <h2 className="text-2xl font-black uppercase leading-tight text-ink md:text-3xl">
               Track live buying intent
             </h2>
 
-            <p className="mt-2 max-w-2xl text-sm font-bold leading-6 text-black/70">
+            <p className="mt-2 max-w-2xl text-sm font-bold leading-6 text-ink/70">
               Add keywords, load presets, and keep your hunt list tight without wasting dashboard space.
             </p>
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
-            <div className="border-4 border-black bg-white px-3 py-2 text-xs font-black uppercase shadow-[4px_4px_0px_#000]">
+            <div className="border-4 border-outline bg-card px-3 py-2 text-xs font-black uppercase shadow-brutal">
               {keywords.length} tracked
             </div>
-            <div className="border-4 border-black bg-[#FFE082] px-3 py-2 text-xs font-black uppercase shadow-[4px_4px_0px_#000]">
+            <div className="border-4 border-outline bg-highlight-strong px-3 py-2 text-xs font-black uppercase shadow-brutal">
               {isPending ? 'Updating…' : selectedHeroClass}
             </div>
           </div>
@@ -99,7 +99,7 @@ export function DashboardKeywords({
             onChange={(e) => setNewKeyword(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && addKeyword()}
             placeholder="Add a keyword or phrase..."
-            className="min-w-0 flex-[1.6] border-4 border-black bg-white px-4 py-3 font-black text-base shadow-[4px_4px_0px_#000] focus:outline-none focus:ring-4 focus:ring-[#13D7C2]"
+            className="min-w-0 flex-[1.6] border-4 border-outline bg-card px-4 py-3 font-black text-base shadow-brutal focus:outline-none focus:ring-4 focus:ring-[#13D7C2]"
           />
 
           <label htmlFor="keyword-class" className="sr-only">
@@ -110,7 +110,7 @@ export function DashboardKeywords({
             id="keyword-class"
             value={selectedHeroClass}
             onChange={(e) => setSelectedHeroClass(e.target.value)}
-            className="min-w-0 xl:w-[220px] border-4 border-black bg-[#13D7C2] px-4 py-3 font-black text-sm uppercase shadow-[4px_4px_0px_#000] focus:outline-none"
+            className="min-w-0 xl:w-[220px] border-4 border-outline bg-[#13D7C2] px-4 py-3 font-black text-sm uppercase shadow-brutal focus:outline-none"
           >
             <option value="Warrior 🥷">Warrior 🥷</option>
             <option value="Mage 🧙‍♂️">Mage 🧙‍♂️</option>
@@ -121,7 +121,7 @@ export function DashboardKeywords({
             type="button"
             onClick={addKeyword}
             disabled={isPending}
-            className="inline-flex min-h-[56px] items-center justify-center gap-2 border-4 border-black bg-black px-5 py-3 font-black uppercase text-[#FFE600] shadow-[4px_4px_0px_#000] transition-transform hover:-translate-y-0.5 disabled:opacity-50 xl:w-auto"
+            className="inline-flex min-h-[56px] items-center justify-center gap-2 border-4 border-outline bg-black px-5 py-3 font-black uppercase text-[#FFE600] shadow-brutal transition-transform hover:-translate-y-0.5 disabled:opacity-50 xl:w-auto"
           >
             <Plus aria-hidden="true" className="h-5 w-5 shrink-0 stroke-[3px]" />
             Arm Signal
@@ -131,8 +131,8 @@ export function DashboardKeywords({
         {notice ? (
           <div
             id="dashboard-notice"
-            className={`border-4 border-black px-4 py-3 text-sm font-black shadow-[4px_4px_0px_#000] ${
-              noticeIsError ? 'bg-[#FFD6D6] text-black' : 'bg-[#C7FFF3] text-black'
+            className={`border-4 border-outline px-4 py-3 text-sm font-black shadow-brutal ${
+              noticeIsError ? 'bg-[#FFD6D6] text-on-accent' : 'bg-[#C7FFF3] text-on-accent'
             }`}
           >
             {notice}
@@ -146,7 +146,7 @@ export function DashboardKeywords({
               type="button"
               onClick={() => handlePresetClick(preset)}
               disabled={isPending}
-              className="inline-flex items-center gap-2 border-2 border-black bg-white px-3 py-2 text-xs font-black uppercase shadow-[2px_2px_0px_#000] transition-transform hover:-translate-y-0.5 disabled:opacity-50"
+              className="inline-flex items-center gap-2 border-2 border-outline bg-card px-3 py-2 text-xs font-black uppercase shadow-brutal-sm transition-transform hover:-translate-y-0.5 disabled:opacity-50"
             >
               <Sparkles className="h-3.5 w-3.5" />
               {preset}
@@ -167,10 +167,10 @@ export function DashboardKeywords({
                     initial={{ opacity: 0, y: 6 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -6 }}
-                    className={`flex min-h-[132px] min-w-0 flex-col justify-between border-4 border-black p-4 shadow-[4px_4px_0px_#000] ${getKeywordTone(label)}`}
+                    className={`flex min-h-[132px] min-w-0 flex-col justify-between border-4 border-outline p-4 shadow-brutal ${getKeywordTone(label)}`}
                   >
                     <div className="flex items-start justify-between gap-3">
-                      <p className="min-w-0 text-base font-black uppercase leading-6 text-black break-words">
+                      <p className="min-w-0 text-base font-black uppercase leading-6 text-ink break-words">
                         {label}
                       </p>
 
@@ -179,17 +179,17 @@ export function DashboardKeywords({
                         onClick={() => removeKeyword(keyword.id)}
                         disabled={isPending}
                         aria-label={`Remove ${label}`}
-                        className="inline-flex h-10 w-10 shrink-0 items-center justify-center border-2 border-black bg-white shadow-[2px_2px_0px_#000] disabled:opacity-50"
+                        className="inline-flex h-10 w-10 shrink-0 items-center justify-center border-2 border-outline bg-card shadow-brutal-sm disabled:opacity-50"
                       >
                         <X className="h-4 w-4" />
                       </button>
                     </div>
 
                     <div className="mt-4 flex items-center justify-between gap-2">
-                      <span className="border-2 border-black bg-black px-2 py-1 text-xs font-black uppercase tracking-[0.08em] text-[#FFE600]">
+                      <span className="border-2 border-outline bg-black px-2 py-1 text-xs font-black uppercase tracking-[0.08em] text-[#FFE600]">
                         Active
                       </span>
-                      <span className="truncate text-xs font-black uppercase text-black/55">
+                      <span className="truncate text-xs font-black uppercase text-ink/55">
                         {selectedHeroClass}
                       </span>
                     </div>
@@ -200,10 +200,10 @@ export function DashboardKeywords({
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                className="md:col-span-2 2xl:col-span-3 border-4 border-dashed border-black bg-[#FFFBEA] px-6 py-10 text-center shadow-[4px_4px_0px_#000]"
+                className="md:col-span-2 2xl:col-span-3 border-4 border-dashed border-outline bg-[#FFFBEA] px-6 py-10 text-center shadow-brutal"
               >
-                <p className="text-lg font-black uppercase text-black">No tracked keywords yet</p>
-                <p className="mt-2 text-sm font-bold text-black/65">
+                <p className="text-lg font-black uppercase text-on-accent">No tracked keywords yet</p>
+                <p className="mt-2 text-sm font-bold text-ink/65">
                   Add one phrase or tap a preset to start filling this queue.
                 </p>
               </motion.div>

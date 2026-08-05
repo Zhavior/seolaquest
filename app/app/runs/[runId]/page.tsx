@@ -20,7 +20,7 @@ export default async function ScanRunPage({
   if (!run) notFound()
 
   return (
-    <div className="min-h-screen bg-[#F4F0EA] p-5 sm:p-8 lg:p-10">
+    <div className="min-h-screen bg-canvas p-5 sm:p-8 lg:p-10">
       <div className="mx-auto max-w-6xl">
         <ScanRunDetail run={run} />
       </div>

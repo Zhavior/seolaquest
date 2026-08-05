@@ -4,6 +4,366 @@
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 }
 
+/* ══ THEME PALETTES ═══════════════════════════════════════════════════════
+   Raw values only, scoped by `data-theme` on <html> (set pre-paint by
+   components/theme/ThemeScript.tsx). Components never reference these
+   directly — they use the semantic utilities mapped in `@theme inline` below,
+   which is what lets one 40-line block own every colour decision.
+
+   Two rules hold across all three themes:
+     • Elevation is monotonic: base < surface < card, and inset sits one step
+       *below* card (recessed sub-panels and form fields).
+     • Status colours are language, not decoration — green means healthy in
+       every theme. Only surfaces and the secondary accent carry theme
+       personality; the brand yellow accent is constant.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+:root,
+[data-theme="parchment"] {
+  color-scheme: light;
+
+  --bg-base: #F4F0EA;
+  --bg-surface: #FDFBF7;
+  --bg-card: #FFFFFF;
+  --bg-inset: #F4F4F5;
+
+  --border-main: #000000;
+  --border-strong: #000000;
+
+  /* Light theme keeps the classic cut-paper slab. */
+  --shadow-color: #000000;
+  --shadow-accent: #000000;
+
+  --ink-primary-base: #0A0A0A;
+  --ink-muted-base: #52525B;
+  --text-primary: var(--ink-primary-base);
+  --text-muted: var(--ink-muted-base);
+  --text-inverse: #FFFFFF;
+  --text-on-accent: #000000;
+
+  --accent-primary: #FFE600;
+  --accent-secondary: #FF5722;
+
+  /* Highlighter panels stay light in every theme, so the black text they
+     carry keeps working — a sticky-note accent, not a surface. */
+  --bg-highlight: #FFF8D9;
+  --bg-highlight-strong: #FFD84D;
+
+  --status-success: #16A34A;
+  --status-warning: #D97706;
+  --status-danger: #DC2626;
+  --status-info: #0891B2;
+
+  --focus-ring: #000000;
+  --focus-halo: #FFE600;
+
+  /* Ruled notebook paper. */
+  --canvas-texture: repeating-linear-gradient(
+    transparent, transparent 39px,
+    rgba(0, 0, 0, 0.06) 39px, rgba(0, 0, 0, 0.06) 40px
+  );
+}
+
+[data-theme="grey"] {
+  color-scheme: dark;
+
+  --bg-base: #0D1117;
+  --bg-surface: #161B22;
+  --bg-card: #1E252E;
+  --bg-inset: #14191F;
+
+  --border-main: #313A46;
+  --border-strong: #64748B;
+
+  /* A black slab is invisible on a near-black ground, so on dark themes the
+     light border carries the silhouette and the offset slab is off by
+     default. `shadow-brutal-accent` opts hero/CTA cards back in. */
+  --shadow-color: transparent;
+  --shadow-accent: #FFE600;
+
+  --ink-primary-base: #F3F4F6;
+  --ink-muted-base: #9CA3AF;
+  --text-primary: var(--ink-primary-base);
+  --text-muted: var(--ink-muted-base);
+  --text-inverse: #0D1117;
+  --text-on-accent: #000000;
+
+  --accent-primary: #FFE600;
+  --accent-secondary: #F97316;
+
+  /* Highlighter panels stay light in every theme, so the black text they
+     carry keeps working — a sticky-note accent, not a surface. */
+  --bg-highlight: #F4E4A6;
+  --bg-highlight-strong: #FFD84D;
+
+  --status-success: #4ADE80;
+  --status-warning: #FBBF24;
+  --status-danger: #F87171;
+  --status-info: #38BDF8;
+
+  --focus-ring: #F3F4F6;
+  --focus-halo: #FFE600;
+
+  /* HUD grid, not ruled paper. */
+  --canvas-texture:
+    linear-gradient(to right, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+}
+
+[data-theme="blue"] {
+  color-scheme: dark;
+
+  --bg-base: #0A1128;
+  --bg-surface: #101B36;
+  --bg-card: #16244A;
+  --bg-inset: #0E1A33;
+
+  --border-main: #2C4370;
+  --border-strong: #4C6D9C;
+
+  --shadow-color: transparent;
+  --shadow-accent: #38BDF8;
+
+  --ink-primary-base: #E2E8F0;
+  --ink-muted-base: #93A7C7;
+  --text-primary: var(--ink-primary-base);
+  --text-muted: var(--ink-muted-base);
+  --text-inverse: #0A1128;
+  --text-on-accent: #000000;
+
+  --accent-primary: #FFE600;
+  /* #FF007F reads at ~4:1 here — fine on a 900-weight badge, not on 12px
+     label text. Rose-400 carries the cyber-coral note and passes AA. */
+  --accent-secondary: #FB7185;
+
+  /* Highlighter panels stay light in every theme, so the black text they
+     carry keeps working — a sticky-note accent, not a surface. */
+  --bg-highlight: #F2E6B0;
+  --bg-highlight-strong: #FFD84D;
+
+  --status-success: #4ADE80;
+  --status-warning: #FBBF24;
+  --status-danger: #F87171;
+  --status-info: #38BDF8;
+
+  --focus-ring: #E2E8F0;
+  --focus-halo: #FFE600;
+
+  --canvas-texture:
+    linear-gradient(to right, rgba(56, 189, 248, 0.06) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(56, 189, 248, 0.06) 1px, transparent 1px);
+}
+
+/* Ink for fills that are always dark (bg-black and friends) — identical in
+   every theme, because the fill itself is. */
+:root {
+  --text-on-dark: #F8FAFC;
+  --text-on-dark-muted: #CBD5E1;
+}
+
+/* ══ SEMANTIC TOKEN MAP ═══════════════════════════════════════════════════
+   `inline` is load-bearing: a plain `@theme` would resolve var(--bg-card) once
+   at :root and freeze it, so later [data-theme] changes would not propagate.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+@theme inline {
+  /* Surfaces */
+  --color-canvas: var(--bg-base);
+  --color-surface: var(--bg-surface);
+  --color-card: var(--bg-card);
+  --color-inset: var(--bg-inset);
+  --color-highlight: var(--bg-highlight);
+  --color-highlight-strong: var(--bg-highlight-strong);
+
+  /* Lines */
+  --color-hairline: var(--border-main);
+  --color-outline: var(--border-strong);
+
+  /* Type */
+  --color-ink: var(--text-primary);
+  --color-ink-muted: var(--text-muted);
+  --color-ink-inverse: var(--text-inverse);
+  --color-on-accent: var(--text-on-accent);
+
+  /* Accents + status */
+  --color-accent: var(--accent-primary);
+  --color-accent-2: var(--accent-secondary);
+  --color-success: var(--status-success);
+  --color-warning: var(--status-warning);
+  --color-danger: var(--status-danger);
+  --color-info: var(--status-info);
+
+  /* Neobrutalist offset slabs — theme-aware, no !important overrides needed. */
+  --shadow-brutal-sm: 2px 2px 0 0 var(--shadow-color);
+  --shadow-brutal: 4px 4px 0 0 var(--shadow-color);
+  --shadow-brutal-lg: 8px 8px 0 0 var(--shadow-color);
+  --shadow-brutal-accent: 6px 6px 0 0 var(--shadow-accent);
+}
+
+/* ── Ink on bright surfaces ───────────────────────────────────────────────
+   Yellow, coral and the status colours stay bright in every theme, so text on
+   them must stay black — never the theme's ink, which goes light in grey and
+   blue mode.
+
+   Rather than fighting each `text-*` utility for specificity, a bright fill
+   redefines what "ink" *means* for its subtree: `--text-primary` and
+   `--text-muted` become the on-accent colour, so `text-ink`, `text-ink-muted`
+   and `text-ink/60` inside it all resolve to black on their own. A themed
+   surface nested inside a bright panel restores the theme's ink below, so the
+   nearest surface always wins. */
+@layer base {
+  .bg-accent,
+  .bg-accent-2,
+  .bg-highlight,
+  .bg-highlight-strong,
+  .bg-success,
+  .bg-warning,
+  .bg-danger,
+  .bg-info {
+    --text-primary: var(--text-on-accent);
+    --text-muted: color-mix(in srgb, var(--text-on-accent) 70%, transparent);
+    color: var(--text-primary);
+  }
+
+  /* Nearest surface wins: a themed panel inside a bright one gets theme ink
+     back, for its own text and for anything it contains. */
+  .bg-card,
+  .bg-canvas,
+  .bg-surface,
+  .bg-inset {
+    --text-primary: var(--ink-primary-base);
+    --text-muted: var(--ink-muted-base);
+    color: var(--text-primary);
+  }
+
+  /* BEGIN generated by scripts/audit-bright-fills.sh — do not hand-edit */
+  /* Bright literal fills: pinned to dark ink in every theme. */
+  [class~="bg-[#00D6B3]"],
+  [class~="bg-[#00FFFF]"],
+  [class~="bg-[#00c951]"],
+  [class~="bg-[#00ff95]"],
+  [class~="bg-[#10B981]"],
+  [class~="bg-[#13D7C2]"],
+  [class~="bg-[#22c55e]"],
+  [class~="bg-[#38BDF8]"],
+  [class~="bg-[#3B82F6]"],
+  [class~="bg-[#86EFAC]"],
+  [class~="bg-[#8B5CF6]"],
+  [class~="bg-[#8CF3E7]"],
+  [class~="bg-[#A855F7]"],
+  [class~="bg-[#B8FFF3]"],
+  [class~="bg-[#BAE6FD]"],
+  [class~="bg-[#BBF7D0]"],
+  [class~="bg-[#C7FFF3]"],
+  [class~="bg-[#CFFAFE]"],
+  [class~="bg-[#D97706]"],
+  [class~="bg-[#D9FFE3]"],
+  [class~="bg-[#DDD6FE]"],
+  [class~="bg-[#E2E8F0]"],
+  [class~="bg-[#E7E2DA]"],
+  [class~="bg-[#E9D5FF]"],
+  [class~="bg-[#ECFCCB]"],
+  [class~="bg-[#F0F9FF]"],
+  [class~="bg-[#F3E5E5]"],
+  [class~="bg-[#F4E2FF]"],
+  [class~="bg-[#F4EFE2]"],
+  [class~="bg-[#F4EFE6]"],
+  [class~="bg-[#F59E0B]"],
+  [class~="bg-[#F7B500]"],
+  [class~="bg-[#F7C7C7]"],
+  [class~="bg-[#F7D046]"],
+  [class~="bg-[#F7F1DD]"],
+  [class~="bg-[#F8F7F3]"],
+  [class~="bg-[#F8FAFC]"],
+  [class~="bg-[#FAF5FF]"],
+  [class~="bg-[#FAF6EE]"],
+  [class~="bg-[#FB7185]"],
+  [class~="bg-[#FCA5A5]"],
+  [class~="bg-[#FCD34D]"],
+  [class~="bg-[#FECACA]"],
+  [class~="bg-[#FF0055]"],
+  [class~="bg-[#FF3333]"],
+  [class~="bg-[#FF4500]"],
+  [class~="bg-[#FF7043]"],
+  [class~="bg-[#FF8A00]"],
+  [class~="bg-[#FFB4A2]"],
+  [class~="bg-[#FFD2A8]"],
+  [class~="bg-[#FFD6D6]"],
+  [class~="bg-[#FFE0C7]"],
+  [class~="bg-[#FFE3C7]"],
+  [class~="bg-[#FFE9A3]"],
+  [class~="bg-[#FFF1F2]"],
+  [class~="bg-[#FFF3BF]"],
+  [class~="bg-[#FFF4BF]"],
+  [class~="bg-[#FFF7ED]"],
+  [class~="bg-[#FFF9EC]"],
+  [class~="bg-[#FFFBEA]"],
+  [class~="bg-[#FFFBEB]"],
+  [class~="bg-[#a855f7]"],
+  [class~="bg-[#ef4444]"],
+  [class~="bg-[#f7f1e8]"],
+  [class~="bg-[#facc15]"],
+  [class~="bg-[#ff4500]"],
+  [class~="bg-[#ffd200]"],
+  [class~="bg-[#fff1bf]"],
+  [class~="bg-[#fff3b0]"],
+  [class~="bg-zinc-200"],
+  [class~="bg-zinc-300"],
+  [class~="bg-zinc-400"],
+  [class~="bg-slate-200"],
+  [class~="bg-slate-300"],
+  [class~="bg-gray-200"],
+  [class~="bg-gray-300"],
+  [class~="bg-yellow-300"] {
+    --text-primary: var(--text-on-accent);
+    --text-muted: color-mix(in srgb, var(--text-on-accent) 70%, transparent);
+    color: var(--text-primary);
+  }
+
+  /* Dark literal fills: pinned to light ink in every theme. */
+  [class~="bg-[#000000]"],
+  [class~="bg-[#06121C]"],
+  [class~="bg-[#0C1F2E]"],
+  [class~="bg-[#111827]"],
+  [class~="bg-[#121212]"],
+  [class~="bg-[#1E293B]"],
+  [class~="bg-[#1a1a1a]"],
+  [class~="bg-[#2F5A00]"],
+  [class~="bg-[#334155]"],
+  [class~="bg-[#4169e1]"],
+  [class~="bg-[#7A5200]"],
+  [class~="bg-[#8A2BE2]"],
+  [class~="bg-[#D92D20]"],
+  [class~="bg-[#DC2626]"],
+  [class~="bg-black"],
+  [class~="bg-zinc-600"],
+  [class~="bg-zinc-700"],
+  [class~="bg-zinc-800"],
+  [class~="bg-zinc-900"],
+  [class~="bg-slate-700"],
+  [class~="bg-slate-800"],
+  [class~="bg-slate-900"],
+  [class~="bg-slate-950"] {
+    --text-primary: var(--text-on-dark);
+    --text-muted: var(--text-on-dark-muted);
+    color: var(--text-primary);
+  }
+  /* END generated */
+}
+
+/* Escape hatches for the rare per-theme special case. */
+@custom-variant theme-parchment (&:where([data-theme="parchment"] *));
+@custom-variant theme-grey (&:where([data-theme="grey"] *));
+@custom-variant theme-blue (&:where([data-theme="blue"] *));
+
+/* Freeze transitions for one frame during a swap (see ThemeProvider). */
+[data-theme-switching] *,
+[data-theme-switching] *::before,
+[data-theme-switching] *::after {
+  transition: none !important;
+  animation-duration: 0.01ms !important;
+}
+
 /* Safe-area padding for mobile shell chrome (notch / home indicator).
    Requires `viewportFit: 'cover'` on the root viewport export. */
 @utility pt-safe {
@@ -30,6 +390,15 @@
     box-sizing: border-box;
   }
 
+  /* Canvas colours live here rather than as an inline style on <body>, which
+     no stylesheet (and therefore no theme) could ever override. */
+  body {
+    background-color: var(--bg-base);
+    background-image: var(--canvas-texture);
+    background-size: auto, 40px 40px, 40px 40px;
+    color: var(--text-primary);
+  }
+
   img, svg, video, canvas {
     max-width: 100%;
   }
@@ -43,17 +412,16 @@
   }
 }
 
-/* Hardened Mobile Responsive Rules (< 640px) */
+/* Hardened Mobile Responsive Rules (< 640px)
+   Offset slabs shrink on small screens so they don't eat the gutter. Because
+   the shadow utilities resolve through these theme vars, redefining them here
+   retargets every `shadow-brutal*` at once — no per-class !important list. */
 @media (max-width: 639px) {
-  .shadow-\[4px_4px_0_0_\#000\],
-  .shadow-\[4px_4px_0px_0px_rgba\(0\,0\,0\,1\)\],
-  .shadow-\[5px_5px_0_0_\#000\],
-  .shadow-\[6px_6px_0_0_\#000\],
-  .shadow-\[6px_6px_0px_0px_rgba\(0\,0\,0\,1\)\],
-  .shadow-\[8px_8px_0_0_\#000\],
-  .shadow-\[10px_10px_0_0_\#000\],
-  .shadow-\[12px_12px_0_0_\#000\] {
-    box-shadow: 2.5px 2.5px 0 0 #000 !important;
+  :root {
+    --shadow-brutal-sm: 1.5px 1.5px 0 0 var(--shadow-color);
+    --shadow-brutal: 2.5px 2.5px 0 0 var(--shadow-color);
+    --shadow-brutal-lg: 4px 4px 0 0 var(--shadow-color);
+    --shadow-brutal-accent: 3px 3px 0 0 var(--shadow-accent);
   }
 }
 
@@ -131,8 +499,8 @@
 }
 
 .notebook-pattern {
-  background-color: #F4F0EA;
-  background-image: radial-[#000000] 1px, transparent 0;
+  background-color: var(--bg-base);
+  background-image: radial-gradient(var(--border-main) 1px, transparent 0);
   background-size: 24px 24px;
 }
 
@@ -253,14 +621,14 @@
   left: 0.75rem;
   z-index: 10000;
   transform: translateY(calc(-100% - 1.5rem));
-  border: 3px solid #000;
-  background: #FFE600;
-  color: #000;
+  border: 3px solid var(--border-strong);
+  background: var(--accent-primary);
+  color: var(--text-on-accent);
   padding: 0.75rem 1rem;
   font-weight: 900;
   line-height: 1;
   text-transform: uppercase;
-  box-shadow: 4px 4px 0 #000;
+  box-shadow: 4px 4px 0 var(--focus-ring);
 }
 
 .skip-link:focus-visible {
@@ -277,9 +645,9 @@
   [contenteditable="true"],
   [tabindex]:not([tabindex="-1"])
 ):focus-visible {
-  outline: 3px solid #000;
+  outline: 3px solid var(--focus-ring);
   outline-offset: 3px;
-  box-shadow: 0 0 0 6px #FFE600;
+  box-shadow: 0 0 0 6px var(--focus-halo);
 }
 
 /* Keep motion optional while preserving final component state and content. */
@@ -300,156 +668,44 @@
   }
 }
 
-/* ── Grey Background Mode (Sun/Moon Toggle High-Contrast System) ───────── */
-html.grey-mode,
-html.grey-mode body,
-html.grey-mode main,
-html.grey-mode #__next,
-html.grey-mode [data-nextjs-scroll-focus-boundary] {
-  background-color: #1E293B !important;
-  color: #F8FAFC !important;
+
+/* ── Shell layout geometry ────────────────────────────────────────────────
+   The sidebar uses `sticky` positioning anchored to the header's real height.
+   We expose it as a CSS custom property so there is exactly ONE place to
+   update when the header height changes — here in CSS, not scattered across
+   component className strings.
+
+   The StatusBar renders h-16 (64px) on mobile and h-20 (80px) on sm+.
+   We add border-b-4 (4px) for a true total of 68px / 84px — but since the
+   header itself is a `sticky` element outside the scroll container, the
+   sidebar only needs to offset by the rendered height, which Tailwind sets
+   as a height utility (h-16 = 4rem = 64px, h-20 = 5rem = 80px). The
+   border sits inside that height box in the current markup, so:
+     mobile  → --header-h: 64px  (h-16)
+     sm+     → --header-h: 80px  (h-20)                                    */
+:root {
+  --header-h: 64px;
 }
 
-/* Light canvas backgrounds -> Slate-800 (#1E293B) */
-html.grey-mode [class*="bg-[#FDFBF7]"],
-html.grey-mode [class*="bg-[#F4F0EA]"],
-html.grey-mode [class*="bg-[#f4ebd8]"],
-html.grey-mode [class*="bg-[#FAF7F2]"],
-html.grey-mode [class*="bg-[#FFF8D9]"],
-html.grey-mode .bg-\[\#FDFBF7\],
-html.grey-mode .bg-\[\#F4F0EA\],
-html.grey-mode .bg-\[\#f4ebd8\],
-html.grey-mode .bg-\[\#FAF7F2\],
-html.grey-mode .bg-\[\#FFF8D9\] {
-  background-color: #1E293B !important;
+@media (min-width: 640px) {
+  :root {
+    --header-h: 80px;
+  }
 }
 
-/* Hard white card containers -> Dark Slate (#0F172A) */
-html.grey-mode .bg-white,
-html.grey-mode [class*="bg-white"] {
-  background-color: #0F172A !important;
-  color: #F8FAFC !important;
+/* ── SFX toggle icon swap ─────────────────────────────────────────────────
+   Which icon the sound button shows is decided by CSS, not React state: the
+   blocking script in the root layout sets `sfx-muted` before first paint, so
+   the correct icon is painted immediately and the button's server-rendered
+   HTML always matches its first client render. */
+.sfx-icon-off {
+  display: none;
 }
 
-/* Sub-containers & inputs -> Slate-700 (#334155) */
-html.grey-mode .bg-slate-100,
-html.grey-mode .bg-zinc-50,
-html.grey-mode .bg-zinc-100,
-html.grey-mode .bg-zinc-200,
-html.grey-mode [class*="bg-slate-100"],
-html.grey-mode [class*="bg-zinc-50"],
-html.grey-mode [class*="bg-zinc-100"],
-html.grey-mode [class*="bg-zinc-200"] {
-  background-color: #334155 !important;
-  color: #F8FAFC !important;
+html.sfx-muted .sfx-icon-off {
+  display: block;
 }
 
-/* Universal Typography & Text Contrast Overrides */
-html.grey-mode h1,
-html.grey-mode h2,
-html.grey-mode h3,
-html.grey-mode h4,
-html.grey-mode h5,
-html.grey-mode h6,
-html.grey-mode p,
-html.grey-mode span,
-html.grey-mode div,
-html.grey-mode label,
-html.grey-mode dt,
-html.grey-mode dd,
-html.grey-mode li,
-html.grey-mode th,
-html.grey-mode td,
-html.grey-mode a:not([class*="bg-"]) {
-  color: #F8FAFC;
+html.sfx-muted .sfx-icon-on {
+  display: none;
 }
-
-/* Primary Dark Text Utility Overrides -> Pure White (#FFFFFF) */
-html.grey-mode .text-black,
-html.grey-mode .text-zinc-900,
-html.grey-mode .text-zinc-800,
-html.grey-mode .text-slate-900,
-html.grey-mode .text-slate-800,
-html.grey-mode .text-gray-900,
-html.grey-mode .text-gray-800,
-html.grey-mode [class*="text-black"],
-html.grey-mode [class*="text-zinc-900"],
-html.grey-mode [class*="text-zinc-800"],
-html.grey-mode [class*="text-slate-900"],
-html.grey-mode [class*="text-slate-800"] {
-  color: #FFFFFF !important;
-}
-
-/* Muted & Secondary Text Utility Overrides -> Bright Light Slate (#CBD5E1) */
-html.grey-mode .text-zinc-700,
-html.grey-mode .text-zinc-600,
-html.grey-mode .text-zinc-500,
-html.grey-mode .text-zinc-400,
-html.grey-mode .text-slate-700,
-html.grey-mode .text-slate-600,
-html.grey-mode .text-slate-500,
-html.grey-mode .text-slate-400,
-html.grey-mode .text-gray-700,
-html.grey-mode .text-gray-600,
-html.grey-mode .text-gray-500,
-html.grey-mode [class*="text-zinc-700"],
-html.grey-mode [class*="text-zinc-600"],
-html.grey-mode [class*="text-zinc-500"],
-html.grey-mode [class*="text-slate-700"],
-html.grey-mode [class*="text-slate-600"],
-html.grey-mode [class*="text-slate-500"],
-html.grey-mode [class*="text-black/"] {
-  color: #CBD5E1 !important;
-}
-
-/* Form Inputs, Textareas, Selects & Placeholders in Grey Mode */
-html.grey-mode input:not([type="checkbox"]):not([type="radio"]),
-html.grey-mode textarea,
-html.grey-mode select {
-  background-color: #0F172A !important;
-  color: #FFFFFF !important;
-  border-color: #475569 !important;
-}
-
-html.grey-mode input::placeholder,
-html.grey-mode textarea::placeholder {
-  color: #94A3B8 !important;
-}
-
-/* Preserve Ultra-Sharp Deep Black Text on Neon Badges & Highlights */
-html.grey-mode .bg-\[\#FFE600\],
-html.grey-mode .bg-\[\#FFD84D\],
-html.grey-mode .bg-\[\#A3E635\],
-html.grey-mode .bg-\[\#06B6D4\],
-html.grey-mode .bg-\[\#38BDF8\],
-html.grey-mode .bg-\[\#FF5722\],
-html.grey-mode [class*="bg-[#FFE600]"],
-html.grey-mode [class*="bg-[#FFD84D]"],
-html.grey-mode [class*="bg-[#A3E635]"],
-html.grey-mode [class*="bg-[#06B6D4]"],
-html.grey-mode [class*="bg-[#38BDF8]"],
-html.grey-mode [class*="bg-[#FF5722]"] {
-  color: #000000 !important;
-}
-
-html.grey-mode .bg-\[\#FFE600\] *,
-html.grey-mode .bg-\[\#FFD84D\] *,
-html.grey-mode .bg-\[\#A3E635\] *,
-html.grey-mode [class*="bg-[#FFE600]"] *,
-html.grey-mode [class*="bg-[#FFD84D]"] *,
-html.grey-mode [class*="bg-[#A3E635]"] * {
-  color: #000000 !important;
-}
-
-/* Border & Shadow Overrides for Dark Slate Canvas */
-html.grey-mode .border-black,
-html.grey-mode [class*="border-black"] {
-  border-color: #475569 !important;
-}
-
-html.grey-mode [class*="shadow-"] {
-  box-shadow: 4px 4px 0 0 #020617 !important;
-}
-
-
-

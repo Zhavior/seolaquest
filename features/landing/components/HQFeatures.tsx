@@ -47,7 +47,7 @@ export function HQFeatures() {
   return (
     <section
       id="features"
-      className="px-4 sm:px-6 py-20 sm:py-28 border-t-4 border-black"
+      className="px-4 sm:px-6 py-20 sm:py-28 border-t-4 border-outline"
       aria-labelledby="features-heading"
       style={{ background: '#f4ebd8' }}
     >
@@ -56,7 +56,7 @@ export function HQFeatures() {
         <div className="mb-12 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
           <div>
             <span
-              className="mb-3 inline-block border-3 border-black px-3 py-1 text-xs font-black uppercase tracking-[0.2em] shadow-[3px_3px_0_0_#000]"
+              className="mb-3 inline-block border-3 border-outline px-3 py-1 text-xs font-black uppercase tracking-[0.2em] shadow-brutal-sm"
               style={{ background: '#FFE600' }}
             >
               The Six Rooms
@@ -68,35 +68,35 @@ export function HQFeatures() {
               One HQ.<br />Six Rooms.
             </h2>
           </div>
-          <p className="max-w-sm text-sm font-bold leading-relaxed text-black/60 sm:text-right">
+          <p className="max-w-sm text-sm font-bold leading-relaxed text-ink/60 sm:text-right">
             Every room serves a specific operational purpose.
             Navigate the HQ strip to move between them.
           </p>
         </div>
 
         {/* Feature grid — asymmetric 2+1+2+1 */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 border-t-4 border-l-4 border-black">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 border-t-4 border-l-4 border-outline">
           {FEATURES.map(({ icon, room, headline, body, tag }, i) => (
             <article
               key={room}
-              className="border-b-4 border-r-4 border-black p-6 sm:p-8 flex flex-col gap-3 hover:bg-black hover:text-white transition-colors group"
+              className="border-b-4 border-r-4 border-outline p-6 sm:p-8 flex flex-col gap-3 hover:bg-black hover:text-white transition-colors group"
             >
               <div className="flex items-start justify-between">
                 <span className="text-3xl" aria-hidden="true">{icon}</span>
                 <span
-                  className="border-2 border-black px-2 py-0.5 text-[9px] font-black uppercase tracking-widest group-hover:border-white"
+                  className="border-2 border-outline px-2 py-0.5 text-[9px] font-black uppercase tracking-widest group-hover:border-white"
                   style={{ background: i === 0 ? '#FFE600' : 'transparent' }}
                 >
                   {tag}
                 </span>
               </div>
               <div>
-                <div className="text-xs font-black uppercase tracking-widest text-black/40 group-hover:text-white/50 mb-1">
+                <div className="text-xs font-black uppercase tracking-widest text-ink/40 group-hover:text-white/50 mb-1">
                   {room}
                 </div>
                 <h3 className="text-lg font-black uppercase leading-snug tracking-tight">{headline}</h3>
               </div>
-              <p className="text-sm font-medium leading-relaxed text-black/70 group-hover:text-white/80">{body}</p>
+              <p className="text-sm font-medium leading-relaxed text-ink/70 group-hover:text-white/80">{body}</p>
             </article>
           ))}
         </div>

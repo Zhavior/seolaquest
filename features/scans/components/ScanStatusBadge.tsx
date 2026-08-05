@@ -2,13 +2,13 @@ import { questBadge } from '@/components/quest'
 import type { ScanStatus } from '../types'
 
 const styles: Record<ScanStatus, string> = {
-  QUEUED: 'bg-[#FFE600] text-black',
-  RUNNING: 'bg-sky-300 text-black',
-  SUCCEEDED: 'bg-[#A3E635] text-black',
-  FAILED_REFUNDED: 'bg-orange-300 text-black',
-  DEAD: 'bg-[#FF5722] text-white',
+  QUEUED: 'bg-accent text-on-accent',
+  RUNNING: 'bg-sky-300 text-on-accent',
+  SUCCEEDED: 'bg-success text-on-accent',
+  FAILED_REFUNDED: 'bg-orange-300 text-on-accent',
+  DEAD: 'bg-accent-2 text-white',
   CANCELLED: 'bg-zinc-700 text-white',
-  UNKNOWN: 'bg-zinc-200 text-zinc-800',
+  UNKNOWN: 'bg-inset text-ink',
 }
 
 export function ScanStatusBadge({ status }: { status: ScanStatus }) {

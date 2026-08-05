@@ -84,7 +84,7 @@ export default function DashboardClient({
   const isGuild = activeMobileTab === 'guild'
 
   return (
-    <div className="relative min-h-[100dvh] w-full max-w-full overflow-x-hidden bg-[#FDFBF7] px-4 pb-16 pt-4 font-black text-black select-none md:px-8 md:pb-16 md:pt-6">
+    <div className="relative min-h-[100dvh] w-full max-w-full overflow-x-hidden bg-surface px-4 pb-16 pt-4 font-black text-ink select-none md:px-8 md:pb-16 md:pt-6">
       {/* Authentic Parchment / Commander's Map Paper Overlay (1:1 with Guild Hall & Billing) */}
       <div 
         className="absolute inset-0 pointer-events-none z-0 opacity-[0.07]" 
@@ -96,7 +96,7 @@ export default function DashboardClient({
 
       {/* Subtle Background Watermark Emblem */}
       <div className="hidden md:block absolute top-0 right-0 -mr-24 -mt-24 opacity-[0.05] pointer-events-none">
-        <Crosshair className="w-[650px] h-[650px] text-black" />
+        <Crosshair className="w-[650px] h-[650px] text-ink" />
       </div>
 
       <AnimatePresence mode="wait">
@@ -123,7 +123,7 @@ export default function DashboardClient({
 
       <div className="relative z-10 mx-auto flex w-full max-w-[1400px] min-w-0 flex-col space-y-6 overflow-x-hidden">
         {/* Neo-Brutalist Ticker Banner (1:1 with Guild Hall & Billing) */}
-        <motion.div variants={reveal} initial="hidden" animate="show" className="w-full overflow-hidden border-4 border-black bg-[#FFE600] py-2 flex whitespace-nowrap shadow-[4px_4px_0_0_#000]">
+        <motion.div variants={reveal} initial="hidden" animate="show" className="w-full overflow-hidden border-4 border-outline bg-accent py-2 flex whitespace-nowrap shadow-brutal">
           <motion.div 
             animate={shouldReduceMotion ? { x: 0 } : { x: [0, -1000] }}
             transition={shouldReduceMotion ? { duration: 0 } : { repeat: Infinity, duration: 25, ease: 'linear' }}
@@ -131,7 +131,7 @@ export default function DashboardClient({
           >
             {[...Array(10)].map((_, i) => (
               <span key={i} className="flex items-center gap-3">
-                <Sparkles className="w-5 h-5 text-black" /> ⚔️ DASHBOARD COMMAND CENTER <Sparkles className="w-5 h-5 text-black" /> 🛡️ LIVE BATTLE EXPEDITION RADAR
+                <Sparkles className="w-5 h-5 text-ink" /> ⚔️ DASHBOARD COMMAND CENTER <Sparkles className="w-5 h-5 text-ink" /> 🛡️ LIVE BATTLE EXPEDITION RADAR
               </span>
             ))}
           </motion.div>
@@ -142,26 +142,26 @@ export default function DashboardClient({
           <div>
             <div className="flex items-center gap-3 mb-1">
               <Shield className="w-8 h-8 text-[#FF5722]" />
-              <span className="bg-black text-[#FFE600] uppercase text-xs font-black tracking-widest px-3 py-1 border-2 border-black -rotate-1">
+              <span className="bg-black text-[#FFE600] uppercase text-xs font-black tracking-widest px-3 py-1 border-2 border-outline -rotate-1">
                 COMMANDER&apos;S MAP & BATTLE CONTROL
               </span>
             </div>
-            <h1 className="text-4xl sm:text-5xl md:text-7xl uppercase tracking-tight text-white drop-shadow-[6px_6px_0_rgba(0,0,0,1)]" style={{ WebkitTextStroke: '2px black' }}>
+            <h1 className="text-4xl sm:text-5xl md:text-7xl uppercase tracking-tight text-white drop-shadow-brutal-lg" style={{ WebkitTextStroke: '2px black' }}>
               Main Dashboard
             </h1>
-            <p className="text-xl md:text-2xl mt-2 uppercase bg-black text-white inline-block px-4 py-1 -rotate-1 border-2 border-black">
+            <p className="text-xl md:text-2xl mt-2 uppercase bg-black text-white inline-block px-4 py-1 -rotate-1 border-2 border-outline">
               Tenant Operations & Campaign Telemetry
             </p>
           </div>
           
-          <div className="flex items-center gap-3 border-4 border-black bg-white px-5 py-3 shadow-[6px_6px_0_0_#000]">
+          <div className="flex items-center gap-3 border-4 border-outline bg-card px-5 py-3 shadow-brutal-lg">
             <span className="relative flex h-4 w-4">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-4 w-4 bg-emerald-500 border-2 border-black"></span>
+              <span className="relative inline-flex rounded-full h-4 w-4 bg-emerald-500 border-2 border-outline"></span>
             </span>
             <div className="flex flex-col">
-              <span className="text-xs uppercase text-gray-500 font-bold">EXPEDITION RADAR</span>
-              <span className="text-lg uppercase font-black leading-none text-black">ACTIVE [PATROLLING]</span>
+              <span className="text-xs uppercase text-ink-muted font-bold">EXPEDITION RADAR</span>
+              <span className="text-lg uppercase font-black leading-none text-ink">ACTIVE [PATROLLING]</span>
             </div>
           </div>
         </motion.div>
@@ -184,7 +184,7 @@ export default function DashboardClient({
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
-              className="flex items-center justify-between border-4 border-black bg-[#06B6D4] p-4 text-lg font-black text-black shadow-[6px_6px_0_0_#000]"
+              className="flex items-center justify-between border-4 border-outline bg-info p-4 text-lg font-black text-on-accent shadow-brutal-lg"
             >
               <span>{state.notice}</span>
               <button type="button" aria-label="Dismiss notice" onClick={() => state.setNotice('')}>
@@ -195,14 +195,14 @@ export default function DashboardClient({
         </AnimatePresence>
 
         {/* Mobile Tab Selectors */}
-        <div className="flex border-4 border-black bg-white p-1 shadow-[4px_4px_0_0_#000] sm:hidden">
+        <div className="flex border-4 border-outline bg-card p-1 shadow-brutal sm:hidden">
           <button
             type="button"
             onClick={() => setActiveMobileTab('overview')}
             className={`flex-1 border-2 px-2 py-2.5 text-xs font-black uppercase tracking-[0.08em] transition-all ${
               activeMobileTab === 'overview'
-                ? 'border-black bg-[#FFE600] text-black shadow-[2px_2px_0_0_#000]'
-                : 'border-transparent bg-transparent text-black/55'
+                ? 'border-outline bg-accent text-on-accent shadow-brutal-sm'
+                : 'border-transparent bg-transparent text-ink/55'
             }`}
           >
             Overview
@@ -212,8 +212,8 @@ export default function DashboardClient({
             onClick={() => setActiveMobileTab('signals')}
             className={`flex-1 border-2 px-2 py-2.5 text-xs font-black uppercase tracking-[0.08em] transition-all ${
               activeMobileTab === 'signals'
-                ? 'border-black bg-[#FFE600] text-black shadow-[2px_2px_0_0_#000]'
-                : 'border-transparent bg-transparent text-black/55'
+                ? 'border-outline bg-accent text-on-accent shadow-brutal-sm'
+                : 'border-transparent bg-transparent text-ink/55'
             }`}
           >
             Signals
@@ -223,8 +223,8 @@ export default function DashboardClient({
             onClick={() => setActiveMobileTab('guild')}
             className={`flex-1 border-2 px-2 py-2.5 text-xs font-black uppercase tracking-[0.08em] transition-all ${
               activeMobileTab === 'guild'
-                ? 'border-black bg-[#FFE600] text-black shadow-[2px_2px_0_0_#000]'
-                : 'border-transparent bg-transparent text-black/55'
+                ? 'border-outline bg-accent text-on-accent shadow-brutal-sm'
+                : 'border-transparent bg-transparent text-ink/55'
             }`}
           >
             Guild

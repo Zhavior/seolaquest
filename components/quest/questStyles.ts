@@ -40,17 +40,25 @@ export type QuestTone =
 export type QuestShadow = 'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl'
 export type QuestBorder = 0 | 2 | 3 | 4
 
+/**
+ * Two kinds of tone live here, and the difference decides the text colour:
+ *
+ *   • Surfaces (white, parchment, muted) follow the theme, so their text is
+ *     `text-ink` and flips with it.
+ *   • Bright fills (gold, ember, lime, …) stay bright in every theme, so their
+ *     text stays `text-on-accent` — black — or it vanishes in grey/blue mode.
+ */
 const TONE_CLASS: Record<QuestTone, string> = {
-  white: 'bg-white text-black',
-  parchment: 'bg-[#F4F0EA] text-black',
-  sand: 'bg-[#FFF8D9] text-black',
-  gold: 'bg-[#FFE600] text-black',
-  ember: 'bg-[#FF5722] text-white',
-  lime: 'bg-[#A3E635] text-black',
-  cyan: 'bg-[#06B6D4] text-black',
-  mint: 'bg-[#D9FFE3] text-black',
+  white: 'bg-card text-ink',
+  parchment: 'bg-canvas text-ink',
+  sand: 'bg-highlight text-on-accent',
+  gold: 'bg-accent text-on-accent',
+  ember: 'bg-accent-2 text-white',
+  lime: 'bg-success text-on-accent',
+  cyan: 'bg-info text-on-accent',
+  mint: 'bg-[#D9FFE3] text-on-accent',
   ink: 'bg-black text-white',
-  muted: 'bg-zinc-50 text-black',
+  muted: 'bg-inset text-ink',
   none: '',
 }
 
@@ -60,23 +68,23 @@ const TONE_CLASS: Record<QuestTone, string> = {
  */
 const SHADOW_CLASS: Record<QuestShadow, string> = {
   none: '',
-  xs: 'shadow-[2px_2px_0_0_#000]',
-  sm: 'shadow-[3px_3px_0_0_#000]',
-  md: 'shadow-[4px_4px_0_0_#000]',
-  lg: 'shadow-[6px_6px_0_0_#000]',
-  xl: 'shadow-[8px_8px_0_0_#000]',
+  xs: 'shadow-brutal-sm',
+  sm: 'shadow-brutal-sm',
+  md: 'shadow-brutal',
+  lg: 'shadow-brutal-lg',
+  xl: 'shadow-brutal-lg',
 }
 
 const BORDER_CLASS: Record<QuestBorder, string> = {
   0: '',
-  2: 'border-2 border-black',
-  3: 'border-3 border-black',
-  4: 'border-4 border-black',
+  2: 'border-2 border-outline',
+  3: 'border-3 border-outline',
+  4: 'border-4 border-outline',
 }
 
 /** Hover "lift" used by clickable cards (keyword streams, scan runs, features). */
 export const QUEST_LIFT =
-  'transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[10px_10px_0_0_#000] motion-reduce:transition-none motion-reduce:hover:translate-x-0 motion-reduce:hover:translate-y-0'
+  'transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-brutal-lg motion-reduce:transition-none motion-reduce:hover:translate-x-0 motion-reduce:hover:translate-y-0'
 
 export type QuestSurfaceOptions = {
   tone?: QuestTone
@@ -139,8 +147,8 @@ export function questButton({
 }
 
 /** Section eyebrow text used above panel titles. */
-export const QUEST_EYEBROW = 'text-xs font-black uppercase tracking-wider text-gray-500'
+export const QUEST_EYEBROW = 'text-xs font-black uppercase tracking-wider text-ink-muted'
 
-/** Black outline applied to large display headings. */
-export const QUEST_TITLE_STROKE = { WebkitTextStroke: '2px black' } as const
-export const QUEST_SUBTITLE_STROKE = { WebkitTextStroke: '1px black' } as const
+/** Outline applied to large display headings — follows the theme's hard edge. */
+export const QUEST_TITLE_STROKE = { WebkitTextStroke: '2px var(--border-strong)' } as const
+export const QUEST_SUBTITLE_STROKE = { WebkitTextStroke: '1px var(--border-strong)' } as const

@@ -39,7 +39,7 @@ export function QuestTicker({ label, children, repeat = 5, className }: QuestTic
   return (
     <div
       className={clsx(
-        'w-full max-w-full overflow-hidden whitespace-nowrap border-4 border-black bg-[#FFE600] py-2 shadow-[4px_4px_0_0_#000]',
+        'w-full max-w-full overflow-hidden whitespace-nowrap border-4 border-outline bg-accent py-2 shadow-brutal',
         className
       )}
     >

@@ -16,10 +16,10 @@ interface HQStatProps {
 }
 
 const accents: Record<Accent, string> = {
-  gold: "bg-[#FFE082]",
+  gold: "bg-highlight-strong",
   turquoise: "bg-[#B8FFF3]",
   orange: "bg-[#FFD2A8]",
-  white: "bg-white",
+  white: "bg-card",
 }
 
 const bars: Record<Accent, string> = {
@@ -40,12 +40,12 @@ export default function HQStat({
     <div
       className={clsx(
         "group relative overflow-hidden rounded-[20px]",
-        "border-4 border-black",
-        "shadow-[6px_6px_0_0_#000]",
+        "border-4 border-outline",
+        "shadow-brutal-lg",
         "transition-all duration-150",
         "hover:-translate-x-[2px]",
         "hover:-translate-y-[2px]",
-        "hover:shadow-[8px_8px_0_0_#000]",
+        "hover:shadow-brutal-lg",
         accents[accent],
         className,
       )}
@@ -56,19 +56,19 @@ export default function HQStat({
 
         <div className="flex items-center justify-between">
 
-          <span className="text-[10px] font-black uppercase tracking-[0.22em] text-black/55">
+          <span className="text-[10px] font-black uppercase tracking-[0.22em] text-ink/55">
             {label}
           </span>
 
           {icon && (
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl border-3 border-black bg-white shadow-[2px_2px_0_0_#000] transition-transform group-hover:rotate-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl border-3 border-outline bg-card shadow-brutal-sm transition-transform group-hover:rotate-3">
               {icon}
             </div>
           )}
 
         </div>
 
-        <div className="mt-4 text-4xl font-black tracking-tight leading-none text-black">
+        <div className="mt-4 text-4xl font-black tracking-tight leading-none text-ink">
           {value}
         </div>
 

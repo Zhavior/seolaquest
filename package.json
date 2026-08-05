@@ -9,7 +9,13 @@
     "lint": "eslint app components lib features src prisma/seed.ts proxy.ts --ignore-pattern '**/* 2.*' --max-warnings=0",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:a11y": "bash scripts/phase-5-accessibility-gate.sh"
+    "test:a11y": "bash scripts/phase-5-accessibility-gate.sh",
+    "db": "dotenv -e .env.local -- prisma",
+    "db:migrate": "dotenv -e .env.local -- prisma migrate dev",
+    "db:deploy": "dotenv -e .env.local -- prisma migrate deploy",
+    "db:push": "dotenv -e .env.local -- prisma db push",
+    "db:studio": "dotenv -e .env.local -- prisma studio",
+    "db:seed": "dotenv -e .env.local -- prisma db seed"
   },
   "dependencies": {
     "@clerk/nextjs": "^7.6.2",
@@ -53,6 +59,7 @@
     "axe-core": "^4.12.1",
     "cross-env": "^10.1.0",
     "dotenv": "^17.4.2",
+    "dotenv-cli": "^11.0.0",
     "eslint": "^9",
     "eslint-config-next": "16.2.12",
     "jsdom": "^30.0.1",

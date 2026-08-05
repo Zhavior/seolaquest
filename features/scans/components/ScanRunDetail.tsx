@@ -8,7 +8,7 @@ export function ScanRunDetail({ run }: { run: ScanRunView }) {
   return (
     <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_21rem]">
       <QuestPanel as="section" shadow="xl" padding="none" className="p-6" aria-labelledby="scan-run-heading">
-        <div className="flex flex-wrap items-center justify-between gap-4 border-b-4 border-black pb-5">
+        <div className="flex flex-wrap items-center justify-between gap-4 border-b-4 border-outline pb-5">
           <ScanStatusBadge status={run.status} />
           <Link
             href="/app/runs"
@@ -21,10 +21,10 @@ export function ScanRunDetail({ run }: { run: ScanRunView }) {
         <h1 id="scan-run-heading" className="mt-6 text-3xl font-black uppercase sm:text-4xl">
           Durable scan run
         </h1>
-        <p className="mt-3 max-w-2xl font-bold text-zinc-700">{run.statusMessage}</p>
+        <p className="mt-3 max-w-2xl font-bold text-ink-muted">{run.statusMessage}</p>
 
         {run.customerError && (
-          <div role="status" className="mt-5 border-2 border-black bg-orange-100 p-4 font-bold text-zinc-800">
+          <div role="status" className="mt-5 border-2 border-outline bg-orange-100 p-4 font-bold text-ink">
             {run.customerError}
           </div>
         )}
@@ -39,11 +39,11 @@ export function ScanRunDetail({ run }: { run: ScanRunView }) {
         </dl>
 
         <QuestPanel as="section" tone="muted" shadow="none" padding="none" className="mt-6 p-5" aria-labelledby="provider-summary-heading">
-          <p className="text-xs font-black uppercase tracking-widest text-zinc-500">Provider-safe summary</p>
+          <p className="text-xs font-black uppercase tracking-widest text-ink-muted">Provider-safe summary</p>
           <h2 id="provider-summary-heading" className="mt-2 text-xl font-black uppercase">
             Recorded results only
           </h2>
-          <p className="mt-2 font-bold text-zinc-700">{run.providerSummary}</p>
+          <p className="mt-2 font-bold text-ink-muted">{run.providerSummary}</p>
           <QuestCountGrid
             className="mt-5"
             tone="white"
@@ -60,16 +60,16 @@ export function ScanRunDetail({ run }: { run: ScanRunView }) {
       </QuestPanel>
 
       <QuestPanel as="aside" tone="parchment" padding="none" className="h-fit p-5" aria-labelledby="refund-truth-heading">
-        <p className="text-xs font-black uppercase tracking-widest text-zinc-500">Refund truth</p>
+        <p className="text-xs font-black uppercase tracking-widest text-ink-muted">Refund truth</p>
         <h2 id="refund-truth-heading" className="mt-2 text-xl font-black uppercase">
           {run.refunded ? 'Refund recorded' : 'No refund recorded'}
         </h2>
-        <p className="mt-3 text-sm font-bold text-zinc-700">{run.refundMessage}</p>
+        <p className="mt-3 text-sm font-bold text-ink-muted">{run.refundMessage}</p>
         {run.currentBalance !== null && (
           <div className={questSurface({ border: 2, shadow: 'none', className: 'mt-5 p-4' })}>
-            <p className="text-xs font-black uppercase text-zinc-500">Current scan credits</p>
+            <p className="text-xs font-black uppercase text-ink-muted">Current scan credits</p>
             <p className="mt-1 text-3xl font-black">{run.currentBalance}</p>
-            <p className="mt-1 text-xs font-bold text-zinc-600">
+            <p className="mt-1 text-xs font-bold text-ink-muted">
               Current account balance, not the balance at completion.
             </p>
           </div>
@@ -82,7 +82,7 @@ export function ScanRunDetail({ run }: { run: ScanRunView }) {
 function DetailItem({ label, value, mono = false }: { label: string; value: string; mono?: boolean }) {
   return (
     <div className={questSurface({ tone: 'muted', border: 2, shadow: 'none', className: 'p-4' })}>
-      <dt className="text-xs font-black uppercase text-zinc-500">{label}</dt>
+      <dt className="text-xs font-black uppercase text-ink-muted">{label}</dt>
       <dd className={`mt-1 break-word-safe font-bold ${mono ? 'font-mono text-sm' : ''}`}>{value}</dd>
     </div>
   )

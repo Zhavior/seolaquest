@@ -20,12 +20,14 @@ vi.mock('next/navigation', () => ({
   })),
 }))
 
+import { ThemeProvider } from '@/components/theme/ThemeProvider'
 import AppLayout from './layout'
 
 describe('authenticated app layout', () => {
   it('renders application shell and main content', async () => {
     const view = await AppLayout({ children: <div>Authenticated content</div> })
-    render(view)
+    // ThemeProvider lives in the root layout, which this test doesn't render.
+    render(view, { wrapper: ThemeProvider })
 
     const main = screen.getByRole('main')
     expect(main).toBeInTheDocument()

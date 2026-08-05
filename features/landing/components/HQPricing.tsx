@@ -6,7 +6,7 @@ const TIERS = [
     price: 'Free',
     sub: 'forever',
     mana: '200 mana / mo',
-    color: 'bg-white',
+    color: 'bg-card',
     accent: '#000',
     features: [
       '3 tracked keywords',
@@ -64,14 +64,14 @@ const TIERS = [
 export function HQPricing() {
   return (
     <section
-      className="px-4 sm:px-6 py-20 sm:py-28 border-t-4 border-black"
+      className="px-4 sm:px-6 py-20 sm:py-28 border-t-4 border-outline"
       aria-labelledby="pricing-heading"
       style={{ background: '#f4ebd8' }}
     >
       <div className="mx-auto max-w-7xl">
         <div className="mb-12 text-center">
           <span
-            className="mb-4 inline-block border-3 border-black px-3 py-1 text-xs font-black uppercase tracking-[0.2em] shadow-[3px_3px_0_0_#000]"
+            className="mb-4 inline-block border-3 border-outline px-3 py-1 text-xs font-black uppercase tracking-[0.2em] shadow-brutal-sm"
             style={{ background: '#FFE600' }}
           >
             Treasury
@@ -82,34 +82,34 @@ export function HQPricing() {
           >
             Choose Your Guild Rank
           </h2>
-          <p className="mt-3 text-sm font-bold text-black/50 uppercase tracking-widest">
+          <p className="mt-3 text-sm font-bold text-ink/50 uppercase tracking-widest">
             Mana powers every scan. Buy more anytime.
           </p>
         </div>
 
-        <div className="grid sm:grid-cols-3 gap-0 border-4 border-black shadow-[8px_8px_0_0_#000] overflow-hidden">
+        <div className="grid sm:grid-cols-3 gap-0 border-4 border-outline shadow-brutal-lg overflow-hidden">
           {TIERS.map(({ name, price, sub, mana, color, accent, features, cta, href, featured }, i) => (
             <div
               key={name}
-              className={`flex flex-col ${color} ${i < 2 ? 'sm:border-r-4 sm:border-black' : ''} ${featured ? '' : ''} relative`}
+              className={`flex flex-col ${color} ${i < 2 ? 'sm:border-r-4 sm:border-outline' : ''} ${featured ? '' : ''} relative`}
               style={featured ? { background: '#f4ebd8' } : {}}
             >
               {featured && (
                 <div
-                  className="absolute inset-x-0 top-0 border-b-4 border-black text-center py-1.5 text-[10px] font-black uppercase tracking-[0.2em]"
+                  className="absolute inset-x-0 top-0 border-b-4 border-outline text-center py-1.5 text-[10px] font-black uppercase tracking-[0.2em]"
                   style={{ background: '#ff4500' }}
                 >
                   Most Popular
                 </div>
               )}
-              <div className={`p-6 sm:p-8 border-b-4 border-black flex flex-col gap-1 ${featured ? 'pt-10' : ''}`}>
-                <span className="text-xs font-black uppercase tracking-widest text-black/40">{name}</span>
+              <div className={`p-6 sm:p-8 border-b-4 border-outline flex flex-col gap-1 ${featured ? 'pt-10' : ''}`}>
+                <span className="text-xs font-black uppercase tracking-widest text-ink/40">{name}</span>
                 <div className="flex items-end gap-1">
                   <span className="text-4xl font-black">{price}</span>
-                  <span className="text-sm font-bold text-black/50 mb-1">{sub}</span>
+                  <span className="text-sm font-bold text-ink/50 mb-1">{sub}</span>
                 </div>
                 <span
-                  className="inline-block self-start border-2 border-black px-2 py-0.5 text-[10px] font-black uppercase tracking-wider mt-1"
+                  className="inline-block self-start border-2 border-outline px-2 py-0.5 text-[10px] font-black uppercase tracking-wider mt-1"
                   style={{ background: accent, color: accent === '#000' ? 'white' : 'black' }}
                 >
                   {mana}
@@ -128,7 +128,7 @@ export function HQPricing() {
               <div className="p-6 sm:p-8 pt-0">
                 <Link
                   href={href}
-                  className="flex w-full items-center justify-center border-4 border-black py-3.5 font-black uppercase tracking-widest text-sm shadow-[4px_4px_0_0_#000] hover:translate-x-[-2px] hover:translate-y-[-2px] active:translate-x-0 active:translate-y-0 transition-transform"
+                  className="flex w-full items-center justify-center border-4 border-outline py-3.5 font-black uppercase tracking-widest text-sm shadow-brutal hover:translate-x-[-2px] hover:translate-y-[-2px] active:translate-x-0 active:translate-y-0 transition-transform"
                   style={{
                     background: accent,
                     color: accent === '#000' ? 'white' : accent === '#FFE600' ? 'black' : 'black',
@@ -141,7 +141,7 @@ export function HQPricing() {
           ))}
         </div>
 
-        <p className="mt-6 text-center text-xs font-bold text-black/40 uppercase tracking-widest">
+        <p className="mt-6 text-center text-xs font-bold text-ink/40 uppercase tracking-widest">
           All plans include 14-day money-back guarantee · No hidden mana fees
         </p>
       </div>

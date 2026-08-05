@@ -20,19 +20,19 @@ export type BrewStatus = 'idle' | 'brewing' | 'redirecting' | 'error'
 
 export function VerificationPanel({ model }: { model: BillingUnavailableViewModel | BillingLoadingViewModel }) {
   return (
-    <div className="min-h-[100dvh] min-w-0 break-words bg-[#FDFBF7] p-3 text-black sm:p-5 md:p-10">
-      <section aria-live="polite" className="mx-auto min-w-0 max-w-4xl border-4 border-black bg-white p-4 shadow-[8px_8px_0_0_#000] sm:p-7 md:p-10">
-        <div className="inline-flex max-w-full min-w-0 items-center gap-2 border-3 border-black bg-[#06B6D4] px-3 py-2 text-xs font-black uppercase shadow-[3px_3px_0_0_#000]">
+    <div className="min-h-[100dvh] min-w-0 break-words bg-surface p-3 text-ink sm:p-5 md:p-10">
+      <section aria-live="polite" className="mx-auto min-w-0 max-w-4xl border-4 border-outline bg-card p-4 shadow-brutal-lg sm:p-7 md:p-10">
+        <div className="inline-flex max-w-full min-w-0 items-center gap-2 border-3 border-outline bg-info px-3 py-2 text-xs font-black uppercase shadow-brutal-sm">
           {model.status === 'loading' ? <RefreshCw aria-hidden className="h-4 w-4 animate-spin" /> : <AlertTriangle aria-hidden className="h-4 w-4" />}
           {model.status === 'loading' ? 'Server verification in progress' : 'Server verification unavailable'}
         </div>
         <h1 className="mt-6 text-4xl font-black uppercase leading-none md:text-6xl">{model.title}</h1>
-        <p className="mt-4 max-w-2xl text-base font-bold text-zinc-700">{model.message}</p>
+        <p className="mt-4 max-w-2xl text-base font-bold text-ink-muted">{model.message}</p>
         {model.status === 'unavailable' && (
           <button
             type="button"
             onClick={() => window.location.reload()}
-            className="mt-7 min-h-12 border-4 border-black bg-[#FFE600] px-5 py-3 text-sm font-black uppercase shadow-[5px_5px_0_0_#000]"
+            className="mt-7 min-h-12 border-4 border-outline bg-accent px-5 py-3 text-sm font-black uppercase shadow-brutal"
           >
             Retry verification
           </button>
@@ -131,13 +131,13 @@ function BillingApp({ model, highlightPlan }: { model: BillingReadyViewModel; hi
   }
 
   const returnStyle = model.checkoutReturn.state === 'verified'
-    ? 'bg-[#A3E635]'
+    ? 'bg-success'
     : model.checkoutReturn.state === 'cancelled'
-      ? 'bg-zinc-200'
+      ? 'bg-inset'
       : 'bg-amber-200'
 
   return (
-    <div className="min-h-[100dvh] w-full bg-[#FDFBF7] relative">
+    <div className="min-h-[100dvh] w-full bg-surface relative">
       <div 
         className="absolute inset-0 pointer-events-none z-0 opacity-[0.06]" 
         style={{ 
@@ -148,11 +148,11 @@ function BillingApp({ model, highlightPlan }: { model: BillingReadyViewModel; hi
 
       <div className="min-h-[100dvh] w-full max-w-[1400px] mx-auto p-4 md:p-8 font-black overflow-hidden relative z-10">
         <div className="hidden md:block absolute top-0 left-0 -ml-32 -mt-32 opacity-5 pointer-events-none">
-          <FlaskConical className="w-[600px] h-[600px] text-black" />
+          <FlaskConical className="w-[600px] h-[600px] text-ink" />
         </div>
         
         {model.checkoutReturn.state !== 'none' && (
-          <section role="status" className={`relative z-10 mb-6 min-w-0 border-4 border-black p-4 shadow-[6px_6px_0_0_#000] sm:p-5 ${returnStyle}`}>
+          <section role="status" className={`relative z-10 mb-6 min-w-0 border-4 border-outline p-4 shadow-brutal-lg sm:p-5 ${returnStyle}`}>
             <h2 className="text-xl font-black uppercase">{model.checkoutReturn.title}</h2>
             <p className="mt-2 font-bold">{model.checkoutReturn.message}</p>
           </section>
@@ -163,7 +163,7 @@ function BillingApp({ model, highlightPlan }: { model: BillingReadyViewModel; hi
             type="button"
             onClick={() => void openPortal()}
             disabled={model.availability.portal.state !== 'available'}
-            className="min-h-11 border-3 border-black bg-[#FFE600] px-4 py-2 text-xs font-black uppercase text-black disabled:cursor-not-allowed disabled:bg-zinc-300 disabled:text-zinc-500 shadow-[3px_3px_0_0_#000] hover:shadow-[5px_5px_0_0_#000] transition-shadow"
+            className="min-h-11 border-3 border-outline bg-accent px-4 py-2 text-xs font-black uppercase text-ink disabled:cursor-not-allowed disabled:bg-inset disabled:text-ink-muted shadow-brutal-sm hover:shadow-brutal transition-shadow"
           >
             Manage Billing / Portal
           </button>
@@ -175,7 +175,7 @@ function BillingApp({ model, highlightPlan }: { model: BillingReadyViewModel; hi
           animate="show"
           className="space-y-10 relative z-10"
         >
-          <motion.div variants={item} className="w-full overflow-hidden border-y-4 border-black bg-black py-2 flex whitespace-nowrap -rotate-1 shadow-[4px_4px_0_0_#FFE600]">
+          <motion.div variants={item} className="w-full overflow-hidden border-y-4 border-outline bg-black py-2 flex whitespace-nowrap -rotate-1 shadow-[4px_4px_0_0_#FFE600]">
             <motion.div 
               animate={{ x: [0, -1000] }} 
               transition={{ repeat: Infinity, duration: 15, ease: "linear" }}

@@ -4,7 +4,7 @@ export default function ShellV2Preview() {
   return (
     <CoQuestShell>
       <div className="flex h-full min-h-[calc(100vh-80px)] items-center justify-center bg-[#F4EFE6]">
-        <div className="border-[3px] border-black bg-[#FFF8D6] p-10 shadow-[8px_8px_0_0_#000]">
+        <div className="border-[3px] border-outline bg-highlight p-10 shadow-brutal-lg">
           <h1 className="text-3xl font-black uppercase">
             ⚔ CoQuest Shell V2
           </h1>

@@ -35,7 +35,7 @@ export default function HeroCrest({
   }, [recentLevelUp])
 
   return (
-    <div className="relative flex items-center gap-4 bg-white border-4 border-black p-3.5 shadow-[6px_6px_0_0_#000] overflow-hidden group">
+    <div className="relative flex items-center gap-4 bg-card border-4 border-outline p-3.5 shadow-brutal-lg overflow-hidden group">
       
       {/* Background Sweeping Radar Grid (Active Scan State) */}
       <AnimatePresence>
@@ -67,10 +67,10 @@ export default function HeroCrest({
             repeat: Infinity,
             ease: 'easeInOut',
           }}
-          className={`relative w-14 h-14 md:w-16 md:h-16 flex items-center justify-center border-4 border-black font-black text-2xl shadow-[3px_3px_0_0_#000] transition-colors ${
+          className={`relative w-14 h-14 md:w-16 md:h-16 flex items-center justify-center border-4 border-outline font-black text-2xl shadow-brutal-sm transition-colors ${
             isScanning
-              ? 'bg-[#FFE600] text-black border-[#FFE600]'
-              : 'bg-black text-[#A3E635] border-black'
+              ? 'bg-accent text-on-accent border-[#FFE600]'
+              : 'bg-black text-[#A3E635] border-outline'
           }`}
         >
           {/* Avatar Icon */}
@@ -82,15 +82,15 @@ export default function HeroCrest({
               <span
                 className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${
                   isScanning
-                    ? 'bg-[#FFE600] shadow-[0_0_8px_#FFE600] animate-ping'
-                    : 'bg-[#A3E635] shadow-[0_0_4px_#A3E635]'
+                    ? 'bg-accent shadow-[0_0_8px_#FFE600] animate-ping'
+                    : 'bg-success shadow-[0_0_4px_#A3E635]'
                 }`}
               />
               <span
                 className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${
                   isScanning
-                    ? 'bg-[#FFE600] shadow-[0_0_8px_#FFE600] animate-ping'
-                    : 'bg-[#A3E635] shadow-[0_0_4px_#A3E635]'
+                    ? 'bg-accent shadow-[0_0_8px_#FFE600] animate-ping'
+                    : 'bg-success shadow-[0_0_4px_#A3E635]'
                 }`}
               />
             </div>
@@ -117,10 +117,10 @@ export default function HeroCrest({
             </span>
           )}
         </div>
-        <p className="font-black text-lg md:text-xl uppercase tracking-tight truncate text-black mt-0.5">
+        <p className="font-black text-lg md:text-xl uppercase tracking-tight truncate text-ink mt-0.5">
           {heroName}
         </p>
-        <p className="font-bold text-xs uppercase tracking-wide text-zinc-600 truncate">
+        <p className="font-bold text-xs uppercase tracking-wide text-ink-muted truncate">
           {heroTitle}
         </p>
       </div>
@@ -133,11 +133,11 @@ export default function HeroCrest({
             animate={{ opacity: 1, scale: 1.1, y: -20 }}
             exit={{ opacity: 0, scale: 1.3, y: -40 }}
             transition={{ duration: 0.6 }}
-            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-30 bg-[#FFE600] text-black font-black text-xl uppercase px-4 py-2 border-4 border-black shadow-[6px_6px_0_0_#000] rotate-3 flex items-center gap-2 pointer-events-none"
+            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-30 bg-accent text-on-accent font-black text-xl uppercase px-4 py-2 border-4 border-outline shadow-brutal-lg rotate-3 flex items-center gap-2 pointer-events-none"
           >
             <Zap className="w-6 h-6 fill-black animate-spin" />
             <span>+150 XP! LEVEL UP!</span>
-            <Crown className="w-6 h-6 text-black" />
+            <Crown className="w-6 h-6 text-ink" />
           </motion.div>
         )}
       </AnimatePresence>

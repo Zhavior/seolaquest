@@ -68,13 +68,13 @@ function StatCard({
           <h2 id={headingId} className="text-2xl md:text-3xl font-black uppercase text-white" style={QUEST_SUBTITLE_STROKE}>
             {title}
           </h2>
-          <span className="mt-1 inline-block border border-black bg-white/90 px-2 py-0.5 text-xs font-bold uppercase">
+          <span className="mt-1 inline-block border border-outline bg-white/90 px-2 py-0.5 text-xs font-bold uppercase">
             {caption}
           </span>
         </div>
         {icon}
       </div>
-      <p className="my-5 text-6xl font-black leading-none text-black md:text-7xl">{value.toLocaleString()}</p>
+      <p className="my-5 text-6xl font-black leading-none text-ink md:text-7xl">{value.toLocaleString()}</p>
       <p className={questSurface({ border: 2, shadow: 'sm', className: 'p-3 text-xs font-black uppercase' })}>
         {footnote}
       </p>

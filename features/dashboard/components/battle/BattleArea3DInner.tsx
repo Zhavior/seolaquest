@@ -384,17 +384,17 @@ export function BattleArea3DInner({ userLevel = 1 }: { userLevel?: number }) {
 
       {/* --- MICRO-UI OVERLAY --- */}
       <div className="absolute top-3 left-3 z-10 flex items-center gap-2">
-        <span className="border-2 border-black bg-black px-3 py-1 font-mono text-xs font-black uppercase text-[#FFE600] shadow-[3px_3px_0_0_#000]">
+        <span className="border-2 border-outline bg-black px-3 py-1 font-mono text-xs font-black uppercase text-[#FFE600] shadow-brutal-sm">
           🕹️ 8-BIT ARCADE ENGINE: {activeBiome.replace('-', ' ').toUpperCase()} [{expeditionStatus.toUpperCase()}]
         </span>
       </div>
 
       {/* Top Center Biome Selector */}
-      <div className="absolute top-3 left-1/2 -translate-x-1/2 z-10 hidden md:flex items-center gap-1 border-2 border-black bg-black/90 p-1 shadow-[3px_3px_0_0_#000]">
+      <div className="absolute top-3 left-1/2 -translate-x-1/2 z-10 hidden md:flex items-center gap-1 border-2 border-outline bg-black/90 p-1 shadow-brutal-sm">
         <button
           type="button"
           onClick={() => setActiveBiome('reddit-forest')}
-          className={`flex items-center gap-1 px-2.5 py-1 font-mono text-[10px] font-black uppercase border border-black ${
+          className={`flex items-center gap-1 px-2.5 py-1 font-mono text-[10px] font-black uppercase border border-outline ${
             activeBiome === 'reddit-forest' ? 'bg-[#10B981] text-white' : 'bg-white/10 text-white/70 hover:bg-white/20'
           }`}
         >
@@ -403,8 +403,8 @@ export function BattleArea3DInner({ userLevel = 1 }: { userLevel?: number }) {
         <button
           type="button"
           onClick={() => setActiveBiome('x-wastes')}
-          className={`flex items-center gap-1 px-2.5 py-1 font-mono text-[10px] font-black uppercase border border-black ${
-            activeBiome === 'x-wastes' ? 'bg-[#EF4444] text-white' : 'bg-white/10 text-white/70 hover:bg-white/20'
+          className={`flex items-center gap-1 px-2.5 py-1 font-mono text-[10px] font-black uppercase border border-outline ${
+            activeBiome === 'x-wastes' ? 'bg-danger text-white' : 'bg-white/10 text-white/70 hover:bg-white/20'
           }`}
         >
           <Flame className="w-3 h-3" /> Wastes
@@ -412,7 +412,7 @@ export function BattleArea3DInner({ userLevel = 1 }: { userLevel?: number }) {
         <button
           type="button"
           onClick={() => setActiveBiome('linkedin-citadel')}
-          className={`flex items-center gap-1 px-2.5 py-1 font-mono text-[10px] font-black uppercase border border-black ${
+          className={`flex items-center gap-1 px-2.5 py-1 font-mono text-[10px] font-black uppercase border border-outline ${
             activeBiome === 'linkedin-citadel' ? 'bg-[#A855F7] text-white' : 'bg-white/10 text-white/70 hover:bg-white/20'
           }`}
         >
@@ -425,19 +425,19 @@ export function BattleArea3DInner({ userLevel = 1 }: { userLevel?: number }) {
         <button
           type="button"
           onClick={toggleAudio}
-          className="border-2 border-black bg-black p-1.5 text-white shadow-[2px_2px_0_0_#000] hover:bg-zinc-800"
+          className="border-2 border-outline bg-black p-1.5 text-white shadow-brutal-sm hover:bg-zinc-800"
           title={audioMuted ? 'Unmute Audio' : 'Mute Audio'}
         >
           {audioMuted ? <VolumeX className="w-3.5 h-3.5 text-red-400" /> : <Volume2 className="w-3.5 h-3.5 text-[#FFE600]" />}
         </button>
 
-        <span className="border-2 border-black bg-black px-3 py-1 font-mono text-xs font-black uppercase text-[#06B6D4] shadow-[3px_3px_0_0_#000]">
+        <span className="border-2 border-outline bg-black px-3 py-1 font-mono text-xs font-black uppercase text-[#06B6D4] shadow-brutal-sm">
           FREE PLAY // DEMO
         </span>
         <button
           type="button"
           onClick={triggerDemoScanSequence}
-          className="flex items-center gap-1 border-2 border-black bg-[#FF5722] px-3 py-1 text-xs font-black uppercase text-white hover:bg-orange-600 shadow-[3px_3px_0_0_#000] active:translate-x-[1px] active:translate-y-[1px]"
+          className="flex items-center gap-1 border-2 border-outline bg-accent-2 px-3 py-1 text-xs font-black uppercase text-white hover:bg-orange-600 shadow-brutal-sm active:translate-x-[1px] active:translate-y-[1px]"
           title="Trigger 8-Bit Arcade Pulse"
         >
           <Play className="h-3.5 w-3.5 fill-white" />
@@ -447,7 +447,7 @@ export function BattleArea3DInner({ userLevel = 1 }: { userLevel?: number }) {
 
       {/* Bottom Floating Combat Log */}
       <div className="absolute bottom-3 left-3 right-3 z-10">
-        <div className="w-full border-2 border-black bg-black/90 px-3.5 py-2 font-mono text-xs font-black text-white shadow-[4px_4px_0_0_#000] backdrop-blur-md overflow-hidden whitespace-nowrap text-ellipsis flex items-center justify-between">
+        <div className="w-full border-2 border-outline bg-black/90 px-3.5 py-2 font-mono text-xs font-black text-white shadow-brutal backdrop-blur-md overflow-hidden whitespace-nowrap text-ellipsis flex items-center justify-between">
           <div className="flex items-center gap-2 min-w-0 overflow-hidden text-ellipsis">
             <span className="text-[#FFE600] shrink-0">ARCADE LOG:</span>
             <span className="truncate">{latestLog}</span>

@@ -20,10 +20,10 @@ export function BillingEffectsLayer({ activeEffect }: BillingEffectsLayerProps) 
               initial={{ scale: 0, y: 50 }}
               animate={{ scale: 1.2, y: 0 }}
               transition={{ type: 'spring', bounce: 0.5 }}
-              className="flex flex-col items-center text-zinc-300"
+              className="flex flex-col items-center text-ink-muted"
             >
               <Sprout className="w-36 h-36 stroke-[3px]" />
-              <div className="bg-zinc-300 text-black font-black text-2xl p-4 border-4 border-black mt-4 shadow-[4px_4px_0_0_#fff]">
+              <div className="bg-zinc-300 text-ink font-black text-2xl p-4 border-4 border-outline mt-4 shadow-[4px_4px_0_0_#fff]">
                 🌱 PEASANT AWAKENED! (Time to work)
               </div>
             </motion.div>
@@ -37,7 +37,7 @@ export function BillingEffectsLayer({ activeEffect }: BillingEffectsLayerProps) 
               className="flex flex-col items-center text-[#A3E635]"
             >
               <Sword className="w-36 h-36 stroke-[3px]" />
-              <div className="bg-[#A3E635] text-black font-black text-2xl p-4 border-4 border-black mt-4">
+              <div className="bg-success text-on-accent font-black text-2xl p-4 border-4 border-outline mt-4">
                 🗡️ SWORDSMAN RECRUITED! (+1.5x XP Boost)
               </div>
             </motion.div>
@@ -47,7 +47,7 @@ export function BillingEffectsLayer({ activeEffect }: BillingEffectsLayerProps) 
             <div className="relative flex flex-col items-center justify-center gap-8">
               <div className="relative">
                 <motion.div initial={{ scale: 3, y: -120 }} animate={{ scale: 1.2, y: 0 }} transition={{ type: 'spring', stiffness: 350, damping: 15 }}>
-                  <Shield className="w-48 h-48 text-slate-200 fill-slate-700 stroke-[3px]" />
+                  <Shield className="w-48 h-48 text-ink-inverse fill-slate-700 stroke-[3px]" />
                 </motion.div>
                 <motion.div initial={{ rotate: -90, opacity: 0 }} animate={{ rotate: 45, opacity: 1 }} transition={{ delay: 0.3, duration: 0.3 }} className="absolute inset-0 flex items-center justify-center">
                   <Sword className="w-64 h-64 text-cyan-300 stroke-[3px]" />
@@ -84,7 +84,7 @@ export function BillingEffectsLayer({ activeEffect }: BillingEffectsLayerProps) 
                 <Flame className="w-48 h-48 fill-orange-500 text-yellow-400" />
                 <span className="text-9xl font-black">🐉</span>
               </div>
-              <div className="bg-[#EF4444] text-white font-black text-3xl p-6 border-4 border-white shadow-[6px_6px_0_0_#F59E0B] uppercase text-center max-w-lg leading-tight">
+              <div className="bg-danger text-white font-black text-3xl p-6 border-4 border-white shadow-[6px_6px_0_0_#F59E0B] uppercase text-center max-w-lg leading-tight">
                 Dragon Overlord Summoned! <br/><span className="text-[#FFE600]">Fire Breathed.</span>
               </div>
             </motion.div>

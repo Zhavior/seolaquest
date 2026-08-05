@@ -13,7 +13,7 @@ export interface QuestBadgeProps extends HTMLAttributes<HTMLSpanElement> {
 
 /**
  * The small uppercase chip used everywhere in the Guild Hall aesthetic
- * (`border-2 border-black px-3 py-1 text-xs font-black uppercase shadow-[2px_2px_0_0_#000]`).
+ * (`border-2 border-outline px-3 py-1 text-xs font-black uppercase shadow-brutal-sm`).
  */
 export function QuestBadge({
   tone = 'gold',

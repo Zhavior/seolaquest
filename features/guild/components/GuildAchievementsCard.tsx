@@ -16,7 +16,7 @@ export function GuildAchievementsCard({
     <motion.section variants={item} aria-labelledby="guild-achievements-heading" className="mt-12">
       <QuestSectionHeading
         titleId="guild-achievements-heading"
-        icon={<Trophy className="w-8 h-8 text-black" />}
+        icon={<Trophy className="w-8 h-8 text-ink" />}
         iconTone="gold"
         title="Guild Achievements"
         subtitle="Unlockable Trophies & Badges"
@@ -31,7 +31,7 @@ export function GuildAchievementsCard({
             className={questSurface({
               tone: ach.unlocked ? 'white' : 'parchment',
               shadow: 'none',
-              className: `relative flex flex-col justify-between p-6 shadow-[5px_5px_0_0_#000] ${
+              className: `relative flex flex-col justify-between p-6 shadow-brutal ${
                 ach.unlocked ? '' : 'opacity-90'
               }`,
             })}
@@ -43,7 +43,7 @@ export function GuildAchievementsCard({
                 {ach.unlocked ? (
                   <QuestBadge
                     tone="none"
-                    className="bg-emerald-400 px-2 py-0.5 text-[10px] tracking-normal text-black"
+                    className="bg-emerald-400 px-2 py-0.5 text-[10px] tracking-normal text-ink"
                   >
                     Unlocked
                   </QuestBadge>
@@ -51,7 +51,7 @@ export function GuildAchievementsCard({
                   <QuestBadge
                     tone="none"
                     shadow="none"
-                    className="gap-1 bg-gray-300 px-2 py-0.5 text-[10px] tracking-normal text-gray-700"
+                    className="gap-1 bg-gray-300 px-2 py-0.5 text-[10px] tracking-normal text-ink-muted"
                     icon={<Lock aria-hidden="true" className="w-3 h-3" />}
                   >
                     Locked
@@ -60,13 +60,13 @@ export function GuildAchievementsCard({
               </div>
 
               <h3 className="text-xl uppercase font-black mb-1">{ach.title}</h3>
-              <p className="text-xs font-bold text-gray-600 mb-4 leading-snug">
+              <p className="text-xs font-bold text-ink-muted mb-4 leading-snug">
                 {ach.description}
               </p>
             </div>
 
             {/* Progress / Status */}
-            <div className="pt-3 border-t-2 border-black">
+            <div className="pt-3 border-t-2 border-outline">
               <div className="flex justify-between items-center text-[11px] font-black uppercase mb-1">
                 <span>Progress</span>
                 <span>{ach.progress} / {ach.target}</span>
@@ -77,10 +77,10 @@ export function GuildAchievementsCard({
                 aria-valuemin={0}
                 aria-valuemax={ach.target}
                 aria-valuenow={ach.progress}
-                className="w-full bg-gray-200 border-2 border-black h-3 overflow-hidden"
+                className="w-full bg-inset border-2 border-outline h-3 overflow-hidden"
               >
                 <div
-                  className={`h-full ${ach.unlocked ? 'bg-[#A3E635]' : 'bg-[#06B6D4]'}`}
+                  className={`h-full ${ach.unlocked ? 'bg-success' : 'bg-info'}`}
                   style={{ width: `${Math.min(100, (ach.progress / ach.target) * 100)}%` }}
                 ></div>
               </div>

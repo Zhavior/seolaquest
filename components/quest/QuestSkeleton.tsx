@@ -31,7 +31,7 @@ export function QuestSkeletonBlock({
       className={questSurface({
         tone: 'none',
         className: clsx(
-          'animate-pulse bg-zinc-200 motion-reduce:animate-none',
+          'animate-pulse bg-inset motion-reduce:animate-none',
           height,
           className
         ),
@@ -106,11 +106,11 @@ export function QuestGridSkeleton({
 function QuestHeaderSkeleton({ label }: { label: string }) {
   return (
     <div aria-hidden="true" className="min-w-0">
-      <div className="mb-2 inline-block -rotate-1 border-2 border-black bg-black px-3 py-1 text-xs font-black uppercase tracking-widest text-[#FFE600]">
+      <div className="mb-2 inline-block -rotate-1 border-2 border-outline bg-black px-3 py-1 text-xs font-black uppercase tracking-widest text-[#FFE600]">
         {label}
       </div>
-      <div className="h-14 w-full max-w-xl animate-pulse border-4 border-black bg-zinc-200 shadow-[6px_6px_0_0_#000] motion-reduce:animate-none sm:h-16 md:h-20" />
-      <div className="mt-3 h-8 w-56 -rotate-1 animate-pulse border-2 border-black bg-zinc-300 motion-reduce:animate-none" />
+      <div className="h-14 w-full max-w-xl animate-pulse border-4 border-outline bg-inset shadow-brutal-lg motion-reduce:animate-none sm:h-16 md:h-20" />
+      <div className="mt-3 h-8 w-56 -rotate-1 animate-pulse border-2 border-outline bg-zinc-300 motion-reduce:animate-none" />
     </div>
   )
 }

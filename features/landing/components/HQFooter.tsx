@@ -10,11 +10,11 @@ const LINKS = [
 
 export function HQFooter() {
   return (
-    <footer className="border-t-4 border-black px-4 sm:px-6 py-10" style={{ background: '#f4ebd8' }}>
+    <footer className="border-t-4 border-outline px-4 sm:px-6 py-10" style={{ background: '#f4ebd8' }}>
       <div className="mx-auto max-w-7xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
         <div className="flex items-center gap-3">
           <span
-            className="flex h-9 w-9 items-center justify-center border-4 border-black font-black text-lg shadow-[3px_3px_0_0_#000]"
+            className="flex h-9 w-9 items-center justify-center border-4 border-outline font-black text-lg shadow-brutal-sm"
             style={{ background: '#FFE600' }}
             aria-hidden="true"
           >
@@ -22,7 +22,7 @@ export function HQFooter() {
           </span>
           <div>
             <div className="font-black uppercase tracking-widest text-sm">SEO la Quest</div>
-            <div className="text-[9px] font-bold uppercase tracking-widest text-black/40">
+            <div className="text-[9px] font-bold uppercase tracking-widest text-ink/40">
               © {new Date().getFullYear()} SEO la Quest. All rights reserved.
             </div>
           </div>
@@ -33,7 +33,7 @@ export function HQFooter() {
             <Link
               key={label}
               href={href}
-              className="text-xs font-black uppercase tracking-widest text-black/50 hover:text-black transition-colors"
+              className="text-xs font-black uppercase tracking-widest text-ink/50 hover:text-ink transition-colors"
             >
               {label}
             </Link>

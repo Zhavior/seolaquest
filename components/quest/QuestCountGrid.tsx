@@ -4,7 +4,7 @@ import { questSurface, type QuestBorder, type QuestShadow, type QuestTone } from
 export interface QuestCount {
   label: string
   value: number | string
-  /** Optional per-tile background, e.g. `bg-[#FFE600]`. */
+  /** Optional per-tile background, e.g. `bg-accent`. */
   accent?: string
 }
 
@@ -45,12 +45,12 @@ export function QuestCountGrid({
     >
       {counts.map((count) => (
         <div key={count.label} className={clsx('min-w-0 p-3.5', count.accent)}>
-          <dt className="text-[10px] font-black uppercase tracking-wider text-black/60">
+          <dt className="text-[10px] font-black uppercase tracking-wider text-ink/60">
             {count.label}
           </dt>
           <dd
             className={clsx(
-              'mt-1 font-black text-black',
+              'mt-1 font-black text-ink',
               size === 'md' ? 'text-xl sm:text-2xl' : 'text-2xl'
             )}
           >

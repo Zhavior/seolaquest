@@ -39,7 +39,7 @@ export default function GuildClient({ stats }: { stats: GuildStats }) {
 
   return (
     <>
-      <QuestPageShell watermark={<Swords className="h-[650px] w-[650px] text-black" />} gap="none">
+      <QuestPageShell watermark={<Swords className="h-[650px] w-[650px] text-ink" />} gap="none">
         <motion.div
           variants={container}
           initial="hidden"
@@ -49,8 +49,8 @@ export default function GuildClient({ stats }: { stats: GuildStats }) {
           {/* Neo-Brutalist Ticker Banner */}
           <motion.div variants={item}>
             <QuestTicker label="Tenant activity ledger. Measured rows only.">
-              <Sparkles className="h-5 w-5 text-black" /> ⚔️ TENANT ACTIVITY LEDGER{' '}
-              <Sparkles className="h-5 w-5 text-black" /> 🛡️ MEASURED ROWS ONLY
+              <Sparkles className="h-5 w-5 text-ink" /> ⚔️ TENANT ACTIVITY LEDGER{' '}
+              <Sparkles className="h-5 w-5 text-ink" /> 🛡️ MEASURED ROWS ONLY
             </QuestTicker>
           </motion.div>
 
@@ -73,7 +73,7 @@ export default function GuildClient({ stats }: { stats: GuildStats }) {
                 <h2 id="guild-rankings-heading" className="text-2xl font-black uppercase">
                   Guild rankings unavailable
                 </h2>
-                <p className="mt-2 max-w-2xl text-sm font-bold leading-relaxed text-zinc-600">
+                <p className="mt-2 max-w-2xl text-sm font-bold leading-relaxed text-ink-muted">
                   CoQuest does not publish cross-account rankings until a consented public-profile model exists. Your private,
                   tenant-scoped activity remains visible below.
                 </p>

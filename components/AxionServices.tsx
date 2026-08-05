@@ -128,24 +128,24 @@ export function AxionServices() {
 
   return (
     <section className="w-full max-w-4xl mx-auto my-12 px-4">
-      <div className="bg-white border-2 border-black shadow-[4px_4px_0_0_#000] p-6 rounded-none">
-        <h2 className="text-2xl font-black uppercase tracking-tight text-black mb-2">
+      <div className="bg-card border-2 border-outline shadow-brutal p-6 rounded-none">
+        <h2 className="text-2xl font-black uppercase tracking-tight text-ink mb-2">
           Axion Core Platform Services
         </h2>
-        <p className="text-sm text-black/70 mb-6">
+        <p className="text-sm text-ink/70 mb-6">
           Production-ready integrated workflows for billing, social publishing, and AI assistant chat.
         </p>
 
         {/* Tab Selection */}
-        <div className="flex flex-wrap gap-2 border-b-2 border-black pb-4 mb-6" role="tablist">
+        <div className="flex flex-wrap gap-2 border-b-2 border-outline pb-4 mb-6" role="tablist">
           <button
             role="tab"
             aria-selected={activeTab === 'billing'}
             onClick={() => setActiveTab('billing')}
-            className={`touch-target px-4 py-2 font-bold uppercase text-sm border-2 border-black transition-all ${
+            className={`touch-target px-4 py-2 font-bold uppercase text-sm border-2 border-outline transition-all ${
               activeTab === 'billing'
-                ? 'bg-[#FFE600] text-black shadow-[2px_2px_0_0_#000]'
-                : 'bg-zinc-100 text-black/80 hover:bg-zinc-200'
+                ? 'bg-accent text-on-accent shadow-brutal-sm'
+                : 'bg-inset text-ink/80 hover:bg-inset'
             }`}
           >
             💳 Stripe Billing
@@ -154,10 +154,10 @@ export function AxionServices() {
             role="tab"
             aria-selected={activeTab === 'x'}
             onClick={() => setActiveTab('x')}
-            className={`touch-target px-4 py-2 font-bold uppercase text-sm border-2 border-black transition-all ${
+            className={`touch-target px-4 py-2 font-bold uppercase text-sm border-2 border-outline transition-all ${
               activeTab === 'x'
-                ? 'bg-[#FFE600] text-black shadow-[2px_2px_0_0_#000]'
-                : 'bg-zinc-100 text-black/80 hover:bg-zinc-200'
+                ? 'bg-accent text-on-accent shadow-brutal-sm'
+                : 'bg-inset text-ink/80 hover:bg-inset'
             }`}
           >
             📢 Publish to X
@@ -166,10 +166,10 @@ export function AxionServices() {
             role="tab"
             aria-selected={activeTab === 'gemini'}
             onClick={() => setActiveTab('gemini')}
-            className={`touch-target px-4 py-2 font-bold uppercase text-sm border-2 border-black transition-all ${
+            className={`touch-target px-4 py-2 font-bold uppercase text-sm border-2 border-outline transition-all ${
               activeTab === 'gemini'
-                ? 'bg-[#FFE600] text-black shadow-[2px_2px_0_0_#000]'
-                : 'bg-zinc-100 text-black/80 hover:bg-zinc-200'
+                ? 'bg-accent text-on-accent shadow-brutal-sm'
+                : 'bg-inset text-ink/80 hover:bg-inset'
             }`}
           >
             🤖 Gemini Chat
@@ -179,9 +179,9 @@ export function AxionServices() {
         {/* Tab 1: Billing */}
         {activeTab === 'billing' && (
           <div role="tabpanel" className="space-y-4">
-            <div className="bg-zinc-50 border-2 border-black p-4">
-              <h3 className="font-bold text-lg text-black mb-1">Subscription Upgrade</h3>
-              <p className="text-sm text-black/70 mb-4">
+            <div className="bg-inset border-2 border-outline p-4">
+              <h3 className="font-bold text-lg text-ink mb-1">Subscription Upgrade</h3>
+              <p className="text-sm text-ink/70 mb-4">
                 Subscribe to Axion Pro plan for full platform features and unthrottled API access.
               </p>
 
@@ -197,7 +197,7 @@ export function AxionServices() {
               <button
                 onClick={handleCheckout}
                 disabled={checkoutLoading}
-                className="touch-target px-6 py-3 bg-[#FF4500] text-white font-extrabold uppercase border-2 border-black shadow-[3px_3px_0_0_#000] hover:translate-x-0.5 hover:translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="touch-target px-6 py-3 bg-[#FF4500] text-white font-extrabold uppercase border-2 border-outline shadow-brutal-sm hover:translate-x-0.5 hover:translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {checkoutLoading ? 'Redirecting to Stripe...' : 'Upgrade Now ($29/mo)'}
               </button>
@@ -210,7 +210,7 @@ export function AxionServices() {
           <div role="tabpanel" className="space-y-4">
             <form onSubmit={handleXPost} className="space-y-4">
               <div>
-                <label htmlFor="x-post-input" className="block text-sm font-bold uppercase text-black mb-1">
+                <label htmlFor="x-post-input" className="block text-sm font-bold uppercase text-ink mb-1">
                   Draft Post for X / Twitter
                 </label>
                 <textarea
@@ -220,9 +220,9 @@ export function AxionServices() {
                   onChange={(e) => setXText(e.target.value)}
                   maxLength={280}
                   placeholder="What's happening in your product today?"
-                  className="w-full p-3 border-2 border-black focus:outline-none focus:ring-2 focus:ring-[#FFE600] text-black font-sans text-base"
+                  className="w-full p-3 border-2 border-outline focus:outline-none focus:ring-2 focus:ring-[#FFE600] text-ink font-sans text-base"
                 />
-                <div className="flex justify-between items-center text-xs mt-1 font-mono text-black/70">
+                <div className="flex justify-between items-center text-xs mt-1 font-mono text-ink/70">
                   <span>Authorized server-side OAuth 1.0a dispatch</span>
                   <span className={xText.length > 260 ? 'text-red-600 font-bold' : ''}>
                     {xText.length} / 280
@@ -251,7 +251,7 @@ export function AxionServices() {
               <button
                 type="submit"
                 disabled={xPosting || !xText.trim()}
-                className="touch-target px-6 py-3 bg-[#000000] text-white font-extrabold uppercase border-2 border-black shadow-[3px_3px_0_0_#FFE600] hover:translate-x-0.5 hover:translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="touch-target px-6 py-3 bg-[#000000] text-white font-extrabold uppercase border-2 border-outline shadow-[3px_3px_0_0_#FFE600] hover:translate-x-0.5 hover:translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {xPosting ? 'Posting to X...' : 'Post to X'}
               </button>
@@ -262,9 +262,9 @@ export function AxionServices() {
         {/* Tab 3: Gemini Chat */}
         {activeTab === 'gemini' && (
           <div role="tabpanel" className="space-y-4">
-            <div className="border-2 border-black bg-zinc-50 h-80 overflow-y-auto p-4 space-y-3">
+            <div className="border-2 border-outline bg-inset h-80 overflow-y-auto p-4 space-y-3">
               {chatHistory.length === 0 ? (
-                <div className="text-center text-black/50 text-sm py-12">
+                <div className="text-center text-ink/50 text-sm py-12">
                   👋 Ask Axion’s Gemini Assistant anything about your product workflows.
                 </div>
               ) : (
@@ -273,14 +273,14 @@ export function AxionServices() {
                     key={index}
                     className={`flex flex-col ${msg.role === 'user' ? 'items-end' : 'items-start'}`}
                   >
-                    <span className="text-[10px] font-mono uppercase text-black/60 mb-0.5">
+                    <span className="text-[10px] font-mono uppercase text-ink/60 mb-0.5">
                       {msg.role === 'user' ? 'You' : 'Gemini Assistant'}
                     </span>
                     <div
-                      className={`max-w-[85%] p-3 border-2 border-black text-sm break-word-safe ${
+                      className={`max-w-[85%] p-3 border-2 border-outline text-sm break-word-safe ${
                         msg.role === 'user'
-                          ? 'bg-[#FFE600] text-black font-medium shadow-[2px_2px_0_0_#000]'
-                          : 'bg-white text-black shadow-[2px_2px_0_0_#000]'
+                          ? 'bg-accent text-on-accent font-medium shadow-brutal-sm'
+                          : 'bg-card text-ink shadow-brutal-sm'
                       }`}
                     >
                       {msg.content}
@@ -290,10 +290,10 @@ export function AxionServices() {
               )}
               {chatSending && (
                 <div className="flex flex-col items-start">
-                  <span className="text-[10px] font-mono uppercase text-black/60 mb-0.5">
+                  <span className="text-[10px] font-mono uppercase text-ink/60 mb-0.5">
                     Gemini Assistant
                   </span>
-                  <div className="bg-white border-2 border-black p-3 text-xs italic text-black/70 animate-pulse">
+                  <div className="bg-card border-2 border-outline p-3 text-xs italic text-ink/70 animate-pulse">
                     Thinking...
                   </div>
                 </div>
@@ -321,13 +321,13 @@ export function AxionServices() {
                   onChange={(e) => setChatInput(e.target.value)}
                   onKeyDown={handleKeyDownChat}
                   placeholder="Ask Gemini... (Cmd/Ctrl + Enter to send)"
-                  className="w-full p-2.5 border-2 border-black text-sm text-black focus:outline-none focus:ring-2 focus:ring-[#FFE600]"
+                  className="w-full p-2.5 border-2 border-outline text-sm text-ink focus:outline-none focus:ring-2 focus:ring-[#FFE600]"
                 />
               </div>
               <button
                 type="submit"
                 disabled={chatSending || !chatInput.trim()}
-                className="touch-target self-end px-6 py-3 bg-[#FF4500] text-white font-extrabold uppercase border-2 border-black shadow-[3px_3px_0_0_#000] hover:translate-x-0.5 hover:translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="touch-target self-end px-6 py-3 bg-[#FF4500] text-white font-extrabold uppercase border-2 border-outline shadow-brutal-sm hover:translate-x-0.5 hover:translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {chatSending ? 'Sending...' : 'Send'}
               </button>

@@ -36,8 +36,8 @@ export function BillingHero({
       <motion.div variants={itemVariants} className="flex flex-col lg:flex-row gap-6">
 
         {/* Alchemist Shop Header */}
-        <div className="flex-1 bg-[#A3E635] border-4 border-black p-6 md:p-8 shadow-[8px_8px_0_0_#000] flex flex-col justify-center relative overflow-hidden group" style={{ backgroundImage: 'radial-gradient(#000 2px, transparent 2px)', backgroundSize: '24px 24px', backgroundPosition: '-2px -2px' }}>
-          <div className="absolute inset-0 bg-[#A3E635] opacity-90 z-0"></div>
+        <div className="flex-1 bg-success border-4 border-outline p-6 md:p-8 shadow-brutal-lg flex flex-col justify-center relative overflow-hidden group" style={{ backgroundImage: 'radial-gradient(#000 2px, transparent 2px)', backgroundSize: '24px 24px', backgroundPosition: '-2px -2px' }}>
+          <div className="absolute inset-0 bg-success opacity-90 z-0"></div>
           <div className="relative z-10">
             <div className="bg-black text-white px-4 py-1 inline-block uppercase text-xs md:text-sm mb-3 border-2 border-white -rotate-2 shadow-[2px_2px_0_0_#fff]">
               Merchant&apos;s Guild
@@ -57,11 +57,11 @@ export function BillingHero({
             SFX {sfxEnabled ? 'ON' : 'OFF'}
           </button>
 
-          <Crown className="absolute -bottom-10 -right-10 w-64 h-64 text-black opacity-10 group-hover:scale-110 transition-transform duration-500" />
+          <Crown className="absolute -bottom-10 -right-10 w-64 h-64 text-ink opacity-10 group-hover:scale-110 transition-transform duration-500" />
         </div>
 
         {/* ── Retro 8-Bit Liquid Mana Meter with Low-MP warning ──────── */}
-        <div className="lg:w-1/2 bg-black border-4 border-black p-6 shadow-[8px_8px_0_0_#06B6D4] flex flex-col justify-between relative overflow-hidden">
+        <div className="lg:w-1/2 bg-black border-4 border-outline p-6 shadow-[8px_8px_0_0_#06B6D4] flex flex-col justify-between relative overflow-hidden">
           <div className="flex items-center justify-between border-b-2 border-dashed border-[#06B6D4] pb-2 mb-3 z-10">
             <div className="flex items-center gap-2">
               <Zap className={`w-5 h-5 ${isLowMana ? 'text-red-400 animate-pulse' : 'text-[#06B6D4] animate-pulse'}`} />
@@ -69,7 +69,7 @@ export function BillingHero({
                 {isLowMana ? '⚠️ LOW MANA WARNING' : 'Active Mana Balance'}
               </span>
             </div>
-            <span className="bg-[#06B6D4] text-black px-2 py-0.5 text-[10px] md:text-xs font-black uppercase border border-black shadow-[2px_2px_0_0_#fff]">
+            <span className="bg-info text-on-accent px-2 py-0.5 text-[10px] md:text-xs font-black uppercase border border-outline shadow-[2px_2px_0_0_#fff]">
               RETRO MP METER
             </span>
           </div>
@@ -150,7 +150,7 @@ export function BillingHero({
                 animate={{ y: -30, opacity: 1, scale: 1.15 }}
                 exit={{ y: -50, opacity: 0 }}
                 transition={{ duration: 1.5 }}
-                className="absolute top-2 right-4 bg-[#FFE600] text-black border-2 border-black font-black text-xs md:text-sm px-3 py-1 shadow-[4px_4px_0_0_#000] z-30"
+                className="absolute top-2 right-4 bg-accent text-on-accent border-2 border-outline font-black text-xs md:text-sm px-3 py-1 shadow-brutal z-30"
               >
                 MANA REFILLED! 🧪✨
               </motion.div>
@@ -162,28 +162,28 @@ export function BillingHero({
       </motion.div>
 
       {/* ── Typewriter Alchemist NPC Dialogue + Urgency Timer ──────────── */}
-      <motion.div variants={itemVariants} className="bg-[#FFE600] border-4 border-black p-5 md:p-6 shadow-[8px_8px_0_0_#000] flex flex-col md:flex-row items-center justify-between gap-5 relative overflow-hidden">
+      <motion.div variants={itemVariants} className="bg-accent border-4 border-outline p-5 md:p-6 shadow-brutal-lg flex flex-col md:flex-row items-center justify-between gap-5 relative overflow-hidden">
         <div className="flex items-start gap-4 relative z-10 flex-1">
           {/* NPC Merchant Portrait */}
           <div className="relative flex-shrink-0">
             <motion.div
               animate={{ rotate: [0, -3, 3, -3, 0] }}
               transition={{ repeat: Infinity, duration: 4, ease: 'easeInOut' }}
-              className="w-16 h-16 bg-amber-200 border-4 border-black rounded-full flex items-center justify-center text-3xl shadow-[3px_3px_0_0_#000]"
+              className="w-16 h-16 bg-amber-200 border-4 border-outline rounded-full flex items-center justify-center text-3xl shadow-brutal-sm"
             >
               🧙‍♂️
             </motion.div>
-            <div className="absolute -bottom-1 -right-1 bg-black text-[#FFE600] text-[9px] font-black uppercase px-1.5 py-0.5 border border-white shadow-[1px_1px_0_0_#000]">
+            <div className="absolute -bottom-1 -right-1 bg-black text-[#FFE600] text-[9px] font-black uppercase px-1.5 py-0.5 border border-white shadow-brutal-sm">
               NPC
             </div>
           </div>
 
           {/* Merchant Typewriter Speech */}
           <div className="flex-1">
-            <div className="bg-black text-[#A3E635] border-2 border-white px-2.5 py-0.5 inline-block text-xs font-black uppercase mb-2 shadow-[2px_2px_0_0_#000] -rotate-1">
+            <div className="bg-black text-[#A3E635] border-2 border-white px-2.5 py-0.5 inline-block text-xs font-black uppercase mb-2 shadow-brutal-sm -rotate-1">
               Billing Notice 📜
             </div>
-            <div className="bg-black border-2 border-white p-3 relative shadow-[4px_4px_0_0_#000]">
+            <div className="bg-black border-2 border-white p-3 relative shadow-brutal">
               {/* Speech bubble pointer */}
               <div className="absolute -left-3 top-4 w-0 h-0 border-t-8 border-b-8 border-r-[12px] border-t-transparent border-b-transparent border-r-black" />
               <p className="text-[#A3E635] text-xs md:text-sm font-mono leading-relaxed min-h-[3em]">
@@ -191,7 +191,7 @@ export function BillingHero({
                 <span className="typewriter-caret">{typedDialogue}</span>
               </p>
             </div>
-            <p className="text-xs font-bold text-slate-900 mt-2">Only server-confirmed Stripe payments change your balance.</p>
+            <p className="text-xs font-bold text-ink mt-2">Only server-confirmed Stripe payments change your balance.</p>
           </div>
         </div>
 
@@ -200,11 +200,11 @@ export function BillingHero({
           <button
             disabled
             onMouseEnter={sfxBlip}
-            className="w-full md:w-auto bg-zinc-800 text-zinc-400 font-black text-base uppercase px-6 py-3.5 border-4 border-white shadow-[6px_6px_0_0_#000] cursor-not-allowed"
+            className="w-full md:w-auto bg-zinc-800 text-ink-muted font-black text-base uppercase px-6 py-3.5 border-4 border-white shadow-brutal-lg cursor-not-allowed"
           >
             [BUNDLE NOT FOR SALE]
           </button>
-          <div className="bg-zinc-600 text-white border-2 border-black font-black text-[10px] uppercase px-3 py-1 shadow-[2px_2px_0_0_#000] tracking-widest text-center">
+          <div className="bg-zinc-600 text-white border-2 border-outline font-black text-[10px] uppercase px-3 py-1 shadow-brutal-sm tracking-widest text-center">
             NO FALSE URGENCY
           </div>
         </div>

@@ -11,7 +11,7 @@ type DashboardLeaderboardProps = {
 export function DashboardLeaderboard({ item, dbLeaderboard, dbAnalytics }: DashboardLeaderboardProps) {
   return (
     <motion.div variants={item} className="grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch">
-      <div className="bg-[#FFE600] border-4 border-black p-6 flex flex-col justify-between shadow-[6px_6px_0_0_#000] h-full">
+      <div className="bg-accent border-4 border-outline p-6 flex flex-col justify-between shadow-brutal-lg h-full">
         <div>
           <div className="flex items-center gap-3 mb-4">
             <Trophy className="w-6 h-6 stroke-[3px]" />
@@ -19,11 +19,11 @@ export function DashboardLeaderboard({ item, dbLeaderboard, dbAnalytics }: Dashb
           </div>
           <div className="space-y-3">
             {dbLeaderboard.length === 0 ? (
-              <p className="border-2 border-black bg-white p-4 text-sm font-bold leading-relaxed">
+              <p className="border-2 border-outline bg-card p-4 text-sm font-bold leading-relaxed">
                 Leaderboard unavailable. Cross-account rankings stay hidden until users can explicitly opt in.
               </p>
             ) : dbLeaderboard.slice(0, 3).map((u, idx) => (
-              <div key={idx} className={`p-3 border-2 border-black flex justify-between items-center ${idx === 0 ? 'bg-white shadow-[2px_2px_0_0_#000] scale-105' : 'bg-[#F4F0EA]'}`}>
+              <div key={idx} className={`p-3 border-2 border-outline flex justify-between items-center ${idx === 0 ? 'bg-card shadow-brutal-sm scale-105' : 'bg-canvas'}`}>
                 <div className="flex min-w-0 flex-1 items-center gap-2">
                   <span className="shrink-0 font-black text-lg">#{idx + 1}</span>
                   <span className="min-w-0 truncate font-black uppercase text-sm">{u.name || 'Anon'}</span>
@@ -35,13 +35,13 @@ export function DashboardLeaderboard({ item, dbLeaderboard, dbAnalytics }: Dashb
         </div>
       </div>
 
-      <div className="bg-[#A3E635] border-4 border-black p-6 flex flex-col justify-between shadow-[6px_6px_0_0_#000] h-full">
+      <div className="bg-success border-4 border-outline p-6 flex flex-col justify-between shadow-brutal-lg h-full">
         <div>
           <div className="flex items-center gap-3 mb-4">
             <BarChart3 className="w-6 h-6 stroke-[3px]" />
             <h3 className="font-black uppercase text-xl">7-Day Contacted</h3>
           </div>
-          <div className="grid grid-cols-7 gap-1 h-36 items-end border-b-4 border-black pb-2 sm:h-32">
+          <div className="grid grid-cols-7 gap-1 h-36 items-end border-b-4 border-outline pb-2 sm:h-32">
             {dbAnalytics.map((item, idx) => {
               const heightPct = item.claimed > 0 ? Math.min(100, (item.claimed / 35) * 100) : 0
               return (

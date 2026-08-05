@@ -9,12 +9,12 @@ export const metadata: Metadata = {
 
 export default function Page() {
   return (
-    <main className="flex min-h-screen w-full flex-col items-center justify-center bg-[#F4F0EA] px-4 py-8 text-black">
+    <main className="flex min-h-screen w-full flex-col items-center justify-center bg-canvas px-4 py-8 text-ink">
       <Link href="/" className="mb-5 inline-flex min-h-11 items-center text-2xl font-black uppercase tracking-widest focus-visible:outline-4 focus-visible:outline-offset-4">
         CoQuest
       </Link>
       <section aria-labelledby="sign-up-heading" className="flex w-full max-w-md flex-col items-center">
-        <div className="mb-4 w-full border-3 border-black bg-[#A3E635] p-4 text-center shadow-[4px_4px_0_0_#000]">
+        <div className="mb-4 w-full border-3 border-outline bg-success p-4 text-center shadow-brutal">
           <h1 id="sign-up-heading" className="text-2xl font-black uppercase">Start one focused customer hunt</h1>
           <p className="mt-1 font-bold">Create an account, then save your first real keyword in onboarding.</p>
         </div>

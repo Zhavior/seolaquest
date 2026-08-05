@@ -29,10 +29,10 @@ export function BlogTagFilter({ activeTag, onSelectTag }: BlogTagFilterProps) {
               sfx.playCoinDrop()
               onSelectTag(tag)
             }}
-            className={`min-h-11 border-3 border-black px-4 py-2 text-xs font-black uppercase tracking-wider transition-all ${
+            className={`min-h-11 border-3 border-outline px-4 py-2 text-xs font-black uppercase tracking-wider transition-all ${
               isActive
                 ? 'bg-black text-[#FFE600] shadow-[4px_4px_0_0_#FFE600] translate-x-0.5 translate-y-0.5'
-                : 'bg-white text-black shadow-[4px_4px_0_0_#000] hover:bg-zinc-100'
+                : 'bg-card text-ink shadow-brutal hover:bg-inset'
             }`}
           >
             {tag}

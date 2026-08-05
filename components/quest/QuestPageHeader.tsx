@@ -40,21 +40,21 @@ export function QuestPageHeader({
       <div className="min-w-0">
         <div className="mb-1 flex items-center gap-3">
           {icon ? <span aria-hidden="true" className="shrink-0 text-[#FF5722]">{icon}</span> : null}
-          <span className="-rotate-1 border-2 border-black bg-black px-3 py-1 text-xs font-black uppercase tracking-widest text-[#FFE600]">
+          <span className="-rotate-1 border-2 border-outline bg-black px-3 py-1 text-xs font-black uppercase tracking-widest text-[#FFE600]">
             {eyebrow}
           </span>
         </div>
 
         <h1
           id={titleId}
-          className="text-4xl uppercase tracking-tight text-white drop-shadow-[6px_6px_0_rgba(0,0,0,1)] sm:text-5xl md:text-7xl"
+          className="text-4xl uppercase tracking-tight text-white drop-shadow-brutal-lg sm:text-5xl md:text-7xl"
           style={QUEST_TITLE_STROKE}
         >
           {title}
         </h1>
 
         {subtitle ? (
-          <p className="mt-2 inline-block -rotate-1 border-2 border-black bg-black px-4 py-1 text-xl uppercase text-white md:text-2xl">
+          <p className="mt-2 inline-block -rotate-1 border-2 border-outline bg-black px-4 py-1 text-xl uppercase text-white md:text-2xl">
             {subtitle}
           </p>
         ) : null}

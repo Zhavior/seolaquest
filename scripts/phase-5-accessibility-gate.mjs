@@ -214,6 +214,12 @@ async function launchBrowser(chromePath, axeSource) {
   const profileDirectory = await mkdtemp(join(tmpdir(), 'coquest-a11y-chrome-'))
   const chrome = spawn(chromePath, [
     '--headless=new',
+    // GitHub's Ubuntu runners disable unprivileged user namespaces, so Chrome's
+    // sandbox cannot start and the browser aborts before it ever writes
+    // DevToolsActivePort. Dropping the sandbox is safe here and only here: the
+    // gate loads our own production build on localhost and nothing else. Local
+    // runs keep the sandbox, so this stays a CI-only concession.
+    ...(process.env.CI ? ['--no-sandbox', '--disable-dev-shm-usage'] : []),
     '--disable-background-networking',
     '--disable-component-update',
     '--disable-default-apps',
@@ -283,8 +289,23 @@ async function launchBrowser(chromePath, axeSource) {
         new Promise((resolveExit) => chrome.once('exit', resolveExit)),
         delay(2_000),
       ])
-      if (chrome.exitCode === null) chrome.kill('SIGKILL')
-      await rm(profileDirectory, { recursive: true, force: true })
+      if (chrome.exitCode === null) {
+        chrome.kill('SIGKILL')
+        await Promise.race([
+          new Promise((resolveExit) => chrome.once('exit', resolveExit)),
+          delay(2_000),
+        ])
+      }
+      // Chrome keeps writing to its profile as it tears down, so a plain
+      // recursive rm can walk a directory, have Chrome drop a new file into it,
+      // and then fail the rmdir with ENOTEMPTY. That crashed the gate on CI
+      // *after* every route had already been checked, turning a clean run into
+      // exit 2. Retry the walk, and never let cleanup decide the run's verdict.
+      try {
+        await rm(profileDirectory, { recursive: true, force: true, maxRetries: 5, retryDelay: 200 })
+      } catch (error) {
+        console.warn(`Could not remove the temporary Chrome profile: ${error.message}`)
+      }
     },
   }
 }

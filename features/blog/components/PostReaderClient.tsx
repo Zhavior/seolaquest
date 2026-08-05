@@ -40,7 +40,7 @@ export function PostReaderClient({ post, relatedPosts }: PostReaderClientProps) 
   }, [post])
 
   return (
-    <div className="min-h-screen bg-[#F4F0EA] p-4 sm:p-6 md:p-10 pb-24 relative overflow-hidden">
+    <div className="min-h-screen bg-canvas p-4 sm:p-6 md:p-10 pb-24 relative overflow-hidden">
       {/* Subtle CRT Overlay */}
       <div
         className="pointer-events-none fixed inset-0 z-30 opacity-[0.03]"
@@ -57,48 +57,48 @@ export function PostReaderClient({ post, relatedPosts }: PostReaderClientProps) 
             href="/blog"
             onClick={() => sfx.playCoinDrop()}
             onMouseEnter={() => sfx.playHoverBlip()}
-            className="inline-flex items-center gap-2 border-3 border-black bg-white px-4 py-2 text-xs font-black uppercase text-black shadow-[4px_4px_0_0_#000] hover:bg-[#FFE600] transition-colors"
+            className="inline-flex items-center gap-2 border-3 border-outline bg-card px-4 py-2 text-xs font-black uppercase text-ink shadow-brutal hover:bg-accent transition-colors"
           >
             <ArrowLeft size={16} strokeWidth={3} /> Back to Vault
           </Link>
 
-          <span className="inline-flex items-center gap-1.5 border-3 border-black bg-[#00FFFF] px-3 py-1 text-xs font-black uppercase text-black shadow-[2px_2px_0_0_#000]">
+          <span className="inline-flex items-center gap-1.5 border-3 border-outline bg-[#00FFFF] px-3 py-1 text-xs font-black uppercase text-on-accent shadow-brutal-sm">
             {post.tag}
           </span>
         </div>
 
         {/* Post Header Hero Section */}
-        <header className="border-4 border-black bg-white p-6 md:p-10 shadow-[10px_10px_0_0_#000] space-y-6">
-          <div className="h-3 w-full border border-black" style={{ backgroundColor: post.coverColor || '#FFE600' }} />
+        <header className="border-4 border-outline bg-card p-6 md:p-10 shadow-brutal-lg space-y-6">
+          <div className="h-3 w-full border border-outline" style={{ backgroundColor: post.coverColor || '#FFE600' }} />
 
           <div className="space-y-4">
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-black uppercase tracking-tight text-black leading-tight">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-black uppercase tracking-tight text-ink leading-tight">
               {post.title}
             </h1>
 
-            <p className="text-base md:text-xl font-bold text-zinc-700 leading-relaxed max-w-3xl">
+            <p className="text-base md:text-xl font-bold text-ink-muted leading-relaxed max-w-3xl">
               {post.description}
             </p>
           </div>
 
-          <div className="flex flex-wrap items-center justify-between gap-4 pt-6 border-t-3 border-black">
+          <div className="flex flex-wrap items-center justify-between gap-4 pt-6 border-t-3 border-outline">
             {/* Author Crest */}
             <div className="flex items-center gap-3">
-              <div className="flex h-12 w-12 items-center justify-center border-3 border-black bg-[#FFE600] text-xl font-black shadow-[2px_2px_0_0_#000]">
+              <div className="flex h-12 w-12 items-center justify-center border-3 border-outline bg-accent text-xl font-black shadow-brutal-sm">
                 {post.authorAvatar}
               </div>
               <div>
-                <p className="font-black text-sm uppercase text-black">{post.author}</p>
-                <p className="text-xs font-bold uppercase text-zinc-500">{post.authorRole}</p>
+                <p className="font-black text-sm uppercase text-ink">{post.author}</p>
+                <p className="text-xs font-bold uppercase text-ink-muted">{post.authorRole}</p>
               </div>
             </div>
 
             {/* Read & Date metadata */}
-            <div className="flex items-center gap-4 text-xs font-black uppercase text-zinc-600">
-              <span className="flex items-center gap-1.5 border-2 border-black bg-[#F4F0EA] px-3 py-1.5 shadow-[2px_2px_0_0_#000]">
+            <div className="flex items-center gap-4 text-xs font-black uppercase text-ink-muted">
+              <span className="flex items-center gap-1.5 border-2 border-outline bg-canvas px-3 py-1.5 shadow-brutal-sm">
                 <Clock size={14} /> {post.readTimeMinutes} MIN READ
               </span>
-              <span className="flex items-center gap-1.5 border-2 border-black bg-[#F4F0EA] px-3 py-1.5 shadow-[2px_2px_0_0_#000]">
+              <span className="flex items-center gap-1.5 border-2 border-outline bg-canvas px-3 py-1.5 shadow-brutal-sm">
                 <Calendar size={14} /> {post.date}
               </span>
             </div>
@@ -111,8 +111,8 @@ export function PostReaderClient({ post, relatedPosts }: PostReaderClientProps) 
           {/* Sticky Table of Contents Sidebar */}
           {post.toc.length > 0 && (
             <aside className="lg:col-span-4 order-2 lg:order-1 sticky top-6 space-y-4">
-              <div className="border-4 border-black bg-white p-5 shadow-[6px_6px_0_0_#000]">
-                <div className="flex items-center gap-2 border-b-3 border-black pb-3 mb-4 font-black uppercase text-sm text-black">
+              <div className="border-4 border-outline bg-card p-5 shadow-brutal-lg">
+                <div className="flex items-center gap-2 border-b-3 border-outline pb-3 mb-4 font-black uppercase text-sm text-ink">
                   <List size={18} strokeWidth={3} className="text-[#8A2BE2]" /> TABLE OF CONTENTS
                 </div>
 
@@ -129,8 +129,8 @@ export function PostReaderClient({ post, relatedPosts }: PostReaderClientProps) 
                           heading.level === 3 ? 'ml-3' : ''
                         } ${
                           isActive
-                            ? 'border-black bg-[#FFE600] text-black shadow-[2px_2px_0_0_#000]'
-                            : 'border-transparent text-zinc-600 hover:text-black hover:border-black'
+                            ? 'border-outline bg-accent text-on-accent shadow-brutal-sm'
+                            : 'border-transparent text-ink-muted hover:text-on-accent hover:border-outline'
                         }`}
                       >
                         {heading.text}
@@ -147,18 +147,18 @@ export function PostReaderClient({ post, relatedPosts }: PostReaderClientProps) 
 
           {/* Article Main Body */}
           <main className={`order-1 lg:order-2 ${post.toc.length > 0 ? 'lg:col-span-8' : 'lg:col-span-12'}`}>
-            <article className="border-4 border-black bg-white p-6 sm:p-8 md:p-10 shadow-[8px_8px_0_0_#000] space-y-6">
+            <article className="border-4 border-outline bg-card p-6 sm:p-8 md:p-10 shadow-brutal-lg space-y-6">
               <BlogMarkdownRenderer content={post.content} />
 
               {/* High-Converting Operational CTA Banner Card */}
-              <div className="my-8 border-4 border-black bg-[#FFE600] p-6 md:p-8 shadow-[6px_6px_0_0_#000] space-y-5">
-                <div className="inline-flex items-center gap-2 border-2 border-black bg-black px-3 py-1 text-xs font-black uppercase text-[#FFE600] shadow-[2px_2px_0_0_#000]">
+              <div className="my-8 border-4 border-outline bg-accent p-6 md:p-8 shadow-brutal-lg space-y-5">
+                <div className="inline-flex items-center gap-2 border-2 border-outline bg-black px-3 py-1 text-xs font-black uppercase text-[#FFE600] shadow-brutal-sm">
                   <Zap size={14} className="text-[#00FFFF]" /> EXPLORE THE CURRENT BETA
                 </div>
-                <h3 className="text-xl md:text-2xl font-black uppercase text-black leading-tight">
+                <h3 className="text-xl md:text-2xl font-black uppercase text-ink leading-tight">
                   Review CoQuest&apos;s Stored Lead Workflow
                 </h3>
-                <p className="text-xs md:text-sm font-bold text-black/80 leading-relaxed">
+                <p className="text-xs md:text-sm font-bold text-ink/80 leading-relaxed">
                   Configure keywords, queue supported provider work, and review only the source records the backend actually stores.
                 </p>
 
@@ -168,7 +168,7 @@ export function PostReaderClient({ post, relatedPosts }: PostReaderClientProps) 
                     href="/"
                     onClick={() => sfx.playCoinDrop()}
                     onMouseEnter={() => sfx.playHoverBlip()}
-                    className="inline-flex items-center gap-2 border-3 border-black bg-black px-5 py-3 font-black uppercase text-[#FFE600] text-xs shadow-[3px_3px_0_0_#000] hover:bg-[#8A2BE2] hover:text-white active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all"
+                    className="inline-flex items-center gap-2 border-3 border-outline bg-black px-5 py-3 font-black uppercase text-[#FFE600] text-xs shadow-brutal-sm hover:bg-[#8A2BE2] hover:text-white active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all"
                   >
                     <Zap size={16} /> OPEN DASHBOARD
                   </Link>
@@ -177,7 +177,7 @@ export function PostReaderClient({ post, relatedPosts }: PostReaderClientProps) 
                     href="/app/guild"
                     onClick={() => sfx.playCoinDrop()}
                     onMouseEnter={() => sfx.playHoverBlip()}
-                    className="inline-flex items-center gap-2 border-3 border-black bg-[#A3E635] px-5 py-3 font-black uppercase text-black text-xs shadow-[3px_3px_0_0_#000] hover:bg-[#FFE600] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all"
+                    className="inline-flex items-center gap-2 border-3 border-outline bg-success px-5 py-3 font-black uppercase text-on-accent text-xs shadow-brutal-sm hover:bg-accent active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all"
                   >
                     <Shield size={16} /> ENTER GUILD HALL 🐉
                   </Link>
@@ -185,7 +185,7 @@ export function PostReaderClient({ post, relatedPosts }: PostReaderClientProps) 
               </div>
 
               {/* End of article badge */}
-              <div className="pt-8 border-t-4 border-black flex items-center justify-between">
+              <div className="pt-8 border-t-4 border-outline flex items-center justify-between">
                 <div className="flex items-center gap-2 font-black uppercase text-xs">
                   <Sparkles className="text-[#06B6D4]" /> END OF ARTICLE LOG
                 </div>
@@ -195,7 +195,7 @@ export function PostReaderClient({ post, relatedPosts }: PostReaderClientProps) 
                     sfx.playCoinDrop()
                     window.scrollTo({ top: 0, behavior: 'smooth' })
                   }}
-                  className="border-2 border-black bg-[#FFE600] px-3 py-1 font-black uppercase text-xs shadow-[2px_2px_0_0_#000] hover:bg-[#00FFFF]"
+                  className="border-2 border-outline bg-accent px-3 py-1 font-black uppercase text-xs shadow-brutal-sm hover:bg-[#00FFFF]"
                 >
                   ↑ Return to Top
                 </button>
@@ -211,8 +211,8 @@ export function PostReaderClient({ post, relatedPosts }: PostReaderClientProps) 
 
         {/* Related Quests Section */}
         {relatedPosts.length > 0 && (
-          <section className="pt-8 space-y-6 border-t-4 border-black">
-            <h2 className="text-2xl font-black uppercase tracking-tight text-black flex items-center gap-2">
+          <section className="pt-8 space-y-6 border-t-4 border-outline">
+            <h2 className="text-2xl font-black uppercase tracking-tight text-ink flex items-center gap-2">
               <Sword className="text-[#FF3333] stroke-[3px]" /> RELATED GUILD QUESTS
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
