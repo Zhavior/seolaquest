@@ -1,8 +1,9 @@
 import { NextResponse } from 'next/server'
 import { getCurrentUser } from '@/lib/auth'
 import { logger } from '@/src/modules/core/infrastructure/logger'
+import { withApiHandler } from '@/src/modules/core/infrastructure/api-handler'
 
-export async function POST() {
+export const POST = withApiHandler(async () => {
   try {
     const user = await getCurrentUser()
     if (!user) {
@@ -20,4 +21,4 @@ export async function POST() {
     logger.error({ err: error, outcomeCode: 'POTION_ENDPOINT_FAILED' }, 'Potion endpoint failed')
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
-}
+})

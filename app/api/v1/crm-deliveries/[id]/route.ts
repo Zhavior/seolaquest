@@ -4,11 +4,12 @@ import { getCurrentUser } from '@/lib/auth'
 import { EntitlementService } from '@/src/modules/billing/application/EntitlementService'
 import { normalizeCrmWebhookUrl, UnsafeCrmWebhookUrlError } from '@/src/modules/core/security/crmWebhookUrl'
 import { CrmDeliveryService } from '@/src/modules/leads/application/CrmDeliveryService'
+import { withApiHandler } from '@/src/modules/core/infrastructure/api-handler'
 
 const deliveryIdSchema = z.string().uuid()
 type DeliveryContext = { params: Promise<{ id: string }> }
 
-export async function GET(_request: Request, { params }: DeliveryContext) {
+export const GET = withApiHandler(async (_request, { params }: DeliveryContext) => {
   const user = await getCurrentUser()
   if (!user) return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 })
   const parsed = deliveryIdSchema.safeParse((await params).id)
@@ -17,9 +18,9 @@ export async function GET(_request: Request, { params }: DeliveryContext) {
   const delivery = await CrmDeliveryService.getStatus({ userId: user.id, deliveryId: parsed.data })
   if (!delivery) return NextResponse.json({ success: false, error: 'Delivery not found' }, { status: 404 })
   return NextResponse.json({ success: true, delivery })
-}
+})
 
-export async function POST(_request: Request, { params }: DeliveryContext) {
+export const POST = withApiHandler(async (_request, { params }: DeliveryContext) => {
   const user = await getCurrentUser()
   if (!user) return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 })
   const parsed = deliveryIdSchema.safeParse((await params).id)
@@ -51,4 +52,4 @@ export async function POST(_request: Request, { params }: DeliveryContext) {
     return NextResponse.json({ success: false, error: 'Delivery cannot be retried' }, { status })
   }
   return NextResponse.json({ success: true, deliveryId: result.deliveryId, status: result.status })
-}
+})
