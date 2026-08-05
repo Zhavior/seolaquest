@@ -42,6 +42,7 @@ export default function StatusBar({
     if (savedTheme === 'grey') {
       setIsGreyMode(true)
       document.documentElement.classList.add('grey-mode')
+      document.body?.classList.add('grey-mode')
     }
   }, [])
 
@@ -50,9 +51,11 @@ export default function StatusBar({
     setIsGreyMode(nextMode)
     if (nextMode) {
       document.documentElement.classList.add('grey-mode')
+      document.body?.classList.add('grey-mode')
       localStorage.setItem('coquest_theme', 'grey')
     } else {
       document.documentElement.classList.remove('grey-mode')
+      document.body?.classList.remove('grey-mode')
       localStorage.setItem('coquest_theme', 'parchment')
     }
   }

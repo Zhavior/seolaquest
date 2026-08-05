@@ -244,45 +244,74 @@
 
 /* ── Grey Background Mode (Sun/Moon Toggle) ────────────────────────────── */
 html.grey-mode,
-html.grey-mode body {
+html.grey-mode body,
+html.grey-mode main,
+html.grey-mode #__next,
+html.grey-mode [data-nextjs-scroll-focus-boundary] {
   background-color: #1E293B !important;
   color: #F8FAFC !important;
 }
 
+/* Direct class & attribute overrides for all light canvas backgrounds */
 html.grey-mode [class*="bg-[#FDFBF7]"],
 html.grey-mode [class*="bg-[#F4F0EA]"],
 html.grey-mode [class*="bg-[#f4ebd8]"],
-html.grey-mode [class*="bg-[#FAF7F2]"] {
+html.grey-mode [class*="bg-[#FAF7F2]"],
+html.grey-mode [class*="bg-[#FFF8D9]"],
+html.grey-mode .bg-\[\#FDFBF7\],
+html.grey-mode .bg-\[\#F4F0EA\],
+html.grey-mode .bg-\[\#f4ebd8\],
+html.grey-mode .bg-\[\#FAF7F2\],
+html.grey-mode .bg-\[\#FFF8D9\] {
   background-color: #1E293B !important;
 }
 
+/* Hard white card containers -> Dark Slate #0F172A */
+html.grey-mode .bg-white,
 html.grey-mode [class*="bg-white"] {
   background-color: #0F172A !important;
   color: #F8FAFC !important;
 }
 
+/* Light Slate / Zinc sub-boxes -> Slate-700 #334155 */
+html.grey-mode .bg-slate-100,
+html.grey-mode .bg-zinc-50,
+html.grey-mode .bg-zinc-100,
+html.grey-mode .bg-zinc-200,
+html.grey-mode [class*="bg-slate-100"],
+html.grey-mode [class*="bg-zinc-50"],
+html.grey-mode [class*="bg-zinc-100"],
+html.grey-mode [class*="bg-zinc-200"] {
+  background-color: #334155 !important;
+  color: #F8FAFC !important;
+}
+
+/* Text color overrides */
+html.grey-mode .text-black,
 html.grey-mode [class*="text-black"] {
   color: #F8FAFC !important;
 }
 
-html.grey-mode [class*="text-zinc-700"],
-html.grey-mode [class*="text-zinc-600"],
-html.grey-mode [class*="text-zinc-500"],
-html.grey-mode [class*="text-black/70"],
-html.grey-mode [class*="text-black/60"] {
+html.grey-mode .text-zinc-700,
+html.grey-mode .text-zinc-600,
+html.grey-mode .text-zinc-500,
+html.grey-mode .text-slate-600,
+html.grey-mode .text-slate-500,
+html.grey-mode [class*="text-zinc-"],
+html.grey-mode [class*="text-slate-"],
+html.grey-mode [class*="text-black/"] {
   color: #94A3B8 !important;
 }
 
+/* Border overrides */
+html.grey-mode .border-black,
 html.grey-mode [class*="border-black"] {
-  border-color: #334155 !important;
+  border-color: #475569 !important;
 }
 
-html.grey-mode [class*="shadow-[4px_4px_0_0_#000]"],
-html.grey-mode [class*="shadow-[6px_6px_0_0_#000]"],
-html.grey-mode [class*="shadow-[8px_8px_0_0_#000]"],
-html.grey-mode [class*="shadow-[10px_10px_0_0_#000]"],
-html.grey-mode [class*="shadow-[3px_3px_0_0_#000]"],
-html.grey-mode [class*="shadow-[2px_2px_0_0_#000]"] {
+/* 3D Offset Shadow overrides */
+html.grey-mode [class*="shadow-"] {
   box-shadow: 4px 4px 0 0 #020617 !important;
 }
+
 
