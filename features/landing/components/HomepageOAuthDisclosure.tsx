@@ -74,7 +74,9 @@ export function HomepageOAuthDisclosure() {
             className="mt-4 text-3xl font-black uppercase leading-none tracking-tight text-ink sm:text-5xl"
           >
             What SEOlaQuest is,<br />
-            <span className="text-[#ff5a36]">what it does, and why.</span>
+            {/* Darker than the #ff5a36 brand orange: that shade only reaches 2.73:1
+                on the canvas background, below the 3:1 axe requires for large text. */}
+            <span className="text-[#D93B0F]">what it does, and why.</span>
           </h2>
           <p className="mt-4 max-w-3xl text-base font-bold leading-relaxed text-ink/70">
             This section exists so you can make an informed decision before creating an account.

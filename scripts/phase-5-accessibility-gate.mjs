@@ -635,7 +635,7 @@ async function main() {
     narrow: { name: 'narrow-320/reduced-motion', width: 320, height: 800, mobile: true, reducedMotion: true },
   }
 
-  console.log('CoQuest phase 5 accessibility release gate')
+  console.log('SEOlaQuest phase 5 accessibility release gate')
   console.log(`Base URL: ${options.baseUrl}`)
   console.log(`Browser: ${browser.browserVersion}`)
   console.log(`axe-core: ${require('axe-core/package.json').version}`)
