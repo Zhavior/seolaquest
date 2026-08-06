@@ -21,9 +21,9 @@ export function HQFooter() {
             ⚔
           </span>
           <div>
-            <div className="font-black uppercase tracking-widest text-sm">SEO la Quest</div>
+            <div className="font-black tracking-[0.04em] text-sm">SEOlaQuest</div>
             <div className="text-[9px] font-bold uppercase tracking-widest text-ink/40">
-              © {new Date().getFullYear()} SEO la Quest. All rights reserved.
+              © {new Date().getFullYear()} SEOlaQuest. All rights reserved.
             </div>
           </div>
         </div>

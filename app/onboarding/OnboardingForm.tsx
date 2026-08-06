@@ -393,7 +393,7 @@ export default function OnboardingForm({ initialDraft }: Props) {
           className="inline-flex min-h-11 items-center gap-2 text-xl font-black uppercase tracking-widest underline-offset-4 hover:underline focus-visible:outline-4 focus-visible:outline-offset-4 text-ink"
         >
           <Crown className="h-6 w-6 text-[#EAB308]" />
-          <span>SEO La Quest</span>
+          <span>SEOlaQuest</span>
           <span className="border-2 border-outline bg-accent px-1.5 py-0.5 text-[10px] font-black uppercase shadow-brutal-sm">
             BETA
           </span>

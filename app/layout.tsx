@@ -14,9 +14,9 @@ const inter = Inter({
 })
 
 export const metadata: Metadata = {
-  applicationName: 'SEO la Quest',
-  title: 'SEO la Quest | Customer Research',
-  description: 'A customer research workspace for tracking keywords, running manual source scans, and reviewing matched public posts.',
+  applicationName: 'SEOlaQuest',
+  title: 'SEOlaQuest | AI Social Listening & Lead Monitoring',
+  description: 'SEOlaQuest monitors X (Twitter) and Reddit for your target keywords in real time. AI scouts flag posts from potential customers and deliver matched leads to your dashboard automatically.',
 }
 
 // `viewport-fit=cover` is what makes env(safe-area-inset-*) resolve to real

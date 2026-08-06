@@ -44,17 +44,23 @@ export function HQHero() {
         <div className="grid lg:grid-cols-[1fr_420px] gap-12 items-center">
           {/* Left: copy */}
           <div className="text-center lg:text-left">
+
+            {/* Plain-English purpose strip — crawlable, scannable */}
+            <p className="mb-5 text-sm sm:text-base font-black uppercase tracking-[0.16em] text-ink/60 text-center lg:text-left">
+              AI-powered social listening for SaaS founders
+            </p>
+
             <h1
               id="hero-heading"
               className="font-black uppercase leading-[0.9] tracking-tighter text-ink"
               style={{ fontSize: 'clamp(3rem, 8vw, 7rem)' }}
             >
-              Your AI Scouts.<br />
+              Find customers<br />
               <span
                 className="relative inline-block"
                 style={{ color: '#ff4500' }}
               >
-                Every Lead.
+                mentioning you.
                 <svg
                   className="absolute -bottom-1 left-0 w-full"
                   style={{ height: '6px' }}
@@ -67,18 +73,17 @@ export function HQHero() {
               </span>
             </h1>
 
+            {/* One-sentence value prop — unambiguous for Google & first-time visitors */}
             <p className="mt-6 text-lg sm:text-xl font-bold leading-snug max-w-xl mx-auto lg:mx-0 text-ink/80">
-              SEO la Quest deploys AI adventurers across X — hunting
-              keyword-matched leads and delivering them straight to your
-              War Room. Reddit and the wider web are coming soon.
+              SEOlaQuest monitors X (Twitter) and Reddit for your target keywords in real time, flags posts where potential customers are asking for a solution you sell, and delivers those leads to your inbox — automatically.
             </p>
 
+            {/* Theme flavor, now secondary */}
             <div
               className="mt-6 border-4 border-outline p-4 font-bold text-sm sm:text-base shadow-brutal-lg max-w-xl mx-auto lg:mx-0 -rotate-[0.5deg]"
               style={{ background: '#ffd700' }}
             >
-              ⚔ You are the Guild Master. AI agents are your adventurers.
-              The HQ is your base of operations.
+              ⚔ Track keywords → AI scouts every matching post → you reply first, every time.
             </div>
 
             <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
@@ -87,13 +92,13 @@ export function HQHero() {
                 className="inline-flex items-center justify-center gap-2 px-10 py-4 border-4 border-outline font-black uppercase tracking-widest text-lg sm:text-xl text-ink shadow-brutal-lg hover:translate-x-[-3px] hover:translate-y-[-3px] active:translate-x-0 active:translate-y-0 transition-transform"
                 style={{ background: '#ff4500' }}
               >
-                ⚔ Enter the Guild
+                ⚔ Start Monitoring Free
               </Link>
               <a
                 href="#features"
                 className="inline-flex items-center justify-center gap-2 px-10 py-4 border-4 border-outline font-black uppercase tracking-widest text-lg sm:text-xl bg-card shadow-brutal-lg hover:translate-x-[-3px] hover:translate-y-[-3px] active:translate-x-0 active:translate-y-0 transition-transform"
               >
-                Explore Rooms →
+                See How It Works →
               </a>
             </div>
 
