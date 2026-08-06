@@ -34,7 +34,7 @@ describe('Neobrutalist AppLayout Component', () => {
     )
 
     // Brand and Identity
-    expect(screen.getByText('COQUEST')).toBeInTheDocument()
+    expect(screen.getByText('SEOLAQUEST')).toBeInTheDocument()
     expect(screen.getByText('REINALD')).toBeInTheDocument()
     expect(screen.getAllByText('LVL 10').length).toBeGreaterThan(0)
 

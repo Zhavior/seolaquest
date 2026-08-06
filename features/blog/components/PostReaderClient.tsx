@@ -156,7 +156,7 @@ export function PostReaderClient({ post, relatedPosts }: PostReaderClientProps) 
                   <Zap size={14} className="text-[#00FFFF]" /> EXPLORE THE CURRENT BETA
                 </div>
                 <h3 className="text-xl md:text-2xl font-black uppercase text-ink leading-tight">
-                  Review CoQuest&apos;s Stored Lead Workflow
+                  Review SEOlaQuest&apos;s Stored Lead Workflow
                 </h3>
                 <p className="text-xs md:text-sm font-bold text-ink/80 leading-relaxed">
                   Configure keywords, queue supported provider work, and review only the source records the backend actually stores.

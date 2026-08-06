@@ -1,8 +1,8 @@
 import { redirect } from 'next/navigation'
 import { getCurrentUser } from '@/lib/auth'
 import { toShellUser } from '@/lib/shellUser'
-import CoQuestShell from '@/components/coquest/navigation/os-v2/CoQuestShell'
-import ShellHud from '@/components/coquest/navigation/os-v2/statusbar/ShellHud'
+import SEOlaQuestShell from '@/components/seolaquest/navigation/os-v2/SEOlaQuestShell'
+import ShellHud from '@/components/seolaquest/navigation/os-v2/statusbar/ShellHud'
 
 export const dynamic = 'force-dynamic'
 
@@ -13,5 +13,5 @@ export default async function AppLayout({ children }: { children: React.ReactNod
 
   // The HUD is built here, on the server, and passed down as an already-rendered
   // slot — so the account record never crosses into the client shell.
-  return <CoQuestShell hud={<ShellHud user={await toShellUser(user)} />}>{children}</CoQuestShell>
+  return <SEOlaQuestShell hud={<ShellHud user={await toShellUser(user)} />}>{children}</SEOlaQuestShell>
 }

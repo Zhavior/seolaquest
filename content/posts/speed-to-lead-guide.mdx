@@ -18,7 +18,7 @@ In the high-stakes arena of B2B growth, **velocity isn't just a competitive adva
 
 Yet most sales teams still treat social listening like a once-a-day chore: open TweetDeck, scroll Reddit, maybe check a LinkedIn notification. By the time they compose a reply, the buyer has already moved on — or worse, a competitor already landed in their DMs.
 
-> "The first guild to strike the lead wins the bounty. Latency is the thief of revenue." — *Commander Vex, CoQuest Grandmaster Hunter*
+> "The first guild to strike the lead wins the bounty. Latency is the thief of revenue." — *Commander Vex, SEOlaQuest Grandmaster Hunter*
 
 This playbook breaks down the exact science, automation stack, and outreach templates you need to achieve **sub-60-second response times** on every high-intent social signal.
 
@@ -62,10 +62,10 @@ For **one** SDR. A 5-person outbound team burns **$91,000/year** on manual socia
 
 ### Automated Keyword Scouts: Always On, Zero Latency
 
-CoQuest's **Keyword Radar** system operates like a network of automated scouts deployed across every social platform simultaneously. Here's the architecture:
+SEOlaQuest's **Keyword Radar** system operates like a network of automated scouts deployed across every social platform simultaneously. Here's the architecture:
 
 ```typescript
-// CoQuest Keyword Radar — Real-time Intent Detection Engine
+// SEOlaQuest Keyword Radar — Real-time Intent Detection Engine
 interface KeywordRadar {
   id: string
   keywords: string[]           // e.g., ["CRM alternative", "outbound tool"]
@@ -113,7 +113,7 @@ async function onSignalDetected(signal: DetectedSignal): Promise<void> {
 
 **Cost comparison:**
 
-| Metric | Manual SDR Team (5 people) | CoQuest Automated Scouts |
+| Metric | Manual SDR Team (5 people) | SEOlaQuest Automated Scouts |
 |:---|:---:|:---:|
 | Annual Cost | $91,000+ | $588/year (Pro plan) |
 | Coverage | ~20% of signals | ~95% of signals |
@@ -137,11 +137,11 @@ Getting real-time notifications into your team's communication channel is the cr
 
 1. Open your Discord server → Right-click the target channel → **Edit Channel**.
 2. Navigate to **Integrations** → **Webhooks** → **New Webhook**.
-3. Name it `CoQuest Lead Alerts` and copy the webhook URL.
+3. Name it `SEOlaQuest Lead Alerts` and copy the webhook URL.
 
-### Step 3: Wire It Into CoQuest
+### Step 3: Wire It Into SEOlaQuest
 
-Navigate to your **Keyword Radar** settings in the CoQuest dashboard:
+Navigate to your **Keyword Radar** settings in the SEOlaQuest dashboard:
 
 ```bash
 Dashboard → Keyword Radar → ⚙️ Settings → Webhook URL
@@ -197,7 +197,7 @@ not salesy.
 >
 > We ran into the same problem and ended up building automated keyword radars that push instant Slack alerts with AI-scored intent — cut our response time from 25 minutes to under 30 seconds, which increased our qualified pipeline by 4x in the first quarter.
 >
-> If you want to test the concept, here's a free radar setup you can try: [coquest.app/radar](https://coquest.app/radar) — takes about 60 seconds to configure. Happy to share more details on the scoring system if useful!
+> If you want to test the concept, here's a free radar setup you can try: [seolaquest.app/radar](https://seolaquest.app/radar) — takes about 60 seconds to configure. Happy to share more details on the scoring system if useful!
 
 ### Why This Works
 
@@ -205,9 +205,9 @@ not salesy.
 - **Layer 2** establishes authority through *specific numbers*, not vague claims.
 - **Layer 3** offers value (free tool) with zero pressure — the link is positioned as a *resource*, not a sales page.
 
-### Pre-Loading Templates in CoQuest
+### Pre-Loading Templates in SEOlaQuest
 
-CoQuest lets you save **Quick-Strike Templates** directly in your dashboard. When a high-intent lead fires, the notification includes a **one-click reply** button pre-loaded with your template, customized with the detected keyword context:
+SEOlaQuest lets you save **Quick-Strike Templates** directly in your dashboard. When a high-intent lead fires, the notification includes a **one-click reply** button pre-loaded with your template, customized with the detected keyword context:
 
 ```typescript
 interface QuickStrikeTemplate {
@@ -227,7 +227,7 @@ const crmAlternativeTemplate: QuickStrikeTemplate = {
     Great point — {{author}}. The switching cost from legacy CRMs is usually
     lower than people expect. We documented the exact migration path that
     took one team from {{matchedKeyword}} to a fully automated pipeline
-    in 3 days: [coquest.app/migrate](https://coquest.app/migrate)
+    in 3 days: [seolaquest.app/migrate](https://seolaquest.app/migrate)
   `,
   estimatedReplyTime: 15,
 }
@@ -260,4 +260,4 @@ The difference between a $0 pipeline and a $100K pipeline is **30 seconds of res
 3. **[Join The Guild 🐉](/guild)** — Compete on the weekly leaderboard and earn XP for every lead captured.
 
 > *"A Grandmaster Hunter doesn't wait for leads to arrive. They deploy scouts, pre-load strikes, and claim bounties before the competition even opens their inbox."*
-> — **Commander Vex, CoQuest Lead Master**
+> — **Commander Vex, SEOlaQuest Lead Master**

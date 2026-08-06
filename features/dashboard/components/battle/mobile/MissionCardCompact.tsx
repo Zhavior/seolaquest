@@ -1,4 +1,4 @@
-import HQButton from "@/components/coquest/ui/HQButton"
+import HQButton from "@/components/seolaquest/ui/HQButton"
 
 interface MissionCardCompactProps {
   title: string

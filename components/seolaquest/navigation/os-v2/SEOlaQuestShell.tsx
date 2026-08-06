@@ -64,7 +64,7 @@ const collapsedStore = {
   },
 }
 
-interface CoQuestShellProps {
+interface SEOlaQuestShellProps {
   /**
    * Server-rendered HUD (`ShellHud`), handed straight to the status bar. Taking
    * it as a slot is what keeps the account record on the server.
@@ -73,10 +73,10 @@ interface CoQuestShellProps {
   children: ReactNode
 }
 
-export default function CoQuestShell({
+export default function SEOlaQuestShell({
   hud,
   children,
-}: CoQuestShellProps) {
+}: SEOlaQuestShellProps) {
   const collapsed = useSyncExternalStore(
     collapsedStore.subscribe,
     collapsedStore.getSnapshot,

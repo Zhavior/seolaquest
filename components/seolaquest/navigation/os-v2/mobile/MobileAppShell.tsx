@@ -6,7 +6,7 @@ import { useEffect, useRef, type CSSProperties, type ReactNode } from 'react'
  * Id of the off-canvas drawer panel. Exported so triggers elsewhere in the
  * shell can point `aria-controls` at it.
  */
-export const MOBILE_NAV_ID = 'coquest-mobile-nav'
+export const MOBILE_NAV_ID = 'seolaquest-mobile-nav'
 
 /** Height of the bottom tray content box, published to CSS as a variable. */
 const TRAY_HEIGHT = '4.75rem'
@@ -29,7 +29,7 @@ export interface MobileAppShellProps {
   bottomBar?: ReactNode
   /** Navigation body rendered inside the off-canvas drawer. */
   sidebar?: ReactNode
-  /** Drawer open state — owned by CoQuestShell. */
+  /** Drawer open state — owned by SEOlaQuestShell. */
   mobileOpen?: boolean
   onCloseMobile?: () => void
 }

@@ -21,9 +21,9 @@ vi.mock('next/link', () => ({
   ),
 }))
 
-import Sidebar from './coquest/navigation/os-v2/sidebar/Sidebar'
+import Sidebar from './seolaquest/navigation/os-v2/sidebar/Sidebar'
 
-describe('CoQuest OS Sidebar', () => {
+describe('SEOlaQuest OS Sidebar', () => {
   it('renders sidebar navigation items and branding', () => {
     render(
       <Sidebar

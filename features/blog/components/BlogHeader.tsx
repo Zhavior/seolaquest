@@ -20,7 +20,7 @@ export function BlogHeader() {
             <Zap className="fill-[#FFE600] stroke-[2.5px] w-5 h-5" />
           </div>
           <span className="flex items-center gap-1.5">
-            COQUEST <span className="border-2 border-outline bg-card px-2 py-0.5 text-xs font-black shadow-brutal-sm rotate-[-1deg]">BLOG & KNOWLEDGE VAULT</span>
+            SEOLAQUEST <span className="border-2 border-outline bg-card px-2 py-0.5 text-xs font-black shadow-brutal-sm rotate-[-1deg]">BLOG & KNOWLEDGE VAULT</span>
           </span>
         </Link>
 

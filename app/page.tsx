@@ -5,6 +5,7 @@ import { Footer } from '@/components/Footer'
 import { LandingNav } from '@/features/landing/components/LandingNav'
 import { LandingHero } from '@/features/landing/components/LandingHero'
 import { LandingFeatures } from '@/features/landing/components/LandingFeatures'
+import { HomepageOAuthDisclosure } from '@/features/landing/components/HomepageOAuthDisclosure'
 
 // Non-personalized marketing content. This must live on the page itself: a
 // `export { default } from ...` re-export forwards only the component, silently
@@ -57,6 +58,7 @@ export default function LandingPage() {
         <LandingHero />
         <ManaEngineDemo />
         <LandingFeatures />
+        <HomepageOAuthDisclosure />
         <GuildLeaderboardWins />
       </main>
 

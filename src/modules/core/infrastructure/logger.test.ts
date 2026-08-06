@@ -12,7 +12,7 @@ describe('core logger privacy boundary', () => {
   })
 
   it('logs only the pathname and drops query parameters', () => {
-    expect(requestPath('https://coquest.test/api/items?email=user%40example.com&token=secret'))
+    expect(requestPath('https://seolaquest.test/api/items?email=user%40example.com&token=secret'))
       .toBe('/api/items')
     expect(requestPath('not a URL')).toBe('/unknown')
   })

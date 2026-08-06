@@ -102,7 +102,7 @@ export function getAllPosts(): Post[] {
         slug,
         description: data.description || '',
         date: data.date || new Date().toISOString().split('T')[0],
-        author: data.author || 'CoQuest Lead Hunter',
+        author: data.author || 'SEOlaQuest Lead Hunter',
         authorRole: data.authorRole || 'Guild Member',
         authorAvatar: data.authorAvatar || '⚔️',
         tag: data.tag || '[ALL]',

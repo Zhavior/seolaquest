@@ -2,8 +2,8 @@ import Link from 'next/link'
 import { AlertTriangle, CheckCircle2, Database, Gauge, Lock, Server, XCircle } from 'lucide-react'
 
 export const metadata = {
-  title: 'System Architecture Status | CoQuest',
-  description: 'Verified implementation status and unresolved production gates for CoQuest.',
+  title: 'System Architecture Status | SEOlaQuest',
+  description: 'Verified implementation status and unresolved production gates for SEOlaQuest.',
 }
 
 const implemented = [
@@ -32,7 +32,7 @@ export default function SpecsPage() {
           </span>
           <h1 className="mt-4 text-4xl font-black uppercase leading-none tracking-tight sm:text-6xl">Architecture without theatre</h1>
           <p className="mt-4 max-w-3xl text-sm font-bold leading-relaxed text-ink-muted sm:text-base">
-            This is a code-status document, not a live status page. CoQuest does not currently publish an uptime SLA,
+            This is a code-status document, not a live status page. SEOlaQuest does not currently publish an uptime SLA,
             discovery-latency guarantee, edge-region benchmark, or production capacity number.
           </p>
         </header>

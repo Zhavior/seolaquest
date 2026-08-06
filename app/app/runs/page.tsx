@@ -9,7 +9,7 @@ import { ScanRunListSkeleton } from './loading'
 const ScanRunList = dynamic(() => import('@/features/scans/components/ScanRunList').then((m) => m.ScanRunList))
 
 export const metadata: Metadata = {
-  title: 'Quest Board & Scan Runs | CoQuest',
+  title: 'Quest Board & Scan Runs | SEOlaQuest',
   description: 'Review the durable backend status of your scan runs and active bounties.',
 }
 

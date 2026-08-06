@@ -26,7 +26,7 @@ describe('withApiHandler logging and disclosure', () => {
     })
 
     const response = await handler(
-      new Request('https://coquest.test/api/items?token=secret'),
+      new Request('https://seolaquest.test/api/items?token=secret'),
       { params: {} },
     )
 
@@ -44,7 +44,7 @@ describe('withApiHandler logging and disclosure', () => {
       throw new AppError('rejected', 409, 'CONFLICT')
     })
 
-    await handler(new Request('https://coquest.test/api/items'), { params: {} })
+    await handler(new Request('https://seolaquest.test/api/items'), { params: {} })
 
     expect(warn).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -61,7 +61,7 @@ describe('withApiHandler logging and disclosure', () => {
       throw new AppError('database secret leaked', 503, 'DEPENDENCY_FAILED', { token: 'secret' })
     })
 
-    const response = await handler(new Request('https://coquest.test/api/items'), { params: {} })
+    const response = await handler(new Request('https://seolaquest.test/api/items'), { params: {} })
 
     expect(response.status).toBe(503)
     await expect(response.json()).resolves.toEqual({
@@ -73,13 +73,13 @@ describe('withApiHandler logging and disclosure', () => {
 
   it('returns a bare Internal Server Error when a raw Error escapes the handler', async () => {
     const raw = new Error(
-      'connect ECONNREFUSED 10.0.3.14:5432 for user svc_billing on db coquest_prod',
+      'connect ECONNREFUSED 10.0.3.14:5432 for user svc_billing on db seolaquest_prod',
     )
     const handler = withApiHandler(async () => {
       throw raw
     })
 
-    const response = await handler(new Request('https://coquest.test/api/items'), { params: {} })
+    const response = await handler(new Request('https://seolaquest.test/api/items'), { params: {} })
     const body = await response.json()
 
     expect(response.status).toBe(500)
@@ -91,7 +91,7 @@ describe('withApiHandler logging and disclosure', () => {
     expect(serialized).not.toContain('ECONNREFUSED')
     expect(serialized).not.toContain('10.0.3.14')
     expect(serialized).not.toContain('svc_billing')
-    expect(serialized).not.toContain('coquest_prod')
+    expect(serialized).not.toContain('seolaquest_prod')
     expect(serialized).not.toContain('api-handler')
     for (const frame of (raw.stack ?? '').split('\n').slice(1, 4)) {
       expect(serialized).not.toContain(frame.trim())
@@ -111,7 +111,7 @@ describe('withApiHandler logging and disclosure', () => {
       throw prismaError
     })
 
-    const response = await handler(new Request('https://coquest.test/api/items'), { params: {} })
+    const response = await handler(new Request('https://seolaquest.test/api/items'), { params: {} })
     const body = await response.json()
 
     expect(response.status).toBe(500)
@@ -135,7 +135,7 @@ describe('withApiHandler logging and disclosure', () => {
       })
     })
 
-    const response = await handler(new Request('https://coquest.test/api/items'), { params: {} })
+    const response = await handler(new Request('https://seolaquest.test/api/items'), { params: {} })
     const body = await response.json()
 
     expect(response.status).toBe(409)
@@ -160,7 +160,7 @@ describe('withApiHandler logging and disclosure', () => {
       })
     })
 
-    const response = await handler(new Request('https://coquest.test/api/items'), { params: {} })
+    const response = await handler(new Request('https://seolaquest.test/api/items'), { params: {} })
     const body = await response.json()
 
     expect(body).toEqual({ error: 'Conflict detected', code: 'CONFLICT' })
@@ -173,7 +173,7 @@ describe('withApiHandler logging and disclosure', () => {
       throw new Error('unreachable')
     })
 
-    const response = await handler(new Request('https://coquest.test/api/items'), { params: {} })
+    const response = await handler(new Request('https://seolaquest.test/api/items'), { params: {} })
     const body = await response.json()
 
     expect(response.status).toBe(400)

@@ -11,7 +11,7 @@ export const quests: Quest[] = [
   {
     id: 'launch-beta',
     title: 'Launch Public Beta',
-    description: 'Prepare CoQuest for its first public release.',
+    description: 'Prepare SEOlaQuest for its first public release.',
     progress: 73,
     xpReward: 500,
     completed: false,

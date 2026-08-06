@@ -458,7 +458,7 @@ describe.skipIf(!integrationEnabled)('Phases 4-5 real PostgreSQL invariants', ()
 
   it('atomically snapshots one CRM delivery and deduplicates simultaneous enqueue without a network call', async () => {
     const id = userId('crm')
-    await createUser(id, { crmWebhookUrl: 'https://hooks.example.test/coquest' })
+    await createUser(id, { crmWebhookUrl: 'https://hooks.example.test/seolaquest' })
     const keyword = await prisma.trackedKeyword.create({
       data: { userId: id, phrase: 'looking for crm' },
     })
@@ -477,7 +477,7 @@ describe.skipIf(!integrationEnabled)('Phases 4-5 real PostgreSQL invariants', ()
     const input = {
       userId: id,
       leadId: lead.id,
-      normalizedDestination: 'https://hooks.example.test/coquest',
+      normalizedDestination: 'https://hooks.example.test/seolaquest',
     }
 
     const [first, replay] = await Promise.all([

@@ -3,7 +3,7 @@ import Link from 'next/link'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Create Account | CoQuest',
+  title: 'Create Account | SEOlaQuest',
   description: 'Create an account before saving your first customer-research keyword.',
 }
 
@@ -11,7 +11,7 @@ export default function Page() {
   return (
     <main className="flex min-h-screen w-full flex-col items-center justify-center bg-canvas px-4 py-8 text-ink">
       <Link href="/" className="mb-5 inline-flex min-h-11 items-center text-2xl font-black uppercase tracking-widest focus-visible:outline-4 focus-visible:outline-offset-4">
-        CoQuest
+        SEOlaQuest
       </Link>
       <section aria-labelledby="sign-up-heading" className="flex w-full max-w-md flex-col items-center">
         <div className="mb-4 w-full border-3 border-outline bg-success p-4 text-center shadow-brutal">

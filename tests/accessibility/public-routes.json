@@ -17,14 +17,14 @@
     },
     {
       "path": "/blog",
-      "title": "CoQuest Blog & Content Engine | Arcade Playbooks & Guild Lore",
+      "title": "SEOlaQuest Blog & Content Engine | Arcade Playbooks & Guild Lore",
       "requiredLandmarks": [
         "main"
       ]
     },
     {
       "path": "/status",
-      "title": "System Architecture Status | CoQuest",
+      "title": "System Architecture Status | SEOlaQuest",
       "requiredLandmarks": [
         "main"
       ]
@@ -38,7 +38,7 @@
     },
     {
       "path": "/terms",
-      "title": "Terms | CoQuest",
+      "title": "Terms | SEOlaQuest",
       "requiredLandmarks": [
         "main"
       ]
@@ -52,14 +52,14 @@
     },
     {
       "path": "/sign-in",
-      "title": "Sign In | CoQuest",
+      "title": "Sign In | SEOlaQuest",
       "requiredLandmarks": [
         "main"
       ]
     },
     {
       "path": "/sign-up",
-      "title": "Create Account | CoQuest",
+      "title": "Create Account | SEOlaQuest",
       "requiredLandmarks": [
         "main"
       ]
