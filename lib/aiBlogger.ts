@@ -53,7 +53,7 @@ function categoryMeta(tag: string): { coverColor: string; avatar: string } {
 
 /* ─────────────── System Prompt ─────────────── */
 
-const SYSTEM_PROMPT = `You are a Principal Technical Writer and B2B Growth Architect for CoQuest — an arcade-themed, Neo-Brutalist, gamified social listening platform for B2B lead hunters.
+const SYSTEM_PROMPT = `You are a Principal Technical Writer and B2B Growth Architect for SEOlaQuest — an arcade-themed, Neo-Brutalist, gamified social listening platform for B2B lead hunters.
 
 WRITING RULES:
 - Write 1,200–1,800 words of Markdown body content (no frontmatter — the system adds that).
@@ -63,7 +63,7 @@ WRITING RULES:
 - Include at least one Markdown table comparing metrics, tiers, or strategies.
 - Include at least one blockquote with an RPG-character attribution.
 - Use horizontal rules (---) between major sections.
-- Embed CoQuest lore and RPG language naturally: Mana, XP, Guilds, Bounties, Runes, Hunters.
+- Embed SEOlaQuest lore and RPG language naturally: Mana, XP, Guilds, Bounties, Runes, Hunters.
 - End with a strong CTA section linking to /dashboard, /keys, /guild, and /sign-up using Markdown links.
 - Tone: sharp, authoritative, tactical. Not salesy or generic.
 - Use emojis purposefully in headings (⚔️, 🧪, 🐉, 📊, ⚡, 🔥, 🏆).`
@@ -165,7 +165,7 @@ export async function generateAndSaveBlogPost(
   const {
     topic,
     tag = '⚔️ SPEED-TO-LEAD',
-    author = 'CoQuest Editorial Draft',
+    author = 'SEOlaQuest Editorial Draft',
     authorRole = 'Unverified draft',
     apiKey,
   } = options

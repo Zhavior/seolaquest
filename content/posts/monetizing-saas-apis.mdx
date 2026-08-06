@@ -16,7 +16,7 @@ readTimeMinutes: 7
 
 The old SaaS pricing playbook is broken. Flat-rate monthly tiers punish light users, subsidize power users, and create a binary cliff between "paying" and "churned." Meanwhile, the most profitable developer platforms in the world — Stripe, Twilio, OpenAI — all converge on the same model: **usage-based metered billing.**
 
-In CoQuest, we call this system **Mana (MP)**. Every API call consumes Mana. When your tank runs dry, you refill at the **Alchemist Shop**. This guide breaks down the full architecture: from unit economics to bearer token security to rate limiting with Upstash Redis.
+In SEOlaQuest, we call this system **Mana (MP)**. Every API call consumes Mana. When your tank runs dry, you refill at the **Alchemist Shop**. This guide breaks down the full architecture: from unit economics to bearer token security to rate limiting with Upstash Redis.
 
 > "A well-crafted API endpoint is an alchemical apparatus — it transmutes raw compute cycles into gold." — *Archmage Cypher, Lead Systems Architect*
 
@@ -26,7 +26,7 @@ In CoQuest, we call this system **Mana (MP)**. Every API call consumes Mana. Whe
 
 ### Why Credit-Based Models Print Money
 
-Let's do the math on a typical CoQuest API call — the `/api/v1/leads/scan` endpoint that uses an LLM to score social media posts for buying intent:
+Let's do the math on a typical SEOlaQuest API call — the `/api/v1/leads/scan` endpoint that uses an LLM to score social media posts for buying intent:
 
 ```
 ┌─────────────────────────────────────────────────┐
@@ -59,7 +59,7 @@ Unlike flat subscriptions where users pay once and forget, credit-based systems 
 
 ### Never Store Raw API Keys
 
-This is non-negotiable security hygiene. If your database is breached and API keys are stored in plaintext, every customer's integration is instantly compromised. CoQuest uses **SHA-256 hashing** with a prefix system for key identification:
+This is non-negotiable security hygiene. If your database is breached and API keys are stored in plaintext, every customer's integration is instantly compromised. SEOlaQuest uses **SHA-256 hashing** with a prefix system for key identification:
 
 ```typescript
 import { createHash, randomBytes } from 'crypto'
@@ -146,7 +146,7 @@ async function validateApiKey(rawKey: string): Promise<ApiRune | null> {
 
 ### Selling Consumable Credit Packs
 
-The Alchemist Shop is CoQuest's in-app credit store. Instead of traditional SaaS pricing pages with "Basic / Pro / Enterprise" columns, we sell **consumable Mana packs** styled as RPG potions:
+The Alchemist Shop is SEOlaQuest's in-app credit store. Instead of traditional SaaS pricing pages with "Basic / Pro / Enterprise" columns, we sell **consumable Mana packs** styled as RPG potions:
 
 | Pack Name | Mana (MP) | Price | Cost/MP | Best For |
 |:---|:---:|:---:|:---:|:---|
@@ -181,7 +181,7 @@ Discount %
 
 ### Enforcing Request Quotas at the Edge
 
-Even with Mana-based billing, you need hard rate limits to prevent abuse, accidental infinite loops, and DDoS-style key misuse. CoQuest uses **Upstash Redis** with a sliding-window algorithm for edge-fast enforcement:
+Even with Mana-based billing, you need hard rate limits to prevent abuse, accidental infinite loops, and DDoS-style key misuse. SEOlaQuest uses **Upstash Redis** with a sliding-window algorithm for edge-fast enforcement:
 
 ```typescript
 import { Ratelimit } from '@upstash/ratelimit'
@@ -211,10 +211,10 @@ const rateLimiters = {
 }
 
 export async function POST(req: Request) {
-  const apiKey = req.headers.get('x-coquest-key')
+  const apiKey = req.headers.get('x-seolaquest-key')
   if (!apiKey) {
     return NextResponse.json(
-      { error: 'MISSING_RUNE', message: 'Include x-coquest-key header' },
+      { error: 'MISSING_RUNE', message: 'Include x-seolaquest-key header' },
       { status: 401 }
     )
   }

@@ -27,7 +27,7 @@ export default function GuildLawsModal({ isOpen, onClose }: GuildLawsModalProps)
     {
       title: '📜 The Cancellation Scroll',
       content:
-        'Use the Billing tab to open the available Stripe subscription controls. Cancellation timing and continued access follow the verified billing state shown there; CoQuest does not assume a cancellation succeeded until Stripe confirms it.',
+        'Use the Billing tab to open the available Stripe subscription controls. Cancellation timing and continued access follow the verified billing state shown there; SEOlaQuest does not assume a cancellation succeeded until Stripe confirms it.',
     },
     {
       title: '⚔️ Guild Code of Honor & Ethics',

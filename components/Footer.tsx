@@ -17,7 +17,7 @@ export function Footer() {
         <div className="mx-auto grid max-w-7xl gap-6 md:grid-cols-[minmax(0,1fr)_auto] md:items-start md:gap-10">
           <div className="max-w-xl">
             <Link href="/" className="inline-flex items-center gap-2 text-xl font-black uppercase text-[#FFE600]">
-              <Zap className="fill-[#FFE600]" /> CoQuest Engine
+              <Zap className="fill-[#FFE600]" /> SEOlaQuest Engine
             </Link>
             <p className="mt-2 text-sm font-bold leading-relaxed text-ink-muted">
               Scan public conversations, review real evidence, and keep product limits visible instead of hidden behind sales copy.
@@ -50,7 +50,7 @@ export function Footer() {
         </div>
       </div>
       <div className="mx-auto flex max-w-7xl flex-col gap-2 px-6 py-5 text-xs font-bold text-ink-muted sm:flex-row sm:items-center sm:justify-between">
-        <span>© 2026 CoQuest</span>
+        <span>© 2026 SEOlaQuest</span>
         <span>No public uptime SLA or open API access is currently available.</span>
       </div>
     </footer>

@@ -13,7 +13,7 @@ vi.mock('@clerk/nextjs', () => ({
 import Page from './page'
 
 describe('sign-in page', () => {
-  it('uses CoQuest branding and a safe onboarding fallback', () => {
+  it('uses SEOlaQuest branding and a safe onboarding fallback', () => {
     render(<Page />)
 
     expect(screen.getByRole('heading', { name: /resume your customer hunt/i })).toBeVisible()

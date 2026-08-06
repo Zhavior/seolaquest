@@ -20,12 +20,12 @@ export async function generateMetadata({ params }: PostPageProps): Promise<Metad
 
   if (!post) {
     return {
-      title: 'Article Not Found | CoQuest Blog',
+      title: 'Article Not Found | SEOlaQuest Blog',
     }
   }
 
   return {
-    title: `${post.title} | CoQuest Blog`,
+    title: `${post.title} | SEOlaQuest Blog`,
     description: post.description,
     openGraph: {
       title: post.title,

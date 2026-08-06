@@ -20,7 +20,7 @@ Meanwhile, products that break the mold — Duolingo's streak system, GitHub's c
 
 The lesson is clear: **distinctive design isn't a nice-to-have. It's your growth moat.**
 
-This playbook lays out 7 battle-tested arcade funnel strategies that CoQuest uses to achieve product activation rates **3–10x higher** than industry benchmarks.
+This playbook lays out 7 battle-tested arcade funnel strategies that SEOlaQuest uses to achieve product activation rates **3–10x higher** than industry benchmarks.
 
 > "Your SaaS dashboard should feel like a cockpit, not a spreadsheet. If users don't feel a dopamine hit within 10 seconds of logging in, you've already lost them." — *Master Apex, Guild Growth Officer*
 
@@ -162,7 +162,7 @@ function checkStreak(streak: DailyStreak): ChestReward | null {
 Neo-Brutalism isn't just an aesthetic choice — it's a **conversion optimization strategy**. The high-contrast, unapologetically bold visual language demands attention in a sea of soft, rounded, "friendly" SaaS interfaces.
 
 ```css
-/* CoQuest Neo-Brutalist Design System — Core Tokens */
+/* SEOlaQuest Neo-Brutalist Design System — Core Tokens */
 
 :root {
   /* Neo-Brutalist Color Palette */
@@ -238,7 +238,7 @@ Neo-Brutalism isn't just an aesthetic choice — it's a **conversion optimizatio
 
 ### Turning Top Users Into Organic Referral Loops
 
-The most underutilized growth lever in B2B SaaS is **user-generated social proof**. When a hunter achieves a milestone — ranking up, hitting a 30-day streak, capturing their 100th lead — CoQuest surfaces a **[BRAG ON X]** button that generates a pre-formatted, share-ready post:
+The most underutilized growth lever in B2B SaaS is **user-generated social proof**. When a hunter achieves a milestone — ranking up, hitting a 30-day streak, capturing their 100th lead — SEOlaQuest surfaces a **[BRAG ON X]** button that generates a pre-formatted, share-ready post:
 
 ```typescript
 interface BragPayload {
@@ -256,7 +256,7 @@ function generateBragPost(payload: BragPayload): string {
     ``,
     `${payload.metric}`,
     ``,
-    `Built my lead-hunting engine with @CoQuestApp`,
+    `Built my lead-hunting engine with @SEOlaQuestApp`,
     `and just hit a new milestone. The arcade dashboard`,
     `is genuinely addictive. 🎮⚔️`,
     ``,
@@ -271,9 +271,9 @@ const bragPost = generateBragPost({
   userId: 'user_abc123',
   achievement: 'Master Hunter Rank',
   metric: '15,000 XP earned across 47 captured leads',
-  shareText: 'Just hit Master Hunter on CoQuest!',
-  shareUrl: 'https://coquest.app/invite?ref=user_abc123',
-  hashtags: ['SaaS', 'B2BGrowth', 'LeadHunting', 'CoQuest'],
+  shareText: 'Just hit Master Hunter on SEOlaQuest!',
+  shareUrl: 'https://seolaquest.app/invite?ref=user_abc123',
+  hashtags: ['SaaS', 'B2BGrowth', 'LeadHunting', 'SEOlaQuest'],
 })
 ```
 

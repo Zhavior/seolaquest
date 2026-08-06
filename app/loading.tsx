@@ -4,7 +4,7 @@ export default function RootLoading() {
       <div className="flex flex-col items-center gap-4 bg-card border-4 border-outline p-8 shadow-brutal-lg">
         <div className="h-12 w-12 animate-spin rounded-full border-4 border-outline border-t-[#ff4500]" />
         <p className="font-black uppercase tracking-widest text-sm text-ink">
-          Loading CoQuest Engine...
+          Loading SEOlaQuest Engine...
         </p>
       </div>
     </div>

@@ -23,7 +23,7 @@ export function GameCanvasWrapper() {
             Living HQ // Prototype
           </p>
           <h2 className="text-lg font-black uppercase text-ink">
-            CoQuest World Map
+            SEOlaQuest World Map
           </h2>
         </div>
         <div className="flex items-center gap-1">

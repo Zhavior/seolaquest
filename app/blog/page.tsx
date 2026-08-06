@@ -4,7 +4,7 @@ import BlogIndexClient from './BlogIndexClient'
 export const revalidate = 3600 // 1 hour caching for blog
 
 export const metadata = {
-  title: 'CoQuest Blog & Content Engine | Arcade Playbooks & Guild Lore',
+  title: 'SEOlaQuest Blog & Content Engine | Arcade Playbooks & Guild Lore',
   description:
     'Tactical guides on speed-to-lead velocity, metered API monetization, arcade SaaS growth, and Guild Hall lore.',
 }

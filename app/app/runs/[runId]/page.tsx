@@ -6,7 +6,7 @@ import { getCurrentUserScanRun } from '@/features/scans/queries'
 export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
-  title: 'Scan Run | CoQuest',
+  title: 'Scan Run | SEOlaQuest',
   description: 'Review one durable scan run.',
 }
 

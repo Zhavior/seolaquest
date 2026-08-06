@@ -8,7 +8,7 @@ export function GuildNewsletterBox() {
         <div>
           <h3 className="text-2xl font-black uppercase text-ink">Newsletter unavailable</h3>
           <p className="mt-2 max-w-2xl text-sm font-bold text-ink/80">
-            CoQuest does not currently persist subscribers or deliver email. No address is collected by this page.
+            SEOlaQuest does not currently persist subscribers or deliver email. No address is collected by this page.
           </p>
         </div>
       </div>

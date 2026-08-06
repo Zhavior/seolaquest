@@ -6,7 +6,7 @@ import { getCurrentUserDelivery } from '@/features/deliveries/queries'
 export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
-  title: 'CRM Delivery | CoQuest',
+  title: 'CRM Delivery | SEOlaQuest',
   description: 'Review one recorded CRM delivery.',
 }
 

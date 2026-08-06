@@ -74,7 +74,7 @@ export default function GuildClient({ stats }: { stats: GuildStats }) {
                   Guild rankings unavailable
                 </h2>
                 <p className="mt-2 max-w-2xl text-sm font-bold leading-relaxed text-ink-muted">
-                  CoQuest does not publish cross-account rankings until a consented public-profile model exists. Your private,
+                  SEOlaQuest does not publish cross-account rankings until a consented public-profile model exists. Your private,
                   tenant-scoped activity remains visible below.
                 </p>
               </QuestPanel>

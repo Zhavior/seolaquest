@@ -35,7 +35,7 @@ export function ShareBar({ title, url }: ShareBarProps) {
   const handleShareX = () => {
     sfx.playCoinDrop()
     showToast('🚀 LAUNCHING TWEET TRANSMISSION...')
-    const tweetText = `Just read "${title}" on @CoQuest! ⚔️\n\n${url}`
+    const tweetText = `Just read "${title}" on @SEOlaQuest! ⚔️\n\n${url}`
     const xUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}`
     window.open(xUrl, '_blank', 'noopener,noreferrer')
   }

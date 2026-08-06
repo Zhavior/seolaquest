@@ -9,7 +9,7 @@ export default function ApiKeyVault() {
           <h1 className="text-4xl font-black uppercase">API key vault unavailable</h1>
         </div>
         <p className="mt-5 max-w-2xl text-lg font-bold">
-          CoQuest does not currently create, store, validate, rotate, or revoke public API credentials.
+          SEOlaQuest does not currently create, store, validate, rotate, or revoke public API credentials.
         </p>
       </section>
 

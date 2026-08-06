@@ -1,4 +1,4 @@
-# CoQuest World Layer
+# SEOlaQuest World Layer
 
 This folder isolates the living visualization engine from business logic.
 

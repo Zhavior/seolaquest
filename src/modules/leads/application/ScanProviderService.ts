@@ -39,7 +39,7 @@ function providerUrl(provider: ScanProvider, phrase: string) {
 function requestHeaders(provider: ScanProvider, twitterToken?: string) {
   const headers = new Headers()
   if (provider === 'REDDIT') {
-    headers.set('User-Agent', 'CoQuest/1.0 durable-social-listener')
+    headers.set('User-Agent', 'SEOlaQuest/1.0 durable-social-listener')
   } else {
     headers.set('Authorization', `Bearer ${twitterToken}`)
   }

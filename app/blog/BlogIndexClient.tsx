@@ -60,7 +60,7 @@ export default function BlogIndexClient({ initialPosts, featuredPost }: BlogInde
 
           <div className="max-w-3xl space-y-4">
             <div className="inline-flex items-center gap-2 border-3 border-outline bg-black px-4 py-1.5 font-black uppercase text-xs text-[#FFE600] shadow-brutal-sm">
-              <Sparkles size={14} className="text-[#00FFFF]" /> COQUEST KNOWLEDGE VAULT
+              <Sparkles size={14} className="text-[#00FFFF]" /> SEOLAQUEST KNOWLEDGE VAULT
             </div>
 
             <h1 className="text-3xl sm:text-5xl md:text-6xl font-black uppercase tracking-tight text-ink leading-none">

@@ -14,7 +14,7 @@ const KeywordsClient = nextDynamic(() =>
 export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
-  title: 'Quest Log & Keyword Monitors | CoQuest',
+  title: 'Quest Log & Keyword Monitors | SEOlaQuest',
   description: 'Manage active keyword streams and track live signal sources.',
 }
 

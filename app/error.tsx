@@ -16,7 +16,7 @@ export default function RootError({
   return (
     <div className="flex min-h-screen items-center justify-center bg-canvas p-6">
       <section className="max-w-xl border-4 border-outline bg-card p-8 shadow-brutal-lg">
-        <p className="text-xs font-black uppercase text-ink-muted">CoQuest could not load this page</p>
+        <p className="text-xs font-black uppercase text-ink-muted">SEOlaQuest could not load this page</p>
         <h1 className="mt-3 text-3xl font-black uppercase">Something went wrong.</h1>
         <p className="mt-4 font-bold text-ink-muted">Retry the page. If the problem continues, share the reference below with support.</p>
         {error.digest ? (

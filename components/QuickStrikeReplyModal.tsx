@@ -44,7 +44,7 @@ export default function QuickStrikeReplyModal({ lead, onClose, onConfirmClaim }:
         </div>
 
         <div id="quick-strike-dialog-description" className="border-3 border-outline bg-highlight p-4 text-sm font-bold leading-relaxed">
-          CoQuest will not post, send, or dispatch a reply from this action. Generate or copy a draft separately, then contact
+          SEOlaQuest will not post, send, or dispatch a reply from this action. Generate or copy a draft separately, then contact
           the person through the original source if appropriate.
         </div>
 

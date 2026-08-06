@@ -272,7 +272,7 @@ export function AppLayout({ children, user }: AppLayoutProps) {
             href="/dashboard"
             className="font-black text-base sm:text-lg tracking-[0.14em] uppercase border-2 border-outline bg-accent px-3 py-1.5 h-10 flex items-center shadow-brutal-sm hover:bg-highlight-strong hover:-translate-y-0.5 hover:shadow-brutal active:translate-y-0 active:shadow-none transition-all"
           >
-            COQUEST
+            SEOLAQUEST
           </Link>
 
           {/* User identity chip — sm+ */}

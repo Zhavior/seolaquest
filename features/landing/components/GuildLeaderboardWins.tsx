@@ -5,7 +5,7 @@ const EVIDENCE_STATUS = [
   {
     title: 'Customer outcomes',
     status: 'Locked // Evidence in progress',
-    detail: 'CoQuest does not yet have verified customer case studies to display.',
+    detail: 'SEOlaQuest does not yet have verified customer case studies to display.',
     progressLabel: 'Verified case studies',
     progressValue: '0 / 5 unlocked',
     progressPercent: '0%',

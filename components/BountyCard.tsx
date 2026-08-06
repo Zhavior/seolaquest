@@ -83,7 +83,7 @@ export default function BountyCard({
           </span>
         </div>
         <p className="mt-3 sm:mt-4 text-xs font-bold leading-relaxed text-ink-muted">
-          CoQuest has not measured an intent score, social engagement count, deal value, or response SLA for this record.
+          SEOlaQuest has not measured an intent score, social engagement count, deal value, or response SLA for this record.
         </p>
       </div>
 

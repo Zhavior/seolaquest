@@ -13,7 +13,7 @@ vi.mock('@clerk/nextjs', () => ({
 import Page from './page'
 
 describe('sign-up page', () => {
-  it('uses CoQuest branding and sends new accounts to onboarding', () => {
+  it('uses SEOlaQuest branding and sends new accounts to onboarding', () => {
     render(<Page />)
 
     expect(screen.getByRole('heading', { name: /start one focused customer hunt/i })).toBeVisible()

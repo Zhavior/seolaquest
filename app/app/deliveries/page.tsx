@@ -13,7 +13,7 @@ const DeliveryList = nextDynamic(() =>
 export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
-  title: 'Campaign Broadcast & CRM Deliveries | CoQuest',
+  title: 'Campaign Broadcast & CRM Deliveries | SEOlaQuest',
   description: 'Review the recorded worker status and dispatch history of your CRM deliveries.',
 }
 

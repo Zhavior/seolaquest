@@ -3,7 +3,7 @@ export default function OSPreviewPage() {
     <main className="flex min-h-screen items-center justify-center bg-[#F4EFE6]">
       <div className="border-4 border-outline bg-highlight p-12 shadow-brutal-lg">
         <p className="mb-2 text-xs font-black uppercase tracking-[0.25em] text-ink/60">
-          CoQuest OS Preview
+          SEOlaQuest OS Preview
         </p>
 
         <h1 className="text-5xl font-black tracking-tight">

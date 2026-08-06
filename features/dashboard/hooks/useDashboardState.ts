@@ -429,7 +429,7 @@ export function useDashboardState({
   }
 
   function shareStats() {
-    const text = `I am tracking ${keywords.length} keyword${keywords.length === 1 ? '' : 's'} and reviewing ${leads.length} current lead${leads.length === 1 ? '' : 's'} in CoQuest.`
+    const text = `I am tracking ${keywords.length} keyword${keywords.length === 1 ? '' : 's'} and reviewing ${leads.length} current lead${leads.length === 1 ? '' : 's'} in SEOlaQuest.`
     const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`
     window.open(url, '_blank', 'noopener,noreferrer')
     setNotice('Opened a share draft with measured dashboard counts.')

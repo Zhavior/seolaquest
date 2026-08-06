@@ -11,7 +11,7 @@ const SettingsClient = nextDynamic(() =>
 export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
-  title: 'Basecamp Settings | CoQuest',
+  title: 'Basecamp Settings | SEOlaQuest',
   description: 'Configure your adventurer profile, integrations, and operational scrolls.',
 }
 

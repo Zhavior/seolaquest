@@ -9,7 +9,7 @@ export function HQNav() {
     <nav
       className="fixed inset-x-0 top-0 z-50 border-b-4 border-outline"
       style={{ background: '#f4ebd8' }}
-      aria-label="HypeQuest navigation"
+      aria-label="SEOlaQuest navigation"
     >
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 sm:h-[72px]">
 
@@ -23,7 +23,7 @@ export function HQNav() {
             ⚔
           </span>
           <div className="hidden sm:flex flex-col">
-            <span className="text-xl font-black uppercase tracking-[0.15em] leading-none">HypeQuest</span>
+            <span className="text-xl font-black uppercase tracking-[0.15em] leading-none">SEOlaQuest</span>
             <span className="text-[9px] font-bold uppercase tracking-widest text-ink/50">AI Lead Guild</span>
           </div>
         </Link>

@@ -24,7 +24,7 @@ export default function TermsPage() {
 
   const copyTermsSummary = () => {
     sfx.playCoinDrop()
-    const summary = `COQUEST ENGINE - MASTER GUILD CODE & TERMS SUMMARY (v2.4)\n1. Guild Code: Ethical B2B hunting required.\n2. Billing: Free access includes no paid scans. The enabled Beta plan is $14.99/month and adds 50 scan credits per qualifying paid invoice. Pro and Agency are not for sale.\n3. Credits: Unused credits remain recorded, but paid capabilities require a current active subscription.\n4. Cancellation: Cancel anytime via /billing.\n5. Acceptable Use: No illegal scraping or social spam.`
+    const summary = `SEOLAQUEST ENGINE - MASTER GUILD CODE & TERMS SUMMARY (v2.4)\n1. Guild Code: Ethical B2B hunting required.\n2. Billing: Free access includes no paid scans. The enabled Beta plan is $14.99/month and adds 50 scan credits per qualifying paid invoice. Pro and Agency are not for sale.\n3. Credits: Unused credits remain recorded, but paid capabilities require a current active subscription.\n4. Cancellation: Cancel anytime via /billing.\n5. Acceptable Use: No illegal scraping or social spam.`
     navigator.clipboard.writeText(summary)
     setCopied(true)
     setTimeout(() => setCopied(false), 3000)
@@ -41,7 +41,7 @@ export default function TermsPage() {
             className="flex items-center gap-2 font-black uppercase text-lg sm:text-xl tracking-tight"
           >
             <Zap className="fill-black text-ink w-6 h-6" />
-            <span>COQUEST ENGINE</span>
+            <span>SEOLAQUEST ENGINE</span>
           </Link>
           <div className="flex items-center gap-2 text-xs font-black uppercase">
             <span className="border-2 border-outline bg-card px-2.5 py-1 shadow-brutal-sm">
@@ -70,7 +70,7 @@ export default function TermsPage() {
             </h1>
 
             <p className="text-sm sm:text-base font-bold text-ink-muted max-w-3xl leading-relaxed">
-              Welcome to CoQuest. By using the application, configured scans, or paid credits, you agree to this Master Guild Code of Conduct and Operating Terms.
+              Welcome to SEOlaQuest. By using the application, configured scans, or paid credits, you agree to this Master Guild Code of Conduct and Operating Terms.
             </p>
 
             {/* Quick Action Bar */}
@@ -149,7 +149,7 @@ export default function TermsPage() {
 
           <div className="space-y-4 text-sm font-bold text-ink leading-relaxed">
             <p>
-              CoQuest may surface stored provider results when a configured scan succeeds. Matches are not verified purchase intent. All users must operate under the following core principles:
+              SEOlaQuest may surface stored provider results when a configured scan succeeds. Matches are not verified purchase intent. All users must operate under the following core principles:
             </p>
 
             <ul className="space-y-3 pl-2">
@@ -191,7 +191,7 @@ export default function TermsPage() {
 
           <div className="space-y-4 text-sm font-bold text-ink leading-relaxed">
             <p>
-              The enabled CoQuest Beta subscription is billed monthly through Stripe. A qualifying positive paid invoice adds 50 scan credits. Free access includes no paid scan, AI-reply, or CRM-export entitlement.
+              The enabled SEOlaQuest Beta subscription is billed monthly through Stripe. A qualifying positive paid invoice adds 50 scan credits. Free access includes no paid scan, AI-reply, or CRM-export entitlement.
             </p>
 
             <div className="border-3 border-outline bg-inset p-4 space-y-4 shadow-brutal">
@@ -279,7 +279,7 @@ export default function TermsPage() {
 
           <div className="space-y-4 text-sm font-bold text-ink leading-relaxed">
             <p>
-              CoQuest supports keyword-based source discovery and user-reviewed lead workflows. A source match is not verified purchase intent. The following actions are strictly prohibited:
+              SEOlaQuest supports keyword-based source discovery and user-reviewed lead workflows. A source match is not verified purchase intent. The following actions are strictly prohibited:
             </p>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
@@ -288,7 +288,7 @@ export default function TermsPage() {
                   <Ban size={16} /> 1. UNFAIR AUTOMATED SCRAPING
                 </div>
                 <p className="text-xs font-bold text-ink">
-                  Using automated tools to scrape, dump, or extract CoQuest&apos;s proprietary lead database or attempt bulk reverse-engineering of Scout signals.
+                  Using automated tools to scrape, dump, or extract SEOlaQuest&apos;s proprietary lead database or attempt bulk reverse-engineering of Scout signals.
                 </p>
               </div>
 
@@ -297,7 +297,7 @@ export default function TermsPage() {
                   <Ban size={16} /> 2. UNSOLICITED SPAM OUTREACH
                 </div>
                 <p className="text-xs font-bold text-ink">
-                  Weaponizing CoQuest leads for mass automated email spam, bot spamming on social channels, or sending deceptive/phishing materials.
+                  Weaponizing SEOlaQuest leads for mass automated email spam, bot spamming on social channels, or sending deceptive/phishing materials.
                 </p>
               </div>
 
@@ -306,7 +306,7 @@ export default function TermsPage() {
                   <Ban size={16} /> 3. KEY RESELLING & RE-LICENSING
                 </div>
                 <p className="text-xs font-bold text-ink">
-                  Sub-licensing, renting, or selling access to CoQuest accounts or internal credentials to third parties without prior written consent.
+                  Sub-licensing, renting, or selling access to SEOlaQuest accounts or internal credentials to third parties without prior written consent.
                 </p>
               </div>
 
