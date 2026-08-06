@@ -23,6 +23,13 @@
       ]
     },
     {
+      "path": "/blog/no-such-article",
+      "title": "Article Not Found | SEOlaQuest Blog",
+      "requiredLandmarks": [
+        "main"
+      ]
+    },
+    {
       "path": "/status",
       "title": "System Architecture Status | SEOlaQuest",
       "requiredLandmarks": [
