@@ -8,8 +8,8 @@ import { isPlanCode, type PlanCode } from '@/src/modules/billing/domain/catalog'
 import BillingLoading from './loading'
 
 export const metadata: Metadata = {
-  title: 'Billing | SEO la Quest',
-  description: 'Server-verified SEO la Quest subscription, credits, scan eligibility, and billing availability.',
+  title: 'Billing | SEOlaQuest',
+  description: 'Server-verified SEOlaQuest subscription, credits, scan eligibility, and billing availability.',
 }
 
 type BillingPageProps = {

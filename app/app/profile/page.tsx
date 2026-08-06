@@ -8,7 +8,7 @@ import ProfileLoading from './loading'
 export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
-  title: 'Mage Tower | SEO la Quest',
+  title: 'Mage Tower | SEOlaQuest',
   description: 'Review your guild master profile, class identity, and account state.',
 }
 

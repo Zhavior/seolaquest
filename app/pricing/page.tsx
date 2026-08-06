@@ -7,8 +7,8 @@ import { FounderSeatService } from '@/src/modules/billing/application/FounderSea
 import { FOUNDER_LOCK_TERMS } from '@/src/modules/billing/domain/catalog'
 
 export const metadata = {
-  title: 'Pricing | SEO la Quest',
-  description: 'SEO la Quest plan availability and manual scan entitlements.',
+  title: 'Pricing | SEOlaQuest',
+  description: 'SEOlaQuest plan availability and manual scan entitlements.',
 }
 
 /**
@@ -43,11 +43,11 @@ export default async function PricingPage() {
   return (
     <div className="min-h-screen bg-canvas text-ink">
       <main className="mx-auto max-w-6xl px-5 py-12 sm:py-20">
-        <Link href="/" className="text-sm font-black uppercase underline decoration-4 underline-offset-4">← SEO la Quest home</Link>
+        <Link href="/" className="text-sm font-black uppercase underline decoration-4 underline-offset-4">← SEOlaQuest home</Link>
         <header className="mt-8 max-w-4xl">
           <span className="inline-flex items-center gap-2 border-3 border-outline bg-accent px-4 py-2 text-xs font-black uppercase shadow-brutal-sm"><ShieldCheck size={16} /> Straightforward beta pricing</span>
           <h1 className="mt-6 text-5xl font-black uppercase leading-none sm:text-7xl">Know what you can do before you pay.</h1>
-          <p className="mt-5 max-w-3xl text-lg font-bold text-ink-muted">SEO la Quest stores keywords for free. Manual provider-backed scans require verified paid access and available scan credits. A source match is not a qualified customer.</p>
+          <p className="mt-5 max-w-3xl text-lg font-bold text-ink-muted">SEOlaQuest stores keywords for free. Manual provider-backed scans require verified paid access and available scan credits. A source match is not a qualified customer.</p>
         </header>
 
         <section className="mt-12 grid gap-7 md:grid-cols-2">

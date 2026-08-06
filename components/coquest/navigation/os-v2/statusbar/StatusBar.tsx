@@ -57,7 +57,7 @@ export default function StatusBar({
 
   return (
     <header
-      aria-label="SEO la Quest navigation"
+      aria-label="SEOlaQuest navigation"
       className="sticky inset-x-0 top-0 z-50 border-b-4 border-outline bg-canvas/95 pt-[env(safe-area-inset-top)] backdrop-blur-md select-none"
     >
       <div className="relative z-10 mx-auto flex h-14 max-w-7xl items-center justify-between gap-2 pl-[max(0.5rem,env(safe-area-inset-left))] pr-[max(0.5rem,env(safe-area-inset-right))] sm:h-16 sm:gap-3 sm:px-6">
@@ -96,8 +96,8 @@ export default function StatusBar({
               <Sword aria-hidden="true" size={16} strokeWidth={3} className="text-on-accent" />
             </div>
             <div className="hidden min-[400px]:flex flex-col">
-              <span className="text-base font-black uppercase leading-none tracking-[0.16em] text-ink sm:text-xl">
-                SEO LA QUEST
+              <span className="text-base font-black leading-none tracking-[0.04em] text-ink sm:text-xl">
+                SEOlaQuest
               </span>
               <span className="font-mono text-[8px] uppercase tracking-[0.2em] text-ink-muted sm:text-[9px]">
                 {'// REALM v1.0'}

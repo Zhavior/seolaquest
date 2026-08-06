@@ -2,8 +2,8 @@ import Link from 'next/link'
 import { Ban, KeyRound, ShieldAlert } from 'lucide-react'
 
 export const metadata = {
-  title: 'API Keys Unavailable | SEO la Quest',
-  description: 'SEO la Quest API credentials are not currently issued.',
+  title: 'API Keys Unavailable | SEOlaQuest',
+  description: 'SEOlaQuest API credentials are not currently issued.',
 }
 
 export default function ApiKeysPage() {
@@ -17,7 +17,7 @@ export default function ApiKeysPage() {
           </span>
           <h1 className="text-4xl font-black uppercase leading-none tracking-tight sm:text-6xl">API key vault unavailable</h1>
           <p className="text-sm font-bold leading-relaxed text-ink-muted sm:text-base">
-            SEO la Quest does not currently create, store, validate, rotate, or revoke public API keys. No credential shown by an
+            SEOlaQuest does not currently create, store, validate, rotate, or revoke public API keys. No credential shown by an
             older browser-only demo was a working server secret.
           </p>
         </div>

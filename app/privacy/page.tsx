@@ -2,14 +2,14 @@ import Link from 'next/link'
 import { Database, ExternalLink, Lock, ShieldAlert, Trash2, UserRound } from 'lucide-react'
 
 export const metadata = {
-  title: 'Privacy & Data Handling | SEO la Quest',
-  description: 'A plain-language account of the data SEO la Quest currently stores and the controls still pending.',
+  title: 'Privacy & Data Handling | SEOlaQuest',
+  description: 'A plain-language account of the data SEOlaQuest currently stores and the controls still pending.',
 }
 
 const storedData = [
   {
     title: 'Account identity',
-    body: 'Clerk authenticates the account. SEO la Quest stores the verified email, display name, and product settings needed to associate application data with that account.',
+    body: 'Clerk authenticates the account. SEOlaQuest stores the verified email, display name, and product settings needed to associate application data with that account.',
   },
   {
     title: 'Product data',
@@ -17,7 +17,7 @@ const storedData = [
   },
   {
     title: 'Billing state',
-    body: 'Stripe handles payment details. SEO la Quest stores Stripe identifiers, subscription state, checkout attempts, webhook processing records, and its own credit ledger.',
+    body: 'Stripe handles payment details. SEOlaQuest stores Stripe identifiers, subscription state, checkout attempts, webhook processing records, and its own credit ledger.',
   },
   {
     title: 'Optional providers',
@@ -36,7 +36,7 @@ export default function PrivacyPage() {
               <ShieldAlert size={15} /> Truth-first privacy notice
             </span>
             <h1 className="max-w-3xl text-4xl font-black uppercase leading-none tracking-tight sm:text-6xl">
-              What SEO la Quest stores today
+              What SEOlaQuest stores today
             </h1>
             <p className="max-w-3xl text-sm font-bold leading-relaxed text-ink-muted sm:text-base">
               This page describes the current application behavior. It does not claim certifications, storage regions,
@@ -74,7 +74,7 @@ export default function PrivacyPage() {
             </p>
             <p>
               Completion must be handled by the backend workflow and confirmed separately. Until that end-to-end workflow
-              is deployed and verified, SEO la Quest must not describe deletion as instant or automatic.
+              is deployed and verified, SEOlaQuest must not describe deletion as instant or automatic.
             </p>
             <Link
               href="/app/settings"
@@ -91,7 +91,7 @@ export default function PrivacyPage() {
             <li className="border-2 border-hairline p-4">Server operations re-check the authenticated account and tenant ownership.</li>
             <li className="border-2 border-hairline p-4">API responses use bounded data-transfer objects instead of complete database rows.</li>
             <li className="border-2 border-hairline p-4">The core logger redacts common identity, credential, and free-text fields.</li>
-            <li className="border-2 border-hairline p-4">Payment-card details are not stored in the SEO la Quest application database.</li>
+            <li className="border-2 border-hairline p-4">Payment-card details are not stored in the SEOlaQuest application database.</li>
           </ul>
         </section>
 

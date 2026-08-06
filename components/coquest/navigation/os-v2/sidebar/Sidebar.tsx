@@ -142,8 +142,8 @@ function NavigationContent({
           </div>
         ) : (
           <div className="flex items-center justify-between border-b-3 border-outline pb-2.5 mb-1">
-            <span className="text-xs font-black text-ink tracking-[0.15em]">
-              SEO la Quest
+            <span className="text-xs font-black text-ink tracking-[0.04em]">
+              SEOlaQuest
             </span>
             <button
               type="button"
