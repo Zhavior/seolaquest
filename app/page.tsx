@@ -6,6 +6,9 @@ import { LandingNav } from '@/features/landing/components/LandingNav'
 import { LandingHero } from '@/features/landing/components/LandingHero'
 import { LandingFeatures } from '@/features/landing/components/LandingFeatures'
 import { HomepageOAuthDisclosure } from '@/features/landing/components/HomepageOAuthDisclosure'
+import { PricingTeaser } from '@/features/landing/components/PricingTeaser'
+import { FounderSeatService } from '@/src/modules/billing/application/FounderSeatService'
+import type { FounderSeatSnapshot } from '@/src/modules/billing/application/FounderSeatService'
 
 // Non-personalized marketing content. This must live on the page itself: a
 // `export { default } from ...` re-export forwards only the component, silently
@@ -13,16 +16,34 @@ import { HomepageOAuthDisclosure } from '@/features/landing/components/HomepageO
 export const revalidate = 3600 // 1 hour
 
 const ManaEngineDemo = dynamic(() => import('@/features/landing/components/ManaEngineDemo'), {
-  loading: () => <div className="h-96 w-full bg-black/5 animate-pulse" />
+  loading: () => <div className="h-96 w-full bg-black/5 animate-pulse" />,
 })
 
-const GuildLeaderboardWins = dynamic(() => import('@/features/landing/components/GuildLeaderboardWins'), {
-  loading: () => <div className="h-64 w-full bg-black/5 animate-pulse" />
-})
+const GuildLeaderboardWins = dynamic(
+  () => import('@/features/landing/components/GuildLeaderboardWins'),
+  {
+    loading: () => <div className="h-64 w-full bg-black/5 animate-pulse" />,
+  },
+)
 
 const GRAIN_TEXTURE_DATA_URI = `data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='1'/%3E%3C/svg%3E`
 
-export default function LandingPage() {
+/**
+ * A failed founder-seat read must not break the landing page — it is a
+ * counter, not a gate. Degrades gracefully to no counter if the DB is
+ * unavailable.
+ */
+async function founderSeatsOrNull(): Promise<FounderSeatSnapshot | null> {
+  try {
+    return await FounderSeatService.snapshot()
+  } catch {
+    return null
+  }
+}
+
+export default async function LandingPage() {
+  const founderSeats = await founderSeatsOrNull()
+
   return (
     <div className="relative min-h-screen overflow-x-hidden bg-canvas font-sans text-ink selection:bg-[#ff4500] selection:text-white">
       <div
@@ -58,6 +79,7 @@ export default function LandingPage() {
         <LandingHero />
         <ManaEngineDemo />
         <LandingFeatures />
+        <PricingTeaser founderSeats={founderSeats} />
         <HomepageOAuthDisclosure />
         <GuildLeaderboardWins />
       </main>

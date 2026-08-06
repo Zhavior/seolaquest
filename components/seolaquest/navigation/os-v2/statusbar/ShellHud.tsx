@@ -43,13 +43,33 @@ export default function ShellHud({ user }: { user?: Partial<ShellUser> }) {
       {/* DESKTOP: compact pills */}
       <div className="hidden items-center gap-1.5 md:flex">
 
+        {/* Quests count */}
+        <Link
+          href="/app/runs"
+          title="Active Quests"
+          className="flex items-center gap-1.5 border-2 border-outline bg-accent-2 text-white px-2.5 h-9 text-[11px] font-black uppercase tracking-wider shadow-brutal-sm hover:-translate-y-0.5 hover:shadow-brutal active:translate-y-0 active:shadow-none transition-all"
+        >
+          <span>{openQuests} QUESTS</span>
+        </Link>
+
+        {/* EXP meter */}
+        <div
+          title={`LVL ${playerLevel} — ${playerXp}/${xpRequired} XP`}
+          className="flex items-center gap-1.5 border-2 border-outline bg-card px-2.5 h-9 text-[11px] font-black uppercase tracking-wider shadow-brutal-sm"
+        >
+          <span className="border border-outline bg-accent px-1 text-[9px] font-black text-on-accent">
+            LVL {playerLevel}
+          </span>
+          <span className="text-ink">XP {playerXp}/{xpRequired}</span>
+        </div>
+
         {/* MP / scan credits */}
         <div
           title={`${currentMp} scan credits — each scan costs 1 MP`}
           className="flex items-center gap-1.5 border-2 border-outline bg-card px-2.5 h-9 text-[11px] font-black uppercase tracking-wider shadow-brutal-sm"
         >
           <Zap aria-hidden="true" className="size-3.5 shrink-0 text-[#06B6D4] animate-pulse" strokeWidth={3} />
-          <span className="text-ink">{currentMp}<span className="text-ink-muted">/{maxMp}</span> MP</span>
+          <span className="text-ink">{currentMp}/{maxMp} MP</span>
         </div>
 
         {/* User name badge */}

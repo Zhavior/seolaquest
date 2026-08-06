@@ -25,10 +25,20 @@ export function LandingNav() {
         </div>
 
         <div className="hidden items-center gap-3 md:flex">
-          <div className="flex items-center gap-2 border-[3px] border-outline bg-card px-3 py-1.5 shadow-brutal-sm">
-            <span className="h-2.5 w-2.5 rounded-full bg-[#00c951] motion-safe:animate-pulse motion-reduce:animate-none" />
-            <span className="font-mono text-[11px] font-black uppercase tracking-[0.18em] text-ink">
-              RADAR ONLINE
+          {/* Player HUD — mana bar. Demo values for unauthenticated visitors;
+              real mana state lives inside the app. */}
+          <div
+            className="flex items-center gap-2 border-[3px] border-outline bg-card px-3 py-1.5 shadow-brutal-sm"
+            aria-label="Demo mana bar: 18 of 50 mana"
+          >
+            <span aria-hidden="true" className="font-mono text-[10px] font-black text-ink-muted">⚡</span>
+            <div className="h-2 w-[4.5rem] border border-outline bg-inset">
+              {/* 18/50 = 36% — visually alive, signals "room to grow" */}
+              <div className="h-full bg-accent" style={{ width: '36%' }} />
+            </div>
+            <span className="font-mono text-[9px] font-black uppercase tracking-[0.1em] text-ink">
+              18<span className="text-ink-muted">/50</span>
+              <span className="ml-1 text-ink-muted">mana</span>
             </span>
           </div>
           <Link

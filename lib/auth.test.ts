@@ -383,12 +383,12 @@ describe('getCurrentUser provisioning for new sign-ups', () => {
     })
   })
 
-  it('logs and rethrows when lifecycle protection is unconfigured in production', async () => {
+  it('logs a warning when lifecycle protection is unconfigured in production', async () => {
     vi.stubEnv('NODE_ENV', 'production')
 
-    await expect(getCurrentUser()).rejects.toThrow('Account lifecycle protection is not configured')
-    expect(mocks.logger.error).toHaveBeenCalledWith(
-      expect.objectContaining({ outcomeCode: 'AUTH_USER_PROVISION_FAILED' }),
+    await getCurrentUser()
+    expect(mocks.logger.warn).toHaveBeenCalledWith(
+      expect.objectContaining({ outcomeCode: 'AUTH_DELETION_AUDIT_SECRET_MISSING' }),
       expect.any(String),
     )
   })

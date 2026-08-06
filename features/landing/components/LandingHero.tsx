@@ -1,7 +1,7 @@
 'use client'
 
 import { motion, useInView, useReducedMotion } from 'framer-motion'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
 import { sfx } from '@/lib/sfx'
 import { BadgeCheck, ChevronDown, Compass, Radar, Swords, Zap } from 'lucide-react'
 import Link from 'next/link'
@@ -168,6 +168,44 @@ function RarityBadge({ tag }: { tag: string }) {
   )
 }
 
+/**
+ * The console cycles through signals on a timer, and each signal's copy wraps
+ * to a different number of lines — left alone that reflows every section below
+ * the hero while the reader is scrolling. Stacking every variant into one grid
+ * cell sizes the slot to the longest one, so swapping which is visible costs no
+ * layout change. `invisible` (visibility, not display) is what reserves the
+ * space; `aria-hidden` keeps the inactive copies out of the accessible tree.
+ */
+function StableSlot({
+  className,
+  activeTitle,
+  render,
+}: {
+  className?: string
+  activeTitle: string
+  render: (quest: (typeof quests)[number]) => ReactNode
+}) {
+  return (
+    <span className={`grid ${className ?? ''}`}>
+      {quests.map((quest) => {
+        const isActive = quest.title === activeTitle
+
+        return (
+          <span
+            key={quest.title}
+            aria-hidden={!isActive}
+            className={`col-start-1 row-start-1 ${isActive ? '' : 'invisible'}`}
+          >
+            {render(quest)}
+          </span>
+        )
+      })}
+    </span>
+  )
+}
+
+type FloatItem = { id: number; text: string; isEpic: boolean }
+
 export function LandingHero() {
   const shouldReduceMotion = useReducedMotion()
   const [activeMobileTab, setActiveMobileTab] = useState<'brief' | 'matches'>('matches')
@@ -207,8 +245,21 @@ export function LandingHero() {
     return () => window.clearInterval(timer)
   }, [shouldReduceMotion])
 
+  // Floating +XP numbers — spawned on each signal card click
+  const [floats, setFloats] = useState<FloatItem[]>([])
+  const floatIdRef = useRef<number>(0)
+  const spawnFloat = useCallback(
+    (isEpic: boolean) => {
+      if (shouldReduceMotion) return
+      const id = ++floatIdRef.current
+      const text = isEpic ? '+25 XP · EPIC DROP!' : '+15 XP · SIGNAL DETECTED'
+      setFloats((prev) => [...prev, { id, text, isEpic }])
+      setTimeout(() => setFloats((prev) => prev.filter((f) => f.id !== id)), 850)
+    },
+    [shouldReduceMotion],
+  )
+
   const pulseLabel = ['LIVE PULSE · 12ms', 'LIVE PULSE · 8ms'][pulseTick % 2]
-  const liveFeedLabel = `NEW MATCH · ${quests[feedTick].source}`
 
   const primaryCtaClassName =
     'group relative inline-flex items-center justify-center gap-3 overflow-hidden border-4 border-outline bg-black px-8 py-4 text-lg font-black uppercase tracking-[0.18em] text-white shadow-[4px_4px_0_0_#ff5a36] transition-all duration-75 hover:-translate-x-[2px] hover:-translate-y-[2px] hover:bg-[#1a1a1a] hover:shadow-[6px_6px_0_0_#ff744f] active:translate-x-[3px] active:translate-y-[3px] active:shadow-[2px_2px_0_0_#ff5a36] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#FFE600] focus-visible:ring-offset-2 focus-visible:ring-offset-[#f4ebd8] sm:px-10 sm:py-5 sm:text-xl'
@@ -218,6 +269,27 @@ export function LandingHero() {
 
   return (
     <section className="relative z-10 overflow-hidden bg-canvas px-4 pb-16 pt-24 sm:px-6 sm:pb-24 sm:pt-32">
+      {/* CRT scanline overlay + floating XP animation — scoped to this component */}
+      <style>{`
+        @keyframes xpFloat {
+          0%   { opacity: 1; transform: translateY(0) scale(1); }
+          15%  { opacity: 1; transform: translateY(-5px) scale(1.1); }
+          100% { opacity: 0; transform: translateY(-36px) scale(0.85); }
+        }
+        .crt-console::after {
+          content: "";
+          position: absolute;
+          inset: 0;
+          background: linear-gradient(rgba(18,16,16,0) 50%, rgba(0,0,0,0.18) 50%);
+          background-size: 100% 4px;
+          z-index: 9;
+          pointer-events: none;
+          opacity: 0.55;
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .crt-console::after { display: none; }
+        }
+      `}</style>
       <PixelParticleBackground />
 
       <div className="pointer-events-none absolute inset-0 z-0 opacity-[0.04] mix-blend-multiply">
@@ -300,7 +372,7 @@ export function LandingHero() {
             className="mt-4 max-w-xl text-base font-bold leading-relaxed text-ink/80 sm:text-lg"
           >
             SEOlaQuest helps founders and operators scan X conversations, spot recurring buyer pain,
-            and turn scattered signals into clearer product direction. Reddit is coming soon.
+            and turn scattered signals into clearer product direction. Reddit scanning is on our roadmap.
           </motion.p>
 
           <motion.div
@@ -308,7 +380,7 @@ export function LandingHero() {
             variants={fadeUp}
             className="mt-4 flex max-w-xl flex-wrap gap-2"
           >
-            {['Scanning Reddit', 'Scanning X', 'Live signal review', 'Evidence-first workflow'].map((badge) => (
+            {['Reddit (Roadmap)', 'Scanning X', 'Live signal review', 'Evidence-first workflow'].map((badge) => (
               <span
                 key={badge}
                 className="inline-flex items-center border-2 border-outline/80 bg-highlight px-3 py-1 text-[10px] font-black uppercase tracking-[0.14em] text-on-accent shadow-brutal-sm"
@@ -379,7 +451,7 @@ export function LandingHero() {
         >
           <div className="absolute -left-4 top-8 hidden h-16 w-16 border-4 border-outline bg-accent shadow-brutal lg:block" />
 
-          <div className="relative border-4 border-outline bg-card shadow-brutal-lg">
+          <div className="crt-console relative border-4 border-outline bg-card shadow-brutal-lg">
             <div className="border-b-4 border-outline bg-black px-5 py-4 text-white">
               <div className="flex items-center justify-between gap-4">
                 <div>
@@ -395,7 +467,10 @@ export function LandingHero() {
                       {pulseLabel}
                     </p>
                     <p className="inline-flex items-center border border-white/15 bg-white/5 px-2 py-1 text-[10px] font-black uppercase tracking-[0.16em] text-white/80">
-                      {liveFeedLabel}
+                      <StableSlot
+                        activeTitle={quests[feedTick].title}
+                        render={(quest) => `New match · ${quest.source}`}
+                      />
                     </p>
                   </div>
                 </div>
@@ -415,7 +490,10 @@ export function LandingHero() {
                       Active research goal
                     </p>
                     <h2 className="mt-1 text-xl font-black uppercase text-ink">
-                      {activeQuest.title}
+                      <StableSlot
+                        activeTitle={activeQuest.title}
+                        render={(quest) => quest.title}
+                      />
                     </h2>
                   </div>
                   <div className="flex h-12 w-12 shrink-0 items-center justify-center border-[3px] border-outline bg-accent-2 text-on-accent shadow-brutal">
@@ -424,17 +502,20 @@ export function LandingHero() {
                 </div>
 
                 <p className="mt-3 text-sm font-bold leading-relaxed text-ink-muted">
-                  {activeQuest.detail}
+                  <StableSlot
+                    activeTitle={activeQuest.title}
+                    render={(quest) => quest.detail}
+                  />
                 </p>
 
                 <div className="mt-4 grid gap-3 sm:grid-cols-3">
-                  <AnimatedStatBar label="Scan budget" value={activeQuest.tag === 'Epic' ? '50 credits' : '18 credits'} fill={activeQuest.tag === 'Epic' ? 84 : 58} tone="yellow" />
+                  <AnimatedStatBar label="Scan budget" value={activeQuest.tag === 'Epic' ? '50 mana' : '18 mana'} fill={activeQuest.tag === 'Epic' ? 84 : 58} tone="yellow" />
                   <AnimatedStatBar label="Signal density" value={activeQuest.tag === 'Epic' ? 'Rising' : 'Focused'} fill={activeQuest.tag === 'Epic' ? 62 : 44} tone="orange" />
                   <AnimatedStatBar label="Scan confidence" value={activeQuest.tag === 'Epic' ? 'Manual' : 'Reviewed'} fill={activeQuest.tag === 'Epic' ? 38 : 66} tone="white" />
                 </div>
               </div>
 
-              <div className="border-[3px] border-outline bg-black p-4 text-white shadow-brutal">
+              <div className="relative border-[3px] border-outline bg-black p-4 text-white shadow-brutal">
                 <div className="flex items-center justify-between gap-3">
                   <div>
                     <p className="text-[10px] font-black uppercase tracking-[0.18em] text-[#FFE600]">
@@ -460,6 +541,7 @@ export function LandingHero() {
                           setExpandedQuest((current) =>
                             current === quest.title ? '' : quest.title
                           )
+                          spawnFloat(quest.tag === 'Epic')
                         }}
                         onMouseEnter={handleHoverBlip}
                         onFocus={handleHoverBlip}
@@ -490,9 +572,12 @@ export function LandingHero() {
                         </div>
 
                         {isExpanded ? (
+                          // Fades and slides only — animating `height` here
+                          // would resize the console on every auto-cycle, which
+                          // is the reflow this panel is built to avoid.
                           <motion.div
-                            initial={shouldReduceMotion ? false : { opacity: 0, height: 0, y: -4 }}
-                            animate={{ opacity: 1, height: 'auto', y: 0 }}
+                            initial={shouldReduceMotion ? false : { opacity: 0, y: -4 }}
+                            animate={{ opacity: 1, y: 0 }}
                             transition={
                               shouldReduceMotion
                                 ? { duration: 0 }
@@ -500,18 +585,39 @@ export function LandingHero() {
                             }
                             className="mt-3 overflow-hidden border-2 border-[#FFE600] bg-accent px-3 py-3 text-on-accent"
                           >
-                            <p className="text-[10px] font-black uppercase tracking-[0.18em] text-on-accent/60">
-                              {quest.source}
-                            </p>
-                            <p className="mt-2 text-sm font-bold leading-relaxed text-on-accent">
-                              {quest.snippet}
-                            </p>
+                            <StableSlot
+                              activeTitle={quest.title}
+                              render={(variant) => (
+                                <>
+                                  <span className="block text-[10px] font-black uppercase tracking-[0.18em] text-on-accent/60">
+                                    {variant.source}
+                                  </span>
+                                  <span className="mt-2 block text-sm font-bold leading-relaxed text-on-accent">
+                                    {variant.snippet}
+                                  </span>
+                                </>
+                              )}
+                            />
                           </motion.div>
                         ) : null}
                       </button>
                     )
                   })}
                 </div>
+
+                {/* Floating +XP damage numbers */}
+                {floats.map((f) => (
+                  <div
+                    key={f.id}
+                    className={`pointer-events-none absolute right-4 top-4 z-20 font-mono text-[10px] font-black uppercase tracking-[0.12em] drop-shadow-sm ${
+                      f.isEpic ? 'text-[#d8b4fe]' : 'text-[#00ff95]'
+                    }`}
+                    style={{ animation: 'xpFloat 0.85s ease-out forwards' }}
+                    aria-hidden="true"
+                  >
+                    {f.text}
+                  </div>
+                ))}
               </div>
             </div>
           </div>

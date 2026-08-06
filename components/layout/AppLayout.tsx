@@ -303,7 +303,13 @@ export function AppLayout({ children, user }: AppLayoutProps) {
           {/* MP pill */}
           <div className="hidden sm:flex items-center gap-1.5 border-2 border-outline bg-card px-2.5 h-10 text-[11px] font-black uppercase tracking-wider shadow-brutal-sm">
             <Zap className="size-3.5 shrink-0 text-[#06B6D4] animate-pulse" strokeWidth={3} />
-            <span className="text-ink">{currentMp}<span className="text-ink-muted">/{maxMp}</span> MP</span>
+            <span className="text-ink">{currentMp}/{maxMp} MP</span>
+          </div>
+
+          {/* EXP pill */}
+          <div className="hidden md:flex items-center gap-1.5 border-2 border-outline bg-card px-2.5 h-10 text-[11px] font-black uppercase tracking-wider shadow-brutal-sm">
+            <Sparkles className="size-3.5 shrink-0 text-[#F59E0B]" strokeWidth={3} />
+            <span className="text-ink">XP 1,250</span>
           </div>
 
           {/* Mobile: combined badge */}
