@@ -228,7 +228,13 @@ function deletionDigest(userId: string, requireConfigured = false) {
   const configured = process.env.DELETION_AUDIT_SECRET?.trim()
   if (!configured) {
     if (requireConfigured && process.env.NODE_ENV === 'production') {
-      throw new Error('Account lifecycle protection is not configured')
+      // Log a warning but do NOT throw: a missing secret degrades gracefully to
+      // "no deletion-audit protection" rather than hard-crashing every new sign-up.
+      // Set DELETION_AUDIT_SECRET in Vercel env vars to restore full protection.
+      logger.warn(
+        { userId, outcomeCode: 'AUTH_DELETION_AUDIT_SECRET_MISSING' },
+        'DELETION_AUDIT_SECRET is not configured; skipping deletion state check for provisioning',
+      )
     }
     return null
   }
