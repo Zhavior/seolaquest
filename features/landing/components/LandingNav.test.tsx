@@ -40,7 +40,7 @@ describe('LandingNav mobile usability', () => {
   it('keeps visitor authentication actions present with 44px targets below 640px', () => {
     render(<LandingNav />)
 
-    const nav = screen.getByRole('navigation', { name: 'SEO la Quest navigation' })
+    const nav = screen.getByRole('navigation', { name: 'SEOlaQuest navigation' })
     const signIn = screen.getByRole('link', { name: 'Sign in' })
     const createAccount = screen.getByRole('link', { name: 'Start free' })
 

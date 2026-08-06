@@ -3,14 +3,14 @@
   "routes": [
     {
       "path": "/",
-      "title": "SEO la Quest | Customer Research",
+      "title": "SEOlaQuest | AI Social Listening & Lead Monitoring",
       "requiredLandmarks": [
         "main"
       ]
     },
     {
       "path": "/pricing",
-      "title": "Pricing | SEO la Quest",
+      "title": "Pricing | SEOlaQuest",
       "requiredLandmarks": [
         "main"
       ]
@@ -31,7 +31,7 @@
     },
     {
       "path": "/privacy",
-      "title": "Privacy & Data Handling | SEO la Quest",
+      "title": "Privacy & Data Handling | SEOlaQuest",
       "requiredLandmarks": [
         "main"
       ]
@@ -45,7 +45,7 @@
     },
     {
       "path": "/api-terms",
-      "title": "API Availability | SEO la Quest",
+      "title": "API Availability | SEOlaQuest",
       "requiredLandmarks": [
         "main"
       ]

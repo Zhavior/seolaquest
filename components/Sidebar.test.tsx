@@ -35,7 +35,7 @@ describe('SEOlaQuest OS Sidebar', () => {
     )
 
     // Desktop rail carries the full brand; the mobile top bar uses the short "SEOLQ".
-    expect(screen.getByText('SEO la Quest')).toBeInTheDocument()
+    expect(screen.getByText('SEOlaQuest')).toBeInTheDocument()
     expect(screen.getByText('LIVING HQ')).toBeInTheDocument()
     expect(screen.getByText('QUEST BOARD')).toBeInTheDocument()
     expect(screen.getByText('QUEST LOG')).toBeInTheDocument()
@@ -79,7 +79,7 @@ describe('SEOlaQuest OS Sidebar', () => {
       />
     )
 
-    expect(screen.getAllByText('SEO la Quest')[0]).toBeInTheDocument()
+    expect(screen.getAllByText('SEOlaQuest')[0]).toBeInTheDocument()
   })
 
   it('renders collapsed state with expand toggle button', () => {
