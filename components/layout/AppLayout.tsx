@@ -23,16 +23,13 @@ import {
   PanelLeftOpen,
   Menu,
   X,
-  Sun,
-  Moon,
   type LucideIcon,
 } from 'lucide-react';
 import clsx from 'clsx';
 
 import LogOutButton from '@/components/auth/LogOutButton';
-import { ThemeToggle } from '@/components/theme/ThemeToggle';
 import { useTheme } from '@/components/theme/ThemeProvider';
-import { THEMES, THEME_META, type Theme } from '@/components/theme/theme-config';
+import { THEME_META, type Theme } from '@/components/theme/theme-config';
 import { sfx } from '@/lib/sfx';
 
 export interface AppLayoutProps {
