@@ -99,6 +99,11 @@ describe('Clerk public route boundary', () => {
     '/privacy',
     '/terms',
     '/api-terms',
+    // Sentry's browser tunnel. Protecting it would silently discard every
+    // client-side error report from a logged-out visitor — which is most of
+    // the traffic the marketing pages exist to receive.
+    '/monitoring',
+    '/monitoring/envelope',
   ])('does not call auth.protect for public route %s', async (pathname) => {
     const { protect, response } = await invokeProxy(pathname)
 

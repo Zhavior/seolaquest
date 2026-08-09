@@ -15,7 +15,19 @@ export default function robots(): MetadataRoute.Robots {
     rules: {
       userAgent: '*',
       allow: '/',
-      disallow: ['/api/', '/app/', '/dev/', '/onboarding', '/os-preview', '/sign-in', '/sign-up'],
+      // `/monitoring` is Sentry's browser tunnel, not a page. `/specs`
+      // 308-redirects to /status, which is listed in the sitemap instead.
+      disallow: [
+        '/api/',
+        '/app/',
+        '/dev/',
+        '/monitoring',
+        '/onboarding',
+        '/os-preview',
+        '/sign-in',
+        '/sign-up',
+        '/specs',
+      ],
     },
     sitemap: absoluteUrl('/sitemap.xml'),
     host: absoluteUrl('/').replace(/\/$/, ''),

@@ -23,6 +23,7 @@
     "@google/genai": "^2.15.0",
     "@react-three/drei": "^10.7.7",
     "@react-three/fiber": "^9.7.0",
+    "@sentry/nextjs": "^10.69.0",
     "@stripe/stripe-js": "^9.12.1",
     "@supabase/ssr": "^0.12.4",
     "@upstash/ratelimit": "^2.0.8",

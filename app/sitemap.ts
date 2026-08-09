@@ -7,8 +7,9 @@ import { absoluteUrl } from '@/lib/siteUrl'
  * `robots.ts` must stay out: listing a URL in the sitemap while blocking it in
  * robots.txt is a contradiction Search Console reports as an error.
  *
- * `/status` is deliberately absent — it re-exports `/specs`, and the sitemap
- * should carry the canonical URL of the two, not both.
+ * `/specs` is deliberately absent — proxy.ts 308-redirects it to `/status`, so
+ * listing it would advertise a URL that never returns 200. `/status` is the
+ * one that renders.
  */
 export default function sitemap(): MetadataRoute.Sitemap {
   const posts = getAllPosts()
@@ -20,7 +21,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: absoluteUrl('/'), changeFrequency: 'weekly', priority: 1 },
     { url: absoluteUrl('/pricing'), changeFrequency: 'weekly', priority: 0.9 },
     { url: absoluteUrl('/blog'), lastModified: blogLastModified, changeFrequency: 'weekly', priority: 0.8 },
-    { url: absoluteUrl('/specs'), changeFrequency: 'monthly', priority: 0.5 },
+    { url: absoluteUrl('/status'), changeFrequency: 'monthly', priority: 0.5 },
     { url: absoluteUrl('/api-terms'), changeFrequency: 'yearly', priority: 0.3 },
     { url: absoluteUrl('/privacy'), changeFrequency: 'yearly', priority: 0.3 },
     { url: absoluteUrl('/terms'), changeFrequency: 'yearly', priority: 0.3 },

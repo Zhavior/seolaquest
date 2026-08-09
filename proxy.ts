@@ -20,6 +20,12 @@ export const PUBLIC_ROUTE_PATTERNS = [
   '/privacy',
   '/terms',
   '/api-terms',
+  // Sentry's browser tunnel (`tunnelRoute` in next.config.ts). Client-side
+  // error reports POST here instead of to sentry.io so ad-blockers do not eat
+  // them. It MUST be public: the visitors whose crashes matter most are the
+  // logged-out ones on the marketing pages, and auth.protect() would bounce
+  // their reports to /sign-in where Sentry never sees them.
+  '/monitoring(.*)',
   // These machine endpoints authenticate themselves. Keep the exceptions exact.
   '/api/v1/cron/jobs',
   '/api/v1/health/live',

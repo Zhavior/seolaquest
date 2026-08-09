@@ -60,3 +60,6 @@ next-env.d.ts
 # pattern; keeping them untracked stops `git add -A` from sweeping them in.
 * 2.*
 * [0-9].*
+
+# Sentry Config File
+.env.sentry-build-plugin
