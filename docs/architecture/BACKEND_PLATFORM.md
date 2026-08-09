@@ -376,3 +376,16 @@ Tracked deliberately rather than silently. Current as of the August 2026 hardeni
 | Event graph has no producer for `opportunity.discovered` / `opportunity.engaged` / `lead.converted`, and no consumer for `aurora.opportunity.evaluated` | events + gamify | Open — see `AURORA_GAMIFY_ARCHITECTURE.md` |
 | Byte-identical shadow copies (`RateLimiter 2.ts`, `AuditService 2.ts`, `idempotency 2.ts`) hidden from git and lint by the `* [0-9].*` ignore pattern; will drift from the originals | `src/modules/core/security/` | Open — untracked, so deletion is unrecoverable |
 | Backlogged `DomainEventLog` rows replay in one tick on first deploy of the drain | cron | Check `SELECT status, count(*) FROM "DomainEventLog" GROUP BY status` before shipping |
+| The `ai` tier is charged under two different identifiers for the same human — `gemini/chat` passes the internal DB id, `generateAIReplyAction` passes the Clerk id, so one account holds two 20/h buckets. Both are bounded, so not a hole, but it is not the "one AI budget per account" the tier implies. (`AiUsageLimiter` is consistent — both pass the DB id.) | `app/api/gemini/chat`, `features/dashboard/actions.ts` | Open |
+| `vitest.setup.ts`'s global `next/navigation` mock omits `unstable_rethrow`, so any jsdom test driving a wrapped action into the wrapper's catch dies on the mock instead of asserting. `server-action.test.ts` works around it with `@vitest-environment node`; nothing else can. | `vitest.setup.ts` | Open — shared test infra |
+| A catch neither logs nor rethrows and returns `error.message` to the client, leaking Prisma internals | `app/app/admin/aurora/actions.ts` | Open — pre-existing, in untracked code, action has no callers |
+| `complete-onboarding.ts` is orphaned dead source and the only Server Action file importing `redirect`. Absent from the build's reference manifest, so not a live endpoint. | `app/actions/` | Open — delete rather than leave |
+| `AiUsageLimiter` fails closed in *every* environment, unlike `RateLimiterService`, so a dev box without Upstash now gets 503 on Gemini chat. Chat also shares one 20/day per-tenant AI budget with AI replies. | `app/api/gemini/chat` | Intentional, matches `LeadService` — noted because it is a non-production behaviour change |
+
+### Closed in the August 2026 hardening pass
+
+Outbox never drained and consumers never registered · limiter keyed on raw `x-forwarded-for` ·
+`global`/`ip` writing literal identifiers to Redis · Server Actions entirely unlimited · Gemini
+chat entirely unlimited · in-memory per-instance limiter on `x/post` · malformed JSON rendering as
+500 · `/blog(.*)` prefix over-match · dead-letter endpoint blind to the outbox · `console.*` in
+server code (now lint-enforced).
