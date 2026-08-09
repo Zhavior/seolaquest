@@ -90,3 +90,14 @@ ALTER TABLE "GamifyQuestAssignment"
 ALTER TABLE "GamifyQuestContribution"
     ADD CONSTRAINT "GamifyQuestContribution_assignmentId_fkey"
     FOREIGN KEY ("assignmentId") REFERENCES "GamifyQuestAssignment"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- Quest definitions and progress are managed by trusted server-side services.
+REVOKE ALL ON TABLE
+    "GamifyQuest",
+    "GamifyQuestAssignment",
+    "GamifyQuestContribution"
+FROM anon, authenticated;
+
+ALTER TABLE "GamifyQuest" ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "GamifyQuestAssignment" ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "GamifyQuestContribution" ENABLE ROW LEVEL SECURITY;

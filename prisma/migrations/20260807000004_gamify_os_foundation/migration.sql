@@ -91,3 +91,15 @@ ALTER TABLE "GamifyReputationTransaction"
 ALTER TABLE "GamifyReputationTransaction"
     ADD CONSTRAINT "GamifyReputationTransaction_reversalOfId_fkey"
     FOREIGN KEY ("reversalOfId") REFERENCES "GamifyReputationTransaction"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- Gamify ledgers are server-only. Keep them inaccessible through Supabase's
+-- anon/authenticated Data API roles, including on projects with broad defaults.
+REVOKE ALL ON TABLE
+    "GamifyProfile",
+    "GamifyXpTransaction",
+    "GamifyReputationTransaction"
+FROM anon, authenticated;
+
+ALTER TABLE "GamifyProfile" ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "GamifyXpTransaction" ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "GamifyReputationTransaction" ENABLE ROW LEVEL SECURITY;
