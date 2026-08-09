@@ -2,6 +2,10 @@ import { NextResponse } from 'next/server'
 import { getXClient } from '@/lib/x'
 import { getCurrentUser } from '@/lib/auth'
 import { z } from 'zod'
+import { RateLimiterService } from '@/src/modules/core/security/RateLimiter'
+import { AppError } from '@/src/modules/core/infrastructure/errors'
+import { safeJson } from '@/src/modules/core/infrastructure/safeJson'
+import { logger } from '@/src/modules/core/infrastructure/logger'
 
 export const dynamic = 'force-dynamic'
 
@@ -26,24 +30,6 @@ const postSchema = z.object({
   text: z.string().trim().min(1, 'Post text cannot be empty.').max(280, 'Post text exceeds 280 characters.'),
 })
 
-// In-memory per-process rate limiting window (5 posts per 60 seconds)
-const RATE_LIMIT_WINDOW_MS = 60 * 1000
-const MAX_REQUESTS_PER_WINDOW = 5
-const requestTimestamps: number[] = []
-
-function checkRateLimit(): boolean {
-  const now = Date.now()
-  // Purge expired timestamps
-  while (requestTimestamps.length > 0 && requestTimestamps[0] < now - RATE_LIMIT_WINDOW_MS) {
-    requestTimestamps.shift()
-  }
-  if (requestTimestamps.length >= MAX_REQUESTS_PER_WINDOW) {
-    return false
-  }
-  requestTimestamps.push(now)
-  return true
-}
-
 export async function POST(request: Request) {
   try {
     const user = await getCurrentUser()
@@ -65,21 +51,11 @@ export async function POST(request: Request) {
       )
     }
 
-    if (!checkRateLimit()) {
-      return NextResponse.json(
-        { error: 'Rate limit exceeded. Please wait a minute before posting again.' },
-        { status: 429 }
-      )
-    }
-
-    let body: unknown
-    try {
-      body = await request.json()
-    } catch {
-      return NextResponse.json({ error: 'Invalid JSON payload' }, { status: 400 })
-    }
-
-    const parseResult = postSchema.safeParse(body)
+    // safeJson raises ValidationError (400 VALIDATION_ERROR) for a malformed, empty or
+    // oversized body, which the AppError branch below renders. The hand-rolled
+    // request.json() try/catch this replaces could not reject an unbounded body at all:
+    // `json()` buffers the whole payload before any schema runs.
+    const parseResult = postSchema.safeParse(await safeJson(request))
     if (!parseResult.success) {
       const errorMessage = parseResult.error.errors[0]?.message || 'Invalid post text.'
       return NextResponse.json({ error: errorMessage }, { status: 400 })
@@ -87,8 +63,34 @@ export async function POST(request: Request) {
 
     const { text } = parseResult.data
 
+    /**
+     * Distributed, per-admin budget. The previous module-scope timestamp array was
+     * per-lambda-instance and reset on every cold start, so the enforced ceiling was
+     * 5 x (number of live instances) rather than 5, and it was a single global counter
+     * that let one admin starve the others.
+     *
+     * Kept after the allowlist check on purpose: a caller who is not an allowlisted
+     * admin 403s above and never consumes anyone's budget. The identifier is the
+     * authenticated user id — this route is never reachable anonymously, so there is
+     * no IP fallback to get wrong. `xPost` is in HASHED_TYPES, so the id is HMAC'd
+     * before it becomes a Redis key.
+     *
+     * Charged AFTER validation and immediately before the billable call, matching
+     * AiUsageLimiter in app/api/gemini/chat. The budget meters posts actually sent to X,
+     * and at 8 per 24h it is small enough that spending it on requests that never reach
+     * X is a real outage: 8 malformed bodies from a buggy client used to lock the admin
+     * out for a full day, with nothing posted. Only an allowlisted admin can get this
+     * far, so the parse an over-budget caller can still force is both bounded (safeJson
+     * caps the body at 64 KiB) and self-inflicted.
+     */
+    await RateLimiterService.enforce({ type: 'xPost', identifier: user.id })
+
     const response = await xClient.v2.tweet(text)
     if (!response || !response.data || !response.data.id) {
+      logger.error(
+        { event: 'x_post_failed', outcomeCode: 'X_RESPONSE_MISSING_ID' },
+        'X accepted the request but returned no post id',
+      )
       return NextResponse.json({ error: 'Failed to create post on X.' }, { status: 500 })
     }
 
@@ -97,8 +99,37 @@ export async function POST(request: Request) {
       text: response.data.text || text,
     })
   } catch (error: unknown) {
+    /**
+     * This route is intentionally not wrapped in withApiHandler, so the AppError ->
+     * { error, code } rendering that the wrapper normally performs has to happen here.
+     * RateLimiterService.enforce throws RateLimitError (an AppError, statusCode 429)
+     * both when the budget is spent and when it fails closed in production.
+     */
+    if (error instanceof AppError) {
+      logger.warn(
+        { event: 'x_post_rejected', outcomeCode: error.code, statusCode: error.statusCode },
+        'X post request rejected before reaching the X API',
+      )
+      return NextResponse.json(
+        { error: error.message, code: error.code },
+        { status: error.statusCode },
+      )
+    }
+
     const err = error as { message?: string; code?: number }
-    console.error('[X Post Error]:', err?.message || 'Unknown error')
+    // Neither the post text nor the user id is logged: `text` is caller content and
+    // LOG_REDACT_PATHS would censor `userId` anyway, so there is nothing to gain by
+    // sending either through. The pino `err` serializer keeps only type/code/statusCode.
+    logger.error(
+      {
+        err: error,
+        event: 'x_post_failed',
+        outcomeCode: err?.code === 429 ? 'X_API_RATE_LIMITED' : 'X_API_ERROR',
+        ...(typeof err?.code === 'number' ? { providerStatus: err.code } : {}),
+      },
+      'Posting to X failed',
+    )
+
     if (err?.code === 429) {
       return NextResponse.json({ error: 'X API rate limit reached. Try again later.' }, { status: 429 })
     }

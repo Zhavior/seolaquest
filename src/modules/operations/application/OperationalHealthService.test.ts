@@ -5,6 +5,7 @@ const mocks = vi.hoisted(() => ({
   deletionCount: vi.fn(),
   scheduleCount: vi.fn(),
   stripeCount: vi.fn(),
+  outboxCount: vi.fn(),
   heartbeatFindUnique: vi.fn(),
   queryRaw: vi.fn(),
 }))
@@ -16,6 +17,7 @@ vi.mock('@/lib/prisma', () => ({
     accountDeletionRequest: { count: mocks.deletionCount },
     tenantScanSchedule: { count: mocks.scheduleCount },
     stripeWebhookEvent: { count: mocks.stripeCount },
+    domainEventLog: { count: mocks.outboxCount },
     operationalHeartbeat: { findUnique: mocks.heartbeatFindUnique },
     $queryRaw: mocks.queryRaw,
   },
@@ -30,6 +32,7 @@ describe('OperationalHealthService', () => {
     mocks.deletionCount.mockResolvedValue(0)
     mocks.scheduleCount.mockResolvedValue(0)
     mocks.stripeCount.mockResolvedValue(0)
+    mocks.outboxCount.mockResolvedValue(0)
     mocks.heartbeatFindUnique.mockResolvedValue({
       lastSucceededAt: new Date('2026-07-30T11:59:00Z'),
       lastErrorCode: null,
@@ -60,6 +63,8 @@ describe('OperationalHealthService', () => {
           deadDeletions: 0,
           agedReadyDeletions: 0,
           overdueScanSchedules: 0,
+          failedOutboxEvents: 0,
+          agedReadyOutboxEvents: 0,
         },
         clock: {
           workerLastSucceededAt: '2026-07-30T11:59:00.000Z',
@@ -180,5 +185,62 @@ describe('OperationalHealthService', () => {
         updatedAt: { lt: new Date('2026-07-30T11:50:00Z') },
       },
     })
+  })
+
+  it('queries the outbox with index-supported predicates', async () => {
+    // Call order: FAILED dead letters, then aged ready PENDING.
+    await OperationalHealthService.snapshot(new Date('2026-07-30T12:00:00Z'))
+
+    // Equality on the leading column of @@index([status, availableAt, createdAt]).
+    expect(mocks.outboxCount).toHaveBeenNthCalledWith(1, { where: { status: 'FAILED' } })
+    // Equality + range on the leading two columns of the same index.
+    expect(mocks.outboxCount).toHaveBeenNthCalledWith(2, {
+      where: {
+        status: 'PENDING',
+        availableAt: { lt: new Date('2026-07-30T11:55:00Z') },
+      },
+    })
+  })
+
+  it('reports sub-threshold outbox counts without failing readiness', async () => {
+    // Four dead letters is a poison-payload problem, not an outage; 49 aged ready
+    // rows is a drain that is a few passes behind and will catch up.
+    mocks.outboxCount.mockResolvedValueOnce(4).mockResolvedValueOnce(49)
+
+    await expect(OperationalHealthService.snapshot(new Date('2026-07-30T12:00:00Z')))
+      .resolves.toMatchObject({
+        status: 'ready',
+        counts: { failedOutboxEvents: 4, agedReadyOutboxEvents: 49 },
+      })
+  })
+
+  it('degrades once dead letters reach the outbox breach threshold', async () => {
+    mocks.outboxCount.mockResolvedValueOnce(5).mockResolvedValueOnce(0)
+
+    await expect(OperationalHealthService.snapshot(new Date('2026-07-30T12:00:00Z')))
+      .resolves.toMatchObject({
+        status: 'degraded',
+        counts: { failedOutboxEvents: 5, agedReadyOutboxEvents: 0 },
+      })
+  })
+
+  it('degrades once the ready outbox backlog outruns drain capacity', async () => {
+    mocks.outboxCount.mockResolvedValueOnce(0).mockResolvedValueOnce(50)
+
+    await expect(OperationalHealthService.snapshot(new Date('2026-07-30T12:00:00Z')))
+      .resolves.toMatchObject({
+        status: 'degraded',
+        counts: { failedOutboxEvents: 0, agedReadyOutboxEvents: 50 },
+      })
+  })
+
+  it('scores each breached outbox bucket once rather than per row', async () => {
+    // A single breached bucket must not be able to mask an otherwise clean system,
+    // nor inflate the issue signal in proportion to raw row volume.
+    mocks.outboxCount.mockResolvedValueOnce(500).mockResolvedValueOnce(0)
+
+    const snapshot = await OperationalHealthService.snapshot(new Date('2026-07-30T12:00:00Z'))
+    expect(snapshot.status).toBe('degraded')
+    expect(snapshot.counts.failedOutboxEvents).toBe(500)
   })
 })

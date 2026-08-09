@@ -4,6 +4,7 @@ import { Ban, CheckCircle2, KeyRound, Lock, RadioTower } from 'lucide-react'
 export const metadata = {
   title: 'API Availability | SEOlaQuest',
   description: 'The current, fail-closed status of SEOlaQuest API access and automation.',
+  alternates: { canonical: '/api-terms' },
 }
 
 export default function ApiTermsPage() {

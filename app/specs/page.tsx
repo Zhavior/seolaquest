@@ -4,6 +4,10 @@ import { AlertTriangle, CheckCircle2, Database, Gauge, Lock, Server, XCircle } f
 export const metadata = {
   title: 'System Architecture Status | SEOlaQuest',
   description: 'Verified implementation status and unresolved production gates for SEOlaQuest.',
+  // /status is the live URL for this content: proxy.ts 308-redirects /specs to
+  // /status, so /specs never actually renders in production. The canonical must
+  // name the URL that answers 200, not the one that bounces.
+  alternates: { canonical: '/status' },
 }
 
 const implemented = [

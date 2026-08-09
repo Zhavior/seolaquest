@@ -178,14 +178,41 @@ describe('RateLimiterService key derivation', () => {
     expect(mocks.limit).not.toHaveBeenCalledWith('user-1')
   })
 
-  it('leaves the global identifier unhashed and needs no key secret', async () => {
+  it('never writes the global identifier to Redis literally', async () => {
     vi.stubEnv('NODE_ENV', 'production')
     configureUpstash()
+    vi.stubEnv('RATE_LIMIT_KEY_SECRET', KEY_SECRET)
     mocks.limit.mockResolvedValue({ success: true, limit: 100, remaining: 99, reset: Date.now() + 1_000 })
 
     await (await service()).enforce({ type: 'global', identifier: '203.0.113.4' })
 
-    expect(mocks.limit).toHaveBeenCalledWith('203.0.113.4')
+    // `global` keys on a raw IP or Clerk userId and runs with analytics enabled, so a literal
+    // key would turn the limiter's own telemetry into a record of who called from where.
+    expect(mocks.limit).toHaveBeenCalledWith(
+      createHmac('sha256', KEY_SECRET).update('203.0.113.4', 'utf8').digest('hex'),
+    )
+  })
+
+  it('keeps limiting the API-wide tiers on an ephemeral key rather than failing closed without a secret', async () => {
+    vi.stubEnv('NODE_ENV', 'production')
+    configureUpstash()
+    mocks.limit.mockResolvedValue({ success: true, limit: 100, remaining: 99, reset: Date.now() + 1_000 })
+
+    // `global` and `ip` wrap every route. Failing closed here would take the whole API offline
+    // the moment RATE_LIMIT_KEY_SECRET went missing, so they degrade to a per-process key:
+    // still enforced, still never literal, only bucket continuity is lost.
+    await expect(
+      (await service()).enforce({ type: 'global', identifier: '203.0.113.4' }),
+    ).resolves.toBeUndefined()
+
+    expect(mocks.limit).toHaveBeenCalledTimes(1)
+    const [key] = mocks.limit.mock.calls[0]
+    expect(key).not.toBe('203.0.113.4')
+    expect(key).toMatch(/^[0-9a-f]{64}$/)
+    expect(mocks.loggerError).toHaveBeenCalledWith(
+      expect.objectContaining({ outcomeCode: 'RATE_LIMITER_DEGRADED_KEY', type: 'global' }),
+      expect.any(String),
+    )
   })
 
   it('derives distinct keys for distinct identifiers', async () => {
@@ -195,11 +222,24 @@ describe('RateLimiterService key derivation', () => {
     expect(limiterKey('auth', 'user-1', KEY_SECRET)).toEqual(limiterKey('auth', 'user-1', KEY_SECRET))
   })
 
-  it('returns null for a hashed type when the secret is too short to be adequate', async () => {
+  it('returns a null key for a per-endpoint hashed type when the secret is too short to be adequate', async () => {
     const { limiterKey } = await import('./RateLimiter')
 
-    expect(limiterKey('auth', 'user-1', 'too-short')).toBeNull()
-    expect(limiterKey('auth', 'user-1', undefined)).toBeNull()
+    // Per-endpoint tiers are individually sensitive and are NOT in EPHEMERAL_KEY_FALLBACK_TYPES:
+    // a null key tells enforce() to fail closed rather than write a raw identifier.
+    expect(limiterKey('auth', 'user-1', 'too-short')).toEqual({ key: null, degraded: false })
+    expect(limiterKey('auth', 'user-1', undefined)).toEqual({ key: null, degraded: false })
+  })
+
+  it('marks the API-wide tiers degraded instead of nulling their key when the secret is inadequate', async () => {
+    const { limiterKey } = await import('./RateLimiter')
+
+    for (const type of ['global', 'ip'] as const) {
+      const resolved = limiterKey(type, '203.0.113.4', undefined)
+      expect(resolved.degraded).toBe(true)
+      expect(resolved.key).toMatch(/^[0-9a-f]{64}$/)
+      expect(resolved.key).not.toBe('203.0.113.4')
+    }
   })
 
   it('configures each limiter with its documented window', async () => {

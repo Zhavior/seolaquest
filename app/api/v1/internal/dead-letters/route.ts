@@ -15,7 +15,20 @@ export async function GET(request: Request) {
 
   try {
     const snapshot = await OperationalHealthService.snapshot()
-    return Response.json({ checkedAt: snapshot.checkedAt, counts: snapshot.counts })
+    /*
+     * checkedAt and counts are the established shape and must keep their meaning —
+     * callers poll them. The outbox block is additive: this endpoint is named for
+     * dead letters, so the event-outbox numbers are promoted out of the generic
+     * counts blob instead of only being reachable by knowing their key names.
+     */
+    return Response.json({
+      checkedAt: snapshot.checkedAt,
+      counts: snapshot.counts,
+      outbox: {
+        deadLetters: snapshot.counts.failedOutboxEvents,
+        agedReady: snapshot.counts.agedReadyOutboxEvents,
+      },
+    })
   } catch {
     return Response.json({ status: 'unavailable' }, { status: 503 })
   }

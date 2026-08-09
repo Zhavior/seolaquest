@@ -9,6 +9,8 @@ const mocks = vi.hoisted(() => ({
   markSucceeded: vi.fn(),
   markFailed: vi.fn(),
   pruneProcessedStripeWebhooks: vi.fn(),
+  registerAllEventConsumers: vi.fn(),
+  processPendingBatch: vi.fn(),
 }))
 
 vi.mock('@/src/modules/core/jobs/JobWorkerService', () => ({
@@ -32,8 +34,20 @@ vi.mock('@/src/modules/operations/application/OperationalHeartbeatService', () =
   },
   WORKER_CYCLE_FAILURE_CODE: 'WORKER_CYCLE_FAILED',
 }))
+vi.mock('@/src/modules/core/events/registerConsumers', () => ({
+  registerAllEventConsumers: mocks.registerAllEventConsumers,
+}))
+vi.mock('@/src/modules/core/events/EventProcessor', () => ({
+  EventProcessor: { processPendingBatch: mocks.processPendingBatch },
+}))
 
 import { GET } from './route'
+
+const AUTHORIZED = {
+  headers: { authorization: 'Bearer exact-secret-0123456789abcdef012345678' },
+}
+
+const NO_EVENTS = { claimedCount: 0, processedCount: 0, failedCount: 0 }
 
 describe('GET /api/v1/cron/jobs', () => {
   beforeEach(() => {
@@ -49,6 +63,8 @@ describe('GET /api/v1/cron/jobs', () => {
     mocks.markSucceeded.mockResolvedValue(undefined)
     mocks.markFailed.mockResolvedValue(undefined)
     mocks.pruneProcessedStripeWebhooks.mockResolvedValue({ processedStripeWebhooksDeleted: 0 })
+    mocks.registerAllEventConsumers.mockReturnValue(undefined)
+    mocks.processPendingBatch.mockResolvedValue(NO_EVENTS)
   })
 
   it('fails closed when the cron secret is missing', async () => {
@@ -95,6 +111,7 @@ describe('GET /api/v1/cron/jobs', () => {
       ok: true,
       lifecycle: { enabled: false },
       durable: { ok: true, processed: 2 },
+      events: { ok: true, claimedCount: 0, processedCount: 0, failedCount: 0 },
       maintenance: { processedStripeWebhooksDeleted: 0 },
     })
     expect(mocks.runCycle).toHaveBeenCalledTimes(1)
@@ -136,6 +153,7 @@ describe('GET /api/v1/cron/jobs', () => {
       ok: true,
       lifecycle: { claimed: 1, completed: 1 },
       durable: { ok: true, processed: 2 },
+      events: { ok: true, claimedCount: 0, processedCount: 0, failedCount: 0 },
       maintenance: { processedStripeWebhooksDeleted: 0 },
     })
   })
@@ -182,5 +200,85 @@ describe('GET /api/v1/cron/jobs', () => {
     expect(mocks.markFailed).toHaveBeenCalledWith('WORKER_CYCLE_FAILED')
     expect(mocks.markSucceeded).not.toHaveBeenCalled()
     expect(mocks.pruneProcessedStripeWebhooks).not.toHaveBeenCalled()
+  })
+
+  it('registers every consumer before a single outbox event is claimed', async () => {
+    const callOrder: string[] = []
+    mocks.registerAllEventConsumers.mockImplementation(() => {
+      callOrder.push('register')
+    })
+    mocks.processPendingBatch.mockImplementation(async () => {
+      callOrder.push('drain')
+      return { claimedCount: 3, processedCount: 3, failedCount: 0 }
+    })
+
+    const response = await GET(new Request('http://localhost/api/v1/cron/jobs', AUTHORIZED))
+
+    expect(response.status).toBe(200)
+    // Draining before registration would mark every event PROCESSED with zero
+    // consumers, destroying it. The order is the whole point of the wiring.
+    expect(callOrder).toEqual(['register', 'drain'])
+    await expect(response.json()).resolves.toMatchObject({
+      events: { ok: true, claimedCount: 3, processedCount: 3, failedCount: 0 },
+    })
+  })
+
+  it('bounds the outbox batch so the drain cannot starve the durable job cycle', async () => {
+    await GET(new Request('http://localhost/api/v1/cron/jobs', AUTHORIZED))
+
+    expect(mocks.processPendingBatch).toHaveBeenCalledTimes(1)
+    const [batchSize] = mocks.processPendingBatch.mock.calls[0] as [number]
+    expect(batchSize).toBeGreaterThan(0)
+    expect(batchSize).toBeLessThanOrEqual(25)
+  })
+
+  it('still reports the durable cycle when the outbox drain fails', async () => {
+    mocks.processPendingBatch.mockRejectedValue(new Error('outbox unavailable'))
+
+    const response = await GET(new Request('http://localhost/api/v1/cron/jobs', AUTHORIZED))
+
+    expect(response.status).toBe(200)
+    await expect(response.json()).resolves.toEqual({
+      ok: true,
+      lifecycle: { enabled: false },
+      durable: { ok: true, processed: 2 },
+      events: { ok: false, errorCode: 'EVENT_DRAIN_FAILED' },
+      maintenance: { processedStripeWebhooksDeleted: 0 },
+    })
+    expect(mocks.runCycle).toHaveBeenCalledTimes(1)
+    expect(mocks.markSucceeded).toHaveBeenCalledTimes(1)
+  })
+
+  it('still drains the outbox when the durable job cycle fails', async () => {
+    mocks.runCycle.mockRejectedValue(new Error('durable queue exploded'))
+    let drained = false
+    mocks.processPendingBatch.mockImplementation(async () => {
+      drained = true
+      return NO_EVENTS
+    })
+
+    const response = await GET(new Request('http://localhost/api/v1/cron/jobs', AUTHORIZED))
+
+    expect(drained).toBe(true)
+    expect(mocks.registerAllEventConsumers).toHaveBeenCalledTimes(1)
+    // The aggregate failure contract for the durable lane is unchanged.
+    expect(response.status).toBe(500)
+    await expect(response.json()).resolves.toEqual({
+      ok: false,
+      errorCode: 'WORKER_CYCLE_FAILED',
+    })
+  })
+
+  it('never touches the outbox when an authorization or clock guard rejects the request', async () => {
+    mocks.assertDatabaseSessionUtc.mockRejectedValue(new Error('wrong zone'))
+    await GET(new Request('http://localhost/api/v1/cron/jobs', AUTHORIZED))
+
+    vi.stubEnv('DURABLE_WORKER_ENABLED', 'false')
+    await GET(new Request('http://localhost/api/v1/cron/jobs', AUTHORIZED))
+
+    await GET(new Request('http://localhost/api/v1/cron/jobs'))
+
+    expect(mocks.registerAllEventConsumers).not.toHaveBeenCalled()
+    expect(mocks.processPendingBatch).not.toHaveBeenCalled()
   })
 })

@@ -1,0 +1,48 @@
+name: Verify
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+# A second push to the same branch makes the earlier run's answer irrelevant.
+concurrency:
+  group: verify-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install locked dependencies
+        run: npm ci
+
+      # tsc resolves types from the generated Prisma client, so this must run
+      # before the typecheck. It reads the schema only — no database, and no
+      # DATABASE_URL required.
+      - name: Generate Prisma client
+        run: npx prisma generate
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Typecheck
+        run: npx tsc --noEmit
+
+      # The suites that need a real PostgreSQL database are gated behind
+      # EVENT_CORE_INTEGRATION_TEST / PHASE45_INTEGRATION_TEST /
+      # BILLING_INTEGRATION_TEST and skip here. Everything else runs with no
+      # secrets at all, which is why this job needs none — verified by running
+      # the same three steps locally with .env and .env.local removed.
+      - name: Unit and contract tests
+        run: npm test

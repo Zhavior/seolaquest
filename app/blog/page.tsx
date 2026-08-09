@@ -7,6 +7,8 @@ export const metadata = {
   title: 'SEOlaQuest Blog & Content Engine | Arcade Playbooks & Guild Lore',
   description:
     'Tactical guides on speed-to-lead velocity, metered API monetization, arcade SaaS growth, and Guild Hall lore.',
+  alternates: { canonical: '/blog' },
+  openGraph: { url: '/blog' },
 }
 
 export default function BlogPage() {

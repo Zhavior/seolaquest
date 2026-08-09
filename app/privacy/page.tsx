@@ -4,6 +4,7 @@ import { Database, ExternalLink, Lock, ShieldAlert, Trash2, UserRound } from 'lu
 export const metadata = {
   title: 'Privacy & Data Handling | SEOlaQuest',
   description: 'A plain-language account of the data SEOlaQuest currently stores and the controls still pending.',
+  alternates: { canonical: '/privacy' },
 }
 
 const storedData = [

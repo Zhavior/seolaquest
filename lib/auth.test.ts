@@ -45,6 +45,9 @@ vi.mock('@/lib/prisma', () => ({
 
 vi.mock('@/src/modules/lifecycle/domain/accountDeletion', () => ({
   subjectDigestForUserId: vi.fn(() => 'digest-user-1'),
+  // Reads the real env var rather than returning a fixed value, so the cases below control
+  // it with vi.stubEnv exactly as production would be configured.
+  accountDeletionEnabled: () => process.env.ACCOUNT_DELETION_ENABLED?.trim() === 'true',
 }))
 
 vi.mock('@/src/modules/core/infrastructure/logger', () => ({
@@ -383,12 +386,29 @@ describe('getCurrentUser provisioning for new sign-ups', () => {
     })
   })
 
-  it('logs and rethrows when lifecycle protection is unconfigured in production', async () => {
+  it('logs and rethrows when lifecycle protection is unconfigured in production and deletion is enabled', async () => {
     vi.stubEnv('NODE_ENV', 'production')
+    vi.stubEnv('ACCOUNT_DELETION_ENABLED', 'true')
 
+    // Erasure is live, so skipping the resurrection check would silently re-provision a user
+    // who requested deletion. Provisioning must stop rather than proceed unprotected.
     await expect(getCurrentUser()).rejects.toThrow('Account lifecycle protection is not configured')
     expect(mocks.logger.error).toHaveBeenCalledWith(
       expect.objectContaining({ outcomeCode: 'AUTH_USER_PROVISION_FAILED' }),
+      expect.any(String),
+    )
+  })
+
+  it('provisions with a logged warning when the secret is unconfigured but deletion is disabled', async () => {
+    vi.stubEnv('NODE_ENV', 'production')
+    vi.stubEnv('ACCOUNT_DELETION_ENABLED', 'false')
+    tx.user.create.mockResolvedValue(onboardingReadyUser())
+
+    // Nothing can have been deleted, so the skipped check had nothing to find. Blocking every
+    // new sign-up here would be pure downside — but the degradation must still be visible.
+    await expect(getCurrentUser()).resolves.toMatchObject({ id: 'user_1' })
+    expect(mocks.logger.warn).toHaveBeenCalledWith(
+      expect.objectContaining({ outcomeCode: 'AUTH_DELETION_AUDIT_SECRET_MISSING' }),
       expect.any(String),
     )
   })

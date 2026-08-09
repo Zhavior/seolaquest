@@ -46,12 +46,36 @@ describe('dead-letter inspection route', () => {
   it('returns the snapshot counts for an authorized caller', async () => {
     vi.stubEnv('OPS_SECRET', OPS_SECRET)
     const checkedAt = new Date('2026-08-04T00:00:00.000Z').toISOString()
-    mocks.snapshot.mockResolvedValue({ checkedAt, counts: { dead: 2 }, status: 'ok' })
+    const counts = { dead: 2, failedOutboxEvents: 0, agedReadyOutboxEvents: 0 }
+    mocks.snapshot.mockResolvedValue({ checkedAt, counts, status: 'ok' })
 
     const response = await GET(request(`Bearer ${OPS_SECRET}`))
 
     expect(response.status).toBe(200)
-    await expect(response.json()).resolves.toEqual({ checkedAt, counts: { dead: 2 } })
+    await expect(response.json()).resolves.toEqual({
+      checkedAt,
+      counts,
+      outbox: { deadLetters: 0, agedReady: 0 },
+    })
+  })
+
+  it('surfaces event-outbox dead letters and the aged ready backlog', async () => {
+    vi.stubEnv('OPS_SECRET', OPS_SECRET)
+    const checkedAt = new Date('2026-08-04T00:00:00.000Z').toISOString()
+    mocks.snapshot.mockResolvedValue({
+      checkedAt,
+      status: 'degraded',
+      counts: { deadJobs: 0, failedOutboxEvents: 7, agedReadyOutboxEvents: 120 },
+    })
+
+    const response = await GET(request(`Bearer ${OPS_SECRET}`))
+
+    expect(response.status).toBe(200)
+    const body = await response.json()
+    expect(body.outbox).toEqual({ deadLetters: 7, agedReady: 120 })
+    // The pre-existing shape callers poll must survive the addition.
+    expect(body.checkedAt).toBe(checkedAt)
+    expect(body.counts).toMatchObject({ deadJobs: 0, failedOutboxEvents: 7 })
   })
 
   it('returns 503 instead of an error body when the snapshot fails', async () => {

@@ -47,7 +47,15 @@ export class EventStore {
   }
 
   /**
-   * Claims ready PENDING or retryable FAILED outbox events for processing.
+   * Claims ready PENDING events, plus PROCESSING events whose lease has gone stale.
+   *
+   * FAILED is terminal. markFailed is only ever reached once attempts have reached
+   * maxAttempts, so a FAILED row is a dead letter awaiting operator attention, not a
+   * retry candidate — it is deliberately excluded from the predicate below so that an
+   * operator raising maxAttempts (or resetting attempts) on a dead-lettered row cannot
+   * silently resurrect it through a path nobody is watching. Requeueing a dead letter
+   * must be an explicit, auditable action.
+   *
    * Uses SKIP LOCKED concurrency so parallel workers do not block each other.
    */
   static async claimPendingBatch(
@@ -62,7 +70,6 @@ export class EventStore {
         FROM "DomainEventLog"
         WHERE (
             "status" = 'PENDING'
-            OR "status" = 'FAILED'
             OR ("status" = 'PROCESSING' AND "lockedAt" < ${staleCutoff})
           )
           AND "attempts" < "maxAttempts"

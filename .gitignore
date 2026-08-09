@@ -26,6 +26,9 @@
 *.pem
 
 # debug
+# Broad on purpose: test.log, next_start.log, and onboarding-debug.log were all
+# committed by accident before this line existed.
+*.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
@@ -57,3 +60,6 @@ next-env.d.ts
 # pattern; keeping them untracked stops `git add -A` from sweeping them in.
 * 2.*
 * [0-9].*
+
+# Sentry Config File
+.env.sentry-build-plugin

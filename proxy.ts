@@ -4,14 +4,28 @@ import { NextResponse } from 'next/server'
 export const PUBLIC_ROUTE_PATTERNS = [
   '/',
   '/pricing',
-  '/blog(.*)',
+  // Subtree, not prefix. '/blog(.*)' would also have made /blogadmin, /blog-internal
+  // and any future /blog<suffix> route public.
+  '/blog',
+  '/blog/(.*)',
   '/status',
   '/login',
+  // These two MUST keep the broad prefix form. <SignIn/> and <SignUp/> are mounted in
+  // Next.js optional catch-all segments (app/sign-in/[[...sign-in]]), and Clerk probes
+  // '<path>/<Component>_clerk_catchall_check_<ts>' at runtime; if that child 404s or is
+  // protected, Clerk throws a configuration error. See useEnforceCatchAllRoute in
+  // @clerk/nextjs, which explicitly prescribes adding '(.*)' to the route pattern.
   '/sign-in(.*)',
   '/sign-up(.*)',
   '/privacy',
   '/terms',
   '/api-terms',
+  // Sentry's browser tunnel (`tunnelRoute` in next.config.ts). Client-side
+  // error reports POST here instead of to sentry.io so ad-blockers do not eat
+  // them. It MUST be public: the visitors whose crashes matter most are the
+  // logged-out ones on the marketing pages, and auth.protect() would bounce
+  // their reports to /sign-in where Sentry never sees them.
+  '/monitoring(.*)',
   // These machine endpoints authenticate themselves. Keep the exceptions exact.
   '/api/v1/cron/jobs',
   '/api/v1/health/live',

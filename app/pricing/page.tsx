@@ -9,6 +9,12 @@ import { FOUNDER_LOCK_TERMS } from '@/src/modules/billing/domain/catalog'
 export const metadata = {
   title: 'Pricing | SEOlaQuest',
   description: 'SEOlaQuest plan availability and manual scan entitlements.',
+  alternates: { canonical: '/pricing' },
+  openGraph: {
+    title: 'Pricing | SEOlaQuest',
+    description: 'SEOlaQuest plan availability and manual scan entitlements.',
+    url: '/pricing',
+  },
 }
 
 /**

@@ -21,11 +21,18 @@ vi.mock('@/src/modules/core/security/RateLimiter', () => ({
 import { GET, POST, DELETE } from './route'
 
 const context = { params: {} }
+const KEYWORD_ID = '3f2504e0-4f89-41d3-9a0c-0305e82c3301'
 const jsonRequest = (method: string, body: unknown) =>
   new Request('https://seolaquest.test/api/v1/keywords', {
     method,
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),
+  })
+const rawRequest = (method: string, body: string) =>
+  new Request('https://seolaquest.test/api/v1/keywords', {
+    method,
+    headers: { 'Content-Type': 'application/json' },
+    body,
   })
 
 describe('keywords route', () => {
@@ -66,16 +73,47 @@ describe('keywords route', () => {
   it('removes a keyword by id', async () => {
     mocks.removeKeyword.mockResolvedValue(undefined)
 
-    const response = await DELETE(jsonRequest('DELETE', { id: 'k1' }), context)
+    const response = await DELETE(jsonRequest('DELETE', { id: KEYWORD_ID }), context)
 
     expect(response.status).toBe(200)
-    expect(mocks.removeKeyword).toHaveBeenCalledWith('k1')
+    expect(mocks.removeKeyword).toHaveBeenCalledWith(KEYWORD_ID)
   })
 
-  it('rejects a delete with no id', async () => {
-    const response = await DELETE(jsonRequest('DELETE', { id: '' }), context)
+  it.each([
+    ['empty', { id: '' }],
+    ['not a uuid', { id: 'k1' }],
+    ['oversized', { id: 'x'.repeat(5000) }],
+    ['missing', {}],
+  ])('rejects a %s delete id without opening a transaction', async (_label, body) => {
+    const response = await DELETE(jsonRequest('DELETE', body), context)
 
     expect(response.status).toBe(400)
     expect(mocks.removeKeyword).not.toHaveBeenCalled()
+  })
+
+  it.each([
+    ['malformed', '{"phrase":'],
+    ['empty', ''],
+  ])('answers 400 with a code for a %s POST body, never 500', async (_label, body) => {
+    const response = await POST(rawRequest('POST', body), context)
+
+    expect(response.status).toBe(400)
+    await expect(response.json()).resolves.toMatchObject({ code: 'VALIDATION_ERROR' })
+    expect(mocks.addKeyword).not.toHaveBeenCalled()
+  })
+
+  it('answers 400 with a code for a malformed DELETE body, never 500', async () => {
+    const response = await DELETE(rawRequest('DELETE', 'not json at all'), context)
+
+    expect(response.status).toBe(400)
+    await expect(response.json()).resolves.toMatchObject({ code: 'VALIDATION_ERROR' })
+    expect(mocks.removeKeyword).not.toHaveBeenCalled()
+  })
+
+  it('rejects an oversized body before parsing it', async () => {
+    const response = await POST(rawRequest('POST', JSON.stringify({ phrase: 'a'.repeat(70_000) })), context)
+
+    expect(response.status).toBe(400)
+    expect(mocks.addKeyword).not.toHaveBeenCalled()
   })
 })

@@ -3,6 +3,7 @@ import prisma from '@/lib/prisma'
 import { getCurrentUser } from '@/lib/auth'
 import type { DashboardLead } from '@/features/dashboard/types'
 import { withApiHandler } from '@/src/modules/core/infrastructure/api-handler'
+import { logger } from '@/src/modules/core/infrastructure/logger'
 
 export const dynamic = 'force-dynamic'
 
@@ -38,7 +39,15 @@ export const GET = withApiHandler(async () => {
       leads: dashboardLeads,
     })
   } catch (error) {
-    console.error('dashboard leads hydration failed', error)
+    // requestId/userId/path/ip are injected by withApiHandler's AsyncLocalStorage store.
+    logger.error(
+      {
+        err: error,
+        event: 'dashboard_leads_hydration_failed',
+        outcomeCode: 'DASHBOARD_LEADS_HYDRATION_FAILED',
+      },
+      'Dashboard leads hydration failed',
+    )
     return NextResponse.json(
       {
         ok: false,

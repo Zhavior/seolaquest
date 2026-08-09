@@ -10,6 +10,7 @@ const mocks = vi.hoisted(() => ({
   leadMatchCreateMany: vi.fn(),
   transaction: vi.fn(),
   loggerWarn: vi.fn(),
+  domainEventCreate: vi.fn(),
 }))
 
 const tx = {
@@ -20,6 +21,9 @@ const tx = {
   },
   leadMatch: { createMany: mocks.leadMatchCreateMany },
   providerScanAttempt: { update: mocks.attemptUpdate },
+  // `opportunity.discovered` shares the lead-insert transaction, so it is written on this
+  // client — the atomicity the whole outbox pattern depends on.
+  domainEventLog: { create: mocks.domainEventCreate },
 }
 
 vi.mock('server-only', () => ({}))
@@ -65,7 +69,15 @@ describe('ScanProviderService', () => {
     mocks.transaction.mockImplementation(async (callback: (client: typeof tx) => unknown) => callback(tx))
     mocks.leadCreateMany.mockResolvedValue({ count: 1 })
     mocks.leadUpdateMany.mockResolvedValue({ count: 1 })
-    mocks.leadFindMany.mockResolvedValue([{ id: 'lead-1', externalPostId: 'tw_1234567890' }])
+    /**
+     * `lead.findMany` is now called TWICE per attempt, and the order carries meaning:
+     * first the pre-insert read that establishes which posts we had already stored, then the
+     * post-insert read that resolves ids for LeadMatch. Default here is the first-sighting
+     * case — nothing stored beforehand, one lead afterwards.
+     */
+    mocks.leadFindMany.mockImplementation(async ({ select }: { select?: Record<string, unknown> }) =>
+      select?.id ? [{ id: 'lead-1', externalPostId: 'tw_1234567890' }] : [],
+    )
     mocks.leadMatchCreateMany.mockResolvedValue({ count: 1 })
     mocks.attemptUpdate.mockResolvedValue({ id: 'attempt-1' })
   })
@@ -191,5 +203,82 @@ describe('ScanProviderService', () => {
     expect(peak).toBeLessThanOrEqual(MAX_PROVIDER_CONCURRENCY)
     expect(peak).toBeLessThan(20)
     expect(mocks.attemptUpsert).toHaveBeenCalledTimes(10)
+  })
+
+  /**
+   * THE DISCOVERY PRODUCER.
+   *
+   * `opportunity.discovered` is the event Aurora consumes; nothing produced it before, which
+   * is why Aurora had never run. It must fire exactly once per lead, on first sight only, and
+   * inside the same transaction as the insert.
+   */
+  describe('opportunity.discovered', () => {
+    function oneFreshPost() {
+      vi.stubEnv('TWITTER_BEARER_TOKEN', 'configured-token')
+      mocks.keywordFindMany.mockResolvedValue([{ id: 'kw-1', phrase: 'need a CRM' }])
+      vi.stubGlobal('fetch', vi.fn().mockImplementation(async () => (
+        new Response(JSON.stringify(xBody()), { status: 200 })
+      )))
+    }
+
+    it('emits one event per newly stored lead, on the insert transaction', async () => {
+      oneFreshPost()
+
+      await ScanProviderService.scanTenant('user-1', 'run-1')
+
+      expect(mocks.domainEventCreate).toHaveBeenCalledTimes(1)
+      expect(mocks.domainEventCreate).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({
+            type: 'opportunity.discovered',
+            status: 'PENDING',
+            // Keyed on the lead so a replayed scan cannot enqueue a second evaluation.
+            idempotencyKey: 'opportunity.discovered:lead-1',
+            payload: expect.objectContaining({
+              // A Lead IS the opportunity — both ids are the lead's.
+              opportunityId: 'lead-1',
+              leadId: 'lead-1',
+              // The tenant has to ride the payload: the outbox worker has no session, and
+              // without it Aurora cannot meter its Gemini spend against anyone.
+              userId: 'user-1',
+              keywordId: 'kw-1',
+              platform: 'TWITTER',
+            }),
+          }),
+        }),
+      )
+    })
+
+    it('does not re-emit for a post seen on an earlier scan', async () => {
+      oneFreshPost()
+      // The pre-insert read finds it already stored: this is a re-observation, and the
+      // insert is a no-op under skipDuplicates. Re-emitting would make Aurora re-evaluate
+      // — and re-bill — the same lead on every daily scan, forever.
+      mocks.leadFindMany.mockResolvedValue([{ id: 'lead-1', externalPostId: 'tw_1234567890' }])
+
+      await ScanProviderService.scanTenant('user-1', 'run-1')
+
+      expect(mocks.domainEventCreate).not.toHaveBeenCalled()
+      // The lead itself is still touched: observedAt refreshes and LeadMatch still records
+      // that this scan saw it.
+      expect(mocks.leadUpdateMany).toHaveBeenCalled()
+      expect(mocks.leadMatchCreateMany).toHaveBeenCalled()
+    })
+
+    it('keeps the scan alive when an event payload cannot be built', async () => {
+      oneFreshPost()
+      // A lead whose provider record vanished from the batch: skipped with a warning rather
+      // than aborting the transaction and losing every other lead in the same scan.
+      mocks.leadFindMany.mockImplementation(async ({ select }: { select?: Record<string, unknown> }) =>
+        select?.id ? [{ id: 'lead-1', externalPostId: 'tw_does_not_match' }] : [],
+      )
+
+      await expect(ScanProviderService.scanTenant('user-1', 'run-1')).resolves.toMatchObject({
+        providerSucceeded: true,
+      })
+
+      expect(mocks.domainEventCreate).not.toHaveBeenCalled()
+      expect(mocks.attemptUpdate).toHaveBeenCalled()
+    })
   })
 })

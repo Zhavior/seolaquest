@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { withApiHandler } from '@/src/modules/core/infrastructure/api-handler'
+import { safeJson } from '@/src/modules/core/infrastructure/safeJson'
 import { KeywordService } from '@/src/modules/keywords/application/KeywordService'
 
 export const GET = withApiHandler(async () => {
@@ -13,20 +14,22 @@ const PostKeywordSchema = z.object({
 })
 
 export const POST = withApiHandler(async (req) => {
-  const body = await req.json()
-  const { phrase } = PostKeywordSchema.parse(body)
+  const { phrase } = PostKeywordSchema.parse(await safeJson(req))
   const keyword = await KeywordService.addKeyword(phrase)
 
   return NextResponse.json({ success: true, keyword })
 })
 
 const DeleteKeywordSchema = z.object({
-  id: z.string().min(1, 'Keyword ID required'),
+  // TrackedKeyword.id is `String @id @default(uuid())` (prisma/schema.prisma), and the sibling
+  // id-taking routes (scans/[id], crm-deliveries/[id]) already validate as uuid. A bare
+  // `min(1)` accepted an arbitrarily long string and forwarded it into a $transaction, opening
+  // a DB transaction and connection per request for input that can never match a row.
+  id: z.string().uuid('Keyword ID must be a valid UUID'),
 })
 
 export const DELETE = withApiHandler(async (req) => {
-  const body = await req.json()
-  const { id } = DeleteKeywordSchema.parse(body)
+  const { id } = DeleteKeywordSchema.parse(await safeJson(req))
 
   await KeywordService.removeKeyword(id)
 
