@@ -47,6 +47,7 @@ model User {
   crmDeliveries          CrmExportDelivery[]
   accountDeletionRequest AccountDeletionRequest?
   auditTrails            AuditTrail[]
+  gamifyProfile          GamifyProfile?
 
   @@index([createdAt])
 }
@@ -386,4 +387,211 @@ model AuditTrail {
   @@index([userId, createdAt])
   @@index([action, createdAt])
   @@index([entityType, entityId])
+}
+
+model DomainEventLog {
+  id             String    @id @default(uuid())
+  eventId        String    @unique
+  type           String
+  version        Int       @default(1)
+  actorId        String
+  source         String
+  correlationId  String
+  causationId    String?
+  idempotencyKey String    @unique
+  payload        Json
+  metadata       Json?
+  status         String    @default("PENDING") // PENDING, PROCESSING, PROCESSED, FAILED
+  attempts       Int       @default(0)
+  maxAttempts    Int       @default(5)
+  availableAt    DateTime  @default(now())
+  lockedAt       DateTime?
+  lastErrorCode  String?
+  occurredAt     DateTime
+  processedAt    DateTime?
+  createdAt      DateTime  @default(now())
+
+  consumerReceipts DomainEventConsumerReceipt[]
+
+  @@index([status, availableAt, createdAt])
+  @@index([status, lockedAt])
+  @@index([actorId, type, occurredAt])
+  @@index([correlationId])
+}
+
+model DomainEventConsumerReceipt {
+  id            String         @id @default(uuid())
+  eventId       String
+  event         DomainEventLog @relation(fields: [eventId], references: [eventId], onDelete: Cascade)
+  consumerKey   String
+  status        String         @default("PROCESSED") // PROCESSED, FAILED
+  attemptCount  Int            @default(1)
+  lastError     String?
+  processedAt   DateTime?
+  lastAttemptAt DateTime       @default(now())
+  createdAt     DateTime       @default(now())
+
+  @@unique([eventId, consumerKey])
+  @@index([consumerKey, status])
+}
+
+model AuroraDecision {
+  id                         String   @id @default(uuid())
+  opportunityId              String
+  sourceEventId              String
+  finalScore                 Int
+  confidence                 Float
+  priority                   String // LOW, MEDIUM, HIGH, CRITICAL
+  recommendedAction          String // IGNORE, WATCH, ENGAGE
+  deterministicSignals       Json
+  semanticSignals            Json?
+  reasons                    Json // JSON Array of strings
+  policyFlags                Json // JSON Array of strings
+  classifierProvider         String?
+  classifierModel            String?
+  classifierVersion          String
+  deterministicScorerVersion String
+  policyVersion              String
+  semanticFailureCode        String?
+  evaluationStatus           String // LIVE, DETERMINISTIC_ONLY, FALLBACK, UNAVAILABLE
+  createdAt                  DateTime @default(now())
+
+  feedbacks AuroraFeedback[]
+
+  @@unique([sourceEventId, deterministicScorerVersion, classifierVersion, policyVersion])
+  @@index([opportunityId])
+  @@index([recommendedAction, priority])
+}
+
+model AuroraFeedback {
+  id           String         @id @default(uuid())
+  decisionId   String
+  decision     AuroraDecision @relation(fields: [decisionId], references: [id], onDelete: Cascade)
+  feedbackType String // DISMISSED, SAVED, ENGAGED, REPLIED, QUALIFIED, CONVERTED, MANUAL_OVERRIDE
+  source       String
+  correction   Json?
+  createdAt    DateTime       @default(now())
+
+  @@index([decisionId])
+  @@index([feedbackType])
+}
+
+model GamifyProfile {
+  userId     String   @id
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lifetimeXp Int      @default(0)
+  level      Int      @default(1)
+  reputation Int      @default(0)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  xpTransactions         GamifyXpTransaction[]
+  reputationTransactions GamifyReputationTransaction[]
+  questAssignments       GamifyQuestAssignment[]
+}
+
+model GamifyXpTransaction {
+  id             String               @id @default(uuid())
+  actorId        String
+  profile        GamifyProfile        @relation(fields: [actorId], references: [userId], onDelete: Cascade)
+  sourceEventId  String
+  targetKey      String?
+  ruleId         String
+  ruleVersion    Int
+  entryType      String // AWARD, REVERSAL
+  amount         Int
+  reason         String
+  idempotencyKey String               @unique // award:{actorId}:{sourceEventId}:{ruleId}:{ruleVersion} OR reversal:{originalTransactionId}
+  reversalOfId   String?              @unique
+  reversalOf     GamifyXpTransaction? @relation("XpReversal", fields: [reversalOfId], references: [id], onDelete: Restrict)
+  reversedBy     GamifyXpTransaction? @relation("XpReversal")
+  createdAt      DateTime             @default(now())
+
+  @@index([actorId, createdAt])
+  @@index([actorId, ruleId, targetKey])
+  @@index([sourceEventId])
+}
+
+model GamifyReputationTransaction {
+  id             String                       @id @default(uuid())
+  actorId        String
+  profile        GamifyProfile                @relation(fields: [actorId], references: [userId], onDelete: Cascade)
+  sourceEventId  String
+  targetKey      String?
+  ruleId         String
+  ruleVersion    Int
+  entryType      String // AWARD, REVERSAL
+  amount         Int
+  reason         String
+  idempotencyKey String                       @unique
+  reversalOfId   String?                      @unique
+  reversalOf     GamifyReputationTransaction? @relation("ReputationReversal", fields: [reversalOfId], references: [id], onDelete: Restrict)
+  reversedBy     GamifyReputationTransaction? @relation("ReputationReversal")
+  createdAt      DateTime                     @default(now())
+
+  @@index([actorId, createdAt])
+  @@index([actorId, ruleId, targetKey])
+  @@index([sourceEventId])
+}
+
+model GamifyQuest {
+  id           String    @id @default(uuid())
+  code         String
+  version      Int
+  title        String
+  description  String
+  type         String // ONBOARDING, DAILY, WEEKLY, MILESTONE, AURORA
+  eventType    String
+  eventVersion Int       @default(1)
+  target       Int
+  rewardXp     Int
+  enabled      Boolean   @default(true)
+  startsAt     DateTime?
+  endsAt       DateTime?
+  createdAt    DateTime  @default(now())
+
+  assignments GamifyQuestAssignment[]
+
+  @@unique([code, version])
+  @@index([eventType, eventVersion, enabled])
+  @@index([enabled, startsAt, endsAt])
+}
+
+model GamifyQuestAssignment {
+  id          String        @id @default(uuid())
+  questId     String
+  quest       GamifyQuest   @relation(fields: [questId], references: [id], onDelete: Restrict)
+  actorId     String
+  profile     GamifyProfile @relation(fields: [actorId], references: [userId], onDelete: Cascade)
+  cycleKey    String        @default("once")
+  progress    Int           @default(0)
+  target      Int
+  rewardXp    Int
+  status      String        @default("IN_PROGRESS") // IN_PROGRESS, COMPLETED, CLAIMED, EXPIRED
+  assignedAt  DateTime      @default(now())
+  completedAt DateTime?
+  claimedAt   DateTime?
+  expiresAt   DateTime?
+
+  contributions GamifyQuestContribution[]
+
+  @@unique([actorId, questId, cycleKey])
+  @@index([actorId, status, assignedAt])
+  @@index([status, expiresAt])
+}
+
+model GamifyQuestContribution {
+  id                 String                @id @default(uuid())
+  assignmentId       String
+  assignment         GamifyQuestAssignment @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+  sourceEventId      String
+  sourceEventType    String
+  sourceEventVersion Int
+  increment          Int                   @default(1)
+  occurredAt         DateTime
+  createdAt          DateTime              @default(now())
+
+  @@unique([assignmentId, sourceEventId])
+  @@index([sourceEventId])
+  @@index([assignmentId, createdAt])
 }

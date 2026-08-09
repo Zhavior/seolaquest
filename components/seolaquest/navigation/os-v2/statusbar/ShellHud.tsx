@@ -21,15 +21,12 @@ export default function ShellHud({ user }: { user?: Partial<ShellUser> }) {
   const playerLevel = user?.level ?? 1
   const playerXp = user?.xp ?? 0
   const xpRequired = user?.xpRequired ?? 100
-  const xpPercent = xpRequired > 0 ? Math.min(100, Math.round((playerXp / xpRequired) * 100)) : 0
-  const activeXpSegments = Math.round((xpPercent / 100) * 8)
 
   // MP is the scan-credit balance: one credit is spent per queued scan and
   // refunded if that scan fails. `maxCredits` is a high-water mark, so it can sit
   // at 0 for an account that has never been granted an allocation.
   const currentMp = user?.questsRemaining ?? 0
   const maxMp = Math.max(user?.maxCredits ?? 0, currentMp)
-  const activeManaSegments = maxMp > 0 ? Math.round((currentMp / maxMp) * 8) : 0
   const openQuests = user?.openQuests ?? 0
 
   return (
