@@ -378,6 +378,32 @@ When adding a backend surface:
 - [ ] If it emits domain events, write them through `EventStore.writeOutbox` **inside** the
       domain transaction.
 
+### 10.1 Auditing the shadow copies
+
+macOS/cloud-sync clients duplicate files as `Foo 2.tsx`, and `.gitignore` hides them from git
+while `--ignore-pattern '**/* 2.*'` hides them from lint. Nothing imports them, so tsc and the
+build stay silent too — they are invisible to every gate this document otherwise relies on. They
+recur, so this is an audit to repeat, not a one-time cleanup. Classify before deleting: they are
+untracked, so `rm` is unrecoverable and a shadow with no original is the *only* copy of that file.
+
+```bash
+find . -path ./node_modules -prune -o -path ./.next -prune -o -name "* [0-9].*" -print | while read -r f; do
+  orig=$(echo "$f" | sed -E 's/ [0-9]+\././')
+  if   [ ! -e "$orig" ];                    then echo "ORPHAN    | $f"
+  elif diff -q "$f" "$orig" >/dev/null 2>&1; then echo "IDENTICAL | $f"
+  else                                            echo "DRIFTED   | $f"; fi
+done | sort
+```
+
+The August 2026 sweep found 58: 31 identical, 25 drifted, 2 orphans. Both categories beyond
+"identical" matter. `RateLimiter 2.ts` was *drifted*, not byte-identical as this document
+previously claimed — 152 lines against the real file's 301, a pre-hardening copy with no `ai`
+tier, no `HASHED_TYPES` and no fail-closed branch. A reader who opened it looking for the limiter
+would have found a version whose security properties this document describes but which the code
+no longer has. The orphans were a stale test importing a `./route` that had since been split into
+`live/` and `ready/`, and `CoQuestShell 2.tsx` — the sole surviving copy of the pre-rebrand shell,
+superseded by `SEOlaQuestShell.tsx`.
+
 ---
 
 ## 11. Known open risks
@@ -390,7 +416,7 @@ Tracked deliberately rather than silently. Current as of the August 2026 hardeni
 | `GeminiSemanticClassifier.classify` is a hardcoded mock returning `confidence: 0.85` | `src/modules/aurora/classifiers/` | Open |
 | Deep-cloned `sanitizeDetails` output is the only thing keeping zod's `received` (the caller's rejected input) out of 4xx bodies | `errors.ts` + every route that passes `details` | Open — convention, not enforced |
 | Event graph has no producer for `opportunity.discovered` / `opportunity.engaged` / `lead.converted`, and no consumer for `aurora.opportunity.evaluated` | events + gamify | Open — see `AURORA_GAMIFY_ARCHITECTURE.md` |
-| Byte-identical shadow copies (`RateLimiter 2.ts`, `AuditService 2.ts`, `idempotency 2.ts`) hidden from git and lint by the `* [0-9].*` ignore pattern; will drift from the originals | `src/modules/core/security/` | Open — untracked, so deletion is unrecoverable |
+| macOS/cloud-sync shadow copies (`Foo 2.tsx`) reappear in bulk and are invisible to git, lint and tsc via the `* 2.*` / `* [0-9].*` ignore patterns | repo-wide | **Cleared 2026-08-09 (58 files). Recurrence is the risk, not the files** — re-run the audit below whenever the sync client has been active. |
 | Backlogged `DomainEventLog` rows replay in one tick on first deploy of the drain | cron | **Checked 2026-08-09 against the Supabase instance in `.env.local`: `DomainEventLog` and `DomainEventConsumerReceipt` are both empty, so there is no backlog to replay.** Consistent rather than surprising — the only two `writeOutbox` producers are `AuroraService:158` and `AuroraFeedbackService:75`, and `AuroraDecision`/`AuroraFeedback` are also empty, so neither has ever run. Re-check against the deploy target if it is a different instance than the one configured locally. |
 | `getCurrentUser()` is not memoized: each call is `auth()` + a `findUnique` + two deletion-state queries, so a request that calls it twice pays ~6 round trips | `lib/auth.ts` | Open — cost, not correctness |
 | A catch neither logs nor rethrows and returns `error.message` to the client, leaking Prisma internals | `app/app/admin/aurora/actions.ts` | Open — pre-existing, in untracked code, action has no callers |
