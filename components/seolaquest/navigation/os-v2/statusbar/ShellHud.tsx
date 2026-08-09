@@ -1,7 +1,35 @@
 import Link from 'next/link'
-import { User, Zap } from 'lucide-react'
+import { Scroll, Sparkles, User, Zap } from 'lucide-react'
 
 import type { ShellUser } from '@/lib/shellUser'
+
+/** Notches in the EXP and MP meters — segments, not a smooth bar. */
+const METER_SEGMENTS = 8
+
+function segmentsFor(value: number, ceiling: number) {
+  if (ceiling <= 0) return 0
+  return Math.round((Math.min(value, ceiling) / ceiling) * METER_SEGMENTS)
+}
+
+/**
+ * A meter is a picture of the number the pill already states in text beside it,
+ * so it is hidden from assistive tech rather than read out twice. It also drops
+ * below `lg`, where the pills have to share the bar with the name badge.
+ */
+function Meter({ filled, fillClass }: { filled: number; fillClass: string }) {
+  return (
+    <div aria-hidden="true" className="hidden items-center gap-0.5 lg:flex">
+      {Array.from({ length: METER_SEGMENTS }).map((_, index) => (
+        <span
+          key={index}
+          className={`inline-block h-2.5 w-1 border border-outline ${
+            index < filled ? fillClass : 'bg-inset'
+          }`}
+        />
+      ))}
+    </div>
+  )
+}
 
 /**
  * The status bar's telemetry cluster: quests waiting, EXP meter, MP meter and
@@ -27,26 +55,96 @@ export default function ShellHud({ user }: { user?: Partial<ShellUser> }) {
   // at 0 for an account that has never been granted an allocation.
   const currentMp = user?.questsRemaining ?? 0
   const maxMp = Math.max(user?.maxCredits ?? 0, currentMp)
+
+  // Signals still waiting in the queue. Zero is a state worth showing, not a
+  // reason to hide the counter: an empty board is information.
   const openQuests = user?.openQuests ?? 0
+
+  // Each reading is one string rather than nested spans. Split across elements a
+  // meter reads as "18" then "/50" to anything walking the DOM — a screen reader
+  // included — and the number the user sees stops being a number anyone can
+  // assert on.
+  const questLabel = `${openQuests} QUESTS`
+  const xpLabel = `XP ${playerXp.toLocaleString()}/${xpRequired.toLocaleString()}`
+  const mpLabel = `${currentMp}/${maxMp} MP`
+  const levelLabel = `LVL ${playerLevel}`
 
   return (
     <>
-      {/* MOBILE: MP only */}
-      <div className="flex md:hidden items-center gap-1 border-2 border-outline bg-card px-2 h-9 text-[9px] font-black uppercase shadow-brutal-sm">
-        <Zap className="size-2.5 shrink-0 text-[#06B6D4] animate-pulse" strokeWidth={3} />
-        <span>{currentMp}<span className="opacity-60">/{maxMp}</span></span>
+      {/* MOBILE: numbers only — there is no room for the words */}
+      <div className="flex items-center gap-1 md:hidden">
+        <Link
+          href="/app/runs"
+          aria-label={questLabel}
+          title={`${openQuests} signals waiting for action`}
+          className="flex h-9 items-center gap-1 border-2 border-outline bg-accent-2 px-2 text-[9px] font-black uppercase text-white shadow-brutal-sm"
+        >
+          <Scroll aria-hidden="true" className="size-2.5 shrink-0" strokeWidth={3} />
+          <span>{openQuests}</span>
+        </Link>
+
+        {/*
+          `role="img"` so the abbreviated reading is announced in full: a generic
+          div cannot carry an accessible name, and "18/50" on its own says
+          nothing about what is being counted.
+        */}
+        <div
+          role="img"
+          aria-label={mpLabel}
+          className="flex h-9 items-center gap-1 border-2 border-outline bg-card px-2 text-[9px] font-black uppercase shadow-brutal-sm"
+        >
+          <Zap aria-hidden="true" className="size-2.5 shrink-0 text-[#06B6D4] animate-pulse" strokeWidth={3} />
+          <span>{`${currentMp}/${maxMp}`}</span>
+        </div>
+
+        <div
+          role="img"
+          aria-label={levelLabel}
+          className="flex h-9 items-center border-2 border-outline bg-highlight-strong px-2 font-mono text-[9px] font-black uppercase text-on-accent shadow-brutal-sm"
+        >
+          {`L${playerLevel}`}
+        </div>
       </div>
 
-      {/* DESKTOP: compact pills */}
+      {/*
+        DESKTOP: compact pills, revealed in the order the bar can afford them.
+        The status bar also carries the brand, the sound toggle and the recharge
+        CTA, so from `md` a pill shows its label, from `lg` its meter, and only
+        from `xl` its raw numbers — anything eagerer clips the CTA.
+      */}
       <div className="hidden items-center gap-1.5 md:flex">
+
+        {/* Quests waiting */}
+        <Link
+          href="/app/runs"
+          title={`${openQuests} signals waiting for action`}
+          className="flex h-9 items-center gap-1.5 border-2 border-outline bg-accent-2 px-2.5 text-[11px] font-black uppercase tracking-wider text-white shadow-brutal-sm transition-transform duration-150 hover:-translate-y-0.5 hover:shadow-brutal active:translate-y-0 active:shadow-none"
+        >
+          <Scroll aria-hidden="true" className="size-3.5 shrink-0" strokeWidth={3} />
+          <span>{questLabel}</span>
+        </Link>
+
+        {/* EXP toward the next level */}
+        <div
+          title={`${playerXp} of ${xpRequired} XP toward level ${playerLevel + 1}`}
+          className="flex h-9 items-center gap-1.5 border-2 border-outline bg-card px-2.5 text-[11px] font-black uppercase tracking-wider shadow-brutal-sm"
+        >
+          <Sparkles aria-hidden="true" className="size-3.5 shrink-0 text-warning" strokeWidth={3} />
+          <span className="border-2 border-outline bg-highlight-strong px-1 font-mono text-[9px] font-black text-on-accent">
+            {levelLabel}
+          </span>
+          <Meter filled={segmentsFor(playerXp, xpRequired)} fillClass="bg-accent" />
+          <span className="hidden font-mono text-[10px] text-ink xl:inline">{xpLabel}</span>
+        </div>
 
         {/* MP / scan credits */}
         <div
           title={`${currentMp} scan credits — each scan costs 1 MP`}
-          className="flex items-center gap-1.5 border-2 border-outline bg-card px-2.5 h-9 text-[11px] font-black uppercase tracking-wider shadow-brutal-sm"
+          className="flex h-9 items-center gap-1.5 border-2 border-outline bg-card px-2.5 text-[11px] font-black uppercase tracking-wider shadow-brutal-sm"
         >
           <Zap aria-hidden="true" className="size-3.5 shrink-0 text-[#06B6D4] animate-pulse" strokeWidth={3} />
-          <span className="text-ink">{currentMp}<span className="text-ink-muted">/{maxMp}</span> MP</span>
+          <Meter filled={segmentsFor(currentMp, maxMp)} fillClass="bg-info" />
+          <span className="text-ink">{mpLabel}</span>
         </div>
 
         {/* User name badge */}

@@ -7,12 +7,122 @@ import LogOutButton from '@/components/auth/LogOutButton'
 import { sfx } from '@/lib/sfx'
 
 import { navigation } from '../../os/shared/navigation'
+import { useTheme } from '@/components/theme/ThemeProvider'
+import { THEME_META, type Theme } from '@/components/theme/theme-config'
+import clsx from 'clsx'
 
 interface SidebarProps {
   collapsed?: boolean
-  mobileOpen?: boolean
-  onCloseMobile?: () => void
   onToggleCollapsed?: () => void
+}
+
+/**
+ * Swatch colours preview *other* themes, so they cannot come from the theme
+ * tokens — those always resolve to whichever theme is currently applied. The
+ * labels do come from `THEME_META`, which owns the naming.
+ */
+const THEME_SWATCHES: { key: Theme; bg: string; ring: string; textClass: string }[] = [
+  { key: 'parchment', bg: '#E8E0D0', ring: '#B0A090', textClass: 'text-[#4A3F2F]' },
+  { key: 'grey', bg: '#2D3340', ring: '#4A5260', textClass: 'text-[#C8D0DC]' },
+  { key: 'blue', bg: '#0F1E45', ring: '#2A4080', textClass: 'text-[#7EB8F0]' },
+]
+
+function SidebarThemePicker({ collapsed = false, mobile = false }: { collapsed?: boolean; mobile?: boolean }) {
+  const { theme, setTheme } = useTheme()
+
+  if (collapsed && !mobile) {
+    return (
+      <div
+        role="radiogroup"
+        aria-label="Interface theme"
+        className="flex flex-col gap-1.5 w-full border-t-2 border-outline pt-3 mt-1"
+      >
+        {THEME_SWATCHES.map(({ key, bg, ring }) => {
+          const active = theme === key
+          return (
+            <button
+              key={key}
+              type="button"
+              role="radio"
+              aria-checked={active}
+              aria-label={THEME_META[key].label}
+              title={THEME_META[key].label}
+              onClick={() => {
+                if (key !== theme) {
+                  setTheme(key)
+                  sfx.playSidebarCollapse()
+                }
+              }}
+              className={clsx(
+                'w-full h-8 border-2 transition-all duration-150',
+                active ? 'shadow-brutal-sm -translate-y-[1px]' : 'opacity-60 hover:opacity-90 hover:-translate-y-[1px]'
+              )}
+              style={{
+                backgroundColor: bg,
+                borderColor: active ? ring : 'rgba(0,0,0,0.35)',
+              }}
+            />
+          )
+        })}
+      </div>
+    )
+  }
+
+  return (
+    <div className="mt-4 border-t-2 border-outline pt-4">
+      <p className="text-[10px] font-black text-ink-muted uppercase tracking-[0.18em] px-1 flex items-center gap-1.5 mb-2">
+        <Sparkles className="size-3 text-ink-muted" />
+        Interface Theme
+      </p>
+      <div
+        role="radiogroup"
+        aria-label="Interface theme"
+        className="grid grid-cols-3 gap-1.5"
+      >
+        {THEME_SWATCHES.map(({ key, bg, ring, textClass }) => {
+          const active = theme === key
+          return (
+            <button
+              key={key}
+              type="button"
+              role="radio"
+              aria-checked={active}
+              aria-label={THEME_META[key].label}
+              title={THEME_META[key].label}
+              onClick={() => {
+                if (key !== theme) {
+                  setTheme(key)
+                  sfx.playSidebarCollapse()
+                }
+              }}
+              className={clsx(
+                'relative flex flex-col items-center gap-1.5 py-2 px-1 border-2 font-black text-[9px] uppercase tracking-widest leading-none transition-all duration-150',
+                'active:translate-y-[1px]',
+                active
+                  ? 'shadow-brutal-sm -translate-y-0.5'
+                  : 'opacity-60 hover:opacity-90 hover:-translate-y-0.5',
+              )}
+              style={{
+                backgroundColor: bg,
+                borderColor: active ? ring : 'rgba(0,0,0,0.35)',
+                outline: active ? `2px solid ${ring}` : 'none',
+                outlineOffset: '1px',
+              }}
+            >
+              <span
+                className="block w-full h-3 rounded-sm border border-black/20"
+                style={{ backgroundColor: bg, filter: 'brightness(0.85) saturate(1.1)' }}
+              />
+              <span className={clsx('leading-none', textClass)}>{THEME_META[key].short}</span>
+              {active && (
+                <span className="absolute -top-1 -right-1 size-2 rounded-full bg-accent border border-outline" />
+              )}
+            </button>
+          )
+        })}
+      </div>
+    </div>
+  )
 }
 
 const sections = [
@@ -107,6 +217,8 @@ function NavigationContent({
 
         {/* Bottom Collapsed Icon Actions */}
         <div className="flex flex-col items-center gap-3 w-full">
+          <SidebarThemePicker collapsed={true} />
+
           <div className="grid size-10 place-items-center border-2 border-outline bg-success shadow-brutal-sm" title="3/3 Party Agents Active">
             <span className="h-2.5 w-2.5 rounded-full bg-black border border-white animate-pulse" />
           </div>
@@ -220,6 +332,8 @@ function NavigationContent({
 
       {/* Bottom Sidebar Mini-Party Status Card & Log Out */}
       <div className="mt-5 space-y-3 pt-2">
+        <SidebarThemePicker mobile={mobile} />
+
         <div className="border-3 border-outline bg-success p-3.5 shadow-brutal relative overflow-hidden">
           <div className="flex items-center justify-between text-xs font-black uppercase mb-1.5 tracking-wider">
             <div className="flex items-center gap-2">
@@ -258,42 +372,22 @@ function NavigationContent({
 
 export { NavigationContent as SidebarNavigation }
 
-export default function Sidebar({
-  collapsed = false,
-  mobileOpen = false,
-  onCloseMobile = () => {},
-  onToggleCollapsed = () => {},
-}: SidebarProps) {
+/**
+ * The desktop rail. Mobile is not this component's business: `MobileAppShell`
+ * owns the off-canvas drawer — with the focus trap, Escape handling and scroll
+ * lock a drawer needs — and fills it with `SidebarNavigation`. A second drawer
+ * lived here until it turned out nothing mounted it.
+ */
+export default function Sidebar({ collapsed = false, onToggleCollapsed = () => {} }: SidebarProps) {
   return (
-    <>
-      <aside
-        aria-label="Sidebar navigation"
-        role="navigation"
-        className={`border-r-4 border-outline bg-card p-0 hidden md:flex flex-col justify-between shadow-[4px_0px_0px_0px_rgba(0,0,0,1)] h-full overflow-y-auto shrink-0 transition-[width,padding] duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${
-          collapsed ? 'w-20' : 'w-72'
-        }`}
-      >
-        <NavigationContent collapsed={collapsed} onToggleCollapsed={onToggleCollapsed} />
-      </aside>
-
-      {mobileOpen && (
-        <div className="fixed inset-0 z-50 md:hidden">
-          <button
-            type="button"
-            aria-label="Close navigation"
-            onClick={onCloseMobile}
-            className="absolute inset-0 bg-black/55 backdrop-blur-xs transition-opacity"
-          />
-
-          <aside
-            aria-label="Mobile navigation"
-            role="navigation"
-            className="absolute inset-y-0 left-0 h-dvh w-[88vw] max-w-[320px] border-r-4 border-outline bg-card shadow-[10px_0_0_rgba(0,0,0,0.25)]"
-          >
-            <NavigationContent mobile onNavigate={onCloseMobile} />
-          </aside>
-        </div>
-      )}
-    </>
+    <aside
+      aria-label="Sidebar navigation"
+      role="navigation"
+      className={`border-r-4 border-outline bg-card p-0 hidden md:flex flex-col justify-between shadow-[4px_0px_0px_0px_rgba(0,0,0,1)] h-full overflow-y-auto shrink-0 transition-[width,padding] duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+        collapsed ? 'w-20' : 'w-72'
+      }`}
+    >
+      <NavigationContent collapsed={collapsed} onToggleCollapsed={onToggleCollapsed} />
+    </aside>
   )
 }
