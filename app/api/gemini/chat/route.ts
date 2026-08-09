@@ -77,8 +77,15 @@ export const POST = withApiHandler(async (request) => {
    * caller cannot multiply their allowance by rotating networks. `ai` is in HASHED_TYPES,
    * so the id is HMAC'd before it becomes a Redis key.
    *
-   * Charged before the body is read, like app/api/x/post: a caller who is over budget must
-   * not be able to make us parse their payload first.
+   * Charged before the body is read: sign-up is public, so this route is reachable by
+   * anyone who registers, and a caller who is over budget must not be able to make us
+   * buffer and parse their payload first.
+   *
+   * app/api/x/post deliberately does the opposite and charges after validation. The
+   * tradeoff differs there: that route is allowlist-only, so the parse can only ever be
+   * forced by an admin, and its budget is 8/24h — small enough that spending it on
+   * requests that never reach X locks the admin out for a day. The per-request AI budget
+   * below (AiUsageLimiter) follows that same after-validation rule for the same reason.
    */
   await RateLimiterService.enforce({ type: 'ai', identifier: user.id })
 

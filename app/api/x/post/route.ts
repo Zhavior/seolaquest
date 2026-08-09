@@ -4,6 +4,7 @@ import { getCurrentUser } from '@/lib/auth'
 import { z } from 'zod'
 import { RateLimiterService } from '@/src/modules/core/security/RateLimiter'
 import { AppError } from '@/src/modules/core/infrastructure/errors'
+import { safeJson } from '@/src/modules/core/infrastructure/safeJson'
 import { logger } from '@/src/modules/core/infrastructure/logger'
 
 export const dynamic = 'force-dynamic'
@@ -50,6 +51,18 @@ export async function POST(request: Request) {
       )
     }
 
+    // safeJson raises ValidationError (400 VALIDATION_ERROR) for a malformed, empty or
+    // oversized body, which the AppError branch below renders. The hand-rolled
+    // request.json() try/catch this replaces could not reject an unbounded body at all:
+    // `json()` buffers the whole payload before any schema runs.
+    const parseResult = postSchema.safeParse(await safeJson(request))
+    if (!parseResult.success) {
+      const errorMessage = parseResult.error.errors[0]?.message || 'Invalid post text.'
+      return NextResponse.json({ error: errorMessage }, { status: 400 })
+    }
+
+    const { text } = parseResult.data
+
     /**
      * Distributed, per-admin budget. The previous module-scope timestamp array was
      * per-lambda-instance and reset on every cold start, so the enforced ceiling was
@@ -61,23 +74,16 @@ export async function POST(request: Request) {
      * authenticated user id — this route is never reachable anonymously, so there is
      * no IP fallback to get wrong. `xPost` is in HASHED_TYPES, so the id is HMAC'd
      * before it becomes a Redis key.
+     *
+     * Charged AFTER validation and immediately before the billable call, matching
+     * AiUsageLimiter in app/api/gemini/chat. The budget meters posts actually sent to X,
+     * and at 8 per 24h it is small enough that spending it on requests that never reach
+     * X is a real outage: 8 malformed bodies from a buggy client used to lock the admin
+     * out for a full day, with nothing posted. Only an allowlisted admin can get this
+     * far, so the parse an over-budget caller can still force is both bounded (safeJson
+     * caps the body at 64 KiB) and self-inflicted.
      */
     await RateLimiterService.enforce({ type: 'xPost', identifier: user.id })
-
-    let body: unknown
-    try {
-      body = await request.json()
-    } catch {
-      return NextResponse.json({ error: 'Invalid JSON payload' }, { status: 400 })
-    }
-
-    const parseResult = postSchema.safeParse(body)
-    if (!parseResult.success) {
-      const errorMessage = parseResult.error.errors[0]?.message || 'Invalid post text.'
-      return NextResponse.json({ error: errorMessage }, { status: 400 })
-    }
-
-    const { text } = parseResult.data
 
     const response = await xClient.v2.tweet(text)
     if (!response || !response.data || !response.data.id) {

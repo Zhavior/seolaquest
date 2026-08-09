@@ -127,6 +127,23 @@ Three independent layers, defence in depth:
 Shared-resource endpoints add a **fourth** layer: an explicit env allowlist, because public sign-up
 means "signed in" is not an authorization statement. See §6.
 
+**`User.id` *is* the Clerk user id.** There is no separate `clerkId` column and no mapping table:
+`createUserInTransaction` inserts `{ id: userId }` straight from `auth()` (`lib/auth.ts:208`, the
+only place production code creates a `User`), every read is `findUnique({ where: { id: userId } })`,
+and `reconcileVerifiedEmailUser` *rewrites* a legacy row's `id` to the Clerk id rather than
+cross-referencing it. So `getCurrentUser().id`, `auth().userId`, and the ids in
+`X_POST_ADMIN_USER_IDS` / `BLOG_ADMIN_USER_IDS` / `AURORA_ADMIN_USER_IDS` are all the same string.
+
+This matters because the two look like different things at call sites — a route passing `user.id`
+and a Server Action passing `auth().userId` read as two identifiers for one human, which invites a
+"fix" that maps between them or unifies them. They are already the same value; a rate-limit tier
+charged from both paths shares one bucket. The invariant is load-bearing for every allowlist and
+every limiter identifier in this document.
+
+The schema's `@default(uuid())` on `User.id` is the one way it could break: it is never exercised
+today because the id is always supplied, but a `user.create` that omits `id` would mint a row the
+Clerk session can never find again. Always supply it.
+
 ### 3.2 Machine callers
 
 `src/modules/core/security/machineBearer.ts` — `verifyMachineBearer` is timing-safe
@@ -371,15 +388,12 @@ Tracked deliberately rather than silently. Current as of the August 2026 hardeni
 |---|---|---|
 | Aurora consumer swallows all failures, persists `UNAVAILABLE` and reports success — so `EventProcessor` marks the event `PROCESSED` | `AuroraService.evaluate` | Documented as intentional degradation, but newly on the hot path since consumers were first registered |
 | `GeminiSemanticClassifier.classify` is a hardcoded mock returning `confidence: 0.85` | `src/modules/aurora/classifiers/` | Open |
-| `x/post` charges its 24h budget before validation, so malformed requests can lock an admin out for a day | `app/api/x/post/route.ts` | Open |
-| Two different 400 shapes on the same endpoint | `app/api/v1/blog/generate/route.ts` | Open |
+| Deep-cloned `sanitizeDetails` output is the only thing keeping zod's `received` (the caller's rejected input) out of 4xx bodies | `errors.ts` + every route that passes `details` | Open — convention, not enforced |
 | Event graph has no producer for `opportunity.discovered` / `opportunity.engaged` / `lead.converted`, and no consumer for `aurora.opportunity.evaluated` | events + gamify | Open — see `AURORA_GAMIFY_ARCHITECTURE.md` |
 | Byte-identical shadow copies (`RateLimiter 2.ts`, `AuditService 2.ts`, `idempotency 2.ts`) hidden from git and lint by the `* [0-9].*` ignore pattern; will drift from the originals | `src/modules/core/security/` | Open — untracked, so deletion is unrecoverable |
 | Backlogged `DomainEventLog` rows replay in one tick on first deploy of the drain | cron | Check `SELECT status, count(*) FROM "DomainEventLog" GROUP BY status` before shipping |
-| The `ai` tier is charged under two different identifiers for the same human — `gemini/chat` passes the internal DB id, `generateAIReplyAction` passes the Clerk id, so one account holds two 20/h buckets. Both are bounded, so not a hole, but it is not the "one AI budget per account" the tier implies. (`AiUsageLimiter` is consistent — both pass the DB id.) | `app/api/gemini/chat`, `features/dashboard/actions.ts` | Open |
-| `vitest.setup.ts`'s global `next/navigation` mock omits `unstable_rethrow`, so any jsdom test driving a wrapped action into the wrapper's catch dies on the mock instead of asserting. `server-action.test.ts` works around it with `@vitest-environment node`; nothing else can. | `vitest.setup.ts` | Open — shared test infra |
+| `getCurrentUser()` is not memoized: each call is `auth()` + a `findUnique` + two deletion-state queries, so a request that calls it twice pays ~6 round trips | `lib/auth.ts` | Open — cost, not correctness |
 | A catch neither logs nor rethrows and returns `error.message` to the client, leaking Prisma internals | `app/app/admin/aurora/actions.ts` | Open — pre-existing, in untracked code, action has no callers |
-| `complete-onboarding.ts` is orphaned dead source and the only Server Action file importing `redirect`. Absent from the build's reference manifest, so not a live endpoint. | `app/actions/` | Open — delete rather than leave |
 | `AiUsageLimiter` fails closed in *every* environment, unlike `RateLimiterService`, so a dev box without Upstash now gets 503 on Gemini chat. Chat also shares one 20/day per-tenant AI budget with AI replies. | `app/api/gemini/chat` | Intentional, matches `LeadService` — noted because it is a non-production behaviour change |
 
 ### Closed in the August 2026 hardening pass
@@ -388,4 +402,21 @@ Outbox never drained and consumers never registered · limiter keyed on raw `x-f
 `global`/`ip` writing literal identifiers to Redis · Server Actions entirely unlimited · Gemini
 chat entirely unlimited · in-memory per-instance limiter on `x/post` · malformed JSON rendering as
 500 · `/blog(.*)` prefix over-match · dead-letter endpoint blind to the outbox · `console.*` in
-server code (now lint-enforced).
+server code (now lint-enforced) · orphaned `complete-onboarding.ts` Server Action deleted ·
+missing `DELETION_AUDIT_SECRET` no longer fails open.
+
+Closed after it: `x/post` charging its 8/24h budget before validation, which let 8 malformed
+requests lock an admin out for a day — it now charges after the schema passes and immediately
+before the billable call, and reads the body through `safeJson` so the parse an over-budget caller
+can force is bounded (`app/api/x/post/route.test.ts`, previously untested entirely) ·
+`blog/generate` answering schema failures with a second, incompatible 400 shape — both rejection
+paths now raise `ValidationError` and render as `{ error, code, details? }` ·
+`vitest.setup.ts`'s `next/navigation` mock omitting `unstable_rethrow`, `redirect`,
+`permanentRedirect` and `notFound`, which made the redirect hazard unreachable from the default
+jsdom environment — the mock now models them against Next 16's digest formats, and
+`server-action.jsdom.test.ts` exercises the wrapper through it.
+
+**Withdrawn, not fixed:** the "`ai` tier is charged under two identifiers" entry was wrong. It
+assumed an internal DB id distinct from the Clerk id; there is no such thing here — `User.id` *is*
+the Clerk id (see §3.1), so `gemini/chat`'s `user.id` and `withServerAction`'s `auth().userId` are
+the same string and share one 20/h bucket. The tier already behaves as "one AI budget per account".

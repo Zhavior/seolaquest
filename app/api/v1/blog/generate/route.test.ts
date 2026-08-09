@@ -89,6 +89,49 @@ describe('blog generation boundary', () => {
     expect(mocks.generateAndSaveBlogPost).not.toHaveBeenCalled()
   })
 
+  /**
+   * ONE 400 SHAPE.
+   *
+   * A schema failure and a malformed body are both the caller's mistake and must be
+   * indistinguishable in structure, so a client can write a single error path. The route
+   * used to answer the schema case with `{ success: false, error: 'INVALID_REQUEST',
+   * details: <fieldErrors> }` and the malformed case with the canonical
+   * `{ error, code, details? }` — same status, incompatible bodies.
+   */
+  it('answers a schema failure with the canonical shape, not a second one', async () => {
+    const response = await POST(request({ topic: 'x' }), routeContext)
+    const body = await response.json()
+
+    expect(body).toMatchObject({ code: 'VALIDATION_ERROR', error: expect.any(String) })
+    // The discarded shape's fingerprints.
+    expect(body).not.toHaveProperty('success')
+    expect(body.error).not.toBe('INVALID_REQUEST')
+    // `details` is the sanitized issue array, not zod's field-keyed object, and must never
+    // echo the rejected input back (raw issues carry it on `received`).
+    expect(Array.isArray(body.details)).toBe(true)
+    expect(body.details).not.toHaveProperty('topic')
+    expect(JSON.stringify(body)).not.toContain('received')
+  })
+
+  it('answers both kinds of bad body with the same set of keys', async () => {
+    const schemaFailure = await (await POST(request({ topic: 'x' }), routeContext)).json()
+    const malformedBody = await (
+      await POST(
+        new Request('https://seolaquest.test/api/v1/blog/generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: '{"topic":',
+        }),
+        routeContext,
+      )
+    ).json()
+
+    expect(Object.keys(schemaFailure).sort()).toEqual(
+      expect.arrayContaining(Object.keys(malformedBody).sort()),
+    )
+    expect(schemaFailure.code).toBe(malformedBody.code)
+  })
+
   it.each([
     ['malformed', '{"topic":'],
     ['empty', ''],

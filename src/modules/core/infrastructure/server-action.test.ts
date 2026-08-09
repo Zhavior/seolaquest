@@ -24,9 +24,14 @@ vi.mock('next/headers', () => ({
     new Headers(scope.forwardedFor ? { 'x-forwarded-for': scope.forwardedFor } : {}),
 }))
 
-// vitest.setup.ts installs a global `next/navigation` mock for component tests. It has no
-// `unstable_rethrow`, `redirect` or `notFound`, and a stub would make the redirect cases a
-// strawman: the whole point is that the REAL Next.js control-flow errors survive the catch.
+// vitest.setup.ts installs a global `next/navigation` mock that now does model
+// `unstable_rethrow`, `redirect`, `permanentRedirect` and `notFound` faithfully (see
+// server-action.jsdom.test.ts, which covers the wrapper through exactly that mock). This
+// file still shadows it with the REAL module: a mock, however faithful, is written against
+// the same digest formats the assertions below check, so on its own it proves only internal
+// consistency. Pairing the two means the digest contract is pinned against Next.js itself
+// here, and the shared jsdom test infrastructure is pinned against this file's expectations
+// there. It also keeps the node-only bailout branches covered — see the docblock above.
 vi.mock('next/navigation', async () =>
   vi.importActual<typeof import('next/navigation')>('next/navigation'),
 )
