@@ -57,6 +57,11 @@ export function ScanRunList({ runs: initialRuns, hasMore: initialHasMore }: Scan
             return changed ? updated : currentRuns
           })
         }
+      }).catch(() => {
+        // Background poll: a rejection here is not actionable by the user and must not
+        // surface as an unhandled rejection. The action rethrows (onError: 'rethrow'), and
+        // since it is now rate limited it can reject on a spent budget as well as on a dead
+        // session. The next tick retries; the row keeps its last known status until then.
       })
     }, 3000)
 

@@ -11,6 +11,7 @@ const mocks = vi.hoisted(() => {
     retryDead: vi.fn(),
     revalidatePath: vi.fn(),
     logError: vi.fn(),
+    logWarn: vi.fn(),
   }
 })
 
@@ -25,9 +26,15 @@ vi.mock('@/src/modules/core/security/crmWebhookUrl', () => ({
 vi.mock('@/src/modules/leads/application/CrmDeliveryService', () => ({
   CrmDeliveryService: { retryDead: mocks.retryDead },
 }))
-vi.mock('@/src/modules/core/infrastructure/logger', () => ({
-  logger: { error: mocks.logError },
-}))
+// `withServerAction` runs the action inside `loggerContext`, so the mock has to provide the
+// real AsyncLocalStorage as well as the logger methods the wrapper itself calls.
+vi.mock('@/src/modules/core/infrastructure/logger', async () => {
+  const { AsyncLocalStorage } = await import('node:async_hooks')
+  return {
+    logger: { error: mocks.logError, warn: mocks.logWarn },
+    loggerContext: new AsyncLocalStorage(),
+  }
+})
 vi.mock('next/cache', () => ({ revalidatePath: mocks.revalidatePath }))
 
 import { retryDeliveryAction } from '../actions'

@@ -4,8 +4,15 @@ import { unstable_rethrow } from 'next/navigation'
 import { ZodError } from 'zod'
 
 import { RateLimiterService, type RateLimiterType } from '../security/RateLimiter'
+import { resolveClientIp } from './api-handler'
 import { AppError, sanitizeDetails } from './errors'
 import { logger, loggerContext } from './logger'
+
+/**
+ * Sentinel for a caller whose IP could not be established. Never used as a limiter
+ * identifier for the caller's chosen tier — see the `unidentified` branch in the wrapper.
+ */
+const UNIDENTIFIED_CALLER = 'unidentified'
 
 /**
  * The Server Action counterpart to `withApiHandler`.
@@ -86,13 +93,19 @@ const GENERIC_FAILURE_MESSAGE = 'Something went wrong. Please try again.'
  * exist under unit test or when an action is invoked outside a request. A missing IP must
  * not be fatal — the limiter still has `userId` for every authenticated caller, and
  * `RateLimiterService` itself decides how to behave when it cannot answer.
+ *
+ * Resolution is delegated to `resolveClientIp` rather than reading `x-forwarded-for`
+ * directly. That header is a caller-appendable hop list, so reading it raw would let an
+ * unauthenticated caller mint an unlimited number of buckets by varying it — and signed-out
+ * actions fall back to exactly this value as their limiter identity. `x-real-ip` is
+ * deliberately not consulted for the same reason. See the trust model on `resolveClientIp`.
  */
 async function callerIp(): Promise<string> {
   try {
     const headerList = await headers()
-    return headerList.get('x-forwarded-for') || headerList.get('x-real-ip') || 'unknown'
+    return resolveClientIp(headerList) ?? UNIDENTIFIED_CALLER
   } catch {
-    return 'unknown'
+    return UNIDENTIFIED_CALLER
   }
 }
 
@@ -192,7 +205,17 @@ export function withServerAction<A extends unknown[], R, F>(
       try {
         // An unauthenticated caller collapses to their IP. `enforce` throws RateLimitError
         // when the budget is spent and — in production — when it cannot be consulted.
-        await RateLimiterService.enforce({ type: tier, identifier: userId || ip })
+        //
+        // With neither a userId nor a resolvable IP there is no identity to meter, so the
+        // request goes to the shared `unidentified` tier rather than being charged to the
+        // action's own tier under a constant key: that would give every anonymous caller a
+        // combined budget at the action's rate, which for a signed-out-reachable action is
+        // a free bucket for anyone who can strip a header. Mirrors withApiHandler.
+        if (userId === null && ip === UNIDENTIFIED_CALLER) {
+          await RateLimiterService.enforce({ type: 'unidentified', identifier: UNIDENTIFIED_CALLER })
+        } else {
+          await RateLimiterService.enforce({ type: tier, identifier: userId || ip })
+        }
 
         return await handler(...args)
       } catch (error) {
