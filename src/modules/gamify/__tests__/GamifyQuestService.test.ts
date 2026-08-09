@@ -50,6 +50,8 @@ type Contribution = {
 type Profile = { userId: string; lifetimeXp: number; level: number; reputation: number }
 type XpRow = { id: string; idempotencyKey: string; actorId: string; amount: number; [key: string]: unknown }
 
+const ASSIGNMENT_AT = new Date('2026-08-08T08:00:00.000Z')
+
 function cloneState(state: ReturnType<typeof baseState>) {
   return {
     quests: new Map([...state.quests].map(([key, value]) => [key, { ...value }])),
@@ -303,7 +305,7 @@ describe('GamifyQuestService', () => {
     const db = createDb()
     db.seedQuest(quest({ target: 3 }))
     const service = new GamifyQuestService(db as never)
-    const assignment = await service.assignQuest('user_1', 'quest_1')
+    const assignment = await service.assignQuest('user_1', 'quest_1', ASSIGNMENT_AT)
     const event = engagementEvent('event_concurrent')
 
     await Promise.all([
@@ -319,7 +321,7 @@ describe('GamifyQuestService', () => {
     const db = createDb()
     db.seedQuest(quest())
     const service = new GamifyQuestService(db as never)
-    const assignment = await service.assignQuest('user_1', 'quest_1')
+    const assignment = await service.assignQuest('user_1', 'quest_1', ASSIGNMENT_AT)
     const systemEvent = { ...engagementEvent('event_system', 'system'), source: 'system.scanner' }
 
     await expect(service.contributeForEvent(systemEvent)).resolves.toEqual([])
@@ -332,7 +334,7 @@ describe('GamifyQuestService', () => {
     const db = createDb()
     db.seedQuest(quest({ target: 1 }))
     const service = new GamifyQuestService(db as never)
-    const assignment = await service.assignQuest('user_1', 'quest_1')
+    const assignment = await service.assignQuest('user_1', 'quest_1', ASSIGNMENT_AT)
     await service.expireAssignments(new Date('2026-08-10T00:00:00.000Z'))
 
     const result = await service.contributeForEvent(engagementEvent('event_delayed'))
@@ -345,7 +347,7 @@ describe('GamifyQuestService', () => {
     const db = createDb()
     db.seedQuest(quest({ target: 1 }))
     const service = new GamifyQuestService(db as never)
-    const assignment = await service.assignQuest('user_1', 'quest_1')
+    const assignment = await service.assignQuest('user_1', 'quest_1', ASSIGNMENT_AT)
     await service.contributeForEvent(engagementEvent('event_complete'))
 
     const first = await service.claimQuest('user_1', assignment.id, new Date('2026-08-10T00:00:00.000Z'))
@@ -362,7 +364,7 @@ describe('GamifyQuestService', () => {
     const db = createDb()
     db.seedQuest(quest({ target: 1 }))
     const service = new GamifyQuestService(db as never)
-    const assignment = await service.assignQuest('user_1', 'quest_1')
+    const assignment = await service.assignQuest('user_1', 'quest_1', ASSIGNMENT_AT)
     await service.contributeForEvent(engagementEvent('event_complete'))
     db.failNextAssignmentUpdate()
 
@@ -377,7 +379,7 @@ describe('GamifyQuestService', () => {
     const db = createDb()
     db.seedQuest(quest())
     const service = new GamifyQuestService(db as never)
-    const assignment = await service.assignQuest('user_1', 'quest_1')
+    const assignment = await service.assignQuest('user_1', 'quest_1', ASSIGNMENT_AT)
 
     await expect(service.claimQuest('user_1', assignment.id)).rejects.toBeInstanceOf(DomainError)
     expect(db.state.xp).toHaveLength(0)
