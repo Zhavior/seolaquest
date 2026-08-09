@@ -4,7 +4,7 @@ import { Prisma, type OnboardingSource, type User } from '@prisma/client'
 import { currentUser, auth } from '@clerk/nextjs/server'
 import prisma from '@/lib/prisma'
 import { logger } from '@/src/modules/core/infrastructure/logger'
-import { subjectDigestForUserId } from '@/src/modules/lifecycle/domain/accountDeletion'
+import { accountDeletionEnabled, subjectDigestForUserId } from '@/src/modules/lifecycle/domain/accountDeletion'
 
 // Provisioning is serialized by a per-email advisory lock, so a unique conflict means a
 // concurrent request won the race. One extra pass is enough to observe its committed row.
@@ -228,9 +228,25 @@ function deletionDigest(userId: string, requireConfigured = false) {
   const configured = process.env.DELETION_AUDIT_SECRET?.trim()
   if (!configured) {
     if (requireConfigured && process.env.NODE_ENV === 'production') {
-      // Log a warning but do NOT throw: a missing secret degrades gracefully to
-      // "no deletion-audit protection" rather than hard-crashing every new sign-up.
-      // Set DELETION_AUDIT_SECRET in Vercel env vars to restore full protection.
+      // Whether a missing secret may be tolerated depends entirely on whether erasure is a
+      // live feature, so the two cases are separated rather than collapsed into one policy.
+      //
+      // ACCOUNT_DELETION_ENABLED off: there are no deletion records for the skipped check to
+      // have found, so the check is moot and hard-crashing every new sign-up would be pure
+      // downside. Degrade, and say so. This is the case 7154cc7 was reacting to.
+      //
+      // ACCOUNT_DELETION_ENABLED on: skipping the check silently re-provisions a user who
+      // requested erasure, defeating the deletion guarantee with no error and no audit trail.
+      // A missing secret must stop provisioning, not quietly widen it — matching this repo's
+      // "unconfigured means forbidden" convention (docs/architecture/BACKEND_PLATFORM.md §6).
+      if (accountDeletionEnabled()) {
+        logger.error(
+          { userId, outcomeCode: 'AUTH_DELETION_AUDIT_SECRET_MISSING' },
+          'DELETION_AUDIT_SECRET is not configured while account deletion is enabled; refusing to provision',
+        )
+        throw new Error('Account lifecycle protection is not configured')
+      }
+
       logger.warn(
         { userId, outcomeCode: 'AUTH_DELETION_AUDIT_SECRET_MISSING' },
         'DELETION_AUDIT_SECRET is not configured; skipping deletion state check for provisioning',
