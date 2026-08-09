@@ -5,6 +5,7 @@ import { AuroraSemanticClassifier } from './classifiers/AuroraSemanticClassifier
 import { CanonicalPolicyScorer } from './classifiers/CanonicalPolicyScorer';
 import { EventFactory } from '../core/events/EventFactory';
 import { EventStore } from '../core/events/EventStore';
+import { logger } from '@/src/modules/core/infrastructure/logger';
 
 export class AuroraService {
   constructor(
@@ -27,7 +28,18 @@ export class AuroraService {
     });
 
     if (existing) {
-      console.log(`AuroraDecision for ${context.sourceEventId} and version ${context.policyVersion} already exists. Skipping.`);
+      // Not inside a request; carry correlation fields explicitly since there is no
+      // withApiHandler AsyncLocalStorage store to inherit them from.
+      logger.info(
+        {
+          event: 'aurora_evaluation_skipped',
+          outcomeCode: 'AURORA_DECISION_ALREADY_EXISTS',
+          sourceEventId: context.sourceEventId,
+          opportunityId: context.opportunityId,
+          policyVersion: context.policyVersion,
+        },
+        'Aurora decision already exists, skipping evaluation',
+      );
       return; // Idempotency
     }
 
@@ -59,7 +71,19 @@ export class AuroraService {
       // 3. Final canonical policy scoring
       finalDecision = this.policyScorer.score(deterministicResult, semanticResult);
     } catch (error) {
-      console.error('Aurora evaluation failed unexpectedly', error);
+      // Degraded-but-continuing path: the decision is still persisted below with
+      // evaluationStatus UNAVAILABLE, so this must never be silent.
+      logger.error(
+        {
+          err: error,
+          event: 'aurora_evaluation_failed',
+          outcomeCode: 'AURORA_EVALUATION_UNAVAILABLE',
+          sourceEventId: context.sourceEventId,
+          opportunityId: context.opportunityId,
+          policyVersion: context.policyVersion,
+        },
+        'Aurora evaluation failed unexpectedly',
+      );
       evaluationStatus = 'UNAVAILABLE';
       deterministicResult = { hardReject: false, hardRejectReasons: [], signals: {} };
       finalDecision = {

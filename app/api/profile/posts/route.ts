@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
 import { getCurrentUser } from '@/lib/auth'
 import { withApiHandler } from '@/src/modules/core/infrastructure/api-handler'
+import { logger } from '@/src/modules/core/infrastructure/logger'
 
 export const dynamic = 'force-dynamic'
 
@@ -24,7 +25,15 @@ export const GET = withApiHandler(async () => {
       posts: posts.map((post) => ({ ...post, createdAt: post.createdAt.toISOString() })),
     })
   } catch (error) {
-    console.error('profile posts hydration failed', error)
+    // requestId/userId/path/ip are injected by withApiHandler's AsyncLocalStorage store.
+    logger.error(
+      {
+        err: error,
+        event: 'profile_posts_hydration_failed',
+        outcomeCode: 'PROFILE_POSTS_HYDRATION_FAILED',
+      },
+      'Profile posts hydration failed',
+    )
     return NextResponse.json(
       {
         ok: false,
