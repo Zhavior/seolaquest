@@ -88,4 +88,22 @@ describe('blog generation boundary', () => {
     expect(response.status).toBe(400)
     expect(mocks.generateAndSaveBlogPost).not.toHaveBeenCalled()
   })
+
+  it.each([
+    ['malformed', '{"topic":'],
+    ['empty', ''],
+  ])('answers 400 for a %s body instead of a 500 GENERATION_FAILED', async (_label, body) => {
+    const response = await POST(
+      new Request('https://seolaquest.test/api/v1/blog/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body,
+      }),
+      routeContext,
+    )
+
+    expect(response.status).toBe(400)
+    await expect(response.json()).resolves.toMatchObject({ code: 'VALIDATION_ERROR' })
+    expect(mocks.generateAndSaveBlogPost).not.toHaveBeenCalled()
+  })
 })

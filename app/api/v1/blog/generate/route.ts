@@ -4,6 +4,8 @@ import { generateAndSaveBlogPost } from '@/lib/aiBlogger'
 import { getCurrentUser } from '@/lib/auth'
 import { logger } from '@/src/modules/core/infrastructure/logger'
 import { withApiHandler } from '@/src/modules/core/infrastructure/api-handler'
+import { safeJson } from '@/src/modules/core/infrastructure/safeJson'
+import { AppError } from '@/src/modules/core/infrastructure/errors'
 
 const GenerateBlogPostSchema = z.object({
   topic: z.string().trim().min(3).max(160),
@@ -44,7 +46,7 @@ export const POST = withApiHandler(async (req) => {
       )
     }
 
-    const { topic, tag, category, author, authorRole } = GenerateBlogPostSchema.parse(await req.json())
+    const { topic, tag, category, author, authorRole } = GenerateBlogPostSchema.parse(await safeJson(req))
     const resolvedTag = category || tag
 
     const result = await generateAndSaveBlogPost({
@@ -71,6 +73,11 @@ export const POST = withApiHandler(async (req) => {
         { status: 400 },
       )
     }
+    // Typed errors already carry their own status and code (safeJson raises ValidationError
+    // -> 400 VALIDATION_ERROR for a malformed or oversized body). Let withApiHandler render
+    // them rather than mislabelling a client mistake as a server-side generation failure.
+    if (error instanceof AppError) throw error
+
     logger.error({ err: error, outcomeCode: 'BLOG_GENERATION_FAILED' }, 'Blog generation failed')
     return NextResponse.json(
       { success: false, error: 'GENERATION_FAILED', message: 'Blog generation failed.' },
