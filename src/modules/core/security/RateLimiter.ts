@@ -12,6 +12,16 @@ const LIMITER_CONFIG = {
   auth: { limit: 5, window: '1 m', prefix: '@upstash/ratelimit/seolaquest/auth' },
   // Billing & sensitive write operations - moderate
   billing: { limit: 10, window: '1 m', prefix: '@upstash/ratelimit/seolaquest/billing' },
+  // Writes to the single shared X account (app/api/x/post). Deliberately the strictest
+  // tier in this file, and deliberately not `global` or `billing`: the budget being
+  // protected is not ours to spend freely. X API v2 `POST /2/tweets` is capped per
+  // access token per 24 h — 17 writes on the Free tier, 100 on Basic — and every
+  // allowlisted admin draws down that ONE token, so a per-user allowance has to be
+  // sized as a fraction of the account-wide cap rather than as a comfortable personal
+  // quota. 8 per 24 h keeps two concurrent admins inside the Free-tier 17 and far
+  // inside Basic's 100. X's own 429 (surfaced by the route) remains the backstop if
+  // the allowlist ever grows past that.
+  xPost: { limit: 8, window: '24 h', prefix: '@upstash/ratelimit/seolaquest/x-post' },
 } as const
 
 export type RateLimiterType = keyof typeof LIMITER_CONFIG
@@ -20,7 +30,7 @@ export type RateLimiterType = keyof typeof LIMITER_CONFIG
  * Limiter types whose identifiers are user-attributable (userId, email, IP) and must
  * therefore never be persisted to Redis as literal keys. Mirrors AiUsageLimiter.tenantKey.
  */
-const HASHED_TYPES: ReadonlySet<RateLimiterType> = new Set<RateLimiterType>(['auth', 'billing'])
+const HASHED_TYPES: ReadonlySet<RateLimiterType> = new Set<RateLimiterType>(['auth', 'billing', 'xPost'])
 
 export interface RateLimitOptions {
   type?: RateLimiterType
