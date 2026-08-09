@@ -4,9 +4,17 @@ import { NextResponse } from 'next/server'
 export const PUBLIC_ROUTE_PATTERNS = [
   '/',
   '/pricing',
-  '/blog(.*)',
+  // Subtree, not prefix. '/blog(.*)' would also have made /blogadmin, /blog-internal
+  // and any future /blog<suffix> route public.
+  '/blog',
+  '/blog/(.*)',
   '/status',
   '/login',
+  // These two MUST keep the broad prefix form. <SignIn/> and <SignUp/> are mounted in
+  // Next.js optional catch-all segments (app/sign-in/[[...sign-in]]), and Clerk probes
+  // '<path>/<Component>_clerk_catchall_check_<ts>' at runtime; if that child 404s or is
+  // protected, Clerk throws a configuration error. See useEnforceCatchAllRoute in
+  // @clerk/nextjs, which explicitly prescribes adding '(.*)' to the route pattern.
   '/sign-in(.*)',
   '/sign-up(.*)',
   '/privacy',
