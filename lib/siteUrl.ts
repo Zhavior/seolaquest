@@ -15,8 +15,29 @@ function isLocalHost(hostname: string): boolean {
   return hostname === 'localhost' || hostname === '127.0.0.1' || hostname.endsWith('.local')
 }
 
+/**
+ * `NEXT_PUBLIC_APP_URL` is the explicit answer, but it is not currently set in
+ * the Vercel production environment — and an unset value here would publish
+ * `http://localhost:3000` as the canonical of every page on the live site.
+ *
+ * `VERCEL_PROJECT_PRODUCTION_URL` is injected by the platform and holds the
+ * project's stable production domain (hostname only, no protocol). It is the
+ * right second choice: unlike `VERCEL_URL` it does not change per deployment,
+ * so preview builds still resolve to the production canonical instead of
+ * advertising a preview hostname to crawlers.
+ */
+function configuredOrigin(): string | undefined {
+  const explicit = process.env.NEXT_PUBLIC_APP_URL?.trim()
+  if (explicit) return explicit
+
+  const vercelProductionHost = process.env.VERCEL_PROJECT_PRODUCTION_URL?.trim()
+  if (vercelProductionHost) return `https://${vercelProductionHost}`
+
+  return undefined
+}
+
 function resolveSiteUrl(): URL {
-  const configured = process.env.NEXT_PUBLIC_APP_URL?.trim()
+  const configured = configuredOrigin()
 
   let url: URL
   try {

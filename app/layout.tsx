@@ -6,6 +6,8 @@ import { SkipLink } from '@/components/SkipLink'
 import { ThemeProvider } from '@/components/theme/ThemeProvider'
 import { ThemeScript } from '@/components/theme/ThemeScript'
 import { siteUrl } from '@/lib/siteUrl'
+import { Analytics } from '@vercel/analytics/next'
+import { SpeedInsights } from '@vercel/speed-insights/next'
 
 const inter = Inter({
   subsets: ['latin'],
@@ -87,6 +89,13 @@ export default function RootLayout({
             </div>
           </ClerkProvider>
         </ThemeProvider>
+        {/*
+          Last in <body> so neither script competes with the first paint.
+          Both are inert outside Vercel, so local development and the test
+          environment are unaffected — no config flag needed.
+        */}
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   )
