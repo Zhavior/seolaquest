@@ -9,6 +9,7 @@
     "lint": "eslint app components lib features src prisma/seed.ts proxy.ts --ignore-pattern '**/* 2.*' --max-warnings=0",
     "test": "vitest run",
     "test:watch": "vitest",
+    "test:integration": "dotenv -e .env.local -- cross-env EVENT_CORE_INTEGRATION_TEST=true PHASE45_INTEGRATION_TEST=true BILLING_INTEGRATION_TEST=true vitest run",
     "test:a11y": "bash scripts/phase-5-accessibility-gate.sh",
     "db": "dotenv -e .env.local -- prisma",
     "db:migrate": "dotenv -e .env.local -- prisma migrate dev",

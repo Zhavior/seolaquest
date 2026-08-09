@@ -5,6 +5,7 @@ import { Inter } from 'next/font/google'
 import { SkipLink } from '@/components/SkipLink'
 import { ThemeProvider } from '@/components/theme/ThemeProvider'
 import { ThemeScript } from '@/components/theme/ThemeScript'
+import { siteUrl } from '@/lib/siteUrl'
 
 const inter = Inter({
   subsets: ['latin'],
@@ -13,10 +14,34 @@ const inter = Inter({
   variable: '--font-inter',
 })
 
+const TITLE = 'SEOlaQuest | AI Social Listening & Lead Monitoring'
+const DESCRIPTION =
+  'SEOlaQuest monitors X (Twitter) and Reddit for your target keywords in real time. AI scouts flag posts from potential customers and deliver matched leads to your dashboard automatically.'
+
 export const metadata: Metadata = {
+  // Without `metadataBase` every relative URL below resolves against the
+  // deployment's own hostname, so preview builds would publish preview URLs as
+  // their canonical and Open Graph targets.
+  metadataBase: siteUrl,
   applicationName: 'SEOlaQuest',
-  title: 'SEOlaQuest | AI Social Listening & Lead Monitoring',
-  description: 'SEOlaQuest monitors X (Twitter) and Reddit for your target keywords in real time. AI scouts flag posts from potential customers and deliver matched leads to your dashboard automatically.',
+  title: TITLE,
+  description: DESCRIPTION,
+  // No `alternates.canonical` and no `openGraph.url` here on purpose. Metadata
+  // fields are inherited by any child page that does not set them, so a
+  // canonical declared at the root would tell crawlers that /pricing, /blog,
+  // and every post are all copies of the homepage. Each public page declares
+  // its own; see app/page.tsx.
+  openGraph: {
+    type: 'website',
+    siteName: 'SEOlaQuest',
+    title: TITLE,
+    description: DESCRIPTION,
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: TITLE,
+    description: DESCRIPTION,
+  },
 }
 
 // `viewport-fit=cover` is what makes env(safe-area-inset-*) resolve to real

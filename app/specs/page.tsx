@@ -4,6 +4,9 @@ import { AlertTriangle, CheckCircle2, Database, Gauge, Lock, Server, XCircle } f
 export const metadata = {
   title: 'System Architecture Status | SEOlaQuest',
   description: 'Verified implementation status and unresolved production gates for SEOlaQuest.',
+  // `/status` renders this same page, so both URLs point at /specs rather than
+  // competing as duplicate content.
+  alternates: { canonical: '/specs' },
 }
 
 const implemented = [

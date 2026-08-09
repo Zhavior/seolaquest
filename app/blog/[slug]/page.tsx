@@ -27,10 +27,12 @@ export async function generateMetadata({ params }: PostPageProps): Promise<Metad
   return {
     title: `${post.title} | SEOlaQuest Blog`,
     description: post.description,
+    alternates: { canonical: `/blog/${post.slug}` },
     openGraph: {
       title: post.title,
       description: post.description,
       type: 'article',
+      url: `/blog/${post.slug}`,
       publishedTime: post.date,
       authors: [post.author],
       tags: [post.tag],

@@ -2,7 +2,15 @@ import { describe, it, expect, beforeAll, afterAll, beforeEach } from 'vitest'
 import prisma from '@/lib/prisma'
 import { EventStore } from '../EventStore'
 
-describe('EventStore Integration (Lease & Recovery)', () => {
+// Same gate the other real-PostgreSQL suites use (Phase45, DeletionBillingRace,
+// CreditService). Without it this file ran unconditionally in `npm test`, where
+// no DATABASE_URL is loaded, so it failed on every default run — and a suite
+// that always fails is a suite nobody reads.
+//
+// Run it with `npm run test:integration`, which loads .env.local and sets this.
+const integrationEnabled = process.env.EVENT_CORE_INTEGRATION_TEST === 'true'
+
+describe.skipIf(!integrationEnabled)('EventStore Integration (Lease & Recovery)', () => {
   beforeAll(async () => {
     // Clean up any existing outbox items to ensure a clean slate
     await prisma.domainEventLog.deleteMany({})
