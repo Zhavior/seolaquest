@@ -13,6 +13,7 @@ const mocks = vi.hoisted(() => ({
   entitlementsForUser: vi.fn(),
   crmEnqueue: vi.fn(),
   aiUsageCheck: vi.fn(),
+  domainEventCreate: vi.fn(),
 }))
 
 vi.mock('server-only', () => ({}))
@@ -54,6 +55,11 @@ const tx = {
   },
   lead: {
     updateMany: mocks.leadUpdateMany,
+  },
+  // `opportunity.engaged` is written through EventStore.writeOutbox on THIS client, so the
+  // double has to carry it — that is the point: the event shares the claim's transaction.
+  domainEventLog: {
+    create: mocks.domainEventCreate,
   },
 }
 
@@ -111,6 +117,42 @@ describe('LeadService tenant boundaries', () => {
     expect(mocks.queryRaw.mock.invocationCallOrder[0]).toBeLessThan(
       mocks.userFindUnique.mock.invocationCallOrder[0],
     )
+  })
+
+  /**
+   * Gamify pays XP for `opportunity.engaged`, so this event is the user's reward. It has to
+   * ride the claim's own transaction — if the status update commits and the event does not,
+   * the user did the work and silently earned nothing, with no failure anywhere to notice.
+   */
+  it('emits opportunity.engaged inside the claim transaction', async () => {
+    mocks.userFindUnique.mockResolvedValue({ xp: 0, level: 1, xpRequired: 100 })
+    mocks.leadUpdateMany.mockResolvedValue({ count: 1 })
+
+    await LeadService.claimQuest('lead-1')
+
+    expect(mocks.domainEventCreate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          type: 'opportunity.engaged',
+          actorId: 'user-1',
+          status: 'PENDING',
+          // Keyed on the lead, so a replay cannot mint a second reward for one engagement.
+          idempotencyKey: 'opportunity.engaged:lead-1',
+          payload: expect.objectContaining({ leadId: 'lead-1', actionTaken: 'CLAIMED' }),
+        }),
+      }),
+    )
+  })
+
+  it('does not emit opportunity.engaged when the lead was already claimed', async () => {
+    mocks.userFindUnique.mockResolvedValue({ xp: 0, level: 1, xpRequired: 100 })
+    // The `status: 'NEW'` predicate matched nothing: someone else claimed it first.
+    mocks.leadUpdateMany.mockResolvedValue({ count: 0 })
+
+    await expect(LeadService.claimQuest('lead-1')).resolves.toMatchObject({ ok: false })
+
+    expect(mocks.domainEventCreate).not.toHaveBeenCalled()
+    expect(mocks.userUpdate).not.toHaveBeenCalled()
   })
 
   it('preserves both XP awards when different leads are claimed concurrently', async () => {

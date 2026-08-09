@@ -47,6 +47,23 @@ const LIMITER_CONFIG = {
   // day instead of being locked out until tomorrow. This is a rate brake only; the per-tenant
   // SPEND cap remains AiUsageLimiter's job, and the two are meant to be used together.
   ai: { limit: 20, window: '1 h', prefix: '@upstash/ratelimit/seolaquest/ai' },
+  // Aurora's semantic classifier, one Gemini call per newly discovered lead, charged to the
+  // tenant who owns the lead. Deliberately NOT the `ai` tier and NOT AiUsageLimiter: both of
+  // those are the human's own budget for chat and AI replies, and Aurora spends without the
+  // user asking for anything. Sharing either would let a background scan silently consume the
+  // allowance a user needs to generate a reply.
+  //
+  // Sizing is a blast radius, not a cost control. The pipeline's own ceiling is 100 leads per
+  // tenant per day — MAX_ACTIVE_KEYWORDS_PER_TENANT (10) x max_results=10 x one scan per day
+  // (SCHEDULE_INTERVAL_MS) x one enabled provider — and only if every result is a first sight,
+  // which `skipDuplicates` on `@@unique([userId, externalPostId])` makes unlikely. At roughly
+  // 400 input + 150 output tokens a call, that ceiling is about $0.05/tenant/day. 300/day
+  // therefore sits 3x above anything the current pipeline can generate: it never fires in
+  // normal operation, and it is the thing that stops a raised keyword cap, a second enabled
+  // provider, or a shortened scan interval from scaling our Gemini bill with nothing in the
+  // way. Exceeding it degrades that lead to a deterministic-only decision — never a failure,
+  // because a metered-out classifier is not an error the outbox should retry.
+  auroraClassify: { limit: 300, window: '24 h', prefix: '@upstash/ratelimit/seolaquest/aurora-classify' },
 } as const
 
 export type RateLimiterType = keyof typeof LIMITER_CONFIG
@@ -69,6 +86,7 @@ const HASHED_TYPES: ReadonlySet<RateLimiterType> = new Set<RateLimiterType>([
   'billing',
   'xPost',
   'ai',
+  'auroraClassify',
 ])
 
 /**

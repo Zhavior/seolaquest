@@ -6,6 +6,7 @@ import { CanonicalPolicyScorer } from './classifiers/CanonicalPolicyScorer';
 import { EventFactory } from '../core/events/EventFactory';
 import { EventStore } from '../core/events/EventStore';
 import { logger } from '@/src/modules/core/infrastructure/logger';
+import { getServerEnv } from '@/lib/env';
 
 export class AuroraService {
   constructor(
@@ -61,7 +62,16 @@ export class AuroraService {
           context: context.additionalData || {}
         });
 
-        if (semanticResult.reasons.includes('Classifier failed or timed out')) {
+        /**
+         * FALLBACK is decided by `failureCode`, the field that exists to say so.
+         *
+         * This used to string-match the literal reason 'Classifier failed or timed out'.
+         * That coupled the status to prose: the real classifier reports distinct reasons per
+         * failure mode (timed out, budget spent, schema mismatch), every one of which would
+         * have been recorded as LIVE — a decision stamped with real provider provenance and
+         * a confidence of 0, indistinguishable from a genuine low-confidence verdict.
+         */
+        if (semanticResult.failureCode) {
           evaluationStatus = 'FALLBACK';
         }
       } else {
@@ -71,8 +81,28 @@ export class AuroraService {
       // 3. Final canonical policy scoring
       finalDecision = this.policyScorer.score(deterministicResult, semanticResult);
     } catch (error) {
-      // Degraded-but-continuing path: the decision is still persisted below with
-      // evaluationStatus UNAVAILABLE, so this must never be silent.
+      /**
+       * Rethrow. This used to persist a synthetic UNAVAILABLE decision — score 0, confidence
+       * 0, recommendedAction IGNORE — and then return normally.
+       *
+       * That was the worst available outcome. `evaluate()` resolving tells EventProcessor the
+       * event succeeded, so the outbox row is marked PROCESSED and never retried; and because
+       * the idempotency guard at the top of this method keys on the persisted decision, the
+       * synthetic row makes the skip permanent. A transient fault — a dropped connection, a
+       * bad deploy — therefore buried a real opportunity forever, as an IGNORE verdict that
+       * the read layer cannot distinguish from a considered one.
+       *
+       * Throwing instead lets the outbox do its job: EventProcessor records a FAILED consumer
+       * receipt with the error, schedules a backed-off retry, and dead-letters to FAILED only
+       * after maxAttempts — where OperationalHealthService already counts it. Nothing is
+       * persisted, so a later attempt evaluates the lead cleanly.
+       *
+       * Note this catch is now only reachable for genuine faults: the semantic classifier
+       * reports its own failures by RETURNING a `failureCode` (handled above as FALLBACK),
+       * precisely so a metered-out or slow provider does not land here and trigger retries
+       * that would re-bill it. UNAVAILABLE remains in the EvaluationStatus union because
+       * historical rows may carry it.
+       */
       logger.error(
         {
           err: error,
@@ -82,30 +112,36 @@ export class AuroraService {
           opportunityId: context.opportunityId,
           policyVersion: context.policyVersion,
         },
-        'Aurora evaluation failed unexpectedly',
+        'Aurora evaluation failed unexpectedly; leaving the event for retry',
       );
-      evaluationStatus = 'UNAVAILABLE';
-      deterministicResult = { hardReject: false, hardRejectReasons: [], signals: {} };
-      finalDecision = {
-        finalScore: 0,
-        confidence: 0,
-        priority: 'LOW',
-        recommendedAction: 'IGNORE',
-        canonicalReasons: ['SYSTEM_UNAVAILABLE']
-      };
+      throw error;
     }
 
     let classifierProvider: string | null = null;
     let classifierModel: string | null = null;
     let semanticFailureCode: string | null = null;
 
+    /**
+     * Provenance is read from the configured model rather than hardcoded.
+     *
+     * Both branches previously wrote the literal 'gemini-1.5-flash', a model string that
+     * appears nowhere else in this codebase — `GEMINI_MODEL` defaults to gemini-2.5-flash.
+     * Provenance whose only job is to answer "which model decided this?" was answering it
+     * wrong, and would have kept doing so silently after any model upgrade.
+     */
     if (evaluationStatus === 'LIVE') {
       classifierProvider = 'Gemini';
-      classifierModel = 'gemini-1.5-flash';
+      classifierModel = getServerEnv().GEMINI_MODEL;
     } else if (evaluationStatus === 'FALLBACK') {
       classifierProvider = 'Gemini';
-      classifierModel = 'gemini-1.5-flash';
+      classifierModel = getServerEnv().GEMINI_MODEL;
       semanticFailureCode = semanticResult?.failureCode || 'PROVIDER_ERROR';
+    } else if (evaluationStatus === 'UNAVAILABLE') {
+      // An UNAVAILABLE row used to carry no provenance at all — null provider, null model,
+      // null failure code — so the one status that means "we broke" was also the one that
+      // recorded nothing about what broke. The scorer or the classifier threw rather than
+      // returning, so there is no provider verdict to attribute; record the failure itself.
+      semanticFailureCode = 'PROVIDER_ERROR';
     }
 
     // 4. Wrap everything in a database transaction to persist decision + outbox event

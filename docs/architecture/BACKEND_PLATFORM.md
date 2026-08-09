@@ -412,10 +412,11 @@ Tracked deliberately rather than silently. Current as of the August 2026 hardeni
 
 | Risk | Where | Status |
 |---|---|---|
-| Aurora consumer swallows all failures, persists `UNAVAILABLE` and reports success — so `EventProcessor` marks the event `PROCESSED` | `AuroraService.evaluate` | Documented as intentional degradation, but newly on the hot path since consumers were first registered |
-| `GeminiSemanticClassifier.classify` is a hardcoded mock returning `confidence: 0.85` | `src/modules/aurora/classifiers/` | Open |
+| `aurora.opportunity.evaluated` has a producer but no registered consumer, so `EventProcessor` marks it `PROCESSED` on the zero-consumer branch | events | **Intentional.** The decision is already durable in `AuroraDecision`, which is what the product view reads; the event exists for analytics and future consumers. Revisit only if something needs to react to a verdict. |
+| `opportunity.dismissed` has neither producer nor consumer, and `LeadService.dismissLead` is the one lead transition not wrapped in a transaction | `LeadService.ts` | Open — emitting it would require wrapping that update first |
+| `LeadStatus.VIEWED` is declared but never written by anything | `prisma/schema.prisma` | Open — dead state |
 | Deep-cloned `sanitizeDetails` output is the only thing keeping zod's `received` (the caller's rejected input) out of 4xx bodies | `errors.ts` + every route that passes `details` | Open — convention, not enforced |
-| Event graph has no producer for `opportunity.discovered` / `opportunity.engaged` / `lead.converted`, and no consumer for `aurora.opportunity.evaluated` | events + gamify | Open — see `AURORA_GAMIFY_ARCHITECTURE.md` |
+| The shipped `AuroraDecision` / `AuroraFeedback` models diverge from the ones `AURORA_GAMIFY_ARCHITECTURE.md` specifies — no FK to `Lead`, no `userId`, no `dimensions`, and uniqueness on `(sourceEventId, …versions)` rather than `opportunityId` | `prisma/schema.prisma` | Open — "decisions for this tenant" cannot be queried without joining through the event payload |
 | macOS/cloud-sync shadow copies (`Foo 2.tsx`) reappear in bulk and are invisible to git, lint and tsc via the `* 2.*` / `* [0-9].*` ignore patterns | repo-wide | **Cleared 2026-08-09 (58 files). Recurrence is the risk, not the files** — re-run the audit below whenever the sync client has been active. |
 | Backlogged `DomainEventLog` rows replay in one tick on first deploy of the drain | cron | **Checked 2026-08-09 against the Supabase instance in `.env.local`: `DomainEventLog` and `DomainEventConsumerReceipt` are both empty, so there is no backlog to replay.** Consistent rather than surprising — the only two `writeOutbox` producers are `AuroraService:158` and `AuroraFeedbackService:75`, and `AuroraDecision`/`AuroraFeedback` are also empty, so neither has ever run. Re-check against the deploy target if it is a different instance than the one configured locally. |
 | `getCurrentUser()` is not memoized: each call is `auth()` + a `findUnique` + two deletion-state queries, so a request that calls it twice pays ~6 round trips | `lib/auth.ts` | Open — cost, not correctness |
@@ -441,6 +442,69 @@ paths now raise `ValidationError` and render as `{ error, code, details? }` ·
 `permanentRedirect` and `notFound`, which made the redirect hazard unreachable from the default
 jsdom environment — the mock now models them against Next 16's digest formats, and
 `server-action.jsdom.test.ts` exercises the wrapper through it.
+
+### Aurora went live, August 2026
+
+Aurora was fully wired and completely inert: `EventFactory.create` had two non-test call sites
+in the repo, both of them Aurora's *own* outputs, so the pipeline had no input at either end.
+
+**A `Lead` is the opportunity.** There is no `Opportunity` table and `AuroraDecision.opportunityId`
+is a bare string with no FK, so the producers set `opportunityId = lead.id`. That needs no
+migration and makes `AuroraDecisionReader.findLatestForOpportunity` work as written.
+
+Producers, each emitted inside the transaction that already performs the mutation:
+
+| Event | Seam | Exactly-once hook |
+|---|---|---|
+| `opportunity.discovered` | `ScanProviderService.persistCompletedAttempt` | A pre-insert read of stored `externalPostId`s. `createMany({skipDuplicates})` returns no ids and the post-insert read deliberately includes re-observed posts (they still need `LeadMatch` rows), so first sighting is established *before* the insert. Without it, Aurora would re-evaluate — and re-bill — every lead on every daily scan. |
+| `opportunity.engaged` | `LeadService.claimQuest` | The existing `claimed.count !== 1` guard on `status: 'NEW'`. |
+| `lead.converted` | `CrmDeliveryService` delivery completion | The existing `crmExportedAt: null` guard. Conversion is defined as a successful CRM export — the strongest intent the product records, since `LeadStatus` has no `CONVERTED` member. |
+
+The last two matter more than they look: Gamify pays XP on both, so emitting outside the
+transaction would let a user do the work and silently earn nothing.
+
+**The classifier is real.** `GeminiSemanticClassifier` calls Gemini with `responseMimeType:
+'application/json'` and a response schema, zod-parses the result independently (a schema is an
+instruction to the model, not a guarantee), and has an 8s per-attempt budget with exactly one
+retry — for transient network errors only. A 4xx is a statement about our request and fails
+identically on a second attempt; a timeout is not retried because the budget *is* the budget and
+16s on one lead starves the rest of the batch.
+
+It **never throws**. Every failure returns a `failureCode`, which `AuroraService` records as
+`FALLBACK`. That is deliberate: a throw would dead-letter the event and re-bill the provider on
+every retry, when the deterministic signals are usually good enough to act on.
+
+**`auroraClassify` is a new limiter tier** (300/24h per tenant, hashed). Not the `ai` tier and not
+`AiUsageLimiter` — both of those are the human's own budget for chat and AI replies, and Aurora
+spends without the user asking for anything. It is sized as a blast radius, not a cost control:
+the pipeline's own ceiling is ~100 leads/tenant/day (10 keywords x 10 results x one daily scan x
+one provider), about $0.05/tenant/day. The tier is what stops a raised keyword cap or a second
+enabled provider from scaling the bill with nothing in the way. Metering requires the tenant, so
+`userId` now rides the `opportunity.discovered` payload — the outbox worker has no session.
+
+Four bugs found while wiring it, each of which would have been invisible in production:
+
+- **`AuroraService` decided `FALLBACK` by string-matching** the literal `'Classifier failed or
+  timed out'` in `reasons`. Every real failure mode reports different prose, so all of them would
+  have been recorded as `LIVE` with real provider provenance and confidence 0 — indistinguishable
+  from a genuine low-confidence verdict. Now keyed on `failureCode`.
+- **The classifier emitted `businessFit: 'EXCELLENT'`**, which `CanonicalPolicyScorer` does not
+  match — it adds 15 points only for `'HIGH'`. The best-sounding answer scored the same as the
+  worst. The response schema now permits only HIGH/MEDIUM/LOW.
+- **Provenance was hardcoded `'gemini-1.5-flash'`**, a model string that appears nowhere else
+  here (`GEMINI_MODEL` defaults to `gemini-2.5-flash`). Now read from env.
+- **The consumer never supplied `ageDays` / `exactMatch` / `sourceQuality`**, the only three
+  signals `DeterministicScorer` reads — so the deterministic half was a no-op that still looked
+  like it had run. It is what the `FALLBACK` path leans on when the classifier cannot answer.
+
+**The swallow is gone, and this is a behaviour change.** `AuroraService.evaluate` used to catch
+any unexpected failure, persist a synthetic score-0 / `IGNORE` / `UNAVAILABLE` decision, and
+return normally. That was the worst available outcome: resolving tells `EventProcessor` the event
+succeeded so it is never retried, and the persisted row then trips the idempotency guard, making
+the skip permanent. A dropped connection buried a real lead forever as a verdict the read layer
+cannot distinguish from a considered one. It now rethrows and persists nothing, so the outbox
+retries with backoff and dead-letters to `FAILED` where `OperationalHealthService` already counts
+it. `UNAVAILABLE` stays in the union for historical rows.
 
 **Withdrawn, not fixed:** the "`ai` tier is charged under two identifiers" entry was wrong. It
 assumed an internal DB id distinct from the Clerk id; there is no such thing here — `User.id` *is*

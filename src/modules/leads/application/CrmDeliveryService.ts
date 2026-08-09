@@ -8,6 +8,8 @@ import {
   type ClaimedDurableJob,
 } from '@/src/modules/core/jobs/DurableJobRepository'
 import { durableErrorCode, DurableJobError } from '@/src/modules/core/jobs/jobErrors'
+import { EventFactory } from '@/src/modules/core/events/EventFactory'
+import { EventStore } from '@/src/modules/core/events/EventStore'
 import { postCrmWebhook } from '@/src/modules/core/security/crmWebhookRequest'
 import { normalizeCrmWebhookUrl } from '@/src/modules/core/security/crmWebhookUrl'
 
@@ -235,15 +237,47 @@ export class CrmDeliveryService {
       })
       if (marked.count !== 1) return
 
+      const convertedAt = new Date()
       const lead = await tx.lead.updateMany({
         where: { id: delivery.leadId, userId: job.userId, crmExportedAt: null },
-        data: { crmExportedAt: new Date() },
+        data: { crmExportedAt: convertedAt },
       })
       if (lead.count === 1) {
         await tx.user.update({
           where: { id: job.userId },
           data: { questsExported: { increment: 1 } },
         })
+
+        /**
+         * `lead.converted`, emitted in the delivery-completion transaction behind the
+         * `crmExportedAt: null` guard.
+         *
+         * Conversion is defined as a successful CRM export: the user cared enough about this
+         * lead to push it into the system they actually sell from. That is the strongest
+         * intent signal the product currently records — `LeadStatus` has no CONVERTED member,
+         * and `VIEWED` is never written by anything.
+         *
+         * The null guard is the exactly-once hook, and it matters more here than elsewhere
+         * because Gamify pays XP on this event: a redelivered job whose lead already carries
+         * `crmExportedAt` updates zero rows and never reaches this branch, so a retry cannot
+         * mint a second reward.
+         */
+        await EventStore.writeOutbox(
+          EventFactory.create({
+            type: 'lead.converted',
+            version: 1,
+            actorId: job.userId,
+            source: 'CrmDeliveryService',
+            idempotencyKey: `lead.converted:${delivery.leadId}`,
+            payload: {
+              leadId: delivery.leadId,
+              opportunityId: delivery.leadId,
+              conversionType: 'CRM_EXPORTED',
+              convertedAt: convertedAt.toISOString(),
+            },
+          }),
+          tx,
+        )
       }
     })
   }

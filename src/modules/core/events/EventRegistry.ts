@@ -9,8 +9,21 @@ export interface EventDefinition<T extends z.ZodTypeAny = z.ZodTypeAny> {
 
 // Canonical Event Payload Schemas
 export const OpportunityDiscoveredPayloadSchema = z.object({
+  /**
+   * There is no Opportunity table: a Lead *is* the opportunity, so this carries the lead id.
+   * Both fields are kept because `AuroraDecision.opportunityId` and
+   * `AuroraDecisionReader.findLatestForOpportunity` are already written against
+   * `opportunityId`, and collapsing them would be a schema migration for no behavioural gain.
+   */
   opportunityId: z.string().min(1),
   leadId: z.string().min(1),
+  /**
+   * The tenant who owns the lead. Aurora runs in the outbox worker, which has no request and
+   * therefore no session to derive a tenant from, so the owner has to ride the event. Without
+   * it the semantic classifier cannot be metered per tenant and one account's scan could spend
+   * the whole product's AI budget.
+   */
+  userId: z.string().min(1),
   keywordId: z.string().min(1),
   keywordPhrase: z.string().min(1),
   platform: z.string().min(1),
@@ -49,7 +62,13 @@ export const AuroraEvaluatedPayloadSchema = z.object({
   opportunityId: z.string().min(1),
   leadId: z.string().min(1).optional(),
   finalScore: z.number().int().min(0).max(100),
-  confidence: z.number().min(0).max(100),
+  /**
+   * A 0..1 fraction, NOT a percentage — `CanonicalPolicyScorer` emits 0.4/0.8/1.0 and the
+   * classifier's own confidence on the LIVE path. The bound was `max(100)`, which accepted
+   * the right values for the wrong reason: every real 0..1 confidence passes a 0..100 check,
+   * so the schema could never catch a unit mix-up in either direction.
+   */
+  confidence: z.number().min(0).max(1),
   priority: z.enum(['LOW', 'MEDIUM', 'HIGH', 'CRITICAL']),
   recommendedAction: z.enum(['IGNORE', 'WATCH', 'ENGAGE']),
   reasons: z.array(z.string()),

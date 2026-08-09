@@ -14,6 +14,7 @@ const mocks = vi.hoisted(() => ({
   postCrmWebhook: vi.fn(),
   markSucceeded: vi.fn(),
   scheduleRetry: vi.fn(),
+  domainEventCreate: vi.fn(),
 }))
 
 vi.mock('server-only', () => ({}))
@@ -36,6 +37,9 @@ const tx = {
   },
   durableJob: { create: mocks.jobCreate },
   user: { update: mocks.userUpdate },
+  // `lead.converted` is written through EventStore.writeOutbox on this client, so it shares
+  // the delivery-completion transaction with the crmExportedAt stamp.
+  domainEventLog: { create: mocks.domainEventCreate },
   $queryRaw: mocks.queryRaw,
 }
 

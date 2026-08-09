@@ -2,8 +2,8 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { AuroraService } from '../AuroraService';
 import { DeterministicScorer } from '../classifiers/DeterministicScorer';
-import { GeminiSemanticClassifier } from '../classifiers/GeminiSemanticClassifier';
 import { CanonicalPolicyScorer } from '../classifiers/CanonicalPolicyScorer';
+import type { AuroraSemanticClassifier, AuroraSemanticResult } from '../types';
 import { PrismaClient } from '@prisma/client';
 import { EventStore } from '../../core/events/EventStore';
 
@@ -12,6 +12,38 @@ vi.mock('../../core/events/EventStore', () => ({
     writeOutbox: vi.fn(),
   }
 }));
+
+// Provenance is read from the configured model rather than hardcoded, so the orchestrator
+// now touches env. Pinned here so these cases do not depend on the machine's .env.local.
+vi.mock('@/lib/env', () => ({
+  getServerEnv: () => ({ GEMINI_MODEL: 'gemini-2.5-flash' }),
+}));
+
+/**
+ * A classifier double.
+ *
+ * These cases cover the ORCHESTRATOR — idempotency, status selection, provenance, what gets
+ * persisted and emitted. They used to construct the real `GeminiSemanticClassifier` and lean
+ * on its hardcoded stub output, which meant they silently became network- and limiter-bound
+ * the moment it became a real adapter. The adapter has its own tests; this decouples them.
+ */
+function stubClassifier(result: Partial<AuroraSemanticResult> = {}): AuroraSemanticClassifier {
+  return {
+    classify: vi.fn(async () => ({
+      confidence: 0.85,
+      semanticSignals: {
+        relevance: 'HIGH',
+        commercialIntent: true,
+        intentCategory: 'PURCHASE',
+        // MEDIUM, not HIGH: the scorer adds 15 for a HIGH fit, which would cap this fixture
+        // at 100/CRITICAL and stop it exercising the ENGAGE/HIGH band.
+        businessFit: 'MEDIUM',
+      },
+      reasons: ['Strong intent detected'],
+      ...result,
+    })),
+  };
+}
 
 const mockPrisma = {
   auroraDecision: {
@@ -38,7 +70,7 @@ describe('AuroraService', () => {
     const service = new AuroraService(
       mockPrisma,
       new DeterministicScorer(),
-      new GeminiSemanticClassifier(),
+      stubClassifier(),
       new CanonicalPolicyScorer()
     );
 
@@ -62,7 +94,7 @@ describe('AuroraService', () => {
       id: 'decision-1',
       opportunityId: 'opp-1',
       finalScore: 85,
-      confidence: 100,
+      confidence: 0.85,
       priority: 'HIGH',
       recommendedAction: 'ENGAGE',
       reasons: ['Strong signals'],
@@ -71,7 +103,7 @@ describe('AuroraService', () => {
     const service = new AuroraService(
       mockPrisma,
       new DeterministicScorer(), // Will not hard reject this input
-      new GeminiSemanticClassifier(), // Will return confidence 0.85 and HIGH relevance
+      stubClassifier(),
       new CanonicalPolicyScorer() // Will score (50 + 20 + 20 = 90 -> ENGAGE/HIGH)
     );
 
@@ -119,13 +151,13 @@ describe('AuroraService', () => {
       id: 'decision-2',
       opportunityId: 'opp-2',
       finalScore: 0,
-      confidence: 100,
+      confidence: 0.85,
       priority: 'LOW',
       recommendedAction: 'IGNORE',
       reasons: ['Hard reject triggered'],
     } as any);
 
-    const semanticClassifier = new GeminiSemanticClassifier();
+    const semanticClassifier = stubClassifier();
     const classifySpy = vi.spyOn(semanticClassifier, 'classify');
 
     const service = new AuroraService(
@@ -155,17 +187,17 @@ describe('AuroraService', () => {
     }));
   });
 
-  it('should save UNAVAILABLE decision with 0 confidence on unexpected failure', async () => {
+  /**
+   * THE SUPPRESSED-OPPORTUNITY REGRESSION.
+   *
+   * This previously asserted the opposite: that an unexpected failure still persisted a
+   * synthetic score-0 / IGNORE decision and resolved normally. That combination is what made
+   * a transient fault permanent — a resolved evaluate() marks the outbox row PROCESSED so it
+   * never retries, and the persisted row then trips the idempotency guard on any future
+   * attempt. A real lead was buried as IGNORE, indistinguishable from a considered verdict.
+   */
+  it('rethrows an unexpected failure instead of burying the lead as IGNORE', async () => {
     vi.mocked(mockPrisma.auroraDecision.findUnique).mockResolvedValueOnce(null);
-    vi.mocked(mockPrisma.auroraDecision.create).mockResolvedValueOnce({
-      id: 'decision-err',
-      opportunityId: 'opp-err',
-      finalScore: 0,
-      confidence: 0,
-      priority: 'LOW',
-      recommendedAction: 'IGNORE',
-      reasons: ['SYSTEM_UNAVAILABLE'],
-    } as any);
 
     const deterministicScorer = new DeterministicScorer();
     vi.spyOn(deterministicScorer, 'score').mockRejectedValueOnce(new Error('Unexpected Database timeout'));
@@ -173,7 +205,7 @@ describe('AuroraService', () => {
     const service = new AuroraService(
       mockPrisma,
       deterministicScorer,
-      new GeminiSemanticClassifier(),
+      stubClassifier(),
       new CanonicalPolicyScorer()
     );
 
@@ -186,15 +218,13 @@ describe('AuroraService', () => {
       discoveredAt: new Date().toISOString(),
     };
 
-    await service.evaluate(context);
+    // Must reject: a resolved evaluate() is EventProcessor's signal to mark the event
+    // PROCESSED, which is exactly what must not happen for a fault that deserves a retry.
+    await expect(service.evaluate(context)).rejects.toThrow('Unexpected Database timeout');
 
-    expect(mockPrisma.auroraDecision.create).toHaveBeenCalledWith(expect.objectContaining({
-      data: expect.objectContaining({
-        evaluationStatus: 'UNAVAILABLE',
-        confidence: 0,
-        finalScore: 0,
-        recommendedAction: 'IGNORE',
-      })
-    }));
+    // And nothing may be written — a persisted decision would make the skip permanent via
+    // the idempotency guard, so a later retry could never re-evaluate this opportunity.
+    expect(mockPrisma.auroraDecision.create).not.toHaveBeenCalled();
+    expect(mockPrisma.$transaction).not.toHaveBeenCalled();
   });
 });

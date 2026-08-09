@@ -3,6 +3,8 @@ import prisma from '@/lib/prisma'
 import { requireCurrentUser } from '@/lib/auth'
 import { EntitlementService } from '@/src/modules/billing/application/EntitlementService'
 import { logger } from '@/src/modules/core/infrastructure/logger'
+import { EventFactory } from '@/src/modules/core/events/EventFactory'
+import { EventStore } from '@/src/modules/core/events/EventStore'
 import { AiUsageLimiter } from '@/src/modules/core/security/AiUsageLimiter'
 import {
   normalizeCrmWebhookUrl,
@@ -43,11 +45,39 @@ export class LeadService {
       const dbUser = await tx.user.findUnique({ where: { id: user.id } })
       if (!dbUser) return null
 
+      const engagedAt = new Date()
       const claimed = await tx.lead.updateMany({
         where: { id: leadId, userId: user.id, status: 'NEW' },
-        data: { status: 'CONTACTED', claimedAt: new Date(), contactedAt: new Date() },
+        data: { status: 'CONTACTED', claimedAt: engagedAt, contactedAt: engagedAt },
       })
       if (claimed.count !== 1) return null
+
+      /**
+       * `opportunity.engaged`, emitted inside the claim transaction and behind the
+       * `count !== 1` guard above.
+       *
+       * That guard is what makes this exactly-once: the `status: 'NEW'` predicate means a
+       * second concurrent claim of the same lead updates zero rows and returns before
+       * reaching here, so Gamify can never be paid twice for one engagement. Emitting after
+       * the transaction instead would break that — the commit could succeed and the event be
+       * lost, silently costing the user XP they earned.
+       */
+      await EventStore.writeOutbox(
+        EventFactory.create({
+          type: 'opportunity.engaged',
+          version: 1,
+          actorId: user.id,
+          source: 'LeadService',
+          idempotencyKey: `opportunity.engaged:${leadId}`,
+          payload: {
+            opportunityId: leadId,
+            leadId,
+            actionTaken: 'CLAIMED',
+            engagedAt: engagedAt.toISOString(),
+          },
+        }),
+        tx,
+      )
 
       const nextUser = levelAfterClaim({
         xp: dbUser.xp,

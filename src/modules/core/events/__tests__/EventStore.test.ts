@@ -47,6 +47,7 @@ describe('EventStore', () => {
       payload: {
         opportunityId: 'opp_test',
         leadId: 'lead_test',
+        userId: 'user_test',
         keywordId: 'kw_test',
         keywordPhrase: 'test phrase',
         platform: 'reddit',

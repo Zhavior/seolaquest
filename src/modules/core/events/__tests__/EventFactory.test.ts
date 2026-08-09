@@ -12,6 +12,7 @@ describe('EventFactory', () => {
       payload: {
         opportunityId: 'opp_123',
         leadId: 'lead_123',
+        userId: 'user_123',
         keywordId: 'kw_123',
         keywordPhrase: 'seo tools',
         platform: 'reddit',

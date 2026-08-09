@@ -3,6 +3,8 @@ import 'server-only'
 import type { Prisma } from '@prisma/client'
 import prisma from '@/lib/prisma'
 import { logger } from '@/src/modules/core/infrastructure/logger'
+import { EventFactory } from '@/src/modules/core/events/EventFactory'
+import { EventStore } from '@/src/modules/core/events/EventStore'
 import { MAX_ACTIVE_KEYWORDS_PER_TENANT } from '@/src/modules/keywords/application/KeywordService'
 import {
   parseRedditPayload,
@@ -132,6 +134,25 @@ async function persistCompletedAttempt(args: {
   return prisma.$transaction(async (tx) => {
     let insertedCount = 0
     if (records.length) {
+      const externalPostIdsSeen = records.map((record) => record.externalPostId)
+
+      /**
+       * Which of these posts we had already stored, read BEFORE the insert.
+       *
+       * `createMany({ skipDuplicates: true })` returns only a count and no ids, and the
+       * `findMany` below deliberately re-reads every id in the batch so `LeadMatch` rows are
+       * written for re-observed posts too. That means the post-insert read cannot tell a
+       * first sighting from a repeat one, and `opportunity.discovered` must fire only on a
+       * first sighting: Aurora bills a Gemini call per event, and re-emitting for a post seen
+       * on every daily scan would re-evaluate the same lead forever. Aurora's own idempotency
+       * key is derived from the *event* id, so it would not dedupe them either.
+       */
+      const alreadyStored = await tx.lead.findMany({
+        where: { userId, externalPostId: { in: externalPostIdsSeen } },
+        select: { externalPostId: true },
+      })
+      const previouslySeen = new Set(alreadyStored.map((lead) => lead.externalPostId))
+
       const created = await tx.lead.createMany({
         data: records.map((record): Prisma.LeadCreateManyInput => ({
           userId,
@@ -148,7 +169,7 @@ async function persistCompletedAttempt(args: {
         skipDuplicates: true,
       })
       insertedCount = created.count
-      const externalPostIds = records.map((record) => record.externalPostId)
+      const externalPostIds = externalPostIdsSeen
       await tx.lead.updateMany({
         where: { userId, externalPostId: { in: externalPostIds } },
         data: { observedAt: completedAt },
@@ -168,6 +189,68 @@ async function persistCompletedAttempt(args: {
         })),
         skipDuplicates: true,
       })
+
+      /**
+       * The discovery event, written in the SAME transaction as the lead rows.
+       *
+       * This is the transactional outbox rule the architecture doc states at §3: if the
+       * insert commits and the event does not, Aurora never sees the lead and nothing ever
+       * notices. Writing it here rather than after the transaction is what makes
+       * "every stored lead was evaluated" true by construction.
+       *
+       * Emitting is best-effort per lead only in the sense that a payload we cannot build is
+       * skipped with a warning — a lead whose provider record is missing a required field
+       * must not abort the whole scan transaction and lose the other leads with it.
+       */
+      const recordByExternalPostId = new Map(records.map((record) => [record.externalPostId, record]))
+      const newlyDiscovered = persistedLeads.filter((lead) => !previouslySeen.has(lead.externalPostId))
+
+      for (const lead of newlyDiscovered) {
+        const record = recordByExternalPostId.get(lead.externalPostId)
+        if (!record) continue
+
+        try {
+          const event = EventFactory.create({
+            type: 'opportunity.discovered',
+            version: 1,
+            // The scan is machine-initiated; the tenant is carried on the payload instead so
+            // Aurora can meter its classifier spend against the account that owns the lead.
+            actorId: 'scan-pipeline',
+            source: 'ScanProviderService',
+            // Stable per lead, so a replayed scan cannot enqueue a second evaluation of the
+            // same opportunity even if the pre-insert read above were ever to race.
+            idempotencyKey: `opportunity.discovered:${lead.id}`,
+            payload: {
+              // A Lead IS the opportunity — there is no Opportunity table. See the schema
+              // comment on OpportunityDiscoveredPayloadSchema.
+              opportunityId: lead.id,
+              leadId: lead.id,
+              userId,
+              keywordId: keyword.id,
+              keywordPhrase: keyword.phrase,
+              platform: provider === 'X' ? 'TWITTER' : 'REDDIT',
+              externalPostId: record.externalPostId,
+              author: record.author,
+              content: record.content,
+              url: record.url,
+              sourceCreatedAt: record.sourceCreatedAt.toISOString(),
+            },
+          })
+
+          await EventStore.writeOutbox(event, tx)
+        } catch (error) {
+          logger.warn(
+            {
+              err: error,
+              event: 'opportunity_discovered_not_emitted',
+              outcomeCode: 'OPPORTUNITY_EVENT_BUILD_FAILED',
+              leadId: lead.id,
+              scanRunId,
+            },
+            'Stored the lead but could not emit opportunity.discovered',
+          )
+        }
+      }
     }
 
     await tx.providerScanAttempt.update({
