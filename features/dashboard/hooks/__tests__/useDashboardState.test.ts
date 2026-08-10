@@ -89,23 +89,32 @@ describe('useDashboardState', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     resetActionMocks()
-    vi.stubGlobal('fetch', vi.fn().mockImplementation(() =>
-      Promise.resolve(
-        new Response(
-          JSON.stringify({
-            success: true,
-            scan: {
-              status: 'SUCCEEDED',
-              counts: { leadsCreated: 2 },
-              refunded: false,
-              balance: 49,
-              provider: { status: 'AVAILABLE' },
-            },
-          }),
-          { status: 200 },
-        ),
-      ),
-    ))
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockImplementation((input: RequestInfo | URL) => {
+        const url = String(input)
+        if (url.includes('/api/dashboard/leads')) {
+          return Promise.resolve(
+            new Response(JSON.stringify({ ok: true, leads: mockLeads }), { status: 200 })
+          )
+        }
+        return Promise.resolve(
+          new Response(
+            JSON.stringify({
+              success: true,
+              scan: {
+                status: 'SUCCEEDED',
+                counts: { leadsCreated: 2 },
+                refunded: false,
+                balance: 49,
+                provider: { status: 'AVAILABLE' },
+              },
+            }),
+            { status: 200 }
+          )
+        )
+      })
+    )
   })
 
   it('initializes with provided user and leads', () => {
@@ -240,5 +249,101 @@ describe('useDashboardState', () => {
     ])
     expect(result.current.scanOutcome).toBe('succeeded')
     expect(result.current.remainingQuests).toBe(49)
+  })
+
+  it('adopts newer server lead props after refresh without remounting', async () => {
+    const initialLeads = mockLeads
+    const refreshedLeads: DashboardLead[] = [
+      ...mockLeads,
+      {
+        id: 'lead-3',
+        platform: 'X',
+        author: '@new',
+        content: 'Need a CRM this week',
+        matched: 'CRM',
+        url: 'https://x.com/3',
+        sourceCreatedAt: new Date().toISOString(),
+        aurora: null,
+      },
+    ]
+
+    const { result, rerender } = renderHook(
+      ({ leads }) =>
+        useDashboardState({
+          dbUser: mockUser,
+          dbKeywords: [{ id: 'k1', phrase: 'CRM', active: true }],
+          dbLeads: leads,
+          dbAnalytics: mockAnalytics,
+          dbLeaderboard: [],
+        }),
+      { initialProps: { leads: initialLeads } }
+    )
+
+    expect(result.current.leads).toHaveLength(2)
+
+    await act(async () => {
+      result.current.dismissLead('lead-1')
+      await Promise.resolve()
+      await Promise.resolve()
+    })
+    expect(result.current.leads.map((lead) => lead.id)).toEqual(['lead-2'])
+
+    // Stale server props (same fingerprint) must not revive the dismissed lead.
+    rerender({ leads: [...initialLeads] })
+    expect(result.current.leads.map((lead) => lead.id)).toEqual(['lead-2'])
+
+    // Changed server snapshot (post-refresh) adopts the new queue.
+    await act(async () => {
+      rerender({ leads: refreshedLeads })
+    })
+    expect(result.current.leads.map((lead) => lead.id)).toEqual(['lead-1', 'lead-2', 'lead-3'])
+    expect(result.current.leadsSliceStatus).toBe('ok')
+  })
+
+  it('marks the leads slice degraded when a background refresh fails', async () => {
+    const { result } = renderHook(() =>
+      useDashboardState({
+        dbUser: mockUser,
+        dbKeywords: [],
+        dbLeads: mockLeads,
+        dbAnalytics: mockAnalytics,
+        dbLeaderboard: [],
+      })
+    )
+
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue(new Response(JSON.stringify({ ok: false }), { status: 500 }))
+    )
+
+    await act(async () => {
+      await result.current.refreshLeadsSlice()
+    })
+
+    expect(result.current.leadsSliceStatus).toBe('degraded')
+    expect(result.current.leads).toHaveLength(2)
+  })
+
+  it('does not fetch /api/dashboard/leads on mount', async () => {
+    const fetchMock = vi.fn().mockResolvedValue(
+      new Response(JSON.stringify({ ok: true, leads: [] }), { status: 200 })
+    )
+    vi.stubGlobal('fetch', fetchMock)
+
+    renderHook(() =>
+      useDashboardState({
+        dbUser: mockUser,
+        dbKeywords: [],
+        dbLeads: mockLeads,
+        dbAnalytics: mockAnalytics,
+        dbLeaderboard: [],
+      })
+    )
+
+    await act(async () => {
+      await Promise.resolve()
+    })
+
+    expect(fetchMock).not.toHaveBeenCalled()
   })
 })

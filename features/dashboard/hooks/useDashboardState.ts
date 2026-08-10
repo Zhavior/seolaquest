@@ -17,8 +17,10 @@ import {
   AnalyticsData,
   LeaderboardUser
 } from '@/features/dashboard/types'
+import { fingerprintKeywords, fingerprintLeads } from '@/features/dashboard/lib/serverSnapshot'
 
 export type DashboardAsyncStatus = 'idle' | 'scanning' | 'claiming' | 'replying' | 'exporting'
+export type DashboardSliceStatus = 'ok' | 'degraded'
 type ScanOutcome = 'waiting' | 'pending' | 'succeeded' | 'failed'
 type ScanStatus = 'QUEUED' | 'RUNNING' | 'SUCCEEDED' | 'FAILED_REFUNDED' | 'DEAD' | 'CANCELLED' | 'UNKNOWN'
 
@@ -66,6 +68,7 @@ export function useDashboardState({
   const [remainingQuests, setRemainingQuests] = useState(dbUser.questsRemaining ?? 0)
   const [claimedCount, setClaimedCount] = useState(0)
   const [particles] = useState<{ id: number; x: number; y: number }[]>([])
+  const [leadsSliceStatus, setLeadsSliceStatus] = useState<DashboardSliceStatus>('ok')
 
   const [activeQuickStrikeLead, setActiveQuickStrikeLead] = useState<DashboardLead | null>(null)
   const [recentLevelUp, setRecentLevelUp] = useState(false)
@@ -78,27 +81,63 @@ export function useDashboardState({
   const restoredScanRef = useRef<string | null>(null)
   const activeScanAbortRef = useRef<AbortController | null>(null)
 
+  /*
+   * Last server snapshots we already applied. Optimistic client edits (add /
+   * dismiss / claim) must not be clobbered by a parent re-render that still
+   * carries the previous RSC payload — only a *changed* fingerprint adopts.
+   */
+  const lastKeywordsFpRef = useRef(fingerprintKeywords(dbKeywords))
+  const lastLeadsFpRef = useRef(fingerprintLeads(dbLeads))
+  const lastCreditsRef = useRef(dbUser.questsRemaining ?? 0)
+
   const filter = searchParams.get('platform') || 'ALL'
 
-  const leadsHydratedRef = useRef(false)
+  const keywordsFp = fingerprintKeywords(dbKeywords)
+  const leadsFp = fingerprintLeads(dbLeads)
+  const serverCredits = dbUser.questsRemaining ?? 0
+
   useEffect(() => {
-    if (leadsHydratedRef.current) return
-    leadsHydratedRef.current = true
-    let cancelled = false
-    void (async () => {
-      try {
-        const response = await fetch('/api/dashboard/leads', { cache: 'no-store' })
-        if (!response.ok) return
-        const payload = await response.json() as { ok?: boolean; leads?: DashboardLead[] }
-        if (!cancelled && payload.ok && Array.isArray(payload.leads)) {
-          setLeads(payload.leads)
-        }
-      } catch {
-        // Server shell leads remain authoritative until the next successful refresh.
+    if (keywordsFp === lastKeywordsFpRef.current) return
+    lastKeywordsFpRef.current = keywordsFp
+    setKeywords(dbKeywords)
+  }, [keywordsFp, dbKeywords])
+
+  useEffect(() => {
+    if (leadsFp === lastLeadsFpRef.current) return
+    lastLeadsFpRef.current = leadsFp
+    setLeads(dbLeads)
+    setLeadsSliceStatus('ok')
+  }, [leadsFp, dbLeads])
+
+  useEffect(() => {
+    if (serverCredits === lastCreditsRef.current) return
+    lastCreditsRef.current = serverCredits
+    setRemainingQuests(serverCredits)
+  }, [serverCredits])
+
+  /**
+   * Background leads slice refresh — updates the queue without remounting the
+   * dashboard shell. Used after a successful scan so new matches appear even
+   * before RSC props catch up. Failures mark the slice degraded; local leads stay.
+   */
+  const refreshLeadsSlice = useCallback(async () => {
+    try {
+      const response = await fetch('/api/dashboard/leads', { cache: 'no-store' })
+      if (!response.ok) {
+        setLeadsSliceStatus('degraded')
+        return
       }
-    })()
-    return () => {
-      cancelled = true
+      const payload = (await response.json()) as { ok?: boolean; leads?: DashboardLead[] }
+      if (!payload.ok || !Array.isArray(payload.leads)) {
+        setLeadsSliceStatus('degraded')
+        return
+      }
+      const nextFp = fingerprintLeads(payload.leads)
+      lastLeadsFpRef.current = nextFp
+      setLeads(payload.leads)
+      setLeadsSliceStatus('ok')
+    } catch {
+      setLeadsSliceStatus('degraded')
     }
   }, [])
 
@@ -255,6 +294,9 @@ export function useDashboardState({
               setScanOutcome('succeeded')
               setScanStep(5)
               setAsyncStatus('idle')
+              // Slice first so the queue updates without waiting on full RSC props.
+              await refreshLeadsSlice()
+              if (signal.aborted) return
               router.refresh()
               return
             }
@@ -330,6 +372,8 @@ export function useDashboardState({
             sfx.playCoinDrop()
             setScanStep(5)
             setScanOutcome('succeeded')
+            await refreshLeadsSlice()
+            if (cancelled) return
             router.refresh()
             return
           }
@@ -351,7 +395,7 @@ export function useDashboardState({
       }
     })()
     return () => { cancelled = true }
-  }, [searchParams, router])
+  }, [searchParams, router, refreshLeadsSlice])
 
   function handleClaimBounty(lead: DashboardLead) {
     sfx.playCoinDrop()
@@ -477,6 +521,8 @@ export function useDashboardState({
     setRemainingQuests,
     claimedCount,
     particles,
+    leadsSliceStatus,
+    refreshLeadsSlice,
     activeQuickStrikeLead,
     setActiveQuickStrikeLead,
     recentLevelUp,

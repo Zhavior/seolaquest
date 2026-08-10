@@ -1,195 +1,20 @@
 'use client'
 
-import { motion, Variants } from 'framer-motion'
+import Link from 'next/link'
+import { motion, type Variants } from 'framer-motion'
 import {
-  Radar,
-  Zap,
-  Crosshair,
-  Crown,
-  Coins,
-  Swords,
-  TimerReset,
-  Shield,
   Activity,
+  CheckCircle2,
+  Crown,
+  Crosshair,
+  Radar,
+  ScrollText,
+  Shield,
+  Swords,
 } from 'lucide-react'
 import HeroCrest from '@/components/HeroCrest'
-import { DashboardUser, DashboardLead } from '@/features/dashboard/types'
-
-function ProviderStatusStrip() {
-  const providers = [
-    {
-      label: 'X',
-      state: 'ACTIVE',
-      detail: 'Signal feed live',
-      tone: 'bg-success',
-      dotTone: 'bg-[#2F5A00]',
-    },
-    {
-      label: 'Reddit',
-      state: 'SOON',
-      detail: 'Coming soon',
-      tone: 'bg-[#F7D046]',
-      dotTone: 'bg-[#7A5200]',
-    },
-    {
-      label: 'LinkedIn',
-      state: 'LOCKED',
-      detail: 'Auth needed',
-      tone: 'bg-card',
-      dotTone: 'bg-black',
-    },
-  ]
-
-  return (
-    <div className="flex flex-wrap items-center gap-2">
-      {providers.map((provider) => (
-        <button
-          key={provider.label}
-          type="button"
-          title={`${provider.label}: ${provider.state} — ${provider.detail}`}
-          className={`inline-flex min-h-11 min-w-0 items-center gap-2 px-3 py-2 text-xs font-black uppercase tracking-wider shadow-brutal-sm border-2 border-outline ${provider.tone}`}
-        >
-          <span className={`inline-block h-3 w-3 shrink-0 rounded-full border-2 border-outline ${provider.dotTone}`} />
-          <span className="truncate">
-            {provider.label} {provider.state}
-          </span>
-        </button>
-      ))}
-    </div>
-  )
-}
-
-function getIntentScore(lead: DashboardLead) {
-  const body = `${lead.content} ${lead.matched}`.toLowerCase()
-
-  let score = 58
-  if (/budget|pricing|quote|urgent|asap|switch/i.test(body)) score += 24
-  if (/alternative|compare|best|recommend|looking for/i.test(body)) score += 12
-  if ((lead.matched || '').split(',').filter(Boolean).length >= 2) score += 6
-
-  return Math.min(score, 98)
-}
-
-function getEstimatedArr(lead: DashboardLead) {
-  const score = getIntentScore(lead)
-
-  if (score >= 92) return 4800
-  if (score >= 84) return 2400
-  if (score >= 72) return 1200
-  return 600
-}
-
-function getTopLeadMetrics(leads: DashboardLead[]) {
-  if (!leads.length) {
-    return {
-      hottestLeadScore: 0,
-      projectedArr: 0,
-      highIntentCount: 0,
-    }
-  }
-
-  const scores = leads.map(getIntentScore)
-  const hottestLeadScore = Math.max(...scores)
-  const projectedArr = leads.reduce((sum, lead) => sum + getEstimatedArr(lead), 0)
-  const highIntentCount = scores.filter((score) => score >= 80).length
-
-  return {
-    hottestLeadScore,
-    projectedArr,
-    highIntentCount,
-  }
-}
-
-function TelemetryCard({
-  icon,
-  label,
-  value,
-  detail,
-  tone = 'bg-card',
-}: {
-  icon: React.ReactNode
-  label: string
-  value: string
-  detail: string
-  tone?: string
-}) {
-  return (
-    <div className={`p-6 flex flex-col h-full border-4 border-outline shadow-brutal-lg ${tone}`}>
-      <div className="flex items-start justify-between gap-3 mb-6">
-        <p className="text-xs font-black uppercase tracking-widest text-on-accent">{label}</p>
-        <div className="bg-[#FFF4BF] p-2 border-2 border-outline shadow-brutal-sm">
-          {icon}
-        </div>
-      </div>
-      <div className="mt-auto">
-        <p className="text-3xl md:text-4xl font-black uppercase text-ink leading-none">{value}</p>
-        <p className="mt-3 text-xs font-bold uppercase leading-relaxed text-ink/80">{detail}</p>
-      </div>
-    </div>
-  )
-}
-
-function DailyQuestCard({
-  questsRemaining,
-  leadsCount,
-  highIntentCount,
-}: {
-  questsRemaining: number
-  leadsCount: number
-  highIntentCount: number
-}) {
-  const completedQuestCount = Math.max(0, 3 - questsRemaining)
-
-  const questRows = [
-    {
-      label: 'Quest streak progress',
-      progressLabel: `${completedQuestCount} / 3`,
-      done: questsRemaining <= 0,
-      tone: 'bg-success',
-    },
-    {
-      label: 'Review 1 live lead',
-      progressLabel: `${Math.min(leadsCount, 1)} / 1`,
-      done: leadsCount >= 1,
-      tone: 'bg-[#C7FFF3]',
-    },
-    {
-      label: 'Flag high-intent targets',
-      progressLabel: `${Math.min(highIntentCount, 3)} / 3`,
-      done: highIntentCount >= 3,
-      tone: 'bg-highlight-strong',
-    },
-  ]
-
-  return (
-    <div className="bg-[#FFF9EC] p-6 border-4 border-outline shadow-brutal-lg flex flex-col">
-      <div className="flex flex-col gap-3 pb-4 sm:flex-row sm:items-start sm:justify-between">
-        <div className="min-w-0 flex-1">
-          <p className="text-xs font-black uppercase tracking-widest text-ink/60">Quest board</p>
-          <h3 className="mt-1 text-2xl font-black uppercase text-on-accent">Daily objectives</h3>
-        </div>
-        <span className="inline-flex shrink-0 items-center gap-2 border-2 border-outline bg-accent px-3 py-1.5 text-xs font-black uppercase shadow-brutal-sm">
-          <Zap className="h-4 w-4 shrink-0" />
-          +100 XP
-        </span>
-      </div>
-
-      <div className="mt-4 flex flex-col gap-2 flex-1">
-        {questRows.map((quest) => (
-          <div
-            key={quest.label}
-            className={`flex min-w-0 flex-wrap items-center justify-between gap-2 px-4 py-3 text-xs font-black uppercase tracking-wider border-3 border-outline shadow-brutal-sm ${quest.done ? quest.tone : 'bg-card'}`}
-          >
-            <span className="min-w-0 flex-1 break-words">
-              {quest.done ? '[x]' : '[ ]'} {quest.label}
-            </span>
-            <span className="shrink-0 whitespace-nowrap">{quest.progressLabel}</span>
-          </div>
-        ))}
-      </div>
-    </div>
-  )
-}
+import type { DashboardLead, DashboardUser } from '@/features/dashboard/types'
+import type { DashboardSliceStatus } from '@/features/dashboard/hooks/useDashboardState'
 
 type DashboardStatsProps = {
   item: Variants
@@ -199,71 +24,211 @@ type DashboardStatsProps = {
   recentLevelUp: boolean
   xpPercent: number
   leads: DashboardLead[]
-  shareStats: () => void
+  remainingQuests: number
+  maxCredits: number
+  leadsSliceStatus?: DashboardSliceStatus
+  shareStats?: () => void
 }
 
+function countLiveScored(leads: DashboardLead[]) {
+  return leads.filter((lead) => lead.aurora?.evaluationStatus === 'LIVE').length
+}
+
+function ProviderStatusStrip() {
+  const providers = [
+    {
+      label: 'X',
+      state: 'LIVE',
+      detail: 'Only live public source today',
+      tone: 'bg-success',
+      text: 'text-ink',
+    },
+    {
+      label: 'Reddit',
+      state: 'IN BUILD',
+      detail: 'Not available yet',
+      tone: 'bg-highlight-strong',
+      text: 'text-ink',
+    },
+    {
+      label: 'LinkedIn',
+      state: 'IN BUILD',
+      detail: 'Not available yet',
+      tone: 'bg-card',
+      text: 'text-ink',
+    },
+  ] as const
+
+  return (
+    <ul className="flex flex-wrap items-center gap-2">
+      {providers.map((provider) => (
+        <li key={provider.label}>
+          <span
+            title={`${provider.label}: ${provider.state} — ${provider.detail}`}
+            className={`inline-flex min-h-11 min-w-0 items-center gap-2 border-2 border-outline px-3 py-2 text-xs font-black uppercase tracking-wider shadow-brutal-sm ${provider.tone} ${provider.text}`}
+          >
+            <span className="sr-only">
+              {provider.label}: {provider.state}. {provider.detail}.
+            </span>
+            <Activity className="h-3.5 w-3.5 shrink-0" aria-hidden />
+            <span aria-hidden className="truncate">
+              {provider.label} · {provider.state}
+            </span>
+          </span>
+        </li>
+      ))}
+    </ul>
+  )
+}
+
+function TelemetryCard({
+  icon,
+  label,
+  value,
+  detail,
+  tone = 'bg-card',
+  testId,
+}: {
+  icon: React.ReactNode
+  label: string
+  value: string
+  detail: string
+  tone?: string
+  testId: string
+}) {
+  return (
+    <div
+      data-testid={testId}
+      className={`flex h-full flex-col border-4 border-outline p-5 shadow-brutal-lg sm:p-6 ${tone}`}
+    >
+      <div className="mb-5 flex items-start justify-between gap-3">
+        <p className="text-xs font-black uppercase tracking-widest text-ink/70">{label}</p>
+        <div className="border-2 border-outline bg-[#FFF4BF] p-2 shadow-brutal-sm">{icon}</div>
+      </div>
+      <div className="mt-auto">
+        <p className="text-3xl font-black uppercase leading-none text-ink md:text-4xl">{value}</p>
+        <p className="mt-3 text-xs font-bold uppercase leading-relaxed text-ink/80">{detail}</p>
+      </div>
+    </div>
+  )
+}
+
+/**
+ * Progress + system health from measured account facts only.
+ * No regex intent scores, ARR projections, sync clocks, or invented daily XP bonuses.
+ */
 export function DashboardStats({
   item,
   user,
   characterTitle,
   isScanning,
   recentLevelUp,
+  xpPercent,
   leads,
+  remainingQuests,
+  maxCredits,
+  leadsSliceStatus = 'ok',
 }: DashboardStatsProps) {
-  const questsRemaining = user.questsRemaining ?? 0
   const entitlements = user.entitlements ?? {
     canUsePaidScans: false,
     canGenerateAIReplies: false,
     canExportToCRM: false,
   }
-  const hasLeadData = leads.length > 0
-  const { hottestLeadScore, projectedArr, highIntentCount } = getTopLeadMetrics(leads)
+  const liveScored = countLiveScored(leads)
+  const creditReading = `${remainingQuests}/${maxCredits}`
+  const xpReading = `${user.xp}/${user.xpRequired} XP · ${xpPercent}%`
+
+  const measuredChecklist = [
+    {
+      label: 'Open leads in queue',
+      progressLabel: `${leads.length}`,
+      done: leads.length > 0,
+      tone: 'bg-[#C7FFF3]',
+    },
+    {
+      label: 'LIVE Aurora scores present',
+      progressLabel: `${liveScored}`,
+      done: liveScored > 0,
+      tone: 'bg-highlight-strong',
+    },
+    {
+      label: 'Scan credits available',
+      progressLabel: creditReading,
+      done: remainingQuests > 0,
+      tone: 'bg-success',
+    },
+  ]
 
   return (
-    <motion.div
-      variants={item}
-      className="w-full min-w-0 max-w-full flex flex-col gap-6"
-    >
-      {/* Provider Status Header Strip */}
-      <div className="border-4 border-outline bg-highlight p-6 shadow-brutal-lg">
+    <motion.div variants={item} className="flex w-full min-w-0 max-w-full flex-col gap-6">
+      <section
+        aria-labelledby="system-health-heading"
+        className="border-4 border-outline bg-highlight p-5 shadow-brutal-lg sm:p-6"
+      >
         <div className="flex flex-col gap-4">
-          <div className="flex items-center justify-between">
-            <span className="bg-black text-[#FFE600] text-xs font-black uppercase tracking-widest px-3 py-1 border-2 border-outline -rotate-1">
-              RADAR INTEGRATIONS & PROVIDERS
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <p className="text-[10px] font-black uppercase tracking-[0.18em] text-ink/60">System health</p>
+              <h2 id="system-health-heading" className="mt-1 text-xl font-black uppercase text-ink sm:text-2xl">
+                Providers & entitlements
+              </h2>
+            </div>
+            <span
+              className={`inline-flex min-h-11 items-center border-2 border-outline px-3 py-2 text-xs font-black uppercase shadow-brutal-sm ${
+                leadsSliceStatus === 'degraded' ? 'bg-[#FFE0C7] text-ink' : 'bg-card text-ink'
+              }`}
+            >
+              Queue: {leadsSliceStatus === 'degraded' ? 'degraded' : 'ok'}
             </span>
           </div>
+
           <ProviderStatusStrip />
 
-          <div className="flex flex-wrap items-center gap-3 text-xs font-black uppercase tracking-wider">
-            <span className="inline-flex items-center gap-2 border-2 border-outline bg-card px-3 py-2 shadow-brutal-sm">
-              <Radar className="h-4 w-4 shrink-0" />
-              Command pulse stable
+          <p className="inline-flex items-start gap-2 text-xs font-bold uppercase leading-snug text-ink/70">
+            <Radar className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
+            <span>
+              {isScanning
+                ? 'A scan is running or the scanner modal is open.'
+                : 'No scan freshness timestamp is available on this payload — status is not claimed as live-synced.'}
             </span>
-            <span className="inline-flex items-center gap-2 border-2 border-outline bg-highlight-strong px-3 py-2 shadow-brutal-sm">
-              <TimerReset className="h-4 w-4 shrink-0" />
-              Next auto-run 26m
-            </span>
-            <span className="inline-flex items-center gap-2 border-2 border-outline bg-info px-3 py-2 shadow-brutal-sm">
-              <Activity className="h-4 w-4 shrink-0" />
-              Last synced 4m ago
-            </span>
+          </p>
+
+          <div className="flex flex-wrap gap-2">
+            <Link
+              href="/app/runs"
+              className="inline-flex min-h-11 items-center gap-2 border-2 border-outline bg-card px-3 py-2 text-xs font-black uppercase shadow-brutal-sm hover:bg-highlight"
+            >
+              <ScrollText className="h-4 w-4" aria-hidden />
+              Open run history
+            </Link>
+            <Link
+              href="/app/billing"
+              className="inline-flex min-h-11 items-center gap-2 border-2 border-outline bg-card px-3 py-2 text-xs font-black uppercase shadow-brutal-sm hover:bg-highlight"
+            >
+              Open billing
+            </Link>
           </div>
         </div>
-      </div>
+      </section>
 
-      <div className="grid min-w-0 grid-cols-1 xl:grid-cols-[1.2fr_0.95fr] gap-6">
-        <div className="flex flex-col min-w-0 gap-6">
-          {/* Commander Profile Hero Badge */}
-          <div className="border-4 border-outline bg-highlight p-6 shadow-brutal-lg">
+      <div className="grid min-w-0 grid-cols-1 gap-6 xl:grid-cols-[1.2fr_0.95fr]">
+        <div className="flex min-w-0 flex-col gap-6">
+          <section
+            aria-labelledby="progress-path-heading"
+            className="border-4 border-outline bg-highlight p-5 shadow-brutal-lg sm:p-6"
+          >
             <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
               <div className="flex items-center gap-2">
-                <Crown className="w-6 h-6 text-[#FF5722]" />
-                <span className="border-2 border-outline bg-black px-3 py-1 text-xs font-black uppercase tracking-widest text-[#FFE600] shadow-brutal-sm">
-                  COMMANDER PROFILE
-                </span>
+                <Crown className="h-6 w-6 text-[#FF5722]" aria-hidden />
+                <div>
+                  <p className="text-[10px] font-black uppercase tracking-[0.18em] text-ink/60">Progress path</p>
+                  <h2 id="progress-path-heading" className="text-xl font-black uppercase text-ink sm:text-2xl">
+                    Hunter progression
+                  </h2>
+                </div>
               </div>
-              <span className="border-2 border-outline bg-card px-3 py-1 text-xs font-black uppercase tracking-widest text-ink shadow-brutal-sm">
-                RANK & TELEMETRY
+              <span className="border-2 border-outline bg-black px-3 py-1 text-xs font-black uppercase tracking-widest text-[#FFE600]">
+                Level {user.level}
               </span>
             </div>
 
@@ -274,93 +239,149 @@ export function DashboardStats({
               isScanning={isScanning}
               recentLevelUp={recentLevelUp}
             />
-          </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 flex-1">
+            <div className="mt-5 border-3 border-outline bg-black p-3 shadow-brutal-sm">
+              <div className="mb-2 flex items-center justify-between gap-2 text-[11px] font-black uppercase text-[#FFE600]">
+                <span>XP toward next level</span>
+                <span>{xpReading}</span>
+              </div>
+              <div
+                className="h-3 w-full overflow-hidden border-2 border-white bg-slate-900"
+                role="progressbar"
+                aria-valuemin={0}
+                aria-valuemax={100}
+                aria-valuenow={xpPercent}
+                aria-label={`Experience progress ${xpPercent} percent`}
+              >
+                <div className="h-full bg-[#FFE600]" style={{ width: `${xpPercent}%` }} />
+              </div>
+            </div>
+          </section>
+
+          <div className="grid flex-1 grid-cols-1 gap-6 sm:grid-cols-2">
             <TelemetryCard
+              testId="telemetry-open-leads"
+              icon={<Swords className="h-6 w-6 text-ink" />}
+              label="Open lead queue"
+              value={`${leads.length}`}
+              detail="Measured count of NEW/VIEWED leads currently in the dashboard feed."
+              tone="bg-card"
+            />
+            <TelemetryCard
+              testId="telemetry-live-aurora"
               icon={<Crosshair className="h-6 w-6 text-ink" />}
-              label="Hottest lead"
-              value={hasLeadData ? `${hottestLeadScore}%` : '--'}
+              label="LIVE Aurora scores"
+              value={`${liveScored}`}
               detail={
-                hasLeadData
-                  ? 'Highest urgency and buyer intent detected.'
-                  : 'Run a scan to generate your first ranked target.'
+                liveScored > 0
+                  ? 'Leads with evaluationStatus LIVE only — FALLBACK scores are not counted as intent.'
+                  : 'No LIVE Aurora verdicts in the current queue.'
               }
               tone="bg-highlight-strong"
             />
             <TelemetryCard
-              icon={<Coins className="h-6 w-6 text-ink" />}
-              label="Projected ARR"
-              value={hasLeadData ? `$${projectedArr.toLocaleString()}` : '--'}
-              detail={
-                hasLeadData
-                  ? 'Rough opportunity stack based on current signal quality.'
-                  : 'Appears after your queue starts filling with leads.'
-              }
+              testId="telemetry-scan-credits"
+              icon={<Radar className="h-6 w-6 text-ink" />}
+              label="Scan credits"
+              value={creditReading}
+              detail="Remaining scan credits versus this account's measured high-water mark."
               tone="bg-info"
             />
             <TelemetryCard
-              icon={<Swords className="h-6 w-6 text-ink" />}
-              label="Active queue"
-              value={`${leads.length}`}
-              detail="Total live signals ready for triage, reply, or CRM export."
-              tone="bg-card"
-            />
-            <TelemetryCard
-              icon={<Crown className="h-6 w-6 text-ink" />}
-              label="High-intent"
-              value={`${highIntentCount}`}
-              detail="Signals above the fast-action threshold and worth immediate review."
+              testId="telemetry-plan"
+              icon={<Shield className="h-6 w-6 text-ink" />}
+              label="Plan"
+              value={user.planLabel ?? 'NO ACTIVE PLAN'}
+              detail={
+                entitlements.canUsePaidScans
+                  ? 'Paid scans entitled on this account.'
+                  : 'Paid scans are locked by current entitlements.'
+              }
               tone="bg-[#FFE3C7]"
             />
           </div>
         </div>
 
-        <div className="flex flex-col min-w-0 gap-6">
-          <DailyQuestCard
-            questsRemaining={questsRemaining}
-            leadsCount={leads.length}
-            highIntentCount={highIntentCount}
-          />
+        <div className="flex min-w-0 flex-col gap-6">
+          <section
+            aria-labelledby="ops-checklist-heading"
+            className="flex flex-col border-4 border-outline bg-[#FFF9EC] p-5 shadow-brutal-lg sm:p-6"
+          >
+            <p className="text-xs font-black uppercase tracking-widest text-ink/60">Operations checklist</p>
+            <h3 id="ops-checklist-heading" className="mt-1 text-2xl font-black uppercase text-on-accent">
+              Measured readiness
+            </h3>
+            <p className="mt-2 text-xs font-bold text-ink/70">
+              No bonus XP is promised here — progression is decided by the Gamify ledger after real events.
+            </p>
 
-          <div className="border-4 border-outline bg-card p-6 shadow-brutal-lg">
+            <div className="mt-4 flex flex-1 flex-col gap-2">
+              {measuredChecklist.map((row) => (
+                <div
+                  key={row.label}
+                  className={`flex min-w-0 flex-wrap items-center justify-between gap-2 border-3 border-outline px-4 py-3 text-xs font-black uppercase tracking-wider shadow-brutal-sm ${
+                    row.done ? row.tone : 'bg-card'
+                  }`}
+                >
+                  <span className="min-w-0 flex-1 break-words">
+                    {row.done ? '[x]' : '[ ]'} {row.label}
+                  </span>
+                  <span className="shrink-0 whitespace-nowrap">{row.progressLabel}</span>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          <section
+            aria-labelledby="unlock-track-heading"
+            className="border-4 border-outline bg-card p-5 shadow-brutal-lg sm:p-6"
+          >
             <div className="flex items-start justify-between gap-3 pb-4">
               <div>
-                <p className="text-xs font-black uppercase tracking-widest text-ink/60">Command perks</p>
-                <h3 className="mt-1 text-2xl font-black uppercase text-on-accent">Unlock track</h3>
+                <p className="text-xs font-black uppercase tracking-widest text-ink/60">Entitlements</p>
+                <h3 id="unlock-track-heading" className="mt-1 text-2xl font-black uppercase text-on-accent">
+                  Unlock track
+                </h3>
               </div>
-              <div className="bg-[#FFF4BF] p-2 border-2 border-outline shadow-brutal-sm">
-                <Shield className="h-6 w-6 text-on-accent" />
+              <div className="border-2 border-outline bg-[#FFF4BF] p-2 shadow-brutal-sm">
+                <Shield className="h-6 w-6 text-on-accent" aria-hidden />
               </div>
             </div>
 
-            <div className="mt-4 flex flex-col gap-3">
+            <ul className="mt-2 flex flex-col gap-3">
               {[
                 {
-                  title: 'Instant reply combos',
+                  title: 'AI reply drafts',
                   detail: entitlements.canGenerateAIReplies
-                    ? 'Draft a reply straight from any signal card.'
-                    : 'Included with a paid plan. Draft replies from any signal card.',
+                    ? 'Entitled — draft replies from signal cards.'
+                    : 'Locked — included with a paid plan.',
                   state: entitlements.canGenerateAIReplies ? 'UNLOCKED' : 'LOCKED',
                 },
                 {
-                  title: 'CRM auto-routing',
+                  title: 'CRM export',
                   detail: entitlements.canExportToCRM
-                    ? 'Push any signal to your CRM webhook from the signal card.'
-                    : 'Included with a paid plan. Push signals to your CRM webhook.',
+                    ? 'Entitled — queue CRM webhook deliveries from signal cards.'
+                    : 'Locked — included with a paid plan.',
                   state: entitlements.canExportToCRM ? 'UNLOCKED' : 'LOCKED',
                 },
                 {
-                  // Not a plan gate and not a level gate: Reddit and LinkedIn are
-                  // not built yet, so no account can have this today.
+                  title: 'Paid scans',
+                  detail: entitlements.canUsePaidScans
+                    ? 'Entitled — manual scans spend scan credits.'
+                    : 'Locked — upgrade required for paid scans.',
+                  state: entitlements.canUsePaidScans ? 'UNLOCKED' : 'LOCKED',
+                },
+                {
                   title: 'Multi-feed scanner',
                   detail: 'X is the only live source. Reddit and LinkedIn are still in build.',
                   state: 'IN BUILD',
                 },
               ].map((perk) => (
-                <div
+                <li
                   key={perk.title}
-                  className={`p-4 border-3 border-outline shadow-brutal-sm ${perk.state === 'UNLOCKED' ? 'bg-success' : 'bg-highlight'}`}
+                  className={`border-3 border-outline p-4 shadow-brutal-sm ${
+                    perk.state === 'UNLOCKED' ? 'bg-success' : 'bg-highlight'
+                  }`}
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div>
@@ -371,10 +392,15 @@ export function DashboardStats({
                       {perk.state}
                     </span>
                   </div>
-                </div>
+                </li>
               ))}
-            </div>
-          </div>
+            </ul>
+
+            <p className="mt-4 inline-flex items-center gap-2 text-xs font-bold text-ink/65">
+              <CheckCircle2 className="h-4 w-4 shrink-0" aria-hidden />
+              Entitlements come from EntitlementService — not from hunter level.
+            </p>
+          </section>
         </div>
       </div>
     </motion.div>

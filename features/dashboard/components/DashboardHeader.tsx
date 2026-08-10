@@ -1,5 +1,12 @@
 'use client'
 
+/**
+ * @deprecated Batch 1 Mission Control replaced this header with
+ * `TodaysMissionPanel` + `CampaignPulsePanel` in `DashboardClient`.
+ * Kept temporarily so existing imports/tests can migrate without a hard delete.
+ * Do not wire fabricated streak/XP copy back into the live dashboard.
+ */
+
 import Link from 'next/link'
 import { motion, type Variants } from 'framer-motion'
 import { Swords, Radar, Scroll, Trophy, ArrowRight, Sparkles, CheckCircle2 } from 'lucide-react'
