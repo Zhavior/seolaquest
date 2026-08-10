@@ -99,6 +99,13 @@ describe('Clerk public route boundary', () => {
     '/privacy',
     '/terms',
     '/api-terms',
+    // These three shipped and then served 404 in production, because .txt and
+    // .xml are absent from the matcher's extension allow-list and
+    // auth.protect() 404s a non-document request instead of redirecting it.
+    // A blocked robots.txt is invisible until someone thinks to fetch it.
+    '/robots.txt',
+    '/sitemap.xml',
+    '/opengraph-image',
     // Sentry's browser tunnel. Protecting it would silently discard every
     // client-side error report from a logged-out visitor — which is most of
     // the traffic the marketing pages exist to receive.
