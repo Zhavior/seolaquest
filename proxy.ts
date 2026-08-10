@@ -20,6 +20,15 @@ export const PUBLIC_ROUTE_PATTERNS = [
   '/privacy',
   '/terms',
   '/api-terms',
+  // Next's generated metadata routes. The matcher below only skips files whose
+  // extension is in its allow-list, and .txt and .xml are not in it, so these
+  // reach clerkMiddleware like any page would. auth.protect() answers a
+  // non-document request with 404 rather than a sign-in redirect, which is
+  // exactly how all three silently 404'd in production: the crawler surface
+  // shipped and served nothing.
+  '/robots.txt',
+  '/sitemap.xml',
+  '/opengraph-image',
   // Sentry's browser tunnel (`tunnelRoute` in next.config.ts). Client-side
   // error reports POST here instead of to sentry.io so ad-blockers do not eat
   // them. It MUST be public: the visitors whose crashes matter most are the
