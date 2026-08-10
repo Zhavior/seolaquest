@@ -16,7 +16,8 @@
     "db:deploy": "dotenv -e .env.local -- prisma migrate deploy",
     "db:push": "dotenv -e .env.local -- prisma db push",
     "db:studio": "dotenv -e .env.local -- prisma studio",
-    "db:seed": "dotenv -e .env.local -- prisma db seed"
+    "db:seed": "dotenv -e .env.local -- prisma db seed",
+    "db:quests": "dotenv -e .env.local -- tsx scripts/sync-quest-catalog.ts"
   },
   "dependencies": {
     "@clerk/nextjs": "^7.6.2",

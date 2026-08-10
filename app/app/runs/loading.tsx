@@ -1,12 +1,12 @@
 import { QuestListSkeleton, QuestRouteSkeleton } from '@/components/quest'
 
 /**
- * Route-level fallback: the full Quest Board shape, shown while the segment
+ * Route-level fallback: the full scan-run ledger shape, shown while the segment
  * streams in on navigation or first load.
  */
 export default function ScanRunsLoading() {
   return (
-    <QuestRouteSkeleton label="Quest Board">
+    <QuestRouteSkeleton label="Scan Runs">
       <ScanRunListSkeleton />
     </QuestRouteSkeleton>
   )

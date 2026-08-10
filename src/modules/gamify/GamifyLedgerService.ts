@@ -6,7 +6,13 @@ import { AuroraDecisionReader } from './AuroraDecisionReader'
 import { GamifyLevelCurve } from './GamifyLevelCurve'
 import { DeterministicGamifyRuleEngine } from './GamifyRuleEngine'
 import { RewardEligibilityService } from './RewardEligibilityService'
-import type { GamifyAwardResult, GamifyRuleEngine, GamifyRuleEvaluation, RewardRejectionCode } from './types'
+import type {
+  GamifyAwardResult,
+  GamifyRejectedRuleId,
+  GamifyRuleEngine,
+  GamifyRuleEvaluation,
+  RewardRejectionCode,
+} from './types'
 
 type Tx = Prisma.TransactionClient
 type Db = PrismaClient | Tx
@@ -71,11 +77,11 @@ export class GamifyLedgerService {
       return {
         awarded: false,
         profile: await this.readOrDefaultProfile(event.actorId),
-        rejected: [{ ruleId: 'opportunity_discovered', code: 'NO_REWARD_RULE' }],
+        rejected: [{ ruleId: 'none', code: 'NO_REWARD_RULE' }],
       }
     }
 
-    const rejected: Array<{ ruleId: GamifyRuleEvaluation['ruleId']; code: RewardRejectionCode }> = []
+    const rejected: Array<{ ruleId: GamifyRejectedRuleId; code: RewardRejectionCode }> = []
     const eligibleRules: GamifyRuleEvaluation[] = []
 
     for (const rule of rules) {

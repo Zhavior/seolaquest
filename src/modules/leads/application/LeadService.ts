@@ -10,10 +10,6 @@ import {
   normalizeCrmWebhookUrl,
   UnsafeCrmWebhookUrlError,
 } from '@/src/modules/core/security/crmWebhookUrl'
-import {
-  applyXpGain,
-  XP_PER_CLAIMED_QUEST,
-} from '@/src/modules/progression/domain/progression'
 import { CrmDeliveryService } from './CrmDeliveryService'
 import { z } from 'zod'
 
@@ -23,34 +19,33 @@ const openAiReplySchema = z.object({
   })).min(1),
 })
 
-function levelAfterClaim(user: { xp: number; level: number; xpRequired: number; xpMultiplier?: number }) {
-  const result = applyXpGain(user, XP_PER_CLAIMED_QUEST)
-  return {
-    xp: result.xp,
-    level: result.level,
-    xpRequired: result.xpRequired,
-    xpMultiplier: result.xpMultiplier,
-    didLevelUp: result.didLevelUp,
-  }
-}
-
 export class LeadService {
+  /**
+   * Claims a lead and emits the engagement event. It does **not** pay XP.
+   *
+   * It used to: the claim transaction wrote `User.xp`/`User.level` directly and
+   * returned the new totals for the HUD. That made two systems own progression —
+   * these columns and `GamifyProfile` — and two owners of one number always end
+   * up disagreeing. Gamify is now the only one. XP for this claim is minted by
+   * `GamifyLedgerService` when the outbox delivers `opportunity.engaged`, behind
+   * the same eligibility rules (Aurora score, velocity, daily cap) every other
+   * award goes through.
+   *
+   * The practical consequence is that the reward is no longer instant, so this
+   * returns no progression for the client to optimistically render. Showing a
+   * number here would mean guessing at a decision the ledger has not made yet —
+   * and the ledger is entitled to decline.
+   */
   static async claimQuest(leadId: string) {
     const user = await requireCurrentUser()
 
-    const claimedUser = await prisma.$transaction(async (tx) => {
-      // Serialize progression per tenant. Without this row lock, two different
-      // lead claims can both read the same XP and overwrite one earned reward.
-      await tx.$queryRaw`SELECT "id" FROM "User" WHERE "id" = ${user.id} FOR UPDATE`
-      const dbUser = await tx.user.findUnique({ where: { id: user.id } })
-      if (!dbUser) return null
-
+    const claimed = await prisma.$transaction(async (tx) => {
       const engagedAt = new Date()
       const claimed = await tx.lead.updateMany({
         where: { id: leadId, userId: user.id, status: 'NEW' },
         data: { status: 'CONTACTED', claimedAt: engagedAt, contactedAt: engagedAt },
       })
-      if (claimed.count !== 1) return null
+      if (claimed.count !== 1) return false
 
       /**
        * `opportunity.engaged`, emitted inside the claim transaction and behind the
@@ -79,24 +74,15 @@ export class LeadService {
         tx,
       )
 
-      const nextUser = levelAfterClaim({
-        xp: dbUser.xp,
-        level: dbUser.level,
-        xpRequired: dbUser.xpRequired,
-      })
-      await tx.user.update({
-        where: { id: user.id },
-        data: nextUser,
-      })
-      return nextUser
+      return true
     })
 
-    if (!claimedUser) {
+    if (!claimed) {
       return { ok: false, message: 'Quest no longer available or already claimed.' }
     }
 
     revalidatePath('/')
-    return { ok: true, user: claimedUser }
+    return { ok: true }
   }
 
   static async dismissLead(leadId: string) {

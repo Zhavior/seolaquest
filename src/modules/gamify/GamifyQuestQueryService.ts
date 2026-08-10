@@ -1,10 +1,13 @@
 import type { PrismaClient } from '@prisma/client'
+import prisma from '@/lib/prisma'
 import type { GamifyQuestStatus } from './questTypes'
 
 type QuestQueryPrisma = Pick<PrismaClient, 'gamifyQuestAssignment'>
 
 export class GamifyQuestQueryService {
-  constructor(private readonly db: QuestQueryPrisma) {}
+  // Defaults to the shared client, matching the rest of the gamify services, so
+  // callers that just want to read the board do not have to thread it through.
+  constructor(private readonly db: QuestQueryPrisma = prisma) {}
 
   async getAssignments(actorId: string, statuses?: GamifyQuestStatus[]) {
     const assignments = await this.db.gamifyQuestAssignment.findMany({

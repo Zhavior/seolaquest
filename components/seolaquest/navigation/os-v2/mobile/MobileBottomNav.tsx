@@ -10,7 +10,7 @@ import { MOBILE_NAV_ID } from './MobileAppShell'
 /** Primary destinations, with thumb-sized labels for the tray. */
 const PRIMARY = [
   { href: '/app', label: 'HQ' },
-  { href: '/app/runs', label: 'QUESTS' },
+  { href: '/app/quests', label: 'QUESTS' },
   { href: '/app/keywords', label: 'LOG' },
   { href: '/app/guild', label: 'GUILD' },
 ] as const

@@ -43,7 +43,6 @@ import {
   objectiveForStep,
   QUEST_OBJECTIVES,
   QUEST_TITLE,
-  QUEST_XP_REWARD,
 } from '@/features/auth/questSteps'
 import {
   clampOnboardingStep,
@@ -186,6 +185,9 @@ export default function OnboardingForm({ initialDraft }: Props) {
   const [signedOut, setSignedOut] = useState(false)
   const [soundOn, setSoundOn] = useState(() => sfx.isEnabled())
   const [celebrating, setCelebrating] = useState(false)
+  // What the completion actually produced, so the celebration can report the
+  // real number rather than a constant that was true for every account.
+  const [questsAssigned, setQuestsAssigned] = useState(0)
   const [pending, startTransition] = useTransition()
 
   const stepHeadingRef = useRef<HTMLHeadingElement>(null)
@@ -369,15 +371,15 @@ export default function OnboardingForm({ initialDraft }: Props) {
       if (!result.ok) return handleFailure(result)
 
       sfx.playLevelUp()
+      setQuestsAssigned(result.reward.questsAssigned)
       setCelebrating(true)
 
       const celebration = new URLSearchParams({
         keywordId: result.keyword.id,
         questComplete: 'first-quest',
-        xp: String(result.reward.xpAwarded),
+        quests: String(result.reward.questsAssigned),
         samples: String(result.reward.sampleQuestsSeeded),
       })
-      if (result.reward.didLevelUp) celebration.set('levelUp', String(result.reward.level))
 
       router.push(`/app?${celebration.toString()}`)
       router.refresh()
@@ -438,7 +440,7 @@ export default function OnboardingForm({ initialDraft }: Props) {
                 <ScrollText aria-hidden size={16} /> Level 1 quest
               </span>
               <span className="inline-flex items-center gap-1.5 border-3 border-outline bg-accent px-2.5 py-1 text-xs font-black uppercase shadow-brutal-sm animate-pulse">
-                <Sparkles aria-hidden size={16} /> Bounty Reward +{QUEST_XP_REWARD} XP
+                <Sparkles aria-hidden size={16} /> Reward: your quest board
               </span>
             </div>
 
@@ -624,7 +626,7 @@ export default function OnboardingForm({ initialDraft }: Props) {
 
                 <div className="mt-3 border-t-2 border-outline pt-2 bg-amber-100/60 p-2 border-2 border-amber-400 text-center">
                   <p className="text-[10px] font-black uppercase text-amber-900 flex items-center justify-center gap-1">
-                    <Coins size={12} /> Claim Payout +{QUEST_XP_REWARD} XP
+                    <Coins size={12} /> Claim Payout: quests on your board
                   </p>
                 </div>
               </div>
@@ -667,7 +669,7 @@ export default function OnboardingForm({ initialDraft }: Props) {
         </form>
       </main>
 
-      {celebrating ? <QuestCompleteOverlay /> : null}
+      {celebrating ? <QuestCompleteOverlay questsAssigned={questsAssigned} /> : null}
     </div>
   )
 }
@@ -1082,7 +1084,7 @@ function ContractReviewStation({
       <div className="mt-2.5 flex items-start gap-2.5 border-3 border-outline bg-accent p-2.5 text-xs text-on-accent animate-pulse">
         <Sparkles className="mt-0.5 shrink-0" aria-hidden size={16} />
         <p className="font-bold">
-          Claiming this contract pays +{QUEST_XP_REWARD} XP and stocks your queue with three tutorial signals.
+          Claiming this contract puts the active quests on your board and stocks your queue with three tutorial signals.
         </p>
       </div>
     </div>
@@ -1141,7 +1143,16 @@ function QuestLog({
   )
 }
 
-function QuestCompleteOverlay() {
+/**
+ * Reports what finishing setup actually produced.
+ *
+ * It used to read "+50 XP AWARDED", which stopped being true when progression
+ * moved to `GamifyProfile`: completing onboarding assigns quests, it does not
+ * mint XP. XP is now only ever earned from outcomes, and a celebration banner
+ * announcing a reward the ledger never issued would put the very first number a
+ * new hunter sees permanently out of step with their profile.
+ */
+function QuestCompleteOverlay({ questsAssigned }: { questsAssigned: number }) {
   useEffect(() => {
     sfx.playLevelUp()
     const timer = setTimeout(() => sfx.playBountyUnlock(), 300)
@@ -1162,7 +1173,7 @@ function QuestCompleteOverlay() {
         <p className="text-3xl font-black uppercase tracking-wider">VICTORY!</p>
         <p className="mt-1 text-xl font-black uppercase leading-tight">Quest Complete — Charter Sealed</p>
         <div className="my-3 inline-block border-3 border-outline bg-accent px-4 py-2 font-black text-3xl shadow-brutal animate-pulse">
-          +50 XP AWARDED
+          {questsAssigned} {questsAssigned === 1 ? 'QUEST IS' : 'QUESTS ARE'} ON YOUR BOARD
         </div>
         <p className="mt-2 font-black text-xs uppercase bg-black text-white p-2 border-2 border-outline">
           ⚡ Summoning Workspace & Seeding Tutorial Signals…

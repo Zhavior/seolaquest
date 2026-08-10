@@ -155,7 +155,16 @@ describe('useDashboardState', () => {
     expect(result.current.subscriptionTier).toBe('PLAN UNAVAILABLE')
   })
 
-  it('handles bounty claiming and updates XP', async () => {
+  /*
+   * The mock deliberately still returns a `user` block. Claiming used to hand
+   * back new XP totals and the hook used to paint them straight into the HUD,
+   * which meant the bar moved the instant the button was pressed for a reward
+   * the backend had not agreed to — the Gamify ledger decides what an engagement
+   * is worth once the outbox delivers it, and it is allowed to decide "nothing".
+   * Feeding the stale shape in proves the hook ignores it rather than merely
+   * that the server stopped sending it.
+   */
+  it('claims the bounty without moving the XP bar ahead of the ledger', async () => {
     const { result } = renderHook(() =>
       useDashboardState({
         dbUser: mockUser,
@@ -171,7 +180,7 @@ describe('useDashboardState', () => {
     })
 
     expect(result.current.claimedCount).toBe(1)
-    expect(result.current.user.xp).toBe(1400)
+    expect(result.current.user.xp).toBe(1250)
     expect(result.current.notice).toBe('Quest claimed.')
   })
 

@@ -10,23 +10,15 @@ function stringPayloadValue(event: DomainEvent, key: string): string | null {
 
 export class DeterministicGamifyRuleEngine {
   evaluate(event: DomainEvent): GamifyRuleEvaluation[] {
+    /*
+     * `opportunity.discovered` intentionally has no rule.
+     *
+     * It used to pay 10 XP. Discovery is the output of a scan, and a scan spends
+     * the tenant's own credits — so that rule paid people for spending money and
+     * made the leaderboard a ranking of budget rather than of skill. Progression
+     * starts at engagement, where the hunter has actually done something.
+     */
     switch (event.type) {
-      case 'opportunity.discovered': {
-        const opportunityId = stringPayloadValue(event, 'opportunityId')
-        if (!opportunityId) return []
-
-        return [{
-          ruleId: 'opportunity_discovered',
-          ruleVersion: RULE_VERSION,
-          sourceEventId: event.id,
-          actorId: event.actorId,
-          targetKey: `opportunity:${opportunityId}`,
-          reason: 'Opportunity discovered',
-          effects: [{ kind: 'XP', amount: 10 }],
-          requiresAuroraDecision: false,
-        }]
-      }
-
       case 'opportunity.engaged': {
         const opportunityId = stringPayloadValue(event, 'opportunityId')
         if (!opportunityId) return []

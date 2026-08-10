@@ -7,10 +7,7 @@ import { logger } from '@/src/modules/core/infrastructure/logger'
 import { withServerAction } from '@/src/modules/core/infrastructure/server-action'
 import { MAX_ACTIVE_KEYWORDS_PER_TENANT } from '@/src/modules/keywords/application/KeywordService'
 import { buildSampleQuests } from '@/src/modules/onboarding/domain/sampleQuests'
-import {
-  applyXpGain,
-  XP_FIRST_QUEST_BONUS,
-} from '@/src/modules/progression/domain/progression'
+import { GamifyEnrollmentService } from '@/src/modules/gamify/GamifyEnrollmentService'
 import { DEFAULT_PROFILE_ICON_KEY } from './profileIconOptions'
 import {
   cleanOnboardingText,
@@ -35,12 +32,16 @@ type SaveStepResult = ActionFailure | {
   nextStep: number
 }
 
+/**
+ * What finishing setup actually gives you.
+ *
+ * No XP. Setup is not an outcome — nobody found a customer by filling in a form
+ * — and paying for it would put a number in the HUD that the ledger has no
+ * transaction for. What completion does give the hunter is a board: the active
+ * quest catalog, assigned and ready to make progress against.
+ */
 export type OnboardingReward = {
-  xpAwarded: number
-  xp: number
-  level: number
-  xpRequired: number
-  didLevelUp: boolean
+  questsAssigned: number
   sampleQuestsSeeded: number
 }
 
@@ -210,9 +211,6 @@ type LockedOnboardingUser = {
   targetCustomer: string | null
   firstKeyword: string | null
   preferredSource: PreferredSource | null
-  xp: number
-  level: number
-  xpRequired: number
 }
 
 /**
@@ -250,10 +248,7 @@ export const completeOnboardingAction = withServerAction(
             "businessDescription",
             "targetCustomer",
             "firstKeyword",
-            "preferredSource",
-            "xp",
-            "level",
-            "xpRequired"
+            "preferredSource"
           FROM "User"
           WHERE "id" = ${currentUser.id}
           FOR UPDATE
@@ -328,24 +323,12 @@ export const completeOnboardingAction = withServerAction(
           skipDuplicates: true,
         })
 
-        // The first-quest reward. It rides the same row lock as the rest of
-        // completion, so a double-submitted Complete button cannot pay it twice:
-        // the second pass sees `onboardingComplete` and returns above.
-        const reward = applyXpGain(
-          { xp: user.xp, level: user.level, xpRequired: user.xpRequired },
-          XP_FIRST_QUEST_BONUS,
-        )
-
         await tx.user.update({
           where: { id: currentUser.id },
           data: {
             onboardingComplete: true,
             onboardingStep: LAST_ONBOARDING_STEP,
             profileIconKey: user.profileIconKey ?? DEFAULT_PROFILE_ICON_KEY,
-            xp: reward.xp,
-            level: reward.level,
-            xpRequired: reward.xpRequired,
-            xpMultiplier: reward.xpMultiplier,
           },
         })
 
@@ -366,21 +349,44 @@ export const completeOnboardingAction = withServerAction(
             id: keyword.id,
             phrase: keyword.phrase,
           },
-          reward: {
-            xpAwarded: XP_FIRST_QUEST_BONUS,
-            xp: reward.xp,
-            level: reward.level,
-            xpRequired: reward.xpRequired,
-            didLevelUp: reward.didLevelUp,
-            sampleQuestsSeeded: seeded.count,
-          },
+          sampleQuestsSeeded: seeded.count,
         }
       })
 
       if (!result.ok) return result
+
+      /*
+       * Enrollment runs after the commit, not inside it.
+       *
+       * The shell layout enrolls every authenticated request anyway, so this is
+       * not the only path onto the board — it exists so the completion banner
+       * can state a real number instead of a promise. That makes it safe to
+       * fail: `ensureEnrolled` is idempotent and the next page load repeats it.
+       * Holding the onboarding transaction open across it would be the wrong
+       * trade, since a quest-catalog problem would then roll back a completed
+       * signup.
+       */
+      let questsAssigned = 0
+      try {
+        const enrollment = await new GamifyEnrollmentService().ensureEnrolled(currentUser.id)
+        questsAssigned = enrollment.assigned
+      } catch (error) {
+        logger.warn(
+          { err: error, userId: currentUser.id, outcomeCode: 'ONBOARDING_ENROLLMENT_DEFERRED' },
+          'Could not assign quests during onboarding; the shell will retry on the next request',
+        )
+      }
+
       revalidatePath('/onboarding')
       revalidatePath('/app')
-      return result
+      return {
+        ok: true as const,
+        keyword: result.keyword,
+        reward: {
+          questsAssigned,
+          sampleQuestsSeeded: result.sampleQuestsSeeded,
+        },
+      }
     } catch (error) {
       // Same tripwire. The caller navigates on the CLIENT (`router.push`) after reading the
       // resolved value, so this action deliberately does not redirect. If that ever moves

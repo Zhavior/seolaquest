@@ -5,6 +5,7 @@ import type { DashboardKeyword, DashboardLead, DashboardUser } from '@/features/
 import { withApiHandler } from '@/src/modules/core/infrastructure/api-handler'
 import { logger } from '@/src/modules/core/infrastructure/logger'
 import { fetchDashboardLeads } from '@/features/dashboard/server/leads'
+import { readHunterProgression } from '@/src/modules/gamify/hunterProgression'
 
 export const dynamic = 'force-dynamic'
 
@@ -15,7 +16,7 @@ export const GET = withApiHandler(async () => {
       return NextResponse.json({ ok: false, message: 'Unauthorized' }, { status: 401 })
     }
 
-    const [keywords, leads, billingSubscription] = await Promise.all([
+    const [keywords, leads, billingSubscription, progression] = await Promise.all([
       prisma.trackedKeyword.findMany({
         where: { userId: user.id },
         orderBy: { createdAt: 'desc' },
@@ -26,14 +27,15 @@ export const GET = withApiHandler(async () => {
         where: { userId: user.id },
         select: { plan: true, status: true },
       }),
+      readHunterProgression(user.id),
     ])
 
     const dashboardUser: DashboardUser = {
       name: user.name ?? user.email?.split('@')[0] ?? 'Hunter',
       title: user.title ?? 'Lead Hunter',
-      xp: user.xp,
-      level: user.level,
-      xpRequired: user.xpRequired,
+      xp: progression.xp,
+      level: progression.level,
+      xpRequired: progression.xpRequired,
       questsRemaining: user.questsRemaining,
       maxCredits: user.maxCredits,
       planLabel: billingSubscription ? `${billingSubscription.plan} / ${billingSubscription.status}` : 'NO ACTIVE PLAN',

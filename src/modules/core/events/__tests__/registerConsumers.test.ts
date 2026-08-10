@@ -3,6 +3,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest'
 const mocks = vi.hoisted(() => ({
   registerAurora: vi.fn(),
   registerGamify: vi.fn(),
+  registerGamifyLedger: vi.fn(),
 }))
 
 vi.mock('server-only', () => ({}))
@@ -11,6 +12,9 @@ vi.mock('@/src/modules/aurora/events/AuroraEventConsumers', () => ({
 }))
 vi.mock('@/src/modules/gamify/events/GamifyQuestEventConsumers', () => ({
   registerGamifyQuestConsumers: mocks.registerGamify,
+}))
+vi.mock('@/src/modules/gamify/events/GamifyLedgerEventConsumers', () => ({
+  registerGamifyLedgerConsumers: mocks.registerGamifyLedger,
 }))
 
 import {
@@ -24,11 +28,19 @@ describe('registerAllEventConsumers', () => {
     resetEventConsumerRegistrationForTests()
   })
 
-  it('registers both the aurora and gamify consumer sets', () => {
+  /*
+   * The ledger set is listed here explicitly because leaving it out is exactly
+   * the bug this file exists to catch. `GamifyLedgerService` was fully built and
+   * completely unreachable: nothing registered it, so every outcome event was
+   * marked PROCESSED with zero consumers and the XP it should have minted was
+   * lost with a clean audit trail and no error anywhere.
+   */
+  it('registers the aurora, gamify quest and gamify ledger consumer sets', () => {
     registerAllEventConsumers()
 
     expect(mocks.registerAurora).toHaveBeenCalledTimes(1)
     expect(mocks.registerGamify).toHaveBeenCalledTimes(1)
+    expect(mocks.registerGamifyLedger).toHaveBeenCalledTimes(1)
   })
 
   it('is idempotent across repeated calls in the same process', () => {
@@ -38,6 +50,7 @@ describe('registerAllEventConsumers', () => {
 
     expect(mocks.registerAurora).toHaveBeenCalledTimes(1)
     expect(mocks.registerGamify).toHaveBeenCalledTimes(1)
+    expect(mocks.registerGamifyLedger).toHaveBeenCalledTimes(1)
   })
 })
 

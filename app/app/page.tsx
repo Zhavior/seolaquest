@@ -6,6 +6,7 @@ import { type DashboardKeyword, type DashboardLead, type DashboardUser } from '@
 import { requireCurrentUser } from '@/lib/auth'
 import prisma from '@/lib/prisma'
 import { EntitlementService } from '@/src/modules/billing/application/EntitlementService'
+import { readHunterProgression } from '@/src/modules/gamify/hunterProgression'
 import { fetchDashboardLeads } from '@/features/dashboard/server/leads'
 
 const DashboardClient = nextDynamic(() => import('@/features/dashboard/components/DashboardClient'))
@@ -29,7 +30,7 @@ export default function AppHomePage() {
 async function DashboardShellData() {
   const user = await requireCurrentUser()
 
-  const [keywords, leads, billingSubscription, entitlements] = await Promise.all([
+  const [keywords, leads, billingSubscription, entitlements, progression] = await Promise.all([
     prisma.trackedKeyword.findMany({
       where: { userId: user.id },
       orderBy: { createdAt: 'desc' },
@@ -41,14 +42,15 @@ async function DashboardShellData() {
       select: { plan: true, status: true },
     }),
     EntitlementService.forUser(user.id),
+    readHunterProgression(user.id),
   ])
 
   const dashboardUser: DashboardUser = {
     name: user.name ?? user.email?.split('@')[0] ?? 'Hunter',
     title: user.title ?? 'Lead Hunter',
-    xp: user.xp,
-    level: user.level,
-    xpRequired: user.xpRequired,
+    xp: progression.xp,
+    level: progression.level,
+    xpRequired: progression.xpRequired,
     questsRemaining: user.questsRemaining,
     maxCredits: user.maxCredits,
     planLabel: billingSubscription ? `${billingSubscription.plan} / ${billingSubscription.status}` : 'NO ACTIVE PLAN',

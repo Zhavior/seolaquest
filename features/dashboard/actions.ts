@@ -21,8 +21,12 @@ type AddKeywordResult =
   | { ok: boolean; keyword: KeywordDto; message?: undefined }
   | { ok: boolean; keyword?: undefined; message: string }
 
+/**
+ * Deliberately carries no progression. Claiming emits `opportunity.engaged`; the
+ * Gamify ledger scores it out of band and may decline it, so there is no XP
+ * figure this action could return that would be true at the moment it returns.
+ */
 type ClaimQuestResult = ActionResult & {
-  user?: { xp: number; level: number; xpRequired: number; didLevelUp?: boolean }
   questsRemaining?: number
 }
 

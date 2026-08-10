@@ -27,6 +27,11 @@ model User {
   spellsCast          Int               @default(0)
   questsExported      Int               @default(0)
   maxCredits          Int               @default(0)
+  /// DEPRECATED progression columns. Nothing reads or writes these any more:
+  /// GamifyProfile owns level, XP and reputation, and GamifyLevelCurve owns the
+  /// curve. They are kept only so the values already in them are not destroyed
+  /// by this change — dropping them is a separate, irreversible migration, and
+  /// it should not happen until the ledger has been reconciled against them.
   xpMultiplier        Float             @default(1.0)
   level               Int               @default(1)
   xp                  Int               @default(0)
@@ -594,4 +599,53 @@ model GamifyQuestContribution {
   @@unique([assignmentId, sourceEventId])
   @@index([sourceEventId])
   @@index([assignmentId, createdAt])
+}
+
+/// Marketing blog article. Distinct from `Post`, which is a captured social
+/// listening result — these are the articles rendered at /blog.
+///
+/// Posts live here rather than as MDX files on disk because the filesystem is
+/// read-only on Vercel: the generator writes drafts at runtime, so there is
+/// nowhere on disk for them to go.
+model BlogPost {
+  id              String         @id @default(uuid())
+  slug            String         @unique
+  title           String
+  description     String
+  body            String
+  tag             String         @default("[ALL]")
+  author          String
+  authorRole      String
+  authorAvatar    String
+  coverColor      String         @default("#FFE600")
+  readTimeMinutes Int            @default(1)
+  featured        Boolean        @default(false)
+  status          BlogPostStatus @default(DRAFT)
+  source          BlogPostSource @default(AI_GENERATED)
+  /// The topic the generator was working from. Kept so the picker can avoid
+  /// proposing something already covered, including by drafts never published.
+  topic           String?
+  /// Display date, and the sitemap's lastModified. Set on import from the
+  /// original frontmatter date, so publishing an imported article does not
+  /// silently re-date it; otherwise stamped at publish time.
+  publishedAt     DateTime?
+  reviewedBy      String?
+  /// Discord message carrying the approve/reject buttons for this draft.
+  discordMessageId String?       @unique
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  @@index([status, publishedAt])
+}
+
+enum BlogPostStatus {
+  DRAFT
+  PUBLISHED
+  REJECTED
+}
+
+enum BlogPostSource {
+  AI_GENERATED
+  IMPORTED
+  MANUAL
 }

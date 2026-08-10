@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 const mocks = vi.hoisted(() => ({
   requireCurrentUser: vi.fn(),
   userFindUnique: vi.fn(),
+  gamifyProfileFindUnique: vi.fn(),
   trackedKeywordCount: vi.fn(),
   leadCount: vi.fn(),
   leadFindMany: vi.fn(),
@@ -14,6 +15,7 @@ vi.mock('@/lib/auth', () => ({ requireCurrentUser: mocks.requireCurrentUser }))
 vi.mock('@/lib/prisma', () => ({
   default: {
     user: { findUnique: mocks.userFindUnique },
+    gamifyProfile: { findUnique: mocks.gamifyProfileFindUnique },
     trackedKeyword: { count: mocks.trackedKeywordCount },
     lead: {
       count: mocks.leadCount,
@@ -24,19 +26,16 @@ vi.mock('@/lib/prisma', () => ({
 }))
 
 import { AnalyticsService } from '@/src/modules/analytics/application/AnalyticsService'
-import { applyXpGain } from '@/src/modules/progression/domain/progression'
 
 describe('Guild & Gamification Synchronization', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     mocks.requireCurrentUser.mockResolvedValue({ id: 'user-123' })
     mocks.userFindUnique.mockResolvedValue({
-      level: 3,
-      xp: 40,
-      xpRequired: 225,
       spellsCast: 12,
       questsExported: 5,
     })
+    mocks.gamifyProfileFindUnique.mockResolvedValue({ lifetimeXp: 0, reputation: 0 })
     mocks.trackedKeywordCount.mockResolvedValue(4)
     mocks.leadCount.mockResolvedValue(18)
     mocks.leadFindMany.mockResolvedValue([])
@@ -52,39 +51,26 @@ describe('Guild & Gamification Synchronization', () => {
     expect(mocks.userFindUnique).toHaveBeenCalledWith({
       where: { id: 'user-123' },
       select: {
-        level: true,
-        xp: true,
-        xpRequired: true,
         spellsCast: true,
         questsExported: true,
       },
     })
-    expect(stats.level).toBe(3)
-    expect(stats.xp).toBe(40)
-    expect(stats.xpRequired).toBe(225)
     expect(stats.spellsCast).toBe(12)
     expect(stats.questsExported).toBe(5)
     expect(stats.monstersDefeated).toBe(18)
     expect(stats.totalKeywords).toBe(4)
   })
 
-  it('leveling up recomputes xpRequired and xpMultiplier accurately without drift', () => {
-    const level1State = { xp: 90, level: 1, xpRequired: 100 }
-    const result = applyXpGain(level1State, 20)
+  it('reports progression from the gamify ledger, not the legacy user columns', async () => {
+    // 100 lifetime XP is exactly the level-2 threshold on GamifyLevelCurve, and
+    // level 2 costs 183 XP end to end (round(100 * 2^1.5) - 100).
+    mocks.gamifyProfileFindUnique.mockResolvedValue({ lifetimeXp: 100, reputation: 3 })
 
-    expect(result.didLevelUp).toBe(true)
-    expect(result.level).toBe(2)
-    expect(result.xp).toBe(10)
-    expect(result.xpRequired).toBe(150)
-    expect(result.xpMultiplier).toBe(1.1)
+    const stats = await AnalyticsService.getGuildStats('weekly')
 
-    // Second level up
-    const nextLevel = applyXpGain(result, 150)
-    expect(nextLevel.didLevelUp).toBe(true)
-    expect(nextLevel.level).toBe(3)
-    expect(nextLevel.xp).toBe(10)
-    expect(nextLevel.xpRequired).toBe(225)
-    expect(nextLevel.xpMultiplier).toBe(1.2)
+    expect(stats.level).toBe(2)
+    expect(stats.xp).toBe(0)
+    expect(stats.xpRequired).toBe(183)
   })
 
   it('unlocks achievements dynamically based on database progress metrics', async () => {

@@ -70,13 +70,19 @@ describe('ShellHud telemetry', () => {
     expect(screen.getByText('HUNTER')).toBeInTheDocument()
   })
 
+  /*
+   * The counter is of open *leads*, which live on the dashboard queue — not on
+   * /app/runs, which is now the scan-run ledger and shows no leads at all. A
+   * pill that counts one page and navigates to another is a dead end for anyone
+   * who clicks it expecting to find the seven things it just promised.
+   */
   it('points the quest counter at the queue it is counting', () => {
     renderHud({ openQuests: 7, questsRemaining: 1, maxCredits: 1 })
 
     const questLinks = screen.getAllByRole('link', { name: '7 QUESTS' })
     expect(questLinks.length).toBeGreaterThan(0)
     for (const link of questLinks) {
-      expect(link).toHaveAttribute('href', '/app/runs')
+      expect(link).toHaveAttribute('href', '/app')
     }
   })
 

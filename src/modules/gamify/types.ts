@@ -3,10 +3,17 @@ import type { DomainEvent } from '../core/events/DomainEvent'
 export type GamifyEntryType = 'AWARD' | 'REVERSAL'
 
 export type GamifyRuleId =
-  | 'opportunity_discovered'
   | 'opportunity_engaged'
   | 'lead_converted'
   | 'aurora_feedback_quality'
+
+/**
+ * Rejections can outnumber rules: an event that matches nothing at all is still
+ * reported, and it has no rule id to report under. `'none'` is that case, kept
+ * distinct from a named rule so "we have no rule for this" can never be read as
+ * "this rule declined".
+ */
+export type GamifyRejectedRuleId = GamifyRuleId | 'none'
 
 export type GamifyEffectKind = 'XP' | 'REPUTATION'
 
@@ -56,7 +63,7 @@ export interface GamifyAwardResult {
     reputation: number
   }
   rejected: Array<{
-    ruleId: GamifyRuleId
+    ruleId: GamifyRejectedRuleId
     code: RewardRejectionCode
   }>
 }

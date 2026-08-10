@@ -18,6 +18,7 @@ const mocks = vi.hoisted(() => {
     revalidatePath: vi.fn(),
     updateMany: vi.fn(),
     transaction: vi.fn(),
+    ensureEnrolled: vi.fn(),
     tx,
   }
 })
@@ -31,6 +32,11 @@ vi.mock('@/lib/prisma', () => ({
   default: {
     user: { updateMany: mocks.updateMany },
     $transaction: mocks.transaction,
+  },
+}))
+vi.mock('@/src/modules/gamify/GamifyEnrollmentService', () => ({
+  GamifyEnrollmentService: class {
+    ensureEnrolled = mocks.ensureEnrolled
   },
 }))
 
@@ -73,6 +79,7 @@ describe('Phase 2 onboarding actions', () => {
     mocks.updateMany.mockResolvedValue({ count: 1 })
     mocks.transaction.mockImplementation(async (callback) => callback(mocks.tx))
     mocks.tx.$queryRaw.mockResolvedValue([lockedUser()])
+    mocks.ensureEnrolled.mockResolvedValue({ enrolled: true, assigned: 4 })
     mocks.tx.trackedKeyword.findFirst.mockResolvedValue(null)
     mocks.tx.trackedKeyword.count.mockResolvedValue(0)
     mocks.tx.trackedKeyword.create.mockResolvedValue({ id: 'kw_stable_1', phrase: 'need a website', active: true })
@@ -143,12 +150,11 @@ describe('Phase 2 onboarding actions', () => {
     await expect(completeOnboardingAction()).resolves.toEqual({
       ok: true,
       keyword: { id: 'kw_stable_1', phrase: 'need a website' },
+      // Completing setup pays no XP. XP is minted only from outcomes now, by the
+      // Gamify ledger, so what this hands back is what it genuinely produced:
+      // the quests it put on the board and the sample signals it seeded.
       reward: {
-        xpAwarded: 50,
-        xp: 50,
-        level: 1,
-        xpRequired: 100,
-        didLevelUp: false,
+        questsAssigned: 4,
         sampleQuestsSeeded: 3,
       },
     })
@@ -167,12 +173,27 @@ describe('Phase 2 onboarding actions', () => {
         onboardingComplete: true,
         onboardingStep: 6,
         profileIconKey: 'target',
-        xp: 50,
-        level: 1,
-        xpRequired: 100,
-        xpMultiplier: 1,
       },
     })
+  })
+
+  /**
+   * `User.xp`/`User.level`/`User.xpRequired`/`User.xpMultiplier` are deprecated
+   * columns nothing reads any more. Writing them here would leave a second,
+   * stale copy of progression next to `GamifyProfile` — and the HUD reading one
+   * while the ledger owns the other is exactly the disagreement this change
+   * removed. The columns still exist for the migration, so an accidental write
+   * would succeed silently; that is why this is asserted rather than assumed.
+   */
+  it('never writes the deprecated progression columns', async () => {
+    mocks.getCurrentUser.mockResolvedValue(currentUser({ onboardingStep: 6 }))
+
+    await completeOnboardingAction()
+
+    const [{ data }] = mocks.tx.user.update.mock.calls[0]
+    for (const column of ['xp', 'level', 'xpRequired', 'xpMultiplier']) {
+      expect(data).not.toHaveProperty(column)
+    }
   })
 
   it('seeds three labelled tutorial signals against the new keyword', async () => {
@@ -193,12 +214,30 @@ describe('Phase 2 onboarding actions', () => {
     }
   })
 
-  it('levels the hunter up when the first-quest bonus clears the bar', async () => {
+  /**
+   * Enrollment happens after the commit, so a quest-catalog problem cannot roll
+   * back a signup that already succeeded. The cost of that choice is that the
+   * banner might report zero quests on a bad day — which is the honest number,
+   * and self-correcting, because the shell layout enrolls on the next request.
+   */
+  it('reports the quests enrollment actually assigned, outside the transaction', async () => {
     mocks.getCurrentUser.mockResolvedValue(currentUser({ onboardingStep: 6 }))
-    mocks.tx.$queryRaw.mockResolvedValue([lockedUser({ xp: 80, level: 3, xpRequired: 100 })])
+    mocks.ensureEnrolled.mockResolvedValue({ enrolled: true, assigned: 2 })
 
     await expect(completeOnboardingAction()).resolves.toMatchObject({
-      reward: { xp: 30, level: 4, xpRequired: 150, didLevelUp: true },
+      reward: { questsAssigned: 2, sampleQuestsSeeded: 3 },
+    })
+    expect(mocks.ensureEnrolled).toHaveBeenCalledWith('user_1')
+  })
+
+  it('still completes setup when enrollment fails, reporting zero rather than throwing', async () => {
+    mocks.getCurrentUser.mockResolvedValue(currentUser({ onboardingStep: 6 }))
+    mocks.ensureEnrolled.mockRejectedValue(new Error('quest catalog unavailable'))
+
+    await expect(completeOnboardingAction()).resolves.toMatchObject({
+      ok: true,
+      keyword: { id: 'kw_stable_1' },
+      reward: { questsAssigned: 0, sampleQuestsSeeded: 3 },
     })
   })
 

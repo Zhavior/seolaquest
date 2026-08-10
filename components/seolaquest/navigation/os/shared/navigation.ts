@@ -2,6 +2,7 @@ import {
   Castle,
   LayoutDashboard,
   History,
+  Scroll,
   Send,
   UserCircle,
   Swords,
@@ -33,13 +34,23 @@ export const navigation: NavigationItem[] = [
   },
   {
     label: 'QUEST BOARD',
+    href: '/app/quests',
+    icon: Scroll,
+    section: 'tactical',
+    color: 'bg-yellow-400',
+    // No badge. The one that used to sit here was the literal string '12' on
+    // every account, which is worse than no count at all.
+    hotkey: 'S',
+    description: 'Active quests, progress, and rewards waiting to be claimed.',
+  },
+  {
+    label: 'SCAN RUNS',
     href: '/app/runs',
     icon: History,
     section: 'tactical',
-    color: 'bg-yellow-400',
-    badge: '12',
-    hotkey: 'S',
-    description: 'Incoming signal queue and active hunt matches.',
+    color: 'bg-lime-400',
+    hotkey: 'R',
+    description: 'Durable ledger of every scan this account has queued.',
   },
   {
     label: 'QUEST LOG',

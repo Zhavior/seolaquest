@@ -44,7 +44,15 @@ export function useDashboardState({
   const pathname = usePathname()
   const searchParams = useSearchParams()
 
-  const [user, setUser] = useState(dbUser)
+  /*
+   * The hunter is read straight from the server prop rather than mirrored into
+   * state. It used to be a `useState` seeded from `dbUser` and re-synced by an
+   * effect, which only made sense while claiming a lead paid XP on the spot and
+   * the client wanted to move the bar before the server agreed. Nothing writes
+   * progression on the client any more — the Gamify ledger owns it — so the
+   * copy had exactly one job left: drift out of date until an effect caught up.
+   */
+  const user = dbUser
   const [keywords, setKeywords] = useState(dbKeywords)
   const [leads, setLeads] = useState<DashboardLead[]>(dbLeads)
   const [newKeyword, setNewKeyword] = useState('')
@@ -61,6 +69,7 @@ export function useDashboardState({
 
   const [activeQuickStrikeLead, setActiveQuickStrikeLead] = useState<DashboardLead | null>(null)
   const [recentLevelUp, setRecentLevelUp] = useState(false)
+  const lastSeenLevelRef = useRef(dbUser.level)
 
   const [isScannerModalOpen, setIsScannerModalOpen] = useState(false)
   const [scanLogs, setScanLogs] = useState<string[]>([])
@@ -358,18 +367,13 @@ export function useDashboardState({
       setAsyncStatus('idle')
 
       if (result.ok) {
-        const returnedUser = result.user
-        if (returnedUser) {
-          setUser((current) => ({
-            ...current,
-            xp: returnedUser.xp,
-            level: returnedUser.level,
-            xpRequired: returnedUser.xpRequired,
-          }))
-          setRecentLevelUp(returnedUser.didLevelUp ?? false)
-          if (returnedUser.didLevelUp) sfx.playLevelUp()
-        }
-
+        /*
+         * No XP is applied here any more. Claiming emits `opportunity.engaged`
+         * and the Gamify ledger decides what it is worth once the outbox
+         * delivers it — a decision that can legitimately come back as nothing.
+         * The old code moved the bar the instant the button was pressed, which
+         * meant the HUD was showing a reward the backend had not agreed to.
+         */
         if (typeof result.questsRemaining === 'number') {
           setRemainingQuests(result.questsRemaining)
         }
@@ -435,9 +439,24 @@ export function useDashboardState({
     setNotice('Opened a share draft with measured dashboard counts.')
   }
 
+  /*
+   * Progression arrives from the server, not from the click.
+   *
+   * Claiming a lead emits an event; the Gamify ledger scores it asynchronously
+   * and `revalidatePath` re-renders this page with whatever it decided. So the
+   * level-up flourish keys off the server's level actually rising — a real
+   * event — rather than off a number the client predicted at claim time.
+   */
+  useEffect(() => {
+    if (dbUser.level > lastSeenLevelRef.current) {
+      setRecentLevelUp(true)
+      sfx.playLevelUp()
+    }
+    lastSeenLevelRef.current = dbUser.level
+  }, [dbUser])
+
   return {
     user,
-    setUser,
     keywords,
     setKeywords,
     leads,
