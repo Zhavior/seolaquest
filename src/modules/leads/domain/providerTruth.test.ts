@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import {
   aggregateProviderAttempts,
+  filterQualifiedRecords,
   MalformedProviderResponseError,
   parseRedditPayload,
   parseXPayload,
@@ -73,5 +74,73 @@ describe('provider truth validation', () => {
       expect.objectContaining({ provider: 'REDDIT', zeroResults: 1 }),
       expect.objectContaining({ provider: 'X', rateLimited: 1 }),
     ]))
+  })
+})
+
+describe('filterQualifiedRecords', () => {
+  const record = (over: Partial<{ externalPostId: string; author: string; content: string }>) => ({
+    externalPostId: 'tw_1',
+    author: 'x-user:1',
+    content: 'Anyone know a good CRM for a small sales team?',
+    url: 'https://x.com/i/web/status/1',
+    sourceCreatedAt: new Date('2026-08-10T00:00:00.000Z'),
+    ...over,
+  })
+
+  it('keeps a post that carries a real question', () => {
+    expect(filterQualifiedRecords([record({})])).toHaveLength(1)
+  })
+
+  it('keeps terse high-intent posts', () => {
+    // "Need a CRM" is ten characters and is the strongest possible signal. Any
+    // length floor tuned against spam has to clear this first.
+    expect(filterQualifiedRecords([record({ content: 'Need a CRM' })])).toHaveLength(1)
+    expect(filterQualifiedRecords([record({ content: 'any CRM recs?' })])).toHaveLength(1)
+  })
+
+  it('drops a single-word post that cannot express intent', () => {
+    expect(filterQualifiedRecords([record({ content: 'hi' })])).toEqual([])
+  })
+
+  it('drops a post whose entire body is a link', () => {
+    // The first production scan stored several of these as leads. There is
+    // nothing for a classifier or a human to qualify.
+    expect(filterQualifiedRecords([record({ content: 'https://t.co/mO2Ig8uwkG' })])).toEqual([])
+  })
+
+  it('drops a reply that is only mentions and a link', () => {
+    expect(
+      filterQualifiedRecords([record({ content: '@someone @another https://t.co/abc' })]),
+    ).toEqual([])
+  })
+
+  it('caps how many records one author can contribute', () => {
+    // Four betting accounts produced ten "leads" in the first real run by
+    // reposting themselves.
+    const spam = Array.from({ length: 5 }, (_, i) =>
+      record({
+        externalPostId: `tw_${i}`,
+        author: 'x-user:spam',
+        content: `Best plays tonight, huge value on the totals line, entry ${i}`,
+      }),
+    )
+    expect(filterQualifiedRecords(spam)).toHaveLength(2)
+  })
+
+  it('counts the cap per author rather than across the batch', () => {
+    const mixed = [
+      record({ externalPostId: 'a1', author: 'x-user:a', content: 'Looking for a HubSpot alternative for our team' }),
+      record({ externalPostId: 'b1', author: 'x-user:b', content: 'Looking for a HubSpot alternative for our team' }),
+      record({ externalPostId: 'c1', author: 'x-user:c', content: 'Looking for a HubSpot alternative for our team' }),
+    ]
+    expect(filterQualifiedRecords(mixed)).toHaveLength(3)
+  })
+
+  it('preserves provider order for the records it keeps', () => {
+    const ordered = [
+      record({ externalPostId: 'first', content: 'Which CRM would you recommend for us?' }),
+      record({ externalPostId: 'second', author: 'x-user:2', content: 'We are migrating off Salesforce soon' }),
+    ]
+    expect(filterQualifiedRecords(ordered).map((r) => r.externalPostId)).toEqual(['first', 'second'])
   })
 })

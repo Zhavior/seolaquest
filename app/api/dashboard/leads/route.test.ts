@@ -3,11 +3,17 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 const mocks = vi.hoisted(() => ({
   getCurrentUser: vi.fn(),
   leadFindMany: vi.fn(),
+  // fetchDashboardLeads joins Aurora's verdict onto each lead, so the feed can
+  // say "not scored" instead of inventing a number.
+  auroraDecisionFindMany: vi.fn(),
 }))
 
 vi.mock('@/lib/auth', () => ({ getCurrentUser: mocks.getCurrentUser }))
 vi.mock('@/lib/prisma', () => ({
-  default: { lead: { findMany: mocks.leadFindMany } },
+  default: {
+    lead: { findMany: mocks.leadFindMany },
+    auroraDecision: { findMany: mocks.auroraDecisionFindMany },
+  },
 }))
 // Rate limiting is covered by RateLimiter.test.ts; these cases exercise route behaviour.
 vi.mock('@/src/modules/core/security/RateLimiter', () => ({
@@ -24,6 +30,7 @@ describe('dashboard leads route', () => {
     vi.clearAllMocks()
     mocks.getCurrentUser.mockResolvedValue({ id: 'user-1' })
     mocks.leadFindMany.mockResolvedValue([])
+    mocks.auroraDecisionFindMany.mockResolvedValue([])
   })
 
   it('rejects unauthenticated callers before querying', async () => {

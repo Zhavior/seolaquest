@@ -48,11 +48,7 @@ describe('OnboardingForm', () => {
       ok: true,
       keyword: { id: 'kw/id stable', phrase: 'need a website' },
       reward: {
-        xpAwarded: 50,
-        xp: 50,
-        level: 1,
-        xpRequired: 100,
-        didLevelUp: false,
+        questsAssigned: 4,
         sampleQuestsSeeded: 3,
       },
     })
@@ -97,7 +93,7 @@ describe('OnboardingForm', () => {
     await user.click(screen.getByRole('button', { name: /complete setup/i }))
     await waitFor(() =>
       expect(mocks.push).toHaveBeenCalledWith(
-        '/app?keywordId=kw%2Fid+stable&questComplete=first-quest&xp=50&samples=3',
+        '/app?keywordId=kw%2Fid+stable&questComplete=first-quest&quests=4&samples=3',
       ),
     )
   })
@@ -105,7 +101,9 @@ describe('OnboardingForm', () => {
   it('frames setup as a quest with the reward and objective progress visible', async () => {
     render(<OnboardingForm initialDraft={draft({ onboardingStep: 3 })} />)
 
-    expect(screen.getByText(/reward \+50 xp/i)).toBeVisible()
+    // Setup no longer pays XP — XP is outcomes-only now — so the reward it
+    // advertises is the thing it genuinely hands over: a populated quest board.
+    expect(screen.getByText(/reward: your quest board/i)).toBeVisible()
     expect(screen.getByText(/objective 3 of 6/i)).toBeVisible()
 
     // Two of six objectives cleared before the current one.
@@ -145,7 +143,13 @@ describe('OnboardingForm', () => {
     )
   })
 
-  it('celebrates the reward before leaving for the dashboard', async () => {
+  /*
+   * The celebration reports the server's own count rather than a constant. The
+   * banner used to read "+50 XP AWARDED" on every account, which stopped being
+   * true when progression moved to `GamifyProfile`: completing setup assigns
+   * quests and mints no XP at all.
+   */
+  it('celebrates the quests it actually put on the board', async () => {
     const user = userEvent.setup()
     render(<OnboardingForm initialDraft={draft({ onboardingStep: 6 })} />)
 
@@ -153,7 +157,8 @@ describe('OnboardingForm', () => {
 
     const celebration = await screen.findByRole('status')
     expect(celebration).toHaveTextContent(/quest complete/i)
-    expect(celebration).toHaveTextContent(/\+50 xp/i)
+    expect(celebration).toHaveTextContent(/4 quests are on your board/i)
+    expect(celebration).not.toHaveTextContent(/xp/i)
   })
 
   it('offers a safe sign-in return link if the session expires', async () => {

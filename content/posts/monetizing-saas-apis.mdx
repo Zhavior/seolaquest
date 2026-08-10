@@ -37,21 +37,21 @@ Let's do the math on a typical SEOlaQuest API call — the `/api/v1/leads/scan` 
 │    → Output: 250 tokens × $0.60/1M  = $0.0001500│
 │    → Total LLM cost per call:         $0.00019  │
 │                                                 │
-│  Upstash Redis (rate limit check):    $0.00002  │
-│  Vercel Serverless (50ms execution):  $0.00001  │
+│  Upstash Redis (rate limit check, est.): $0.00002│
+│  Vercel Serverless (50ms, est.):      $0.00001  │
 │  ─────────────────────────────────────────────  │
-│  TOTAL COST PER CALL:                 $0.00022  │
+│  TOTAL COST PER CALL (illustrative):  $0.00022  │
 │                                                 │
 │  PRICE CHARGED (10 Mana × $0.002/MP): $0.02    │
-│  GROSS MARGIN:                        98.9% 🟢  │
+│  GROSS MARGIN (illustrative):         ~99% 🟢   │
 └─────────────────────────────────────────────────┘
 ```
 
-At scale, this is absurdly profitable. A developer making **1,000 API calls/day** generates **$20/day in revenue** at a cost of **$0.22**. Monthly, that's **$600 revenue on $6.60 COGS** — a **98.9% gross margin**.
+At scale, this is absurdly profitable. A developer making **1,000 API calls/day** generates **$20/day in revenue** against a few cents of estimated COGS — an illustrative gross margin well above 90%.
 
 ### The Refill Compulsion Loop
 
-Unlike flat subscriptions where users pay once and forget, credit-based systems create a **natural re-engagement trigger.** When a developer's Mana tank hits zero mid-workflow, they experience an immediate friction point that drives them back to the purchase page. This is the same psychological mechanic that mobile games use to generate billions — except here, you're selling *real compute value*, not cosmetic gems.
+Unlike flat subscriptions where users pay once and forget, credit-based systems create a **natural re-engagement trigger.** When a developer's Mana tank hits zero mid-workflow, they experience an immediate friction point that drives them back to the purchase page. This is the same psychological mechanic that mobile games use to drive large recurring spend — except here, you're selling *real compute value*, not cosmetic gems.
 
 ---
 

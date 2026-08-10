@@ -1,6 +1,7 @@
 import { LeadStatus } from '@prisma/client'
 import prisma from '@/lib/prisma'
 import { requireCurrentUser } from '@/lib/auth'
+import { readHunterProgression } from '@/src/modules/gamify/hunterProgression'
 
 const DAY_MS = 24 * 60 * 60 * 1000
 
@@ -78,9 +79,6 @@ export class AnalyticsService {
         prisma.user.findUnique({
           where: { id: user.id },
           select: {
-            level: true,
-            xp: true,
-            xpRequired: true,
             spellsCast: true,
             questsExported: true,
           },
@@ -158,9 +156,10 @@ export class AnalyticsService {
       huntingStreak += 1
     }
 
-    const level = dbUser?.level ?? 1
-    const xp = dbUser?.xp ?? 0
-    const xpRequired = dbUser?.xpRequired ?? 100
+    // Progression comes from the Gamify ledger, which is the only system that
+    // can account for every point it reports. The `User.level`/`User.xp` columns
+    // this used to read are no longer written by anything.
+    const { level, xp, xpRequired } = await readHunterProgression(user.id)
     const spellsCast = dbUser?.spellsCast ?? 0
     const questsExported = dbUser?.questsExported ?? 0
     const targets = [10, 25, 50, 100, 250, 500, 1000]

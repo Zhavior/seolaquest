@@ -8,10 +8,14 @@ import { sfx } from '@/lib/sfx'
 /**
  * The reward banner shown once, immediately after first-run setup commits.
  *
- * It reports what the server already wrote — the XP is granted inside the
- * onboarding transaction, never here — so a refresh or a shared link cannot
- * mint a reward. The query params are stripped as soon as it mounts, which is
- * also what stops the banner reappearing on every later visit.
+ * It reports what the server already wrote — the quests are assigned inside
+ * onboarding, never here — so a refresh or a shared link cannot mint anything.
+ * The query params are stripped as soon as it mounts, which is also what stops
+ * the banner reappearing on every later visit.
+ *
+ * It does not announce XP. Finishing setup no longer pays any: progression is
+ * earned against the quests this banner is announcing, not against the act of
+ * signing up.
  */
 export default function FirstQuestBanner() {
   const params = useSearchParams()
@@ -19,9 +23,8 @@ export default function FirstQuestBanner() {
   const pathname = usePathname()
 
   const questComplete = params.get('questComplete') === 'first-quest'
-  const xpAwarded = Number.parseInt(params.get('xp') ?? '', 10)
+  const questCount = Number.parseInt(params.get('quests') ?? '', 10)
   const sampleCount = Number.parseInt(params.get('samples') ?? '', 10)
-  const newLevel = Number.parseInt(params.get('levelUp') ?? '', 10)
 
   const [visible, setVisible] = useState(questComplete)
 
@@ -33,7 +36,7 @@ export default function FirstQuestBanner() {
     // Consume the params right away. Keeping them in the URL would replay the
     // celebration on every back-navigation to this page.
     const next = new URLSearchParams(params.toString())
-    for (const key of ['questComplete', 'xp', 'samples', 'levelUp']) next.delete(key)
+    for (const key of ['questComplete', 'quests', 'samples']) next.delete(key)
     const query = next.toString()
     router.replace(query ? `${pathname}?${query}` : pathname, { scroll: false })
 
@@ -61,11 +64,8 @@ export default function FirstQuestBanner() {
             </p>
 
             <p className="mt-2 text-sm font-bold text-ink/80">
-              {Number.isFinite(xpAwarded) && xpAwarded > 0
-                ? `+${xpAwarded} XP banked. `
-                : ''}
-              {Number.isFinite(newLevel) && newLevel > 0
-                ? `You reached level ${newLevel}. `
+              {Number.isFinite(questCount) && questCount > 0
+                ? `${questCount} quests are on your board. `
                 : ''}
               Your keyword is tracked and your schedule is on.
             </p>

@@ -17,8 +17,10 @@ import {
   AnalyticsData,
   LeaderboardUser
 } from '@/features/dashboard/types'
+import { fingerprintKeywords, fingerprintLeads } from '@/features/dashboard/lib/serverSnapshot'
 
 export type DashboardAsyncStatus = 'idle' | 'scanning' | 'claiming' | 'replying' | 'exporting'
+export type DashboardSliceStatus = 'ok' | 'degraded'
 type ScanOutcome = 'waiting' | 'pending' | 'succeeded' | 'failed'
 type ScanStatus = 'QUEUED' | 'RUNNING' | 'SUCCEEDED' | 'FAILED_REFUNDED' | 'DEAD' | 'CANCELLED' | 'UNKNOWN'
 
@@ -44,7 +46,15 @@ export function useDashboardState({
   const pathname = usePathname()
   const searchParams = useSearchParams()
 
-  const [user, setUser] = useState(dbUser)
+  /*
+   * The hunter is read straight from the server prop rather than mirrored into
+   * state. It used to be a `useState` seeded from `dbUser` and re-synced by an
+   * effect, which only made sense while claiming a lead paid XP on the spot and
+   * the client wanted to move the bar before the server agreed. Nothing writes
+   * progression on the client any more — the Gamify ledger owns it — so the
+   * copy had exactly one job left: drift out of date until an effect caught up.
+   */
+  const user = dbUser
   const [keywords, setKeywords] = useState(dbKeywords)
   const [leads, setLeads] = useState<DashboardLead[]>(dbLeads)
   const [newKeyword, setNewKeyword] = useState('')
@@ -58,9 +68,11 @@ export function useDashboardState({
   const [remainingQuests, setRemainingQuests] = useState(dbUser.questsRemaining ?? 0)
   const [claimedCount, setClaimedCount] = useState(0)
   const [particles] = useState<{ id: number; x: number; y: number }[]>([])
+  const [leadsSliceStatus, setLeadsSliceStatus] = useState<DashboardSliceStatus>('ok')
 
   const [activeQuickStrikeLead, setActiveQuickStrikeLead] = useState<DashboardLead | null>(null)
   const [recentLevelUp, setRecentLevelUp] = useState(false)
+  const lastSeenLevelRef = useRef(dbUser.level)
 
   const [isScannerModalOpen, setIsScannerModalOpen] = useState(false)
   const [scanLogs, setScanLogs] = useState<string[]>([])
@@ -69,27 +81,63 @@ export function useDashboardState({
   const restoredScanRef = useRef<string | null>(null)
   const activeScanAbortRef = useRef<AbortController | null>(null)
 
+  /*
+   * Last server snapshots we already applied. Optimistic client edits (add /
+   * dismiss / claim) must not be clobbered by a parent re-render that still
+   * carries the previous RSC payload — only a *changed* fingerprint adopts.
+   */
+  const lastKeywordsFpRef = useRef(fingerprintKeywords(dbKeywords))
+  const lastLeadsFpRef = useRef(fingerprintLeads(dbLeads))
+  const lastCreditsRef = useRef(dbUser.questsRemaining ?? 0)
+
   const filter = searchParams.get('platform') || 'ALL'
 
-  const leadsHydratedRef = useRef(false)
+  const keywordsFp = fingerprintKeywords(dbKeywords)
+  const leadsFp = fingerprintLeads(dbLeads)
+  const serverCredits = dbUser.questsRemaining ?? 0
+
   useEffect(() => {
-    if (leadsHydratedRef.current) return
-    leadsHydratedRef.current = true
-    let cancelled = false
-    void (async () => {
-      try {
-        const response = await fetch('/api/dashboard/leads', { cache: 'no-store' })
-        if (!response.ok) return
-        const payload = await response.json() as { ok?: boolean; leads?: DashboardLead[] }
-        if (!cancelled && payload.ok && Array.isArray(payload.leads)) {
-          setLeads(payload.leads)
-        }
-      } catch {
-        // Server shell leads remain authoritative until the next successful refresh.
+    if (keywordsFp === lastKeywordsFpRef.current) return
+    lastKeywordsFpRef.current = keywordsFp
+    setKeywords(dbKeywords)
+  }, [keywordsFp, dbKeywords])
+
+  useEffect(() => {
+    if (leadsFp === lastLeadsFpRef.current) return
+    lastLeadsFpRef.current = leadsFp
+    setLeads(dbLeads)
+    setLeadsSliceStatus('ok')
+  }, [leadsFp, dbLeads])
+
+  useEffect(() => {
+    if (serverCredits === lastCreditsRef.current) return
+    lastCreditsRef.current = serverCredits
+    setRemainingQuests(serverCredits)
+  }, [serverCredits])
+
+  /**
+   * Background leads slice refresh — updates the queue without remounting the
+   * dashboard shell. Used after a successful scan so new matches appear even
+   * before RSC props catch up. Failures mark the slice degraded; local leads stay.
+   */
+  const refreshLeadsSlice = useCallback(async () => {
+    try {
+      const response = await fetch('/api/dashboard/leads', { cache: 'no-store' })
+      if (!response.ok) {
+        setLeadsSliceStatus('degraded')
+        return
       }
-    })()
-    return () => {
-      cancelled = true
+      const payload = (await response.json()) as { ok?: boolean; leads?: DashboardLead[] }
+      if (!payload.ok || !Array.isArray(payload.leads)) {
+        setLeadsSliceStatus('degraded')
+        return
+      }
+      const nextFp = fingerprintLeads(payload.leads)
+      lastLeadsFpRef.current = nextFp
+      setLeads(payload.leads)
+      setLeadsSliceStatus('ok')
+    } catch {
+      setLeadsSliceStatus('degraded')
     }
   }, [])
 
@@ -246,6 +294,9 @@ export function useDashboardState({
               setScanOutcome('succeeded')
               setScanStep(5)
               setAsyncStatus('idle')
+              // Slice first so the queue updates without waiting on full RSC props.
+              await refreshLeadsSlice()
+              if (signal.aborted) return
               router.refresh()
               return
             }
@@ -321,6 +372,8 @@ export function useDashboardState({
             sfx.playCoinDrop()
             setScanStep(5)
             setScanOutcome('succeeded')
+            await refreshLeadsSlice()
+            if (cancelled) return
             router.refresh()
             return
           }
@@ -342,7 +395,7 @@ export function useDashboardState({
       }
     })()
     return () => { cancelled = true }
-  }, [searchParams, router])
+  }, [searchParams, router, refreshLeadsSlice])
 
   function handleClaimBounty(lead: DashboardLead) {
     sfx.playCoinDrop()
@@ -358,18 +411,13 @@ export function useDashboardState({
       setAsyncStatus('idle')
 
       if (result.ok) {
-        const returnedUser = result.user
-        if (returnedUser) {
-          setUser((current) => ({
-            ...current,
-            xp: returnedUser.xp,
-            level: returnedUser.level,
-            xpRequired: returnedUser.xpRequired,
-          }))
-          setRecentLevelUp(returnedUser.didLevelUp ?? false)
-          if (returnedUser.didLevelUp) sfx.playLevelUp()
-        }
-
+        /*
+         * No XP is applied here any more. Claiming emits `opportunity.engaged`
+         * and the Gamify ledger decides what it is worth once the outbox
+         * delivers it — a decision that can legitimately come back as nothing.
+         * The old code moved the bar the instant the button was pressed, which
+         * meant the HUD was showing a reward the backend had not agreed to.
+         */
         if (typeof result.questsRemaining === 'number') {
           setRemainingQuests(result.questsRemaining)
         }
@@ -435,9 +483,24 @@ export function useDashboardState({
     setNotice('Opened a share draft with measured dashboard counts.')
   }
 
+  /*
+   * Progression arrives from the server, not from the click.
+   *
+   * Claiming a lead emits an event; the Gamify ledger scores it asynchronously
+   * and `revalidatePath` re-renders this page with whatever it decided. So the
+   * level-up flourish keys off the server's level actually rising — a real
+   * event — rather than off a number the client predicted at claim time.
+   */
+  useEffect(() => {
+    if (dbUser.level > lastSeenLevelRef.current) {
+      setRecentLevelUp(true)
+      sfx.playLevelUp()
+    }
+    lastSeenLevelRef.current = dbUser.level
+  }, [dbUser])
+
   return {
     user,
-    setUser,
     keywords,
     setKeywords,
     leads,
@@ -458,6 +521,8 @@ export function useDashboardState({
     setRemainingQuests,
     claimedCount,
     particles,
+    leadsSliceStatus,
+    refreshLeadsSlice,
     activeQuickStrikeLead,
     setActiveQuickStrikeLead,
     recentLevelUp,

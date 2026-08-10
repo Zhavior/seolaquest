@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo, useEffect, useRef } from 'react'
 import Link from 'next/link'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
 import {
   CheckCircle2,
   Clock3,
@@ -51,11 +51,51 @@ export function DashboardScannerModal({
   const [logFilter, setLogFilter] = useState('')
   const [copied, setCopied] = useState(false)
   const logContainerRef = useRef<HTMLDivElement>(null)
+  const closeButtonRef = useRef<HTMLButtonElement>(null)
+  const dialogRef = useRef<HTMLDivElement>(null)
+  const previousFocusRef = useRef<HTMLElement | null>(null)
+  const shouldReduceMotion = useReducedMotion()
 
   const close = () => {
     onAbortScan?.()
     setIsScannerModalOpen(false)
   }
+
+  useEffect(() => {
+    previousFocusRef.current = document.activeElement instanceof HTMLElement ? document.activeElement : null
+    closeButtonRef.current?.focus()
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        event.preventDefault()
+        close()
+        return
+      }
+      if (event.key !== 'Tab' || !dialogRef.current) return
+
+      const focusable = dialogRef.current.querySelectorAll<HTMLElement>(
+        'a[href], button:not([disabled]), textarea, input, select, [tabindex]:not([tabindex="-1"])'
+      )
+      if (focusable.length === 0) return
+      const first = focusable[0]
+      const last = focusable[focusable.length - 1]
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault()
+        last.focus()
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault()
+        first.focus()
+      }
+    }
+
+    document.addEventListener('keydown', onKeyDown)
+    return () => {
+      document.removeEventListener('keydown', onKeyDown)
+      previousFocusRef.current?.focus?.()
+    }
+    // Mount/unmount only — close reads latest handlers via refs/closures for this modal lifetime.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   // Extract scan run ID from logs if present
   const scanRunId = useMemo(() => {
@@ -107,13 +147,19 @@ export function DashboardScannerModal({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 p-3 sm:p-4 backdrop-blur-xs select-none">
       <motion.div
-        initial={{ scale: 0.94, opacity: 0, y: 16 }}
+        ref={dialogRef}
+        initial={shouldReduceMotion ? false : { scale: 0.94, opacity: 0, y: 16 }}
         animate={{ scale: 1, opacity: 1, y: 0 }}
-        exit={{ scale: 0.98, opacity: 0, y: 10 }}
-        transition={{ type: 'spring', stiffness: 350, damping: 25 }}
+        exit={shouldReduceMotion ? undefined : { scale: 0.98, opacity: 0, y: 10 }}
+        transition={
+          shouldReduceMotion
+            ? { duration: 0 }
+            : { type: 'spring', stiffness: 350, damping: 25 }
+        }
         className="max-h-[calc(100dvh-1rem)] sm:max-h-[calc(100dvh-2rem)] w-full max-w-4xl overflow-y-auto overscroll-contain border-4 border-outline bg-[#13D7C2] shadow-brutal-lg md:shadow-brutal-lg"
         role="dialog"
-        aria-label="Battlestation live scan"
+        aria-modal="true"
+        aria-labelledby="scanner-modal-title"
       >
         {/* Header Bar */}
         <div className="relative border-b-4 border-outline bg-[#13D7C2] px-4 py-3.5 md:px-5">
@@ -121,13 +167,17 @@ export function DashboardScannerModal({
           <div className="relative flex items-center justify-between gap-3">
             <div className="flex min-w-0 items-center gap-3">
               <div className="flex h-11 w-11 shrink-0 items-center justify-center border-3 border-outline bg-card shadow-brutal-sm">
-                <Radar className="h-5 w-5 text-ink animate-spin" style={{ animationDuration: '4s' }} />
+                <Radar
+                  className={`h-5 w-5 text-ink ${scanOutcome === 'succeeded' || scanOutcome === 'failed' || shouldReduceMotion ? '' : 'animate-spin'}`}
+                  style={shouldReduceMotion ? undefined : { animationDuration: '4s' }}
+                  aria-hidden
+                />
               </div>
 
               <div className="min-w-0">
                 <div className="flex items-center gap-2">
                   <p className="text-[10px] md:text-xs font-black uppercase tracking-[0.14em] text-ink/75">
-                    Battlestation Live Radar
+                    Durable scan run
                   </p>
                   {scanRunId && (
                     <span className="hidden sm:inline-block bg-black text-[#FFE600] text-[9px] font-mono font-black px-1.5 py-0.5 border border-outline -rotate-1">
@@ -135,8 +185,8 @@ export function DashboardScannerModal({
                     </span>
                   )}
                 </div>
-                <h2 className="truncate text-base font-black uppercase text-ink md:text-2xl tracking-wide">
-                  Tactical Scan Run
+                <h2 id="scanner-modal-title" className="truncate text-base font-black uppercase text-ink md:text-2xl tracking-wide">
+                  Scan status
                 </h2>
               </div>
             </div>
@@ -146,8 +196,8 @@ export function DashboardScannerModal({
                 <button
                   type="button"
                   onClick={copyRunId}
-                  title="Copy Durable Run Reference ID"
-                  className="hidden sm:flex items-center gap-1 border-3 border-outline bg-card px-2.5 py-1 text-[10px] font-black uppercase text-ink shadow-brutal-sm hover:bg-accent active:translate-x-[1px] active:translate-y-[1px] transition-all"
+                  title="Copy durable run reference ID"
+                  className="hidden sm:flex min-h-11 items-center gap-1 border-3 border-outline bg-card px-2.5 py-1 text-[10px] font-black uppercase text-ink shadow-brutal-sm hover:bg-accent active:translate-x-[1px] active:translate-y-[1px] transition-all"
                 >
                   {copied ? <Check className="size-3.5 text-green-600" /> : <Copy className="size-3.5" />}
                   <span>{copied ? 'COPIED!' : 'COPY ID'}</span>
@@ -155,9 +205,10 @@ export function DashboardScannerModal({
               )}
 
               <button
+                ref={closeButtonRef}
                 type="button"
                 onClick={close}
-                className="flex h-10 w-10 shrink-0 items-center justify-center border-3 border-outline bg-card text-ink shadow-brutal-sm hover:bg-accent-2 hover:text-white active:translate-x-[1px] active:translate-y-[1px] transition-all"
+                className="flex h-11 w-11 shrink-0 items-center justify-center border-3 border-outline bg-card text-ink shadow-brutal-sm hover:bg-accent-2 hover:text-white active:translate-x-[1px] active:translate-y-[1px] transition-all"
                 aria-label="Close scanner modal"
               >
                 <X className="h-5 w-5" strokeWidth={3} />
@@ -166,12 +217,19 @@ export function DashboardScannerModal({
           </div>
 
           {/* Live Tactial Progress Bar */}
-          <div className="mt-3 relative h-3 w-full border-2 border-outline bg-black/20 overflow-hidden shadow-brutal-sm">
+          <div
+            className="mt-3 relative h-3 w-full border-2 border-outline bg-black/20 overflow-hidden shadow-brutal-sm"
+            role="progressbar"
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-valuenow={progressPercent}
+            aria-label={`Scan progress ${progressPercent} percent`}
+          >
             <motion.div
               className="h-full bg-gradient-to-r from-[#FFE600] via-[#06B6D4] to-[#A3E635]"
-              initial={{ width: '0%' }}
+              initial={false}
               animate={{ width: `${progressPercent}%` }}
-              transition={{ duration: 0.4, ease: 'easeOut' }}
+              transition={shouldReduceMotion ? { duration: 0 } : { duration: 0.4, ease: 'easeOut' }}
             />
           </div>
         </div>
@@ -222,12 +280,16 @@ export function DashboardScannerModal({
 
                       {status === 'active' && (
                         <div className="ml-6 h-1.5 w-32 overflow-hidden border border-[#8CF3E7]/40 bg-[#8CF3E7]/10">
-                          <motion.div
-                            className="h-full bg-[#8CF3E7]"
-                            initial={{ x: '-100%' }}
-                            animate={{ x: '100%' }}
-                            transition={{ repeat: Infinity, duration: 1.1, ease: 'linear' }}
-                          />
+                          {shouldReduceMotion ? (
+                            <div className="h-full w-1/2 bg-[#8CF3E7]" />
+                          ) : (
+                            <motion.div
+                              className="h-full bg-[#8CF3E7]"
+                              initial={{ x: '-100%' }}
+                              animate={{ x: '100%' }}
+                              transition={{ repeat: Infinity, duration: 1.1, ease: 'linear' }}
+                            />
+                          )}
                         </div>
                       )}
                     </div>
@@ -258,13 +320,17 @@ export function DashboardScannerModal({
                   </>
                 ) : (
                   <>
-                    <Clock3 className="h-4 w-4 text-[#0F766E] animate-spin" style={{ animationDuration: '3s' }} />
-                    Radar In Motion ({progressPercent}%)
+                    <Clock3
+                      className={`h-4 w-4 text-[#0F766E] ${shouldReduceMotion ? '' : 'animate-spin'}`}
+                      style={shouldReduceMotion ? undefined : { animationDuration: '3s' }}
+                      aria-hidden
+                    />
+                    Scan in progress ({progressPercent}%)
                   </>
                 )}
               </div>
               <p className="mt-2 text-xs font-bold uppercase tracking-[0.04em] text-ink/70 leading-normal">
-                Track live signal pressure and review matched leads before momentum drops.
+                Status comes from the durable run API — this panel does not invent match quality.
               </p>
             </div>
 
@@ -364,13 +430,16 @@ export function DashboardScannerModal({
                   className="border-4 border-outline bg-highlight p-3.5 shadow-brutal-lg"
                 >
                   <div className="flex items-start gap-2.5">
-                    <Clock3 className="mt-0.5 h-4 w-4 shrink-0 text-ink animate-spin" />
+                    <Clock3
+                      className={`mt-0.5 h-4 w-4 shrink-0 text-ink ${shouldReduceMotion ? '' : 'animate-spin'}`}
+                      aria-hidden
+                    />
                     <div className="min-w-0">
                       <p className="text-[10px] font-black uppercase tracking-[0.12em] text-ink/60">
-                        Awaiting Result
+                        Awaiting result
                       </p>
                       <p className="mt-1 text-xs font-black uppercase tracking-[0.04em] text-ink leading-snug">
-                        Channel open while battlestation routes hunt.
+                        Polling the durable run. You can close this and reopen from Intel or the run URL.
                       </p>
                     </div>
                   </div>

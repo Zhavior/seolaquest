@@ -37,6 +37,7 @@ describe('SEOlaQuest OS Sidebar', () => {
     expect(screen.getByText('SEOlaQuest')).toBeInTheDocument()
     expect(screen.getByText('LIVING HQ')).toBeInTheDocument()
     expect(screen.getByText('QUEST BOARD')).toBeInTheDocument()
+    expect(screen.getByText('SCAN RUNS')).toBeInTheDocument()
     expect(screen.getByText('QUEST LOG')).toBeInTheDocument()
     expect(screen.getByText('GUILD HALL')).toBeInTheDocument()
     expect(screen.getByText('CAMPAIGN BROADCAST')).toBeInTheDocument()
@@ -45,6 +46,20 @@ describe('SEOlaQuest OS Sidebar', () => {
     expect(screen.getByText('ARMORY & SPELLS')).toBeInTheDocument()
     expect(screen.getByText('Party Status')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /LOG OUT/i })).toBeInTheDocument()
+  })
+
+  /*
+   * QUEST BOARD used to point at /app/runs — the scan-run ledger — and carried a
+   * badge reading '12' that was a hardcoded string, identical on every account
+   * including one with nothing on its board. Both were the same failure: the rail
+   * describing something other than what the destination actually holds.
+   */
+  it('sends QUEST BOARD to the board and SCAN RUNS to the run ledger', () => {
+    renderSidebar()
+
+    expect(screen.getByRole('link', { name: /QUEST BOARD/ })).toHaveAttribute('href', '/app/quests')
+    expect(screen.getByRole('link', { name: /SCAN RUNS/ })).toHaveAttribute('href', '/app/runs')
+    expect(screen.getByRole('link', { name: /QUEST BOARD/ })).not.toHaveTextContent('12')
   })
 
   it('ends the Clerk session instead of only linking to /sign-in', async () => {

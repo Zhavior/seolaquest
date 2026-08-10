@@ -58,6 +58,10 @@ export default function ShellHud({ user }: { user?: Partial<ShellUser> }) {
 
   // Signals still waiting in the queue. Zero is a state worth showing, not a
   // reason to hide the counter: an empty board is information.
+  //
+  // This counts leads, so it links to the Battle Area where leads are worked —
+  // not to the Quest Board, which counts something else entirely. It used to
+  // point at the scan-run ledger, which counted nothing this pill mentions.
   const openQuests = user?.openQuests ?? 0
 
   // Each reading is one string rather than nested spans. Split across elements a
@@ -74,7 +78,7 @@ export default function ShellHud({ user }: { user?: Partial<ShellUser> }) {
       {/* MOBILE: numbers only — there is no room for the words */}
       <div className="flex items-center gap-1 md:hidden">
         <Link
-          href="/app/runs"
+          href="/app"
           aria-label={questLabel}
           title={`${openQuests} signals waiting for action`}
           className="flex h-9 items-center gap-1 border-2 border-outline bg-accent-2 px-2 text-[9px] font-black uppercase text-white shadow-brutal-sm"
@@ -116,7 +120,7 @@ export default function ShellHud({ user }: { user?: Partial<ShellUser> }) {
 
         {/* Quests waiting */}
         <Link
-          href="/app/runs"
+          href="/app"
           title={`${openQuests} signals waiting for action`}
           className="flex h-9 items-center gap-1.5 border-2 border-outline bg-accent-2 px-2.5 text-[11px] font-black uppercase tracking-wider text-white shadow-brutal-sm transition-transform duration-150 hover:-translate-y-0.5 hover:shadow-brutal active:translate-y-0 active:shadow-none"
         >

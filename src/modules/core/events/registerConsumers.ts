@@ -1,6 +1,7 @@
 import 'server-only'
 
 import { registerAuroraConsumers } from '@/src/modules/aurora/events/AuroraEventConsumers'
+import { registerGamifyLedgerConsumers } from '@/src/modules/gamify/events/GamifyLedgerEventConsumers'
 import { registerGamifyQuestConsumers } from '@/src/modules/gamify/events/GamifyQuestEventConsumers'
 
 /*
@@ -26,6 +27,7 @@ export function registerAllEventConsumers(): void {
 
   registerAuroraConsumers()
   registerGamifyQuestConsumers()
+  registerGamifyLedgerConsumers()
 
   registered = true
 }

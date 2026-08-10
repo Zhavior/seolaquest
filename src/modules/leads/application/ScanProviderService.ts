@@ -7,6 +7,7 @@ import { EventFactory } from '@/src/modules/core/events/EventFactory'
 import { EventStore } from '@/src/modules/core/events/EventStore'
 import { MAX_ACTIVE_KEYWORDS_PER_TENANT } from '@/src/modules/keywords/application/KeywordService'
 import {
+  filterQualifiedRecords,
   parseRedditPayload,
   parseXPayload,
   rateLimitResetAt,
@@ -31,11 +32,26 @@ type CompletedAttempt = {
   rateLimitResetAt: Date | null
 }
 
+/**
+ * A bare keyword returns whatever the provider has, which in practice is mostly
+ * retweets and non-English posts. The first real scan run returned ten "leads"
+ * for one keyword that were four sports-betting accounts reposting each other.
+ *
+ * `-is:retweet` is the single highest-value filter: a retweet is someone else's
+ * words, so it can never be a lead — the account that posted it is not the one
+ * with the need. `lang:en` matches the only language the classifier prompt and
+ * the reply drafts are written in.
+ *
+ * Replies are deliberately NOT excluded. The best lead in that first run was a
+ * reply ("What's your budget range for a CRM solution?"), which is exactly the
+ * shape real buying intent takes.
+ */
 function providerUrl(provider: ScanProvider, phrase: string) {
-  const query = encodeURIComponent(phrase)
-  return provider === 'REDDIT'
-    ? `https://www.reddit.com/search.json?q=${query}&type=link&sort=new&limit=10`
-    : `https://api.twitter.com/2/tweets/search/recent?query=${query}&max_results=10&tweet.fields=created_at,author_id`
+  if (provider === 'REDDIT') {
+    return `https://www.reddit.com/search.json?q=${encodeURIComponent(phrase)}&type=link&sort=new&limit=10`
+  }
+  const query = encodeURIComponent(`${phrase} -is:retweet lang:en`)
+  return `https://api.twitter.com/2/tweets/search/recent?query=${query}&max_results=10&tweet.fields=created_at,author_id`
 }
 
 function requestHeaders(provider: ScanProvider, twitterToken?: string) {
@@ -98,10 +114,14 @@ async function readProvider(
 
   try {
     const payload: unknown = await response.json()
-    const records = provider === 'REDDIT'
-      ? parseRedditPayload(payload)
-      : parseXPayload(payload)
+    // Parsing stays faithful to what the provider returned; qualification is a
+    // separate step so a filtered-out post is never mistaken for a parse failure.
+    const records = filterQualifiedRecords(
+      provider === 'REDDIT' ? parseRedditPayload(payload) : parseXPayload(payload),
+    )
     return {
+      // A response that parsed fine but qualified nothing is genuinely zero
+      // results for this tenant, not a provider fault.
       outcome: records.length ? 'SUCCESS' : 'ZERO_RESULTS',
       httpStatusClass,
       records,

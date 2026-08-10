@@ -3,6 +3,7 @@ import prisma from '@/lib/prisma'
 import type { DomainEvent } from '../core/events/DomainEvent'
 import { DomainError, NotFoundError } from '../core/infrastructure/errors'
 import { GamifyLedgerService } from './GamifyLedgerService'
+import { assignmentCycle, earliestDate } from './questCycle'
 
 type Tx = Prisma.TransactionClient
 type QuestRewardLedger = Pick<GamifyLedgerService, 'awardQuestRewardInTransaction'>
@@ -52,8 +53,8 @@ export class GamifyQuestService {
         create: { userId: actorId, lifetimeXp: 0, level: 1, reputation: 0 },
       })
 
-      const cycle = this.assignmentCycle(quest.type, at)
-      const expiresAt = this.earliestDate(quest.endsAt, cycle.expiresAt)
+      const cycle = assignmentCycle(quest.type, at)
+      const expiresAt = earliestDate(quest.endsAt, cycle.expiresAt)
 
       return tx.gamifyQuestAssignment.upsert({
         where: { actorId_questId_cycleKey: { actorId, questId, cycleKey: cycle.key } },
@@ -227,40 +228,4 @@ export class GamifyQuestService {
     return true
   }
 
-  private assignmentCycle(type: string, at: Date): { key: string; expiresAt: Date | null } {
-    if (type === 'DAILY') {
-      const year = at.getUTCFullYear()
-      const month = String(at.getUTCMonth() + 1).padStart(2, '0')
-      const day = String(at.getUTCDate()).padStart(2, '0')
-      return {
-        key: `${year}-${month}-${day}`,
-        expiresAt: new Date(Date.UTC(year, at.getUTCMonth(), at.getUTCDate() + 1)),
-      }
-    }
-
-    if (type === 'WEEKLY') {
-      const day = at.getUTCDay() || 7
-      const monday = new Date(Date.UTC(at.getUTCFullYear(), at.getUTCMonth(), at.getUTCDate() - day + 1))
-      const thursday = new Date(monday)
-      thursday.setUTCDate(monday.getUTCDate() + 3)
-      const firstThursday = new Date(Date.UTC(thursday.getUTCFullYear(), 0, 4))
-      const firstThursdayDay = firstThursday.getUTCDay() || 7
-      firstThursday.setUTCDate(firstThursday.getUTCDate() - firstThursdayDay + 4)
-      const week = 1 + Math.round((thursday.getTime() - firstThursday.getTime()) / (7 * 24 * 60 * 60 * 1000))
-      const nextMonday = new Date(monday)
-      nextMonday.setUTCDate(monday.getUTCDate() + 7)
-      return {
-        key: `${thursday.getUTCFullYear()}-W${String(week).padStart(2, '0')}`,
-        expiresAt: nextMonday,
-      }
-    }
-
-    return { key: 'once', expiresAt: null }
-  }
-
-  private earliestDate(first: Date | null, second: Date | null): Date | null {
-    if (!first) return second
-    if (!second) return first
-    return first < second ? first : second
-  }
 }

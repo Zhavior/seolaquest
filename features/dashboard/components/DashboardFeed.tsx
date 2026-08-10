@@ -1,7 +1,7 @@
 'use client'
 
-import { memo, useState, useMemo } from 'react'
-import { motion, AnimatePresence, type Variants } from 'framer-motion'
+import { memo, useState, useMemo, useEffect, useRef } from 'react'
+import { motion, AnimatePresence, useReducedMotion, type Variants } from 'framer-motion'
 import {
   Flame,
   Crosshair,
@@ -39,39 +39,32 @@ type DashboardFeedProps = {
   handlePresetClick: (phrase: string) => void
 }
 
-type LootTier = 'COMMON' | 'RARE' | 'EPIC' | 'LEGENDARY'
+type SignalBadge = 'LIVE_SCORED' | 'UNSCORED' | 'SCORING_UNAVAILABLE'
 
-const tierStyles: Record<
-  LootTier,
+const signalBadgeStyles: Record<
+  SignalBadge,
   { label: string; wrap: string; badge: string; border: string; accent: string }
 > = {
-  COMMON: {
-    label: 'COMMON DROP',
+  LIVE_SCORED: {
+    label: 'LIVE SCORED',
+    wrap: 'bg-[#FFFBEB]',
+    badge: 'bg-highlight-strong text-amber-950 border-amber-500',
+    border: 'border-l-8 border-l-amber-500',
+    accent: 'bg-amber-500 hover:bg-amber-600 text-on-accent font-black',
+  },
+  UNSCORED: {
+    label: 'NOT SCORED',
     wrap: 'bg-[#F8FAFC]',
     badge: 'bg-[#E2E8F0] text-ink border-hairline',
     border: 'border-l-8 border-l-slate-400',
     accent: 'bg-slate-700 hover:bg-slate-800 text-white',
   },
-  RARE: {
-    label: 'RARE SIGNAL',
+  SCORING_UNAVAILABLE: {
+    label: 'SCORING UNAVAILABLE',
     wrap: 'bg-[#F0F9FF]',
     badge: 'bg-[#BAE6FD] text-blue-900 border-blue-400',
     border: 'border-l-8 border-l-blue-500',
     accent: 'bg-blue-600 hover:bg-blue-700 text-white',
-  },
-  EPIC: {
-    label: 'EPIC INTENT',
-    wrap: 'bg-[#FAF5FF]',
-    badge: 'bg-[#E9D5FF] text-purple-900 border-purple-400',
-    border: 'border-l-8 border-l-purple-600',
-    accent: 'bg-purple-600 hover:bg-purple-700 text-white',
-  },
-  LEGENDARY: {
-    label: 'LEGENDARY LEAD',
-    wrap: 'bg-[#FFFBEB]',
-    badge: 'bg-highlight-strong text-amber-950 border-amber-500',
-    border: 'border-l-8 border-l-amber-500',
-    accent: 'bg-amber-500 hover:bg-amber-600 text-on-accent font-black',
   },
 }
 
@@ -111,44 +104,67 @@ function getPlatformTone(platform: string) {
   }
 }
 
-function getLeadTier(lead: DashboardLead): LootTier {
-  const body = `${lead.content} ${lead.matched}`.toLowerCase()
-
-  if (
-    /budget|pricing|quote|urgent|asap|need now|ready to switch|alternative|migration|demo/i.test(body)
-  ) {
-    return 'LEGENDARY'
-  }
-
-  if (/compare|comparison|best|recommend|stack|replace|versus|vs\./i.test(body)) {
-    return 'EPIC'
-  }
-
-  if (/looking for|searching for|tool for|software for|crm|analytics|workflow|automation/i.test(body)) {
-    return 'RARE'
-  }
-
-  return 'COMMON'
+/**
+ * Presentation badge from Aurora truth only — never regex "loot rarity".
+ */
+function getSignalBadge(lead: DashboardLead): SignalBadge {
+  const aurora = lead.aurora
+  if (!aurora) return 'UNSCORED'
+  if (aurora.evaluationStatus === 'LIVE') return 'LIVE_SCORED'
+  return 'SCORING_UNAVAILABLE'
 }
 
-function getIntentScore(lead: DashboardLead) {
-  const body = `${lead.content} ${lead.matched}`.toLowerCase()
+/**
+ * What Aurora actually concluded, or an explicit "not scored" — never a guess.
+ *
+ * This replaced a regex that started every lead at 58 and added points for words
+ * like "budget", then rendered the total as "N% intent match" beside a dollar
+ * ARR figure derived from the same number. Both were presented as measurements.
+ * In production every real Aurora decision is a FALLBACK 50 (the classifier is
+ * unreachable), so those percentages described nothing but the regex itself —
+ * one of them labelled a tweet about the $CRM stock ticker a 70% match.
+ *
+ * A lead with no verdict is worth showing: the customer can still read it and
+ * judge. What is not acceptable is implying a machine judged it when none did.
+ */
+type IntentDisplay =
+  | { kind: 'scored'; score: number; action: string }
+  | { kind: 'unscored'; label: string }
 
-  let score = 58
-  if (/budget|pricing|quote|urgent|asap|switch/i.test(body)) score += 24
-  if (/alternative|compare|best|recommend|looking for/i.test(body)) score += 12
-  if ((lead.matched || '').split(',').filter(Boolean).length >= 2) score += 6
+function getIntentDisplay(lead: DashboardLead): IntentDisplay {
+  const aurora = lead.aurora
 
-  return Math.min(score, 98)
+  if (!aurora) return { kind: 'unscored', label: 'Not scored yet' }
+
+  // Only LIVE means the semantic classifier ran. DETERMINISTIC_ONLY, FALLBACK,
+  // and UNAVAILABLE all still carry a finalScore, and showing it would restate
+  // the same false precision this function exists to remove.
+  if (aurora.evaluationStatus !== 'LIVE') {
+    return { kind: 'unscored', label: 'Scoring unavailable' }
+  }
+
+  return { kind: 'scored', score: aurora.score, action: aurora.recommendedAction }
 }
 
-function getEstimatedArr(lead: DashboardLead) {
-  const score = getIntentScore(lead)
-
-  if (score >= 92) return 4800
-  if (score >= 84) return 2400
-  if (score >= 72) return 1200
-  return 600
+/**
+ * The prose form of the same claim, so it degrades with it. Saying "urgent buyer
+ * language detected" about a post nothing has read is the same fabrication as
+ * printing a percentage for it.
+ */
+function getTacticalRead(intent: IntentDisplay): string {
+  if (intent.kind !== 'scored') {
+    return 'Not yet evaluated by Aurora. Read the post and judge it yourself — no automated assessment is available for this lead.'
+  }
+  if (intent.score >= 90) {
+    return 'Urgent buyer language detected. Active switch decision with strong commercial intent.'
+  }
+  if (intent.score >= 80) {
+    return 'Comparison or replacement intent present. Good candidate for a fast reply.'
+  }
+  if (intent.score >= 70) {
+    return 'Problem-aware prospect with relevant keywords. Worth drafting early.'
+  }
+  return 'Early-stage market pain mention. Lower urgency, but useful for visibility.'
 }
 
 function getKeywords(lead: DashboardLead) {
@@ -160,10 +176,10 @@ function getKeywords(lead: DashboardLead) {
 }
 
 function formatTimestamp(sourceCreatedAt: string | null) {
-  if (!sourceCreatedAt) return 'Fresh ping'
+  if (!sourceCreatedAt) return 'Source time unknown'
 
   const created = new Date(sourceCreatedAt).getTime()
-  if (Number.isNaN(created)) return 'Fresh ping'
+  if (Number.isNaN(created)) return 'Source time unknown'
 
   const diffMs = Date.now() - created
   const diffMinutes = Math.max(1, Math.floor(diffMs / 60000))
@@ -243,6 +259,30 @@ function DashboardFeedComponent({
   const [searchQuery, setSearchQuery] = useState('')
   const [activeDetailLead, setActiveDetailLead] = useState<DashboardLead | null>(null)
   const [viewMode, setViewMode] = useState<'grid' | 'compact'>('grid')
+  const shouldReduceMotion = useReducedMotion()
+  const detailCloseRef = useRef<HTMLButtonElement>(null)
+  const detailDialogRef = useRef<HTMLDivElement>(null)
+  const previousFocusRef = useRef<HTMLElement | null>(null)
+
+  useEffect(() => {
+    if (!activeDetailLead) return
+
+    previousFocusRef.current = document.activeElement instanceof HTMLElement ? document.activeElement : null
+    detailCloseRef.current?.focus()
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        event.preventDefault()
+        setActiveDetailLead(null)
+      }
+    }
+
+    document.addEventListener('keydown', onKeyDown)
+    return () => {
+      document.removeEventListener('keydown', onKeyDown)
+      previousFocusRef.current?.focus?.()
+    }
+  }, [activeDetailLead])
 
   const displayedLeads = useMemo(() => {
     if (!searchQuery.trim()) return filteredLeads
@@ -266,13 +306,20 @@ function DashboardFeedComponent({
     >
       {/* Resilient Warming / Stale Data Indicator */}
       {isPending && (
-        <div className="mb-4 flex items-center justify-between border-3 border-outline bg-accent px-3.5 py-2 text-xs font-black uppercase shadow-brutal-sm">
+        <div
+          role="status"
+          aria-live="polite"
+          className="mb-4 flex items-center justify-between border-3 border-outline bg-accent px-3.5 py-2 text-xs font-black uppercase shadow-brutal-sm"
+        >
           <span className="flex items-center gap-2">
-            <RefreshCw className="h-4 w-4 animate-spin text-on-accent" />
-            WARMING RADAR SIGNAL... PRESERVING ACTIVE STATE
+            <RefreshCw
+              className={`h-4 w-4 text-on-accent ${shouldReduceMotion ? '' : 'animate-spin'}`}
+              aria-hidden
+            />
+            Updating queue — keeping current leads visible
           </span>
-          <span className="hidden sm:inline-block border border-outline bg-black text-[#FFE600] px-2 py-0.5 text-[10px]">
-            LIVE REFRESH
+          <span className="hidden sm:inline-block border border-outline bg-card text-ink px-2 py-0.5 text-[10px] font-black uppercase">
+            Measured queue
           </span>
         </div>
       )}
@@ -287,7 +334,7 @@ function DashboardFeedComponent({
           <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-2 mb-1">
               <span className="bg-black text-[#FFE600] uppercase text-[10px] sm:text-xs font-black tracking-widest px-2.5 py-0.5 sm:px-3 sm:py-1 border-2 border-outline -rotate-1">
-                ZONE 04 — LIVE HUNT & LOOT BOARD
+                Opportunity Queue
               </span>
             </div>
 
@@ -295,7 +342,7 @@ function DashboardFeedComponent({
               className="text-2xl sm:text-4xl md:text-5xl uppercase tracking-tight text-white drop-shadow-brutal mt-0.5"
               style={{ WebkitTextStroke: '1.5px black' }}
             >
-              Battle-Ready Signal Queue
+              Open leads to triage
             </h2>
 
             <div className="mt-3 flex flex-wrap items-center gap-2">
@@ -356,7 +403,7 @@ function DashboardFeedComponent({
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="SEARCH SIGNALS, PLAYERS, KEYWORDS..."
-            className="w-full bg-transparent py-2.5 pl-10 pr-10 text-xs sm:text-sm font-black uppercase text-ink placeholder:text-ink/40 focus:outline-none"
+            className="w-full bg-transparent py-2.5 pl-10 pr-10 text-xs sm:text-sm font-black uppercase text-ink placeholder:text-ink/40 focus:outline-none focus:ring-4 focus:ring-[#FFE600]"
           />
           {searchQuery && (
             <button
@@ -401,21 +448,30 @@ function DashboardFeedComponent({
           {viewMode === 'compact' ? (
             <div className="space-y-2.5">
               {displayedLeads.map((lead) => {
-                const tier = getLeadTier(lead)
-                const tierStyle = tierStyles[tier]
+                const badge = getSignalBadge(lead)
+                const badgeStyle = signalBadgeStyles[badge]
                 const platformTone = getPlatformTone(lead.platform)
-                const intentScore = getIntentScore(lead)
+                const intentDisplay = getIntentDisplay(lead)
                 const freshness = formatTimestamp(lead.sourceCreatedAt)
 
                 return (
                   <article
                     key={`compact-${lead.id}`}
+                    role="button"
+                    tabIndex={0}
                     onClick={() => setActiveDetailLead(lead)}
-                    className={`cursor-pointer border-3 border-outline bg-card p-3 ${tierStyle.border} shadow-brutal-sm hover:-translate-y-0.5 transition flex flex-col md:flex-row md:items-center justify-between gap-3`}
+                    onKeyDown={(event) => {
+                      if (event.key === 'Enter' || event.key === ' ') {
+                        event.preventDefault()
+                        setActiveDetailLead(lead)
+                      }
+                    }}
+                    aria-label={`Open lead from ${lead.author} on ${lead.platform}`}
+                    className={`cursor-pointer border-3 border-outline bg-card p-3 ${badgeStyle.border} shadow-brutal-sm hover:-translate-y-0.5 transition flex flex-col md:flex-row md:items-center justify-between gap-3 focus-visible:outline-none`}
                   >
                     <div className="flex items-center gap-3 min-w-0 flex-1">
-                      <span className={`inline-flex items-center gap-1 border-2 border-outline px-2 py-0.5 text-[10px] font-black uppercase shrink-0 ${tierStyle.badge} shadow-brutal-sm`}>
-                        {intentScore}% MATCH
+                      <span className={`inline-flex items-center gap-1 border-2 border-outline px-2 py-0.5 text-[10px] font-black uppercase shrink-0 ${badgeStyle.badge} shadow-brutal-sm`}>
+                        {intentDisplay.kind === 'scored' ? `${intentDisplay.score}% MATCH` : 'UNSCORED'}
                       </span>
 
                       <span className={`inline-flex items-center gap-1 border border-outline px-2 py-0.5 text-[10px] font-black uppercase shrink-0 ${platformTone.chip}`}>
@@ -453,7 +509,7 @@ function DashboardFeedComponent({
                           handleClaimBounty(lead)
                         }}
                         disabled={isPending}
-                        className={`inline-flex min-h-[34px] items-center gap-1 border-2 border-outline px-2.5 py-1 text-[11px] font-black uppercase shadow-brutal-sm disabled:opacity-60 ${tierStyle.accent}`}
+                        className={`inline-flex min-h-[34px] items-center gap-1 border-2 border-outline px-2.5 py-1 text-[11px] font-black uppercase shadow-brutal-sm disabled:opacity-60 ${badgeStyle.accent}`}
                       >
                         <Sword className="h-3 w-3" />
                         Claim
@@ -479,11 +535,10 @@ function DashboardFeedComponent({
             /* RICH GRID VIEW MODE (Clean Card Anatomy with RPG Rarity Left Borders) */
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {displayedLeads.map((lead, index) => {
-                const tier = getLeadTier(lead)
-                const tierStyle = tierStyles[tier]
+                const badge = getSignalBadge(lead)
+                const badgeStyle = signalBadgeStyles[badge]
                 const platformTone = getPlatformTone(lead.platform)
-                const intentScore = getIntentScore(lead)
-                const estimatedArr = getEstimatedArr(lead)
+                const intentDisplay = getIntentDisplay(lead)
                 const keywords = getKeywords(lead)
                 const freshness = formatTimestamp(lead.sourceCreatedAt)
 
@@ -491,19 +546,23 @@ function DashboardFeedComponent({
                   <motion.article
                     key={`desktop-${lead.id}`}
                     layout
-                    initial={{ opacity: 0, y: 20, scale: 0.95 }}
+                    initial={shouldReduceMotion ? false : { opacity: 0, y: 20, scale: 0.95 }}
                     animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.9, y: 20 }}
-                    transition={{ type: 'spring', stiffness: 300, damping: 25, delay: index * 0.04 }}
-                    className={`group flex h-full flex-col overflow-hidden bg-card border-4 border-outline ${tierStyle.border} shadow-brutal-lg transition hover:-translate-x-1 hover:-translate-y-1 hover:shadow-brutal-lg`}
+                    exit={shouldReduceMotion ? undefined : { opacity: 0, scale: 0.9, y: 20 }}
+                    transition={
+                      shouldReduceMotion
+                        ? { duration: 0 }
+                        : { type: 'spring', stiffness: 300, damping: 25, delay: index * 0.04 }
+                    }
+                    className={`group flex h-full flex-col overflow-hidden bg-card border-4 border-outline ${badgeStyle.border} shadow-brutal-lg transition hover:-translate-x-1 hover:-translate-y-1 hover:shadow-brutal-lg`}
                   >
                     {/* Header Bar */}
-                    <div className={`border-b-3 border-outline px-4 py-2.5 ${tierStyle.wrap}`}>
+                    <div className={`border-b-3 border-outline px-4 py-2.5 ${badgeStyle.wrap}`}>
                       <div className="flex flex-wrap items-center justify-between gap-2">
                         <div className="flex flex-wrap items-center gap-1.5">
-                          <span className={`inline-flex items-center gap-1 border-2 border-outline px-2 py-0.5 text-[11px] font-black uppercase ${tierStyle.badge} shadow-brutal-sm`}>
-                            {tier === 'LEGENDARY' ? <Crown className="h-3.5 w-3.5" /> : <Sparkles className="h-3.5 w-3.5" />}
-                            {tierStyle.label}
+                          <span className={`inline-flex items-center gap-1 border-2 border-outline px-2 py-0.5 text-[11px] font-black uppercase ${badgeStyle.badge} shadow-brutal-sm`}>
+                            {badge === 'LIVE_SCORED' ? <Crown className="h-3.5 w-3.5" /> : <Sparkles className="h-3.5 w-3.5" />}
+                            {badgeStyle.label}
                           </span>
 
                           <span className={`inline-flex items-center gap-1 border-2 border-outline px-2 py-0.5 text-[11px] font-black uppercase shadow-brutal-sm ${platformTone.chip}`}>
@@ -521,17 +580,24 @@ function DashboardFeedComponent({
                     {/* Card Content Body */}
                     <div className="flex flex-1 flex-col justify-between p-4 sm:p-5 gap-4">
                       <div className="space-y-3">
-                        {/* Intent & ARR Badges */}
+                        {/* Aurora's verdict, or an explicit absence of one. */}
                         <div className="flex flex-wrap items-center gap-2">
-                          <span className="inline-flex items-center gap-1.5 border-2 border-outline bg-accent px-2.5 py-1 text-xs font-black uppercase shadow-brutal-sm">
-                            <Crosshair className="h-3.5 w-3.5" />
-                            {intentScore}% intent match
-                          </span>
-
-                          <span className="inline-flex items-center gap-1.5 border-2 border-outline bg-info px-2.5 py-1 text-xs font-black uppercase shadow-brutal-sm text-on-accent">
-                            <Coins className="h-3.5 w-3.5" />
-                            ${estimatedArr.toLocaleString()} ARR est.
-                          </span>
+                          {intentDisplay.kind === 'scored' ? (
+                            <>
+                              <span className="inline-flex items-center gap-1.5 border-2 border-outline bg-accent px-2.5 py-1 text-xs font-black uppercase shadow-brutal-sm">
+                                <Crosshair className="h-3.5 w-3.5" />
+                                {intentDisplay.score}% intent match
+                              </span>
+                              <span className="inline-flex items-center gap-1.5 border-2 border-outline bg-info px-2.5 py-1 text-xs font-black uppercase shadow-brutal-sm text-on-accent">
+                                {intentDisplay.action}
+                              </span>
+                            </>
+                          ) : (
+                            <span className="inline-flex items-center gap-1.5 border-2 border-outline bg-card px-2.5 py-1 text-xs font-black uppercase shadow-brutal-sm text-ink/60">
+                              <Crosshair className="h-3.5 w-3.5" />
+                              {intentDisplay.label}
+                            </span>
+                          )}
                         </div>
 
                         {/* Sentence-Case Lead Quote with Line Clamp 3 */}
@@ -545,13 +611,7 @@ function DashboardFeedComponent({
                             Tactical read
                           </p>
                           <p className="mt-1 text-xs font-bold leading-relaxed text-ink">
-                            {intentScore >= 90
-                              ? 'Urgent buyer language detected. Active switch decision with strong commercial intent.'
-                              : intentScore >= 80
-                                ? 'Comparison or replacement intent present. Good candidate for a fast reply.'
-                                : intentScore >= 70
-                                  ? 'Problem-aware prospect with relevant keywords. Worth drafting early.'
-                                  : 'Early-stage market pain mention. Lower urgency, but useful for visibility.'}
+                            {getTacticalRead(intentDisplay)}
                           </p>
                         </div>
                       </div>
@@ -591,7 +651,7 @@ function DashboardFeedComponent({
                             type="button"
                             onClick={() => handleClaimBounty(lead)}
                             disabled={isPending}
-                            className={`inline-flex min-h-[40px] items-center justify-center gap-1.5 border-3 border-outline px-3 py-2 text-xs font-black uppercase shadow-brutal-sm disabled:opacity-60 transition active:translate-x-[1px] active:translate-y-[1px] ${tierStyle.accent}`}
+                            className={`inline-flex min-h-[40px] items-center justify-center gap-1.5 border-3 border-outline px-3 py-2 text-xs font-black uppercase shadow-brutal-sm disabled:opacity-60 transition active:translate-x-[1px] active:translate-y-[1px] ${badgeStyle.accent}`}
                           >
                             <Sword className="h-3.5 w-3.5" />
                             Claim lead
@@ -652,27 +712,38 @@ function DashboardFeedComponent({
         {activeDetailLead && (
           <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/70 p-0 sm:p-4 backdrop-blur-[2px]">
             <motion.div
-              initial={{ y: '100%', opacity: 0 }}
+              ref={detailDialogRef}
+              initial={shouldReduceMotion ? false : { y: '100%', opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
-              exit={{ y: '100%', opacity: 0 }}
-              transition={{ type: 'spring', damping: 25, stiffness: 280 }}
+              exit={shouldReduceMotion ? undefined : { y: '100%', opacity: 0 }}
+              transition={
+                shouldReduceMotion
+                  ? { duration: 0 }
+                  : { type: 'spring', damping: 25, stiffness: 280 }
+              }
               className="w-full max-w-xl max-h-[85dvh] overflow-y-auto border-t-4 sm:border-4 border-outline bg-highlight p-4 sm:p-6 shadow-[0_-8px_0_0_#000] sm:shadow-brutal-lg"
               role="dialog"
-              aria-label="Signal Tactical Detail"
+              aria-modal="true"
+              aria-labelledby="lead-detail-title"
+              aria-label="Lead detail"
             >
               <div className="flex items-center justify-between border-b-3 border-outline pb-3 mb-4">
                 <div className="flex items-center gap-2">
-                  <span className="border-2 border-outline bg-accent px-2.5 py-1 text-xs font-black uppercase shadow-brutal-sm">
-                    TACTICAL DRILLDOWN
+                  <span
+                    id="lead-detail-title"
+                    className="border-2 border-outline bg-accent px-2.5 py-1 text-xs font-black uppercase shadow-brutal-sm"
+                  >
+                    Lead detail
                   </span>
                   <span className="text-xs font-bold uppercase text-ink/70">
                     {formatTimestamp(activeDetailLead.sourceCreatedAt)}
                   </span>
                 </div>
                 <button
+                  ref={detailCloseRef}
                   type="button"
                   onClick={() => setActiveDetailLead(null)}
-                  className="flex h-9 w-9 items-center justify-center border-2 border-outline bg-card text-ink shadow-brutal-sm"
+                  className="flex h-11 w-11 items-center justify-center border-2 border-outline bg-card text-ink shadow-brutal-sm"
                   aria-label="Close detail sheet"
                 >
                   <X className="h-5 w-5" />
@@ -682,15 +753,28 @@ function DashboardFeedComponent({
               <div className="space-y-4">
                 {/* Intent & Value Banner */}
                 <div className="flex flex-wrap items-center gap-2">
-                  <div className="inline-flex items-center gap-1.5 border-2 border-outline bg-accent px-3 py-1 text-xs font-black uppercase shadow-brutal-sm">
-                    <Crosshair className="h-4 w-4" />
-                    {getIntentScore(activeDetailLead)}% intent match
-                  </div>
-
-                  <div className="inline-flex items-center gap-1.5 border-2 border-outline bg-info px-3 py-1 text-xs font-black uppercase shadow-brutal-sm text-on-accent">
-                    <Coins className="h-4 w-4" />
-                    ${getEstimatedArr(activeDetailLead).toLocaleString()} ARR est.
-                  </div>
+                  {(() => {
+                    const detailIntent = getIntentDisplay(activeDetailLead)
+                    if (detailIntent.kind !== 'scored') {
+                      return (
+                        <div className="inline-flex items-center gap-1.5 border-2 border-outline bg-card px-3 py-1 text-xs font-black uppercase shadow-brutal-sm text-ink/60">
+                          <Crosshair className="h-4 w-4" />
+                          {detailIntent.label}
+                        </div>
+                      )
+                    }
+                    return (
+                      <>
+                        <div className="inline-flex items-center gap-1.5 border-2 border-outline bg-accent px-3 py-1 text-xs font-black uppercase shadow-brutal-sm">
+                          <Crosshair className="h-4 w-4" />
+                          {detailIntent.score}% intent match
+                        </div>
+                        <div className="inline-flex items-center gap-1.5 border-2 border-outline bg-info px-3 py-1 text-xs font-black uppercase shadow-brutal-sm text-on-accent">
+                          {detailIntent.action}
+                        </div>
+                      </>
+                    )
+                  })()}
                 </div>
 
                 {/* Full Quote Content */}
@@ -712,13 +796,7 @@ function DashboardFeedComponent({
                     Tactical read & Buyer state
                   </p>
                   <p className="mt-1.5 text-xs font-bold leading-relaxed text-ink/90">
-                    {getIntentScore(activeDetailLead) >= 90
-                      ? 'Urgent buyer language detected. Active switch decision with strong commercial intent.'
-                      : getIntentScore(activeDetailLead) >= 80
-                        ? 'Comparison or replacement intent is present. Good candidate for a fast reply.'
-                        : getIntentScore(activeDetailLead) >= 70
-                          ? 'Problem-aware prospect with relevant keywords. Worth drafting early.'
-                          : 'Early-stage market pain mention. Lower urgency, but useful for visibility.'}
+                    {getTacticalRead(getIntentDisplay(activeDetailLead))}
                   </p>
                 </div>
 

@@ -62,9 +62,6 @@ export const QUEST_OBJECTIVES: QuestObjective[] = [
 
 export const QUEST_TITLE = 'Tutorial quest — the first hunt'
 
-/** Paid on completion by the server, in one transaction with the keyword. */
-export const QUEST_XP_REWARD = 50
-
 export function objectiveForStep(step: number): QuestObjective {
   return QUEST_OBJECTIVES[Math.min(Math.max(step, 1), LAST_ONBOARDING_STEP) - 1]
 }
