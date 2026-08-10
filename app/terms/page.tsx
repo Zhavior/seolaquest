@@ -18,13 +18,17 @@ import {
 } from 'lucide-react'
 import { Footer } from '@/components/Footer'
 import { sfx } from '@/lib/sfx'
+// The catalog is the single source of truth for what is on sale. Restating the
+// seat count or the lock wording by hand here is how terms drift out of step
+// with what the checkout actually enforces.
+import { FOUNDER_LOCK_TERMS, FOUNDER_SEAT_LIMIT } from '@/src/modules/billing/domain/catalog'
 
 export default function TermsPage() {
   const [copied, setCopied] = useState(false)
 
   const copyTermsSummary = () => {
     sfx.playCoinDrop()
-    const summary = `SEOLAQUEST ENGINE - MASTER GUILD CODE & TERMS SUMMARY (v2.4)\n1. Guild Code: Ethical B2B hunting required.\n2. Billing: Free access includes no paid scans. The enabled Beta plan is $14.99/month and adds 50 scan credits per qualifying paid invoice. Pro and Agency are not for sale.\n3. Credits: Unused credits remain recorded, but paid capabilities require a current active subscription.\n4. Cancellation: Cancel anytime via /billing.\n5. Acceptable Use: No illegal scraping or social spam.`
+    const summary = `SEOLAQUEST ENGINE - MASTER GUILD CODE & TERMS SUMMARY (v2.5)\n1. Guild Code: Ethical B2B hunting required.\n2. Billing: Free access includes no paid scans. The Beta plan is $14.99/month and adds 50 scan credits per qualifying paid invoice. The Founder Pass is $29.99/month, limited to 50 seats, and holds that rate for as long as the subscription stays active. Pro and Agency are not for sale.\n3. Founder rate lock: Cancelling releases the seat and the locked rate; resubscribing later uses the public price at that time. The lock covers the subscription rate, not usage.\n4. Credits: Unused credits remain recorded, but paid capabilities require a current active subscription.\n5. Cancellation: Cancel anytime via /billing.\n6. Acceptable Use: No illegal scraping or social spam.`
     navigator.clipboard.writeText(summary)
     setCopied(true)
     setTimeout(() => setCopied(false), 3000)
@@ -209,6 +213,22 @@ export default function TermsPage() {
                   <div className="font-black uppercase">Beta Hunter — $14.99/month</div>
                   <p className="mt-2 text-xs">50 credits per positive paid subscription-creation or renewal invoice; paid scans, AI replies, and CRM export while the subscription period is current.</p>
                 </div>
+                <div className="border-3 border-outline bg-success p-4 shadow-brutal-sm">
+                  <div className="font-black uppercase">Founder Pass — $29.99/month</div>
+                  <p className="mt-2 text-xs">
+                    Limited to {FOUNDER_SEAT_LIMIT} seats. Same paid entitlements as Beta Hunter at a higher included
+                    allowance, plus the rate lock described below.
+                  </p>
+                </div>
+              </div>
+
+              <div className="border-3 border-outline bg-card p-4 space-y-2">
+                <div className="font-black uppercase text-xs">Founder rate lock</div>
+                <ul className="space-y-1 text-xs list-disc pl-4">
+                  {FOUNDER_LOCK_TERMS.map((term) => (
+                    <li key={term}>{term}</li>
+                  ))}
+                </ul>
               </div>
 
               <div className="border-3 border-outline bg-highlight p-4 text-xs font-bold">
@@ -221,7 +241,7 @@ export default function TermsPage() {
                 <RotateCcw size={18} className="text-amber-600" /> Automatic Renewal & Upgrades
               </h3>
               <p>
-                Beta renews on its Stripe billing date until canceled. No higher paid plan or mid-cycle upgrade is currently enabled. Checkout can be disabled during production verification without changing an existing subscription record.
+                Beta Hunter and Founder Pass each renew on their Stripe billing date until canceled. Mid-cycle upgrades between them are not currently enabled, and no plan above Founder Pass is for sale. Checkout can be disabled during production verification without changing an existing subscription record.
               </p>
             </div>
           </div>
