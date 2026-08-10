@@ -10,6 +10,7 @@ const lead = {
   matched: 'CRM',
   url: 'https://reddit.com/example',
   sourceCreatedAt: null,
+    aurora: null,
 }
 
 describe('QuickStrikeReplyModal', () => {

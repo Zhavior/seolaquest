@@ -4,6 +4,7 @@ import { getCurrentUser } from '@/lib/auth'
 import type { DashboardKeyword, DashboardLead, DashboardUser } from '@/features/dashboard/types'
 import { withApiHandler } from '@/src/modules/core/infrastructure/api-handler'
 import { logger } from '@/src/modules/core/infrastructure/logger'
+import { fetchDashboardLeads } from '@/features/dashboard/server/leads'
 
 export const dynamic = 'force-dynamic'
 
@@ -20,20 +21,7 @@ export const GET = withApiHandler(async () => {
         orderBy: { createdAt: 'desc' },
         select: { id: true, phrase: true, active: true },
       }),
-      prisma.lead.findMany({
-        where: { userId: user.id, status: { in: ['NEW', 'VIEWED'] } },
-        orderBy: [{ sourceCreatedAt: 'desc' }, { createdAt: 'desc' }],
-        take: 24,
-        select: {
-          id: true,
-          platform: true,
-          author: true,
-          content: true,
-          matched: true,
-          url: true,
-          sourceCreatedAt: true,
-        },
-      }),
+      fetchDashboardLeads(user.id),
       prisma.billingSubscription.findUnique({
         where: { userId: user.id },
         select: { plan: true, status: true },
@@ -52,10 +40,7 @@ export const GET = withApiHandler(async () => {
     }
 
     const dashboardKeywords: DashboardKeyword[] = keywords
-    const dashboardLeads: DashboardLead[] = leads.map((lead) => ({
-      ...lead,
-      sourceCreatedAt: lead.sourceCreatedAt?.toISOString() ?? null,
-    }))
+    const dashboardLeads: DashboardLead[] = leads
 
     return NextResponse.json({
       ok: true,

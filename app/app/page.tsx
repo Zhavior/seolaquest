@@ -6,6 +6,7 @@ import { type DashboardKeyword, type DashboardLead, type DashboardUser } from '@
 import { requireCurrentUser } from '@/lib/auth'
 import prisma from '@/lib/prisma'
 import { EntitlementService } from '@/src/modules/billing/application/EntitlementService'
+import { fetchDashboardLeads } from '@/features/dashboard/server/leads'
 
 const DashboardClient = nextDynamic(() => import('@/features/dashboard/components/DashboardClient'))
 const FirstQuestBanner = nextDynamic(() => import('@/features/dashboard/components/FirstQuestBanner'))
@@ -34,20 +35,7 @@ async function DashboardShellData() {
       orderBy: { createdAt: 'desc' },
       select: { id: true, phrase: true, active: true },
     }),
-    prisma.lead.findMany({
-      where: { userId: user.id, status: { in: ['NEW', 'VIEWED'] } },
-      orderBy: [{ sourceCreatedAt: 'desc' }, { createdAt: 'desc' }],
-      take: 24,
-      select: {
-        id: true,
-        platform: true,
-        author: true,
-        content: true,
-        matched: true,
-        url: true,
-        sourceCreatedAt: true,
-      },
-    }),
+    fetchDashboardLeads(user.id),
     prisma.billingSubscription.findUnique({
       where: { userId: user.id },
       select: { plan: true, status: true },
@@ -72,10 +60,7 @@ async function DashboardShellData() {
   }
 
   const dashboardKeywords: DashboardKeyword[] = keywords
-  const dashboardLeads: DashboardLead[] = leads.map((lead) => ({
-    ...lead,
-    sourceCreatedAt: lead.sourceCreatedAt?.toISOString() ?? null,
-  }))
+  const dashboardLeads: DashboardLead[] = leads
 
   return (
     <>

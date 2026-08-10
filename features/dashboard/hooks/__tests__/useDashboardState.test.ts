@@ -66,6 +66,7 @@ const mockLeads: DashboardLead[] = [
     matched: 'Mention alternative',
     url: 'https://reddit.com/r/saas/1',
     sourceCreatedAt: new Date().toISOString(),
+    aurora: null,
   },
   {
     id: 'lead-2',
@@ -75,6 +76,7 @@ const mockLeads: DashboardLead[] = [
     matched: 'need developer',
     url: 'https://x.com/status/2',
     sourceCreatedAt: new Date().toISOString(),
+    aurora: null,
   },
 ]
 

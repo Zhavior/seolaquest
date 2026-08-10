@@ -4,6 +4,7 @@ const mocks = vi.hoisted(() => ({
   getCurrentUser: vi.fn(),
   keywordFindMany: vi.fn(),
   leadFindMany: vi.fn(),
+  auroraDecisionFindMany: vi.fn(),
   subscriptionFindUnique: vi.fn(),
 }))
 
@@ -12,6 +13,7 @@ vi.mock('@/lib/prisma', () => ({
   default: {
     trackedKeyword: { findMany: mocks.keywordFindMany },
     lead: { findMany: mocks.leadFindMany },
+    auroraDecision: { findMany: mocks.auroraDecisionFindMany },
     billingSubscription: { findUnique: mocks.subscriptionFindUnique },
   },
 }))
@@ -41,6 +43,7 @@ describe('dashboard hydration route', () => {
     })
     mocks.keywordFindMany.mockResolvedValue([])
     mocks.leadFindMany.mockResolvedValue([])
+    mocks.auroraDecisionFindMany.mockResolvedValue([])
     mocks.subscriptionFindUnique.mockResolvedValue(null)
   })
 

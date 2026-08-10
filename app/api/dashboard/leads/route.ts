@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
-import prisma from '@/lib/prisma'
 import { getCurrentUser } from '@/lib/auth'
 import type { DashboardLead } from '@/features/dashboard/types'
+import { fetchDashboardLeads } from '@/features/dashboard/server/leads'
 import { withApiHandler } from '@/src/modules/core/infrastructure/api-handler'
 import { logger } from '@/src/modules/core/infrastructure/logger'
 
@@ -14,25 +14,9 @@ export const GET = withApiHandler(async () => {
       return NextResponse.json({ ok: false, message: 'Unauthorized' }, { status: 401 })
     }
 
-    const leads = await prisma.lead.findMany({
-      where: { userId: user.id, status: { in: ['NEW', 'VIEWED'] } },
-      orderBy: [{ sourceCreatedAt: 'desc' }, { createdAt: 'desc' }],
-      take: 24,
-      select: {
-        id: true,
-        platform: true,
-        author: true,
-        content: true,
-        matched: true,
-        url: true,
-        sourceCreatedAt: true,
-      },
-    })
+    const leads = await fetchDashboardLeads(user.id)
 
-    const dashboardLeads: DashboardLead[] = leads.map((lead) => ({
-      ...lead,
-      sourceCreatedAt: lead.sourceCreatedAt?.toISOString() ?? null,
-    }))
+    const dashboardLeads: DashboardLead[] = leads
 
     return NextResponse.json({
       ok: true,

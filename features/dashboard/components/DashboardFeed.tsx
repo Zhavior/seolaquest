@@ -131,24 +131,57 @@ function getLeadTier(lead: DashboardLead): LootTier {
   return 'COMMON'
 }
 
-function getIntentScore(lead: DashboardLead) {
-  const body = `${lead.content} ${lead.matched}`.toLowerCase()
+/**
+ * What Aurora actually concluded, or an explicit "not scored" — never a guess.
+ *
+ * This replaced a regex that started every lead at 58 and added points for words
+ * like "budget", then rendered the total as "N% intent match" beside a dollar
+ * ARR figure derived from the same number. Both were presented as measurements.
+ * In production every real Aurora decision is a FALLBACK 50 (the classifier is
+ * unreachable), so those percentages described nothing but the regex itself —
+ * one of them labelled a tweet about the $CRM stock ticker a 70% match.
+ *
+ * A lead with no verdict is worth showing: the customer can still read it and
+ * judge. What is not acceptable is implying a machine judged it when none did.
+ */
+type IntentDisplay =
+  | { kind: 'scored'; score: number; action: string }
+  | { kind: 'unscored'; label: string }
 
-  let score = 58
-  if (/budget|pricing|quote|urgent|asap|switch/i.test(body)) score += 24
-  if (/alternative|compare|best|recommend|looking for/i.test(body)) score += 12
-  if ((lead.matched || '').split(',').filter(Boolean).length >= 2) score += 6
+function getIntentDisplay(lead: DashboardLead): IntentDisplay {
+  const aurora = lead.aurora
 
-  return Math.min(score, 98)
+  if (!aurora) return { kind: 'unscored', label: 'Not scored yet' }
+
+  // Only LIVE means the semantic classifier ran. DETERMINISTIC_ONLY, FALLBACK,
+  // and UNAVAILABLE all still carry a finalScore, and showing it would restate
+  // the same false precision this function exists to remove.
+  if (aurora.evaluationStatus !== 'LIVE') {
+    return { kind: 'unscored', label: 'Scoring unavailable' }
+  }
+
+  return { kind: 'scored', score: aurora.score, action: aurora.recommendedAction }
 }
 
-function getEstimatedArr(lead: DashboardLead) {
-  const score = getIntentScore(lead)
-
-  if (score >= 92) return 4800
-  if (score >= 84) return 2400
-  if (score >= 72) return 1200
-  return 600
+/**
+ * The prose form of the same claim, so it degrades with it. Saying "urgent buyer
+ * language detected" about a post nothing has read is the same fabrication as
+ * printing a percentage for it.
+ */
+function getTacticalRead(intent: IntentDisplay): string {
+  if (intent.kind !== 'scored') {
+    return 'Not yet evaluated by Aurora. Read the post and judge it yourself — no automated assessment is available for this lead.'
+  }
+  if (intent.score >= 90) {
+    return 'Urgent buyer language detected. Active switch decision with strong commercial intent.'
+  }
+  if (intent.score >= 80) {
+    return 'Comparison or replacement intent present. Good candidate for a fast reply.'
+  }
+  if (intent.score >= 70) {
+    return 'Problem-aware prospect with relevant keywords. Worth drafting early.'
+  }
+  return 'Early-stage market pain mention. Lower urgency, but useful for visibility.'
 }
 
 function getKeywords(lead: DashboardLead) {
@@ -404,7 +437,7 @@ function DashboardFeedComponent({
                 const tier = getLeadTier(lead)
                 const tierStyle = tierStyles[tier]
                 const platformTone = getPlatformTone(lead.platform)
-                const intentScore = getIntentScore(lead)
+                const intentDisplay = getIntentDisplay(lead)
                 const freshness = formatTimestamp(lead.sourceCreatedAt)
 
                 return (
@@ -415,7 +448,7 @@ function DashboardFeedComponent({
                   >
                     <div className="flex items-center gap-3 min-w-0 flex-1">
                       <span className={`inline-flex items-center gap-1 border-2 border-outline px-2 py-0.5 text-[10px] font-black uppercase shrink-0 ${tierStyle.badge} shadow-brutal-sm`}>
-                        {intentScore}% MATCH
+                        {intentDisplay.kind === 'scored' ? `${intentDisplay.score}% MATCH` : 'UNSCORED'}
                       </span>
 
                       <span className={`inline-flex items-center gap-1 border border-outline px-2 py-0.5 text-[10px] font-black uppercase shrink-0 ${platformTone.chip}`}>
@@ -482,8 +515,7 @@ function DashboardFeedComponent({
                 const tier = getLeadTier(lead)
                 const tierStyle = tierStyles[tier]
                 const platformTone = getPlatformTone(lead.platform)
-                const intentScore = getIntentScore(lead)
-                const estimatedArr = getEstimatedArr(lead)
+                const intentDisplay = getIntentDisplay(lead)
                 const keywords = getKeywords(lead)
                 const freshness = formatTimestamp(lead.sourceCreatedAt)
 
@@ -521,17 +553,24 @@ function DashboardFeedComponent({
                     {/* Card Content Body */}
                     <div className="flex flex-1 flex-col justify-between p-4 sm:p-5 gap-4">
                       <div className="space-y-3">
-                        {/* Intent & ARR Badges */}
+                        {/* Aurora's verdict, or an explicit absence of one. */}
                         <div className="flex flex-wrap items-center gap-2">
-                          <span className="inline-flex items-center gap-1.5 border-2 border-outline bg-accent px-2.5 py-1 text-xs font-black uppercase shadow-brutal-sm">
-                            <Crosshair className="h-3.5 w-3.5" />
-                            {intentScore}% intent match
-                          </span>
-
-                          <span className="inline-flex items-center gap-1.5 border-2 border-outline bg-info px-2.5 py-1 text-xs font-black uppercase shadow-brutal-sm text-on-accent">
-                            <Coins className="h-3.5 w-3.5" />
-                            ${estimatedArr.toLocaleString()} ARR est.
-                          </span>
+                          {intentDisplay.kind === 'scored' ? (
+                            <>
+                              <span className="inline-flex items-center gap-1.5 border-2 border-outline bg-accent px-2.5 py-1 text-xs font-black uppercase shadow-brutal-sm">
+                                <Crosshair className="h-3.5 w-3.5" />
+                                {intentDisplay.score}% intent match
+                              </span>
+                              <span className="inline-flex items-center gap-1.5 border-2 border-outline bg-info px-2.5 py-1 text-xs font-black uppercase shadow-brutal-sm text-on-accent">
+                                {intentDisplay.action}
+                              </span>
+                            </>
+                          ) : (
+                            <span className="inline-flex items-center gap-1.5 border-2 border-outline bg-card px-2.5 py-1 text-xs font-black uppercase shadow-brutal-sm text-ink/60">
+                              <Crosshair className="h-3.5 w-3.5" />
+                              {intentDisplay.label}
+                            </span>
+                          )}
                         </div>
 
                         {/* Sentence-Case Lead Quote with Line Clamp 3 */}
@@ -545,13 +584,7 @@ function DashboardFeedComponent({
                             Tactical read
                           </p>
                           <p className="mt-1 text-xs font-bold leading-relaxed text-ink">
-                            {intentScore >= 90
-                              ? 'Urgent buyer language detected. Active switch decision with strong commercial intent.'
-                              : intentScore >= 80
-                                ? 'Comparison or replacement intent present. Good candidate for a fast reply.'
-                                : intentScore >= 70
-                                  ? 'Problem-aware prospect with relevant keywords. Worth drafting early.'
-                                  : 'Early-stage market pain mention. Lower urgency, but useful for visibility.'}
+                            {getTacticalRead(intentDisplay)}
                           </p>
                         </div>
                       </div>
@@ -682,15 +715,28 @@ function DashboardFeedComponent({
               <div className="space-y-4">
                 {/* Intent & Value Banner */}
                 <div className="flex flex-wrap items-center gap-2">
-                  <div className="inline-flex items-center gap-1.5 border-2 border-outline bg-accent px-3 py-1 text-xs font-black uppercase shadow-brutal-sm">
-                    <Crosshair className="h-4 w-4" />
-                    {getIntentScore(activeDetailLead)}% intent match
-                  </div>
-
-                  <div className="inline-flex items-center gap-1.5 border-2 border-outline bg-info px-3 py-1 text-xs font-black uppercase shadow-brutal-sm text-on-accent">
-                    <Coins className="h-4 w-4" />
-                    ${getEstimatedArr(activeDetailLead).toLocaleString()} ARR est.
-                  </div>
+                  {(() => {
+                    const detailIntent = getIntentDisplay(activeDetailLead)
+                    if (detailIntent.kind !== 'scored') {
+                      return (
+                        <div className="inline-flex items-center gap-1.5 border-2 border-outline bg-card px-3 py-1 text-xs font-black uppercase shadow-brutal-sm text-ink/60">
+                          <Crosshair className="h-4 w-4" />
+                          {detailIntent.label}
+                        </div>
+                      )
+                    }
+                    return (
+                      <>
+                        <div className="inline-flex items-center gap-1.5 border-2 border-outline bg-accent px-3 py-1 text-xs font-black uppercase shadow-brutal-sm">
+                          <Crosshair className="h-4 w-4" />
+                          {detailIntent.score}% intent match
+                        </div>
+                        <div className="inline-flex items-center gap-1.5 border-2 border-outline bg-info px-3 py-1 text-xs font-black uppercase shadow-brutal-sm text-on-accent">
+                          {detailIntent.action}
+                        </div>
+                      </>
+                    )
+                  })()}
                 </div>
 
                 {/* Full Quote Content */}
@@ -712,13 +758,7 @@ function DashboardFeedComponent({
                     Tactical read & Buyer state
                   </p>
                   <p className="mt-1.5 text-xs font-bold leading-relaxed text-ink/90">
-                    {getIntentScore(activeDetailLead) >= 90
-                      ? 'Urgent buyer language detected. Active switch decision with strong commercial intent.'
-                      : getIntentScore(activeDetailLead) >= 80
-                        ? 'Comparison or replacement intent is present. Good candidate for a fast reply.'
-                        : getIntentScore(activeDetailLead) >= 70
-                          ? 'Problem-aware prospect with relevant keywords. Worth drafting early.'
-                          : 'Early-stage market pain mention. Lower urgency, but useful for visibility.'}
+                    {getTacticalRead(getIntentDisplay(activeDetailLead))}
                   </p>
                 </div>
 

@@ -126,6 +126,67 @@ export function parseXPayload(payload: unknown, now = new Date()): NormalizedPro
   }
 }
 
+/**
+ * Text left once URLs and the leading @mentions of a reply are removed. A post
+ * whose whole body is `https://t.co/mO2Ig8uwkG` carries no intent for any
+ * classifier — semantic or human — to read.
+ */
+function substantiveText(content: string): string {
+  return content
+    .replace(/https?:\/\/\S+/g, ' ')
+    .replace(/^(?:\s*@\w+)+/, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+}
+
+/**
+ * The bar is "did this person write anything", not "did they write enough".
+ *
+ * An earlier version of this required 20 characters, which the existing suite
+ * immediately rejected: its fixture is `Need a CRM` — ten characters and one of
+ * the highest-intent posts imaginable. Real buying intent is often terse
+ * ("any CRM recs?"), so a length floor tuned to filter spam removes the best
+ * leads first. Two words is enough to separate a written thought from a bare
+ * URL, which is the only thing this needs to catch.
+ */
+const MIN_SUBSTANTIVE_CHARS = 8
+const MIN_SUBSTANTIVE_WORDS = 2
+
+/**
+ * One account posting the same promo five times is one account, not five leads.
+ * A genuine buyer almost never asks the same question twice in one window, so a
+ * low cap costs real signal nothing and removes the bulk of promo spam.
+ */
+const MAX_RECORDS_PER_AUTHOR = 2
+
+/**
+ * Drops records that cannot become leads, before they are written as leads.
+ *
+ * Filtering here rather than at display time matters: a stored row is what gets
+ * counted in "25 source matches", metered against the tenant's AI budget, and
+ * sent to their CRM. Hiding junk in the UI would leave all three wrong.
+ */
+export function filterQualifiedRecords(
+  records: NormalizedProviderRecord[],
+): NormalizedProviderRecord[] {
+  const perAuthor = new Map<string, number>()
+  const qualified: NormalizedProviderRecord[] = []
+
+  for (const record of records) {
+    const text = substantiveText(record.content)
+    if (text.length < MIN_SUBSTANTIVE_CHARS) continue
+    if (text.split(' ').filter(Boolean).length < MIN_SUBSTANTIVE_WORDS) continue
+
+    const seen = perAuthor.get(record.author) ?? 0
+    if (seen >= MAX_RECORDS_PER_AUTHOR) continue
+
+    perAuthor.set(record.author, seen + 1)
+    qualified.push(record)
+  }
+
+  return qualified
+}
+
 export function rateLimitResetAt(headers: Headers, now = new Date()) {
   const epochSeconds = Number(headers.get('x-rate-limit-reset'))
   if (Number.isFinite(epochSeconds) && epochSeconds > 0) {
