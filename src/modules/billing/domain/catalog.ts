@@ -28,7 +28,10 @@ export const PLAN_CATALOG: Record<PlanCode, PlanDefinition> = {
   FOUNDER: {
     code: 'FOUNDER',
     name: 'Founder Pass',
-    priceLabel: '$29/mo — locked for life',
+    // Must match the amount on the live Stripe Price this plan points at. The
+    // pricing page renders this string directly, so a mismatch advertises one
+    // number and charges another.
+    priceLabel: '$29.99/mo — locked for life',
     scanLimit: 3_000,
     enabled: true,
   },

@@ -12,6 +12,17 @@ describe('billing catalog', () => {
     expect(PLAN_CATALOG.AGENCY.enabled).toBe(false)
   })
 
+  it('states the founder rate the live Stripe Price actually charges', () => {
+    // The pricing page renders priceLabel verbatim, so drift here advertises one
+    // number and bills another. This one matters more than the rest: the Founder
+    // Pass is sold as locked for life, and existing subscribers stay on the Price
+    // they signed up with — the label and that Price must agree at sale time.
+    expect(PLAN_CATALOG.FOUNDER).toMatchObject({
+      enabled: true,
+      priceLabel: '$29.99/mo — locked for life',
+    })
+  })
+
   it('rejects free, disabled aliases, and arbitrary paid plan input', () => {
     expect(isPaidPlanCode('BETA')).toBe(true)
     expect(isPaidPlanCode('FREE')).toBe(false)
