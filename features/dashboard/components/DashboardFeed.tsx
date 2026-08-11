@@ -150,10 +150,13 @@ function getIntentDisplay(lead: DashboardLead): IntentDisplay {
  * The prose form of the same claim, so it degrades with it. Saying "urgent buyer
  * language detected" about a post nothing has read is the same fabrication as
  * printing a percentage for it.
+ *
+ * Unscored leads do not use this block in the card list — they render a compact
+ * pending badge instead. Detail modal still calls this for scored reads only.
  */
 function getTacticalRead(intent: IntentDisplay): string {
   if (intent.kind !== 'scored') {
-    return 'Not yet evaluated by Aurora. Read the post and judge it yourself — no automated assessment is available for this lead.'
+    return 'Pending Aurora evaluation.'
   }
   if (intent.score >= 90) {
     return 'Urgent buyer language detected. Active switch decision with strong commercial intent.'
@@ -165,6 +168,20 @@ function getTacticalRead(intent: IntentDisplay): string {
     return 'Problem-aware prospect with relevant keywords. Worth drafting early.'
   }
   return 'Early-stage market pain mention. Lower urgency, but useful for visibility.'
+}
+
+/**
+ * A post that is only a shortened URL (and maybe @mentions) has nothing for an
+ * operator to triage. Mirror the ingest substantiveText bar for already-stored rows.
+ */
+function isBareLinkLead(content: string): boolean {
+  const text = content
+    .replace(/https?:\/\/\S+/g, ' ')
+    .replace(/^(?:\s*@\w+)+/, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+  if (text.length < 8) return true
+  return text.split(' ').filter(Boolean).length < 2
 }
 
 function getKeywords(lead: DashboardLead) {
@@ -285,9 +302,10 @@ function DashboardFeedComponent({
   }, [activeDetailLead])
 
   const displayedLeads = useMemo(() => {
-    if (!searchQuery.trim()) return filteredLeads
+    const actionable = filteredLeads.filter((lead) => !isBareLinkLead(lead.content))
+    if (!searchQuery.trim()) return actionable
     const q = searchQuery.toLowerCase()
-    return filteredLeads.filter(
+    return actionable.filter(
       (lead) =>
         lead.content.toLowerCase().includes(q) ||
         (lead.author && lead.author.toLowerCase().includes(q)) ||
@@ -605,15 +623,24 @@ function DashboardFeedComponent({
                           “{lead.content}”
                         </p>
 
-                        {/* Muted Tactical Read Block */}
-                        <div className="border-l-4 border-l-black bg-inset p-3 border-2 border-outline shadow-brutal-sm">
-                          <p className="text-[10px] font-black uppercase tracking-wider text-ink-muted">
-                            Tactical read
-                          </p>
-                          <p className="mt-1 text-xs font-bold leading-relaxed text-ink">
-                            {getTacticalRead(intentDisplay)}
-                          </p>
-                        </div>
+                        {intentDisplay.kind === 'scored' ? (
+                          <div className="border-l-4 border-l-black bg-inset p-3 border-2 border-outline shadow-brutal-sm">
+                            <p className="text-[10px] font-black uppercase tracking-wider text-ink-muted">
+                              Tactical read
+                            </p>
+                            <p className="mt-1 text-xs font-bold leading-relaxed text-ink">
+                              {getTacticalRead(intentDisplay)}
+                            </p>
+                          </div>
+                        ) : (
+                          <span
+                            className={`inline-flex items-center gap-1.5 border-2 border-outline bg-inset px-2.5 py-1 text-[10px] font-black uppercase tracking-wider text-ink/70 shadow-brutal-sm ${
+                              shouldReduceMotion ? '' : 'animate-pulse'
+                            }`}
+                          >
+                            ⚡ Pending Aurora Evaluation
+                          </span>
+                        )}
                       </div>
 
                       {/* Keywords Row */}
@@ -790,15 +817,31 @@ function DashboardFeedComponent({
                   )}
                 </div>
 
-                {/* Tactical Read Analysis */}
-                <div className="border-l-4 border-outline bg-highlight p-4 border-3 border-outline shadow-brutal-sm">
-                  <p className="text-xs font-black uppercase tracking-wider text-ink/60">
-                    Tactical read & Buyer state
-                  </p>
-                  <p className="mt-1.5 text-xs font-bold leading-relaxed text-ink/90">
-                    {getTacticalRead(getIntentDisplay(activeDetailLead))}
-                  </p>
-                </div>
+                {/* Tactical Read Analysis — scored only; unscored stays a compact pulse tag */}
+                {(() => {
+                  const detailIntent = getIntentDisplay(activeDetailLead)
+                  if (detailIntent.kind !== 'scored') {
+                    return (
+                      <span
+                        className={`inline-flex w-fit items-center gap-1.5 border-2 border-outline bg-inset px-2.5 py-1 text-[10px] font-black uppercase tracking-wider text-ink/70 shadow-brutal-sm ${
+                          shouldReduceMotion ? '' : 'animate-pulse'
+                        }`}
+                      >
+                        ⚡ Pending Aurora Evaluation
+                      </span>
+                    )
+                  }
+                  return (
+                    <div className="border-l-4 border-outline bg-highlight p-4 border-3 border-outline shadow-brutal-sm">
+                      <p className="text-xs font-black uppercase tracking-wider text-ink/60">
+                        Tactical read & Buyer state
+                      </p>
+                      <p className="mt-1.5 text-xs font-bold leading-relaxed text-ink/90">
+                        {getTacticalRead(detailIntent)}
+                      </p>
+                    </div>
+                  )
+                })()}
 
                 {/* Matched Keywords */}
                 <div className="flex flex-wrap gap-2">
