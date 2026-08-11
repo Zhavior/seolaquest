@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import { PLAN_CATALOG } from '@/src/modules/billing/domain/catalog'
 import { 
   ShieldCheck, 
   Zap, 
@@ -28,7 +29,7 @@ export default function TermsPage() {
 
   const copyTermsSummary = () => {
     sfx.playCoinDrop()
-    const summary = `SEOLAQUEST ENGINE - MASTER GUILD CODE & TERMS SUMMARY (v2.5)\n1. Guild Code: Ethical B2B hunting required.\n2. Billing: Free access includes no paid scans. The Beta plan is $14.99/month and adds 50 scan credits per qualifying paid invoice. The Founder Pass is $29.99/month, limited to 50 seats, and holds that rate for as long as the subscription stays active. Pro and Agency are not for sale.\n3. Founder rate lock: Cancelling releases the seat and the locked rate; resubscribing later uses the public price at that time. The lock covers the subscription rate, not usage.\n4. Credits: Unused credits remain recorded, but paid capabilities require a current active subscription.\n5. Cancellation: Cancel anytime via /billing.\n6. Acceptable Use: No illegal scraping or social spam.`
+    const summary = `SEOLAQUEST ENGINE - MASTER GUILD CODE & TERMS SUMMARY (v2.5)\n1. Guild Code: Ethical B2B hunting required.\n2. Billing: Free access includes no paid scans. The Beta plan is $14.99/month and adds ${PLAN_CATALOG.BETA.scanLimit.toLocaleString()} scan credits per qualifying paid invoice. The Founder Pass is $29.99/month, limited to 50 seats, and holds that rate for as long as the subscription stays active. Pro and Agency are not for sale.\n3. Founder rate lock: Cancelling releases the seat and the locked rate; resubscribing later uses the public price at that time. The lock covers the subscription rate, not usage.\n4. Credits: Unused credits remain recorded, but paid capabilities require a current active subscription.\n5. Cancellation: Cancel anytime via /billing.\n6. Acceptable Use: No illegal scraping or social spam.`
     navigator.clipboard.writeText(summary)
     setCopied(true)
     setTimeout(() => setCopied(false), 3000)
@@ -195,7 +196,7 @@ export default function TermsPage() {
 
           <div className="space-y-4 text-sm font-bold text-ink leading-relaxed">
             <p>
-              The enabled SEOlaQuest Beta subscription is billed monthly through Stripe. A qualifying positive paid invoice adds 50 scan credits. Free access includes no paid scan, AI-reply, or CRM-export entitlement.
+              The enabled SEOlaQuest Beta subscription is billed monthly through Stripe. A qualifying positive paid invoice adds {PLAN_CATALOG.BETA.scanLimit.toLocaleString()} scan credits. Free access includes no paid scan, AI-reply, or CRM-export entitlement.
             </p>
 
             <div className="border-3 border-outline bg-inset p-4 space-y-4 shadow-brutal">

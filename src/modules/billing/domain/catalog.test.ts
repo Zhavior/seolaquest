@@ -6,10 +6,29 @@ describe('billing catalog', () => {
     expect(PLAN_CATALOG.BETA).toMatchObject({
       enabled: true,
       priceLabel: '$14.99/mo',
-      scanLimit: 50,
+      scanLimit: 1_500,
     })
     expect(PLAN_CATALOG.PRO.enabled).toBe(false)
     expect(PLAN_CATALOG.AGENCY.enabled).toBe(false)
+  })
+
+  it('keeps every product priced in the same per-scan universe', () => {
+    // One credit buys one scan, so a subscription and a potion pack are directly
+    // comparable. Beta shipped at 50 credits for $14.99 — $0.30 a scan against
+    // $0.005 for the cheapest potion — which made the middle tier 60x the worst
+    // value on the page. Any future edit that reopens that gap should fail here.
+    const perScan = (cents: number, credits: number) => cents / 100 / credits
+
+    const beta = perScan(1499, PLAN_CATALOG.BETA.scanLimit)
+    const founder = perScan(2999, PLAN_CATALOG.FOUNDER.scanLimit)
+    const cheapestPotion = Math.min(
+      ...Object.values(POTION_CATALOG).map((p) => perScan(p.priceCents, p.quests))
+    )
+
+    // A subscription may cost more per scan than a bulk pack, but not by an order
+    // of magnitude — that is the point at which the cheaper product cannibalises it.
+    expect(beta).toBeLessThan(cheapestPotion * 10)
+    expect(founder).toBeLessThan(cheapestPotion * 10)
   })
 
   it('states the founder rate the live Stripe Price actually charges', () => {

@@ -42,7 +42,7 @@ function benefitsForPlan(code: PlanCode, scanLimit: number) {
   }
 
   return [
-    `${scanLimit} scan credits per qualifying paid invoice.`,
+    `${scanLimit.toLocaleString()} scan credits per qualifying paid invoice.`,
     ...COMMON_PAID_BENEFITS,
   ]
 }

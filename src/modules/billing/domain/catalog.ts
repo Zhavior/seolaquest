@@ -39,7 +39,14 @@ export const PLAN_CATALOG: Record<PlanCode, PlanDefinition> = {
     code: 'BETA',
     name: 'Beta Hunter',
     priceLabel: '$14.99/mo',
-    scanLimit: 50,
+    // One credit buys one scan, and every product on the page has to price that
+    // credit in the same universe. At 50 this tier cost $0.30 a scan while a $5
+    // potion pack cost $0.005 and Founder cost $0.010 — the middle tier was 60x
+    // the worst deal on the page, so a customer doing the arithmetic would buy
+    // potions instead and conclude the pricing was arbitrary. 1,500 puts it at
+    // $0.010, level with Founder per scan, with Founder's value being the locked
+    // rate and the larger monthly allowance rather than a cheaper unit.
+    scanLimit: 1_500,
     enabled: true,
   },
   PRO: {

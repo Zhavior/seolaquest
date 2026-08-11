@@ -1,4 +1,5 @@
 import { Prisma } from '@prisma/client'
+import { PLAN_CATALOG } from '@/src/modules/billing/domain/catalog'
 import type Stripe from 'stripe'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
@@ -366,7 +367,7 @@ describe('Stripe webhook inbox and reconciliation', () => {
     )
     expect(mocks.grantInvoice).toHaveBeenCalledWith({
       userId: 'user_1',
-      credits: 50,
+      credits: PLAN_CATALOG.BETA.scanLimit,
       sourceType: 'STRIPE_INVOICE',
       sourceId: 'in_cycle_1',
       reason: 'PLAN_PERIOD_ALLOCATION',

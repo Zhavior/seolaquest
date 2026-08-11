@@ -1,3 +1,4 @@
+import { PLAN_CATALOG } from './catalog'
 import type Stripe from 'stripe'
 import { describe, expect, it } from 'vitest'
 import {
@@ -89,11 +90,11 @@ function validateInvoice(invoice: Stripe.Invoice, plan: 'BETA' | null = 'BETA', 
 
 describe('paid plan invoice validation', () => {
   it.each(['subscription_create', 'subscription_cycle'] as const)(
-    'allocates 50 scans for an eligible %s invoice',
+    'allocates the catalog scan allowance for an eligible %s invoice',
     (billingReason) => {
       expect(validateInvoice(paidInvoice({ billing_reason: billingReason }))).toEqual({
         plan: 'BETA',
-        credits: 50,
+        credits: PLAN_CATALOG.BETA.scanLimit,
       })
     },
   )
