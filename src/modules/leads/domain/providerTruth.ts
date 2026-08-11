@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { isBuyerIntentNoise } from './buyerIntentNoise'
 
 export const PROVIDERS = ['REDDIT', 'X'] as const
 export type ScanProvider = (typeof PROVIDERS)[number]
@@ -176,6 +177,8 @@ export function filterQualifiedRecords(
     const text = substantiveText(record.content)
     if (text.length < MIN_SUBSTANTIVE_CHARS) continue
     if (text.split(' ').filter(Boolean).length < MIN_SUBSTANTIVE_WORDS) continue
+    // Trading chatter, job posts, and invite spam match buyer keywords too often.
+    if (isBuyerIntentNoise(record.content)) continue
 
     const seen = perAuthor.get(record.author) ?? 0
     if (seen >= MAX_RECORDS_PER_AUTHOR) continue

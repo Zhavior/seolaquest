@@ -54,4 +54,51 @@ describe('DeterministicScorer', () => {
     expect(result.hardReject).toBe(true);
     expect(result.hardRejectReasons).toContain('KNOWN_NOISE');
   });
+
+  it('hard rejects trading chatter matched via cashtag / AVWAP vocabulary', async () => {
+    const scorer = new DeterministicScorer();
+    const context: AuroraEvaluationContext = {
+      opportunityId: 'opp-4',
+      sourceEventId: 'evt-4',
+      policyVersion: 'v1',
+      text: '$CRM bounced perfectly from the AVWAP channel',
+      source: 'x',
+      discoveredAt: new Date().toISOString(),
+    };
+
+    const result = await scorer.score(context);
+    expect(result.hardReject).toBe(true);
+    expect(result.hardRejectReasons).toContain('TRADING_NOISE');
+  });
+
+  it('hard rejects job listing copy before semantic scoring', async () => {
+    const scorer = new DeterministicScorer();
+    const context: AuroraEvaluationContext = {
+      opportunityId: 'opp-5',
+      sourceEventId: 'evt-5',
+      policyVersion: 'v1',
+      text: 'HIRING Now — Job Title: Lead Generation Specialist. Salary: 90k. Location: Remote',
+      source: 'x',
+      discoveredAt: new Date().toISOString(),
+    };
+
+    const result = await scorer.score(context);
+    expect(result.hardReject).toBe(true);
+    expect(result.hardRejectReasons).toContain('JOB_LISTING');
+  });
+
+  it('does not hard reject a plain CRM buyer ask', async () => {
+    const scorer = new DeterministicScorer();
+    const context: AuroraEvaluationContext = {
+      opportunityId: 'opp-6',
+      sourceEventId: 'evt-6',
+      policyVersion: 'v1',
+      text: '#LOOKING FOR CRM for a small B2B team',
+      source: 'x',
+      discoveredAt: new Date().toISOString(),
+    };
+
+    const result = await scorer.score(context);
+    expect(result.hardReject).toBe(false);
+  });
 });

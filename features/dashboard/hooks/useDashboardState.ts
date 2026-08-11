@@ -18,6 +18,7 @@ import {
   LeaderboardUser
 } from '@/features/dashboard/types'
 import { fingerprintKeywords, fingerprintLeads } from '@/features/dashboard/lib/serverSnapshot'
+import { isBuyerIntentNoise } from '@/src/modules/leads/domain/buyerIntentNoise'
 
 export type DashboardAsyncStatus = 'idle' | 'scanning' | 'claiming' | 'replying' | 'exporting'
 export type DashboardSliceStatus = 'ok' | 'degraded'
@@ -156,7 +157,13 @@ export function useDashboardState({
   )
 
   const filteredLeads = useMemo(
-    () => leads.filter((lead) => filter === 'ALL' || lead.platform === filter),
+    () =>
+      leads.filter((lead) => {
+        if (filter !== 'ALL' && lead.platform !== filter) return false
+        // Data-layer gate for already-ingested trading/job/promo noise.
+        if (isBuyerIntentNoise(lead.content)) return false
+        return true
+      }),
     [filter, leads],
   )
   const platforms = ['ALL', ...Array.from(new Set(leads.map((lead) => lead.platform)))]

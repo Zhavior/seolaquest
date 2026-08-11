@@ -1,3 +1,4 @@
+import { detectBuyerIntentNoise } from '@/src/modules/leads/domain/buyerIntentNoise';
 import { AuroraEvaluationContext, DeterministicScorerResult } from '../types';
 
 export class DeterministicScorer {
@@ -20,6 +21,12 @@ export class DeterministicScorer {
         hardRejectReasons.push('KNOWN_NOISE');
         break;
       }
+    }
+
+    // 3. Pre-scoring buyer-intent exclusions (trading / jobs / promo)
+    const buyerNoise = detectBuyerIntentNoise(context.text);
+    if (buyerNoise) {
+      hardRejectReasons.push(buyerNoise.reason);
     }
 
     // Signals populated deterministically

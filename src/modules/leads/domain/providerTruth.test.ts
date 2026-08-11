@@ -143,4 +143,31 @@ describe('filterQualifiedRecords', () => {
     ]
     expect(filterQualifiedRecords(ordered).map((r) => r.externalPostId)).toEqual(['first', 'second'])
   })
+
+  it('drops ticker technical-analysis chatter that matches CRM keywords', () => {
+    expect(
+      filterQualifiedRecords([
+        record({
+          content: '$CRM bounced perfectly from the AVWAP channel near the swing low',
+        }),
+      ]),
+    ).toEqual([])
+  })
+
+  it('drops hiring and Discord promo spam', () => {
+    expect(
+      filterQualifiedRecords([
+        record({ content: 'HIRING Now B2B SaaS Sales Executive. Job Title: AE. Location: Remote' }),
+        record({ content: 'Join our Discord for lead tips https://discord.gg/spam' }),
+      ]),
+    ).toEqual([])
+  })
+
+  it('keeps buyer CRM asks that are not cashtags or job spam', () => {
+    expect(
+      filterQualifiedRecords([
+        record({ content: '#LOOKING FOR CRM for our agency pipeline' }),
+      ]),
+    ).toHaveLength(1)
+  })
 })
