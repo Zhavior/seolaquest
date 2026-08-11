@@ -4,31 +4,60 @@ import { sfx } from '@/lib/sfx'
 import { BlogCodeBlock } from '@/features/blog/components/BlogCodeBlock'
 
 /**
- * Helper to parse inline markdown links [text](href) with sound triggers
+ * Helper to parse inline markdown with sound triggers:
+ * links [text](href), bold **text**, italic *text*, and inline `code`
  */
+const INLINE_REGEX = /\[([^\]]+)\]\(([^)]+)\)|\*\*([^*]+)\*\*|`([^`]+)`|\*([^*\n]+)\*/g
+
 function renderInlineText(text: string): React.ReactNode {
-  const linkRegex = /\[([^\]]+)\]\(([^)]+)\)/g
   const parts: (string | React.ReactNode)[] = []
   let lastIndex = 0
   let match: RegExpExecArray | null
 
-  while ((match = linkRegex.exec(text)) !== null) {
+  INLINE_REGEX.lastIndex = 0
+
+  while ((match = INLINE_REGEX.exec(text)) !== null) {
     if (match.index > lastIndex) {
       parts.push(text.slice(lastIndex, match.index))
     }
-    const label = match[1]
-    const href = match[2]
-    parts.push(
-      <Link
-        key={match.index}
-        href={href}
-        onMouseEnter={() => sfx.playHoverBlip()}
-        onClick={() => sfx.playCoinDrop()}
-        className="font-black text-[#8A2BE2] underline decoration-2 underline-offset-2 hover:bg-accent px-1 py-0.5 border border-outline shadow-brutal-sm transition-colors"
-      >
-        {label}
-      </Link>
-    )
+
+    const [, linkLabel, href, boldText, codeText, italicText] = match
+
+    if (linkLabel !== undefined) {
+      parts.push(
+        <Link
+          key={match.index}
+          href={href}
+          onMouseEnter={() => sfx.playHoverBlip()}
+          onClick={() => sfx.playCoinDrop()}
+          className="font-black text-[#8A2BE2] underline decoration-2 underline-offset-2 hover:bg-accent px-1 py-0.5 border border-outline shadow-brutal-sm transition-colors"
+        >
+          {linkLabel}
+        </Link>
+      )
+    } else if (boldText !== undefined) {
+      parts.push(
+        <strong key={match.index} className="font-black text-ink">
+          {boldText}
+        </strong>
+      )
+    } else if (codeText !== undefined) {
+      parts.push(
+        <code
+          key={match.index}
+          className="border-2 border-outline bg-accent/25 px-1 py-0.5 font-mono text-[0.85em] font-bold text-ink"
+        >
+          {codeText}
+        </code>
+      )
+    } else {
+      parts.push(
+        <em key={match.index} className="italic">
+          {italicText}
+        </em>
+      )
+    }
+
     lastIndex = match.index + match[0].length
   }
 
