@@ -66,7 +66,7 @@ export function HQInput({ label, hint, error, hideLabel = false, className, id, 
       )}
 
       {error && (
-        <p id={errorId} className="text-xs font-black uppercase text-danger">
+        <p id={errorId} className="text-xs font-black uppercase text-danger-ink">
           {error}
         </p>
       )}

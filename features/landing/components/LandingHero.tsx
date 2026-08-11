@@ -220,7 +220,11 @@ export function LandingHero() {
     <section className="relative z-10 overflow-hidden bg-canvas px-4 pb-16 pt-24 sm:px-6 sm:pb-24 sm:pt-32">
       <PixelParticleBackground />
 
-      <div className="pointer-events-none absolute inset-0 z-0 opacity-[0.04] mix-blend-multiply">
+      {/* Plain opacity, not mix-blend-multiply. axe cannot compute contrast through a
+          blended layer that overlaps text, so this one layer produced 14 false
+          "black on near-black" violations on an otherwise readable hero. At 4%
+          opacity the two blend modes are visually indistinguishable here. */}
+      <div className="pointer-events-none absolute inset-0 z-0 opacity-[0.04]">
         <div
           className="h-full w-full"
           style={{

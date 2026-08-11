@@ -51,7 +51,12 @@
 
   --status-success: #16A34A;
   --status-warning: #D97706;
-  --status-danger: #DC2626;
+  /* One red cannot do both jobs. A fill carries black ink, so it must be light
+     enough for 4.5:1 against black (#DC2626 was 4.35 — just under). Red *text*
+     needs the opposite: dark enough to clear 4.5:1 against a pale surface. So
+     the fill brightens and a separate ink token goes darker. */
+  --status-danger: #EF4444;
+  --status-danger-ink: #B91C1C;
   --status-info: #0891B2;
 
   --focus-ring: #000000;
@@ -103,6 +108,8 @@
   --status-success: #4ADE80;
   --status-warning: #FBBF24;
   --status-danger: #F87171;
+  /* Light enough to read on the dark surfaces, so ink and fill agree here. */
+  --status-danger-ink: #F87171;
   --status-info: #38BDF8;
 
   --focus-ring: #F3F4F6;
@@ -150,6 +157,8 @@
   --status-success: #4ADE80;
   --status-warning: #FBBF24;
   --status-danger: #F87171;
+  /* Light enough to read on the dark surfaces, so ink and fill agree here. */
+  --status-danger-ink: #F87171;
   --status-info: #38BDF8;
 
   --focus-ring: #E2E8F0;
@@ -200,6 +209,7 @@
   --color-success: var(--status-success);
   --color-warning: var(--status-warning);
   --color-danger: var(--status-danger);
+  --color-danger-ink: var(--status-danger-ink);
   --color-info: var(--status-info);
 
   /* Neobrutalist offset slabs — theme-aware, no !important overrides needed. */

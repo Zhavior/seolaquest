@@ -442,7 +442,15 @@ The first honest pass over this codebase found five distinct violation types acr
 | `link-name` | Every post card | Icon-only arrow link, no accessible name | `sr-only` label naming the post |
 | `scrollable-region-focusable` | Every code block | `overflow-x` container not keyboard-reachable | `tabIndex={0}` plus a labelled region |
 
-After those five, all blog routes pass axe on WCAG 2.1 A/AA in both themes. Two known failures remain, and naming them is more useful than claiming a clean sweep: the marketing homepage still has 14 nodes of black-on-near-black in the dark theme (ratios around 1.06 — text that is effectively invisible), caused by black ink over translucent accent fills, which is the same root cause as the heading bug above. And the `#DC2626` danger token is 4.34:1 against black at 12px bold, just under the 4.5 threshold, which is a token decision rather than a component bug.
+After those five, all blog routes pass axe on WCAG 2.1 A/AA in both themes.
+
+Two findings remain open, and they are different in kind — which is the more useful lesson.
+
+The first is real: the `#DC2626` danger token is 4.34:1 against black at 12px bold, just under the 4.5 threshold. That is a token decision rather than a component bug, and it is genuinely below the bar.
+
+The second turned out not to be a bug at all, and it is worth describing because the trap is common. axe reported 14 nodes on the marketing homepage as black text on a near-black background — ratios around 1.06, which would mean invisible text. The rendered page was fine. Two decorative full-bleed layers, a grain texture at `opacity: 0.045` and a `mix-blend-multiply` layer at `0.04`, sit above the content in paint order, and **axe cannot compute contrast through an element that overlaps the text**, so it reports the worst case rather than guessing. Hiding those two layers and re-running dropped the count from 14 to 0, while measuring the elements directly showed black on `rgb(244,228,166)` — about 16:1.
+
+The lesson is not "ignore axe." It is that a contrast violation on a page with decorative overlays needs one more step before you believe it: read the computed `color` and the composited background off the element itself. If they pass, your bug is the stacking order — decoration painted above content — not the colour. Fixing it means moving the decorative layers behind the content so the tool can see what the eye already can.
 
 That is the real shape of an audit. The generic version of this advice — "aim for a Lighthouse score above 95" — tells you nothing about which of your themes is broken.
 
