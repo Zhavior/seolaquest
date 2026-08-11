@@ -64,13 +64,16 @@ export function BlogPostCard({ post }: BlogPostCardProps) {
             </div>
           </div>
 
-          {/* Read Arrow */}
+          {/* Read Arrow. An icon-only link needs a name: axe reported this as
+              link-name on every card, and a screen reader announced "link"
+              with no destination. */}
           <Link
             href={`/blog/${post.slug}`}
             onClick={() => sfx.playCoinDrop()}
             className="flex h-8 w-8 items-center justify-center border-2 border-outline bg-accent text-on-accent shadow-brutal-sm group-hover:bg-[#00FFFF] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all"
           >
-            <ArrowUpRight size={16} strokeWidth={3} />
+            <ArrowUpRight size={16} strokeWidth={3} aria-hidden="true" />
+            <span className="sr-only">Read: {post.title}</span>
           </Link>
         </div>
       </div>

@@ -10,7 +10,7 @@ tag: "SAAS GROWTH"
 featured: false
 published: true
 coverColor: "#FFE600"
-readTimeMinutes: 13
+readTimeMinutes: 16
 ---
 
 Neo-brutalism is the easiest design language to half-implement and one of the harder ones to ship well. Thick borders and a hard offset shadow take about ten minutes to copy off a dribbble shot. What takes longer is the part nobody screenshots: the shadow disappearing on your dark theme, the yellow button whose white label fails contrast, the 8px slab eating the gutter on a 375px viewport, and the focus ring you removed because it clashed with the border.
@@ -20,6 +20,9 @@ This is the component playbook we run in production on SEOlaQuest — the token 
 If you want the behavioral layer that these components render — streaks, progress, credit meters — that is a separate piece: [SaaS gamification: 7 loops for activation](/blog/high-converting-saas-funnels). This one is purely the visual system.
 
 ---
+
+![Neo-brutalist component reference sheet in the light theme: button variants and states, badge tones, inputs with hint and error states, and cards with nested panels, all with 4px black borders and hard offset shadows.](/blog/neo-brutalist-primitives-light.png)
+*Every primitive in this article, rendered from the components the code blocks describe.*
 
 ## What Makes a UI Neo-Brutalist (The Token Rules)
 
@@ -124,6 +127,11 @@ This is the bug almost every neo-brutalist implementation ships. A `4px 4px 0 #0
 
 Half-implemented systems respond by leaving the shadow on and wondering why dark mode looks flat. The fix is to decide what carries the silhouette in each theme. On light, the shadow does the work and the border can be pure black. On dark, the border goes lighter (`#64748B`) and takes over, and the shadow is set to `transparent` rather than being removed from the markup.
 
+Here is the same reference sheet with nothing changed but `data-theme`:
+
+![The same component sheet in the dark theme: no offset shadows anywhere, with lighter grey borders carrying the element silhouettes instead.](/blog/neo-brutalist-primitives-dark.png)
+*Identical markup, one attribute changed. The slabs are gone and the borders took over.*
+
 Keeping the utility in the markup and neutralizing it through the token is what lets you opt individual elements back in — a hero CTA can still carry a colored slab on dark by pointing at a different shadow variable.
 
 ---
@@ -132,37 +140,67 @@ Keeping the utility in the markup and neutralizing it through the token is what 
 
 The press interaction is the whole point. The element translates toward its shadow and the shadow shrinks by the same amount, so the button appears to physically depress. Get the arithmetic wrong and it looks like it is sliding rather than pressing.
 
+This is the shipped file, not an illustration — it is what rendered the buttons in the screenshots above:
+
 ```tsx
-import type { ComponentProps } from 'react'
+import type { ButtonHTMLAttributes, ReactNode } from 'react'
+import clsx from 'clsx'
 
-type Variant = 'primary' | 'secondary' | 'ghost'
+type Variant = 'primary' | 'secondary' | 'ghost' | 'danger'
 
-const VARIANTS: Record<Variant, string> = {
-  primary: 'bg-accent text-on-accent',
-  secondary: 'bg-accent-2 text-on-accent',
-  ghost: 'bg-card text-ink',
-}
-
-interface NeoButtonProps extends ComponentProps<'button'> {
+interface HQButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+  children: ReactNode
+  icon?: ReactNode
   variant?: Variant
 }
 
-export function NeoButton({ variant = 'primary', className = '', ...props }: NeoButtonProps) {
+// Fills only. The lift and press live in the base class list so every variant
+// moves identically — a per-variant hover translate is how a button set starts
+// feeling inconsistent.
+const variants: Record<Variant, string> = {
+  primary: 'bg-black text-[#FFE600]',
+  secondary: 'bg-card text-ink',
+  // Not `text-on-accent`: that token is black in every theme, and a transparent
+  // fill inherits the page, not an accent. Theme ink is right in both contexts,
+  // because on a bright panel the ink inversion resolves it to black anyway.
+  ghost: 'bg-transparent text-ink hover:bg-black/5',
+  danger: 'bg-[#D92D20] text-white',
+}
+
+export default function HQButton({
+  children,
+  className,
+  icon,
+  variant = 'primary',
+  ...props
+}: HQButtonProps) {
   return (
     <button
       {...props}
-      className={`
-        inline-flex min-h-11 items-center justify-center gap-2
-        border-4 border-outline px-6 py-3
-        text-sm font-black uppercase tracking-wide
-        shadow-brutal transition-transform duration-100 ease-out
-        hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-brutal-lg
-        active:translate-x-1 active:translate-y-1 active:shadow-brutal-sm
-        disabled:pointer-events-none disabled:opacity-50
-        motion-reduce:transition-none motion-reduce:hover:translate-x-0 motion-reduce:hover:translate-y-0
-        ${VARIANTS[variant]} ${className}
-      `}
-    />
+      className={clsx(
+        'inline-flex items-center justify-center gap-2',
+        'border-4 border-outline',
+        // 44px minimum touch target. px-4 py-2 on a small label lands under 40.
+        'min-h-11 px-4 py-2',
+        'font-black uppercase tracking-[0.08em]',
+        'shadow-brutal',
+        'transition-[transform,box-shadow] duration-100 ease-out',
+        // The press conserves the footprint: the element moves into its shadow
+        // by the same amount the shadow shrinks.
+        'hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-brutal-lg',
+        'active:translate-x-1 active:translate-y-1 active:shadow-brutal-sm',
+        'disabled:pointer-events-none disabled:opacity-50',
+        // The whole interaction is movement, so it needs an opt-out.
+        'motion-reduce:transition-none',
+        'motion-reduce:hover:translate-x-0 motion-reduce:hover:translate-y-0',
+        'motion-reduce:active:translate-x-0 motion-reduce:active:translate-y-0',
+        variants[variant],
+        className
+      )}
+    >
+      {icon}
+      {children}
+    </button>
   )
 }
 ```
@@ -175,6 +213,8 @@ Four details in that snippet are load-bearing:
 - `motion-reduce:` variants matter here specifically because the whole interaction is movement. Users with vestibular sensitivity get the color change and the state, without the lurch.
 
 Spreading `...props` before `className` and merging rather than replacing is what keeps the primitive composable — a caller adding `w-full` should not wipe out the border.
+
+One more argument for building the reference sheet before writing the article: the ghost variant in that file used to say `text-on-accent`, and it looked completely fine in the light theme. The dark capture is what exposed it — black label on a `#0D1117` ground, a contrast ratio of about 1.1, a button you literally could not read. Nothing in the code review caught it, because the class name sounds correct. Render every variant in every theme on one screen and this category of bug becomes impossible to miss.
 
 ### How to Build Card, Badge, and Input Primitives That Match
 
@@ -207,25 +247,68 @@ export function NeoBadge({ className = '', ...props }: ComponentProps<'span'>) {
       className={`
         inline-flex items-center gap-1 border-2 border-outline bg-highlight
         px-2 py-0.5 text-xs font-black uppercase tracking-widest
-        text-on-accent shadow-brutal-sm ${className}
-      `}
-    />
-  )
-}
-
-export function NeoInput({ className = '', ...props }: ComponentProps<'input'>) {
-  return (
-    <input
-      {...props}
-      className={`
-        min-h-11 w-full border-4 border-outline bg-inset px-3 py-2
-        font-bold text-ink placeholder:text-ink-muted
-        aria-[invalid=true]:border-danger ${className}
+        shadow-brutal-sm ${className}
       `}
     />
   )
 }
 ```
+
+The input is the one worth writing carefully, because this is where a bold visual style most often drops accessibility. Make the label a required prop rather than something a caller can forget, and wire the hint and error through `aria-describedby`:
+
+```tsx
+'use client'
+
+import { useId } from 'react'
+import type { InputHTMLAttributes } from 'react'
+import clsx from 'clsx'
+
+interface HQInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'aria-invalid'> {
+  label: string
+  hint?: string
+  /** Presence of this switches the field to its invalid state. */
+  error?: string
+  hideLabel?: boolean
+}
+
+export function HQInput({ label, hint, error, hideLabel = false, className, id, ...props }: HQInputProps) {
+  const generatedId = useId()
+  const inputId = id ?? generatedId
+  const hintId = `${inputId}-hint`
+  const errorId = `${inputId}-error`
+  const describedBy = [hint ? hintId : null, error ? errorId : null].filter(Boolean).join(' ')
+
+  return (
+    <div className="flex w-full min-w-0 flex-col gap-1.5">
+      <label
+        htmlFor={inputId}
+        className={clsx('text-xs font-black uppercase tracking-[0.12em] text-ink', hideLabel && 'sr-only')}
+      >
+        {label}
+      </label>
+
+      <input
+        {...props}
+        id={inputId}
+        aria-invalid={error ? true : undefined}
+        aria-describedby={describedBy || undefined}
+        className={clsx(
+          'min-h-11 w-full min-w-0',
+          'border-4 border-outline bg-inset px-3 py-2',
+          'font-bold text-ink placeholder:text-ink-muted',
+          error && 'border-danger',
+          className
+        )}
+      />
+
+      {hint && !error && <p id={hintId} className="text-xs font-bold text-ink-muted">{hint}</p>}
+      {error && <p id={errorId} className="text-xs font-black uppercase text-danger">{error}</p>}
+    </div>
+  )
+}
+```
+
+Three decisions in there worth copying. `label` is required, so a field cannot ship unlabelled — `hideLabel` covers the search-box case where the design carries the meaning. `useId` means no caller has to invent unique ids, which is what makes `htmlFor` and `aria-describedby` reliable in a list of fields. And nothing in it touches `outline`, so the global focus ring stays intact.
 
 Note the scale discipline: badges get `border-2` and `shadow-brutal-sm`, containers get `border-4` and `shadow-brutal`. Two steps, applied by element size. A third step is where systems start looking arbitrary.
 
@@ -312,20 +395,56 @@ The remaining two: every interactive element gets a 44px minimum target, and eve
 
 ---
 
-## Baseline vs Target: What to Measure Before and After
+## How to Audit a Neo-Brutalist System With axe-core
 
-A visual redesign that you cannot measure is a matter of taste, and taste loses arguments. Instrument these four before you ship, using commonly cited web benchmarks as orientation rather than as promises:
+Contrast and focus are pass/fail, so measure them rather than arguing about them. Here is the harness, and then the actual numbers it produced on this site.
 
-| Metric | Typical baseline | Target after the system lands | Tool |
+```javascript
+// scripts/audit-a11y.mjs — run against a local build
+import { chromium } from 'playwright-core'
+import { createRequire } from 'node:module'
+
+const AXE_PATH = createRequire(import.meta.url).resolve('axe-core/axe.min.js')
+const ROUTES = ['/', '/pricing', '/blog']
+const THEMES = ['parchment', 'grey']
+
+const browser = await chromium.launch()
+const page = await browser.newPage({ viewport: { width: 1280, height: 900 } })
+
+for (const route of ROUTES) {
+  for (const theme of THEMES) {
+    await page.goto(`http://localhost:3000${route}`, { waitUntil: 'networkidle' })
+    await page.evaluate((t) => document.documentElement.setAttribute('data-theme', t), theme)
+
+    // Colour tokens transition on theme change. Sampling before that settles
+    // swung results from 0 to 30 nodes on identical code.
+    await page.waitForTimeout(800)
+    await page.addScriptTag({ path: AXE_PATH })
+
+    const { violations } = await page.evaluate(async () =>
+      window.axe.run(document, { runOnly: ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'] })
+    )
+
+    console.log(`${violations.length ? 'FAIL' : 'PASS'} ${route} [${theme}]`)
+  }
+}
+```
+
+**Every theme has to be a separate run.** That is the single most useful thing in that script. A token system that inverts colours at runtime has two or three distinct contrast profiles, and auditing only the default theme tests one of them. Our dark theme was the one carrying the failures.
+
+The first honest pass over this codebase found five distinct violation types across the routes and themes we check:
+
+| Violation | Where | Cause | Fix |
 |:---|:---|:---|:---|
-| Lighthouse accessibility | 75–85 with hand-rolled components | 95+ | Lighthouse CI in the pipeline |
-| Contrast failures | Several, usually on bright fills | 0 | axe-core in CI |
-| CLS | Varies; borders and shadows are layout-stable | Under 0.1 | Real-user field data |
-| Landing bounce rate | Whatever yours is today | Test for a 3–8 point drop | Analytics, split by cohort |
+| `meta-viewport` | Every route | `maximumScale: 1, userScalable: false` | Removed both; pinch-zoom restored |
+| `color-contrast` | Dark theme prose | H2 pinned to black, so 1.35:1 on the dark card | Heading uses theme ink |
+| `color-contrast` | Dark theme links | Brand violet `#8A2BE2` at 2.59:1 | Per-theme `--link-color` token |
+| `link-name` | Every post card | Icon-only arrow link, no accessible name | `sr-only` label naming the post |
+| `scrollable-region-focusable` | Every code block | `overflow-x` container not keyboard-reachable | `tabIndex={0}` plus a labelled region |
 
-Be honest about causation on that last row. A distinctive interface plausibly reduces bounce, but so does the copy you rewrote at the same time. Ship the visual system on its own if you want to know what it did.
+After those five, all blog routes pass axe on WCAG 2.1 A/AA in both themes. Two known failures remain, and naming them is more useful than claiming a clean sweep: the marketing homepage still has 14 nodes of black-on-near-black in the dark theme (ratios around 1.06 — text that is effectively invisible), caused by black ink over translucent accent fills, which is the same root cause as the heading bug above. And the `#DC2626` danger token is 4.34:1 against black at 12px bold, just under the 4.5 threshold, which is a token decision rather than a component bug.
 
-The accessibility numbers, by contrast, are not a matter of opinion. Contrast failures and missing focus indicators are pass/fail, and a bold interface has no excuse for either.
+That is the real shape of an audit. The generic version of this advice — "aim for a Lighthouse score above 95" — tells you nothing about which of your themes is broken.
 
 ---
 

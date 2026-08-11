@@ -57,6 +57,10 @@
   --focus-ring: #000000;
   --focus-halo: #FFE600;
 
+  /* Prose links. The brand violet clears AA on the light surfaces but only
+     reaches 2.59:1 on the dark card, so each theme carries its own. */
+  --link-color: #6B21A8;
+
   /* Ruled notebook paper. */
   --canvas-texture: repeating-linear-gradient(
     transparent, transparent 39px,
@@ -104,6 +108,8 @@
   --focus-ring: #F3F4F6;
   --focus-halo: #FFE600;
 
+  --link-color: #C4B5FD;
+
   /* HUD grid, not ruled paper. */
   --canvas-texture:
     linear-gradient(to right, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
@@ -149,6 +155,8 @@
   --focus-ring: #E2E8F0;
   --focus-halo: #FFE600;
 
+  --link-color: #C4B5FD;
+
   --canvas-texture:
     linear-gradient(to right, rgba(56, 189, 248, 0.06) 1px, transparent 1px),
     linear-gradient(to bottom, rgba(56, 189, 248, 0.06) 1px, transparent 1px);
@@ -184,6 +192,7 @@
   --color-ink-muted: var(--text-muted);
   --color-ink-inverse: var(--text-inverse);
   --color-on-accent: var(--text-on-accent);
+  --color-link: var(--link-color);
 
   /* Accents + status */
   --color-accent: var(--accent-primary);

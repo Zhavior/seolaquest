@@ -48,11 +48,14 @@ export const metadata: Metadata = {
 
 // `viewport-fit=cover` is what makes env(safe-area-inset-*) resolve to real
 // values on notched devices — the mobile shell's safe padding depends on it.
+// Pinch-zoom stays enabled. `maximumScale: 1` with `userScalable: false` is a
+// WCAG 1.4.4 failure (axe flags it as meta-viewport on every route), and it is
+// the single most hostile thing a site can do to a low-vision user on a phone.
+// The double-tap-zoom annoyance it used to prevent has not been a real problem
+// since iOS 10 ignored the directive anyway.
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
-  maximumScale: 1,
-  userScalable: false,
   viewportFit: 'cover',
 }
 

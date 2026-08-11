@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
-import { getPostBySlug } from '@/lib/blog'
+import { getAllPosts, getPostBySlug } from '@/lib/blog'
 import { BlogMarkdownRenderer } from '../BlogMarkdownRenderer'
 
 describe('blog post rendering', () => {
@@ -21,6 +21,32 @@ describe('blog post rendering', () => {
     expect(container.textContent).not.toMatch(/`/)
 
     expect(container.querySelectorAll('strong').length).toBeGreaterThan(0)
+  })
+
+  it('renders images as figures with alt text and a caption', () => {
+    const { container } = render(
+      <BlogMarkdownRenderer content={'![Alt words here](/blog/shot.png)\n*The caption*'} />
+    )
+
+    const img = container.querySelector('img')
+    expect(img).toHaveAttribute('src', '/blog/shot.png')
+    expect(img).toHaveAttribute('alt', 'Alt words here')
+    expect(img).toHaveAttribute('loading', 'lazy')
+    expect(container.querySelector('figcaption')?.textContent).toBe('The caption')
+    // The bang must not leak as text, and the image must not become a link.
+    expect(container.textContent).not.toContain('!')
+    expect(container.querySelector('a')).toBeNull()
+  })
+
+  it('gives every image in every published post real alt text', () => {
+    const images = getAllPosts().flatMap((p) => [...p.content.matchAll(/!\[([^\]]*)\]\(([^)]+)\)/g)])
+
+    // Guard against the test passing vacuously once images exist in the content.
+    expect(images.length).toBeGreaterThan(0)
+
+    for (const [, alt, src] of images) {
+      expect(alt.length, `alt text for ${src}`).toBeGreaterThan(20)
+    }
   })
 
   it('has exactly one H1 (the page header supplies it, not the body)', () => {

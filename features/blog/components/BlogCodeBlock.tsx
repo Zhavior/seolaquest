@@ -51,7 +51,16 @@ export function BlogCodeBlock({ language = 'code', code }: BlogCodeBlockProps) {
       </div>
 
       {/* Code Content */}
-      <pre className="p-4 overflow-x-auto font-mono text-xs md:text-sm text-[#A3E635] leading-relaxed selection:bg-accent selection:text-on-accent">
+      {/* tabIndex + role make the horizontal scroll reachable without a mouse.
+          axe flags an overflow container that keyboard users cannot enter
+          (scrollable-region-focusable), and long code lines are exactly the
+          case where that matters. */}
+      <pre
+        tabIndex={0}
+        role="region"
+        aria-label={`${language} code sample`}
+        className="p-4 overflow-x-auto font-mono text-xs md:text-sm text-[#A3E635] leading-relaxed selection:bg-accent selection:text-on-accent"
+      >
         <code>{code.trim()}</code>
       </pre>
     </div>

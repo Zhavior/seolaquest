@@ -30,7 +30,7 @@ function renderInlineText(text: string): React.ReactNode {
           href={href}
           onMouseEnter={() => sfx.playHoverBlip()}
           onClick={() => sfx.playCoinDrop()}
-          className="font-black text-[#8A2BE2] underline decoration-2 underline-offset-2 hover:bg-accent px-1 py-0.5 border border-outline shadow-brutal-sm transition-colors"
+          className="font-black text-link underline decoration-2 underline-offset-2 hover:bg-accent hover:text-on-accent px-1 py-0.5 border border-outline shadow-brutal-sm transition-colors"
         >
           {linkLabel}
         </Link>
@@ -178,7 +178,7 @@ function renderMarkdownContent(content: string) {
             const text = trimmed.slice(3).trim()
             const id = text.toLowerCase().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-')
             return (
-              <h2 id={id} key={pIdx} className="text-xl sm:text-2xl font-black uppercase text-on-accent pt-5 pb-1 border-b-2 border-outline flex items-center gap-2">
+              <h2 id={id} key={pIdx} className="text-xl sm:text-2xl font-black uppercase text-ink pt-5 pb-1 border-b-2 border-outline flex items-center gap-2">
                 <span className="h-3 w-3 bg-accent border border-outline inline-block"></span>
                 {renderInlineText(text)}
               </h2>
@@ -196,12 +196,42 @@ function renderMarkdownContent(content: string) {
             )
           }
 
+          // Figure: ![alt](src) on its own line, with the following italic
+          // line taken as the caption. Handled before the link parser, which
+          // would otherwise match the bracket pair and emit a stray "!".
+          const figure = /^!\[([^\]]*)\]\(([^)\s]+)\)\s*(?:\n\*([^*]+)\*)?$/.exec(trimmed)
+          if (figure) {
+            const [, alt, src, caption] = figure
+            return (
+              <figure key={pIdx} className="my-6 space-y-2">
+                {/* eslint-disable-next-line @next/next/no-img-element -- post
+                    images are local, pre-sized screenshots; next/image adds a
+                    layout wrapper that fights the offset-slab border here. */}
+                <img
+                  src={src}
+                  alt={alt}
+                  loading="lazy"
+                  decoding="async"
+                  className="w-full border-4 border-outline shadow-brutal"
+                />
+                {caption && (
+                  <figcaption className="text-xs font-bold uppercase tracking-wide text-ink-muted">
+                    {caption}
+                  </figcaption>
+                )}
+              </figure>
+            )
+          }
+
           // Callout Blockquote (supports multi-line > prefixed blocks)
           if (trimmed.startsWith('>')) {
             const quoteLines = trimmed.split('\n').map(l => l.replace(/^>\s?/, '').trim())
             const quoteText = quoteLines.join(' ')
             return (
-              <blockquote key={pIdx} className="my-5 border-l-8 border-[#8A2BE2] bg-accent/20 border-4 border-outline p-4 font-bold text-on-accent shadow-brutal">
+              // `bg-accent/20` is a different class from `bg-accent`, so the
+              // ink-inversion rule in globals.css does not apply to it and the
+              // theme's own ink is the correct colour here.
+              <blockquote key={pIdx} className="my-5 border-l-8 border-link bg-accent/20 border-4 border-outline p-4 font-bold text-ink shadow-brutal">
                 {renderInlineText(quoteText)}
               </blockquote>
             )
