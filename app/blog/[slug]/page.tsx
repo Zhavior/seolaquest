@@ -15,13 +15,30 @@ export async function generateStaticParams() {
   }))
 }
 
+/**
+ * Posts are files on disk, so `generateStaticParams` above is the complete list
+ * of valid slugs — anything else is a 404, and the router can answer it without
+ * rendering.
+ *
+ * This has to live at the routing layer rather than in `notFound()`: because
+ * proxy.ts runs clerkMiddleware on this path, the request arrives rewritten,
+ * and a `notFound()` under that rewrite serves the not-found body with HTTP
+ * 200. Verified in a production build — /blog/<anything> returned 200. Google
+ * reads 200-plus-not-found-content as a soft 404 and can discount the whole
+ * directory, which is every article we have.
+ */
+export const dynamicParams = false
+
 export async function generateMetadata({ params }: PostPageProps): Promise<Metadata> {
   const resolvedParams = await params
   const post = getPostBySlug(resolvedParams.slug)
 
   if (!post) {
+    // Reachable in dev, where dynamicParams is not enforced. Keep it noindex so
+    // a crawler that somehow sees this body never treats it as content.
     return {
-      title: 'Article Not Found | SEOlaQuest Blog',
+      title: 'Article Not Found | SEOlaQuest',
+      robots: { index: false, follow: true },
     }
   }
 

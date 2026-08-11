@@ -1,11 +1,11 @@
 'use client'
 
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Search, Sparkles, Sword, Zap, BookOpen, Filter } from 'lucide-react'
 import { Post, filterPosts } from '@/lib/blog-types'
 import { BlogHeroCard } from '@/features/blog/components/BlogHeroCard'
 import { BlogPostCard } from '@/features/blog/components/BlogPostCard'
-import { BlogTagFilter } from '@/features/blog/components/BlogTagFilter'
+import { ALL_TAG, BlogTagFilter, deriveTags } from '@/features/blog/components/BlogTagFilter'
 import { sfx } from '@/lib/sfx'
 
 import { GuildNewsletterBox } from '@/features/blog/components/GuildNewsletterBox'
@@ -16,13 +16,16 @@ interface BlogIndexClientProps {
 }
 
 export default function BlogIndexClient({ initialPosts, featuredPost }: BlogIndexClientProps) {
-  const [selectedTag, setSelectedTag] = useState<string>('[ALL]')
+  const [selectedTag, setSelectedTag] = useState<string>(ALL_TAG)
   const [searchQuery, setSearchQuery] = useState<string>('')
+
+  // Only categories with a published post behind them get a button.
+  const tags = useMemo(() => deriveTags(initialPosts), [initialPosts])
 
   const filteredPosts = filterPosts(initialPosts, selectedTag, searchQuery)
   // Grid posts exclude the featured post if tag is [ALL] and no search query
   const displayGridPosts =
-    featuredPost && selectedTag === '[ALL]' && !searchQuery
+    featuredPost && selectedTag === ALL_TAG && !searchQuery
       ? filteredPosts.filter((p) => p.slug !== featuredPost.slug)
       : filteredPosts
 
@@ -63,12 +66,14 @@ export default function BlogIndexClient({ initialPosts, featuredPost }: BlogInde
               <Sparkles size={14} className="text-[#00FFFF]" /> SEOLAQUEST KNOWLEDGE VAULT
             </div>
 
+            {/* The H1 is the on-page half of the title tag. It carries the same
+                searchable entities; the lore lives in the badge above it. */}
             <h1 className="text-3xl sm:text-5xl md:text-6xl font-black uppercase tracking-tight text-ink leading-none">
-              Arcade Blog & Guild Lore
+              SEO Growth & Developer Playbooks
             </h1>
 
             <p className="text-sm md:text-lg font-bold text-ink/80 max-w-2xl leading-relaxed">
-              Tactical playbooks on B2B speed-to-lead velocity, metered API monetization, arcade SaaS growth, and Guild Hall tactics.
+              Implementation guides on SaaS gamification, activation metrics, neo-brutalist React UI, metered API billing, and lead-response speed. Working code, honest numbers.
             </p>
 
             {/* Search Input Bar */}
@@ -95,11 +100,11 @@ export default function BlogIndexClient({ initialPosts, featuredPost }: BlogInde
           <div className="flex items-center gap-2 font-black uppercase text-xs text-ink-muted">
             <Filter size={14} /> FILTER QUEST CATEGORY:
           </div>
-          <BlogTagFilter activeTag={selectedTag} onSelectTag={setSelectedTag} />
+          <BlogTagFilter tags={tags} activeTag={selectedTag} onSelectTag={setSelectedTag} />
         </section>
 
         {/* Featured Post Hero Card (Shown when on [ALL] tag & no search filter) */}
-        {featuredPost && selectedTag === '[ALL]' && !searchQuery && (
+        {featuredPost && selectedTag === ALL_TAG && !searchQuery && (
           <section className="space-y-4">
             <div className="flex items-center justify-between">
               <h2 className="text-xl font-black uppercase tracking-tight text-ink flex items-center gap-2">
@@ -115,7 +120,7 @@ export default function BlogIndexClient({ initialPosts, featuredPost }: BlogInde
           <div className="flex items-center justify-between border-b-4 border-outline pb-3">
             <h2 className="text-xl md:text-2xl font-black uppercase tracking-tight text-ink flex items-center gap-2">
               <BookOpen size={22} className="stroke-[3px]" />
-              {selectedTag !== '[ALL]' ? `${selectedTag} ARTICLES` : 'ALL QUEST LOGS'}
+              {selectedTag !== ALL_TAG ? `${selectedTag} ARTICLES` : 'ALL QUEST LOGS'}
               <span className="ml-2 border-2 border-outline bg-black px-2 py-0.5 text-xs text-[#FFE600]">
                 {filteredPosts.length}
               </span>
@@ -138,7 +143,7 @@ export default function BlogIndexClient({ initialPosts, featuredPost }: BlogInde
                 type="button"
                 onClick={() => {
                   sfx.playCoinDrop()
-                  setSelectedTag('[ALL]')
+                  setSelectedTag(ALL_TAG)
                   setSearchQuery('')
                 }}
                 className="inline-flex min-h-11 items-center border-3 border-outline bg-accent px-6 py-2.5 font-black uppercase text-xs shadow-brutal-sm hover:bg-[#00FFFF]"

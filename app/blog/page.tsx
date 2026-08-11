@@ -3,10 +3,13 @@ import BlogIndexClient from './BlogIndexClient'
 
 export const revalidate = 3600 // 1 hour caching for blog
 
+// This is the hub page for the article cluster, so its title has to carry the
+// entities the posts compete for. "Guild Lore" is internal language nobody
+// searches, and at 64 characters the old title was also truncated in the SERP.
 export const metadata = {
-  title: 'SEOlaQuest Blog & Content Engine | Arcade Playbooks & Guild Lore',
+  title: 'SEO Growth & Developer Playbooks | SEOlaQuest Blog',
   description:
-    'Tactical guides on speed-to-lead velocity, metered API monetization, arcade SaaS growth, and Guild Hall lore.',
+    'Implementation guides on SaaS gamification, activation metrics, neo-brutalist React UI, and lead-response speed. Working code, honest numbers.',
   alternates: { canonical: '/blog' },
   openGraph: { url: '/blog' },
 }
