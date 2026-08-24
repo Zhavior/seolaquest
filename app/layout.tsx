@@ -18,7 +18,7 @@ const inter = Inter({
 
 const TITLE = 'SEOlaQuest | AI Social Listening & Lead Monitoring'
 const DESCRIPTION =
-  'SEOlaQuest monitors X (Twitter) and Reddit for your target keywords in real time. AI scouts flag posts from potential customers and deliver matched leads to your dashboard automatically.'
+  'SEOlaQuest monitors X (Twitter) for your target keywords in real time. AI scouts flag posts from potential customers and deliver matched leads to your dashboard automatically. Reddit support is in development.'
 
 export const metadata: Metadata = {
   // Without `metadataBase` every relative URL below resolves against the

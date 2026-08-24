@@ -32,7 +32,7 @@ const quests = [
     title: 'Pain spike detected',
     detail: 'Repeated frustration around slow prospecting and weak demand validation.',
     tag: 'Rare',
-    source: 'Reddit thread · SaaS founders',
+    source: 'X posts · SaaS founders',
     snippet:
       'We keep hearing the same thing: teams waste hours scraping scattered conversations and still leave unsure which pain point is real enough to build around.',
   },
@@ -324,7 +324,7 @@ export function LandingHero() {
             variants={fadeUp}
             className="mt-4 flex max-w-xl flex-wrap gap-2"
           >
-            {['Scanning Reddit', 'Scanning X', 'Live signal review', 'Evidence-first workflow'].map((badge) => (
+            {['Scanning X', 'Buyer-intent scoring', 'Live signal review', 'Evidence-first workflow'].map((badge) => (
               <span
                 key={badge}
                 className="inline-flex items-center border-2 border-outline/80 bg-highlight px-3 py-1 text-[10px] font-black uppercase tracking-[0.14em] text-on-accent shadow-brutal-sm"

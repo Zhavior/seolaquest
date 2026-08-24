@@ -14,7 +14,7 @@ const WHAT_IT_DOES = [
   {
     icon: Radar,
     title: 'Monitors public conversations',
-    body: 'SEOlaQuest scans publicly visible posts on X (Twitter) and Reddit for the keywords and phrases you configure. Only publicly accessible content is read — no private messages, DMs, or restricted posts.',
+    body: 'SEOlaQuest scans publicly visible posts on X (Twitter) for the keywords and phrases you configure. Reddit reading is built but not switched on yet, so nothing is scanned there today. Only publicly accessible content is read — no private messages, DMs, or restricted posts.',
   },
   {
     icon: Zap,
@@ -94,7 +94,7 @@ export function HomepageOAuthDisclosure() {
             <h3 className="mt-1 text-2xl font-black uppercase text-white">SEOlaQuest</h3>
             <p className="mt-3 max-w-3xl text-sm font-bold leading-relaxed text-white/80">
               SEOlaQuest is an AI-powered social listening and lead monitoring platform built for founders and operators.
-              It monitors X (Twitter) and Reddit for your tracked keywords in real time, uses AI agents to classify and score
+              It monitors X (Twitter) for your tracked keywords in real time, uses AI agents to classify and score
               matching public posts for buyer intent, and delivers qualified leads directly to your dashboard —
               so you can reach potential customers before your competitors do.
             </p>
