@@ -1,9 +1,11 @@
+import type { ReactNode } from 'react'
 import { render, screen } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 
 const mocks = vi.hoisted(() => ({ signUp: vi.fn() }))
 
 vi.mock('@clerk/nextjs', () => ({
+  ClerkProvider: ({ children }: { children: ReactNode }) => children,
   SignUp: (props: unknown) => {
     mocks.signUp(props)
     return <div data-testid="clerk-sign-up" />

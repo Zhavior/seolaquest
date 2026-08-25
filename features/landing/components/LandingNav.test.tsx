@@ -1,17 +1,6 @@
 import type { ReactNode } from 'react'
 import { render, screen } from '@testing-library/react'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
-
-const mocks = vi.hoisted(() => ({
-  isLoaded: true,
-  toggle: vi.fn(() => false),
-  userId: null as string | null,
-}))
-
-vi.mock('@clerk/nextjs', () => ({
-  UserButton: () => <button type="button">User account</button>,
-  useAuth: () => ({ isLoaded: mocks.isLoaded, userId: mocks.userId }),
-}))
+import { describe, expect, it, vi } from 'vitest'
 
 vi.mock('next/link', () => ({
   default: ({ children, href, ...props }: { children: ReactNode; href: string }) => (
@@ -24,19 +13,12 @@ vi.mock('@/lib/sfx', () => ({
     isEnabled: () => true,
     playCoinDrop: vi.fn(),
     playHoverBlip: vi.fn(),
-    toggle: mocks.toggle,
   },
 }))
 
 import { LandingNav } from './LandingNav'
 
 describe('LandingNav mobile usability', () => {
-  beforeEach(() => {
-    mocks.isLoaded = true
-    mocks.userId = null
-    mocks.toggle.mockClear()
-  })
-
   it('keeps visitor authentication actions present with 44px targets below 640px', () => {
     render(<LandingNav />)
 
@@ -57,11 +39,4 @@ describe('LandingNav mobile usability', () => {
     // Sound control was moved out of Nav
   })
 
-  it('keeps authenticated actions touch-sized too', () => {
-    mocks.userId = 'user_123'
-    render(<LandingNav />)
-
-    expect(screen.getByRole('link', { name: 'COMMAND CENTER' })).toBeDefined()
-    expect(screen.getByRole('button', { name: 'User account' }).parentElement).toBeDefined()
-  })
 })

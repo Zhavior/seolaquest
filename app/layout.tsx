@@ -1,5 +1,4 @@
 import './globals.css'
-import { ClerkProvider } from '@clerk/nextjs'
 import type { Metadata, Viewport } from 'next'
 import { Inter } from 'next/font/google'
 import { SkipLink } from '@/components/SkipLink'
@@ -85,12 +84,10 @@ export default function RootLayout({
           inline style here would outrank every theme. */}
       <body className="font-sans min-h-screen bg-canvas text-ink antialiased">
         <ThemeProvider>
-          <ClerkProvider>
-            <SkipLink />
-            <div id="main-content" tabIndex={-1}>
-              {children}
-            </div>
-          </ClerkProvider>
+          <SkipLink />
+          <div id="main-content" tabIndex={-1}>
+            {children}
+          </div>
         </ThemeProvider>
         {/*
           Last in <body> so neither script competes with the first paint.
