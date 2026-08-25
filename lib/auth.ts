@@ -1,5 +1,6 @@
 import 'server-only'
 
+import { cache } from 'react'
 import { Prisma, type OnboardingSource, type User } from '@prisma/client'
 import { currentUser, auth } from '@clerk/nextjs/server'
 import prisma from '@/lib/prisma'
@@ -365,7 +366,7 @@ async function provisionCurrentUser(userId: string, email: string, name: string)
   return null
 }
 
-export async function getCurrentUser() {
+export const getCurrentUser = cache(async function getCurrentUser() {
   const { userId } = await auth()
 
   if (!userId) {
@@ -420,7 +421,7 @@ export async function getCurrentUser() {
 
   logger.info({ userId, outcomeCode: 'AUTH_USER_PROVISION_START' }, 'Provisioning a user for a new Clerk session')
   return provisionCurrentUser(userId, email, name)
-}
+})
 
 export async function requireCurrentUser() {
   const user = await getCurrentUser()

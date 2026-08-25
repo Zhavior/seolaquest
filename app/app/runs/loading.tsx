@@ -1,15 +1,11 @@
-import { QuestListSkeleton, QuestRouteSkeleton } from '@/components/quest'
+import { QuestPending, QuestRoutePending } from '@/components/quest'
 
 /**
- * Route-level fallback: the full scan-run ledger shape, shown while the segment
- * streams in on navigation or first load.
+ * Quiet route boundary shown while the segment streams on navigation or first
+ * load.
  */
 export default function ScanRunsLoading() {
-  return (
-    <QuestRouteSkeleton label="Scan Runs">
-      <ScanRunListSkeleton />
-    </QuestRouteSkeleton>
-  )
+  return <QuestRoutePending label="Opening Scan Runs" />
 }
 
 /**
@@ -17,5 +13,5 @@ export default function ScanRunsLoading() {
  * synchronously and suspends just this list, so the header must not repeat.
  */
 export function ScanRunListSkeleton() {
-  return <QuestListSkeleton count={3} height="h-52" label="Loading scan runs" />
+  return <QuestPending label="Loading scan runs" />
 }
