@@ -169,7 +169,7 @@ function RarityBadge({ tag }: { tag: string }) {
 
 export function LandingHero() {
   const shouldReduceMotion = useReducedMotion()
-  const [activeMobileTab, setActiveMobileTab] = useState<'brief' | 'matches'>('matches')
+  const [activeMobileTab, setActiveMobileTab] = useState<'brief' | 'matches'>('brief')
   const [expandedQuest, setExpandedQuest] = useState<string>(quests[0].title)
   const [pulseTick, setPulseTick] = useState(0)
   const [feedTick, setFeedTick] = useState(0)
