@@ -5,15 +5,6 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { sfx } from '@/lib/sfx'
 import { BadgeCheck, ChevronDown, Compass, Radar, Swords, Zap } from 'lucide-react'
 import Link from 'next/link'
-import dynamic from 'next/dynamic'
-
-// Static-imported, this pulled `three` + `@react-three/fiber` into the landing
-// page's initial bundle: 875 KB of the 2,230 KB total, for a decorative layer
-// behind the hero. `ssr: false` because a WebGL canvas renders nothing on the
-// server anyway, so SSR only cost us the bytes.
-const PixelParticleBackground = dynamic(() => import('./PixelParticleBackground'), {
-  ssr: false,
-})
 
 const fadeUp = {
   hidden: { opacity: 0, y: 18 },
@@ -226,12 +217,6 @@ export function LandingHero() {
 
   return (
     <section className="relative z-10 overflow-hidden bg-canvas px-4 pb-16 pt-24 sm:px-6 sm:pb-24 sm:pt-32">
-      {/* Every other motion in this hero already checks this; the WebGL layer was
-          the one holdout, animating a full-screen particle field for users who
-          asked the OS for no animation. The grain layer below stays either way,
-          so removing this is a static fallback, not an empty background. */}
-      {shouldReduceMotion ? null : <PixelParticleBackground />}
-
       {/* Plain opacity, not mix-blend-multiply. axe cannot compute contrast through a
           blended layer that overlaps text, so this one layer produced 14 false
           "black on near-black" violations on an otherwise readable hero. At 4%

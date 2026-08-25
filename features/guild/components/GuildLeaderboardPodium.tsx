@@ -208,7 +208,7 @@ export default function GuildLeaderboardPodium({
             </div>
 
             {rank1.isOwner && (
-              <div className="bg-accent-2 text-white border-2 border-outline text-[10px] font-black uppercase px-2 py-0.5 mb-2 mt-4 shadow-brutal-sm">
+              <div className="bg-accent-2 text-on-accent border-2 border-outline text-[10px] font-black uppercase px-2 py-0.5 mb-2 mt-4 shadow-brutal-sm">
                 YOU • RANK #1
               </div>
             )}

@@ -513,7 +513,7 @@ export function RadarDemo() {
                       <button
                         type="button"
                         onClick={replayStory}
-                        className="flex items-center gap-1 border-2 border-outline bg-card px-2 py-1 font-mono text-[10px] font-black uppercase tracking-[0.14em] text-ink shadow-brutal-sm transition-transform duration-75 hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none"
+                        className="flex min-h-11 items-center gap-1 border-2 border-outline bg-card px-2 py-1 font-mono text-[10px] font-black uppercase tracking-[0.14em] text-ink shadow-brutal-sm transition-transform duration-75 hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none"
                       >
                         <Play className="h-2.5 w-2.5" aria-hidden="true" />
                         <span>Replay intro</span>
@@ -524,7 +524,7 @@ export function RadarDemo() {
                       onClick={toggleSound}
                       aria-pressed={soundOn}
                       className={cn(
-                        'flex items-center gap-1.5 border-2 border-outline px-2 py-1 font-mono text-[10px] font-black uppercase tracking-[0.16em] shadow-brutal-sm transition-transform duration-75 hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none',
+                        'flex min-h-11 min-w-11 items-center gap-1.5 border-2 border-outline px-2 py-1 font-mono text-[10px] font-black uppercase tracking-[0.16em] shadow-brutal-sm transition-transform duration-75 hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none',
                         soundOn ? 'bg-accent text-on-accent' : 'bg-card text-ink-muted',
                       )}
                     >
@@ -577,7 +577,7 @@ export function RadarDemo() {
                           setFilter(entry)
                         }}
                         className={cn(
-                          'border-2 border-outline px-2.5 py-1 font-mono text-[10px] font-black uppercase tracking-[0.16em] transition-transform duration-75 active:translate-x-[1px] active:translate-y-[1px]',
+                          'min-h-11 min-w-11 border-2 border-outline px-2.5 py-1 font-mono text-[10px] font-black uppercase tracking-[0.16em] transition-transform duration-75 active:translate-x-[1px] active:translate-y-[1px]',
                           filter === entry
                             ? 'bg-accent text-on-accent shadow-brutal-sm'
                             : 'bg-card text-ink-muted hover:bg-highlight hover:text-on-accent',
@@ -599,7 +599,7 @@ export function RadarDemo() {
                         aria-pressed={target.id === selected.id}
                         onClick={() => selectTarget(target)}
                         className={cn(
-                          'flex w-full items-center justify-between gap-3 border-4 border-outline px-3 py-2.5 text-left font-mono text-xs font-black uppercase tracking-[0.12em] transition-transform duration-75 hover:translate-x-[1px] hover:translate-y-[1px]',
+                          'flex min-h-11 w-full items-center justify-between gap-3 border-4 border-outline px-3 py-2.5 text-left font-mono text-xs font-black uppercase tracking-[0.12em] transition-transform duration-75 hover:translate-x-[1px] hover:translate-y-[1px]',
                           target.id === selected.id
                             ? 'bg-accent text-on-accent shadow-brutal'
                             : 'bg-card text-ink shadow-brutal-sm',
@@ -647,7 +647,7 @@ export function RadarDemo() {
                   <button
                     type="button"
                     onClick={() => openDrawer(selected)}
-                    className="flex w-full items-center justify-center gap-2 border-2 border-outline bg-ink px-4 py-2.5 font-mono text-[11px] font-black uppercase tracking-[0.18em] text-ink-inverse shadow-brutal-sm transition-transform duration-75 hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none"
+                    className="flex min-h-11 w-full items-center justify-center gap-2 border-2 border-outline bg-ink px-4 py-2.5 font-mono text-[11px] font-black uppercase tracking-[0.18em] text-ink-inverse shadow-brutal-sm transition-transform duration-75 hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none"
                   >
                     <MessageSquare className="h-3.5 w-3.5" aria-hidden="true" />
                     <span>Open draft</span>
@@ -693,7 +693,7 @@ export function RadarDemo() {
                             setPrey(entry)
                           }}
                           className={cn(
-                            'border-2 border-outline p-2.5 text-left font-mono text-[10px] font-black uppercase tracking-[0.14em] transition-transform duration-75 active:translate-x-[1px] active:translate-y-[1px]',
+                            'min-h-11 min-w-11 border-2 border-outline p-2.5 text-left font-mono text-[10px] font-black uppercase tracking-[0.14em] transition-transform duration-75 active:translate-x-[1px] active:translate-y-[1px]',
                             prey === entry
                               ? 'bg-accent text-on-accent shadow-brutal-sm'
                               : 'bg-card text-ink hover:bg-highlight hover:text-on-accent',
@@ -722,9 +722,9 @@ export function RadarDemo() {
                             setPain(entry)
                           }}
                           className={cn(
-                            'flex w-full items-center justify-between border-2 border-outline p-2.5 text-left font-mono text-[10px] font-black uppercase tracking-[0.14em] transition-transform duration-75 active:translate-x-[1px] active:translate-y-[1px]',
+                            'flex min-h-11 w-full items-center justify-between border-2 border-outline p-2.5 text-left font-mono text-[10px] font-black uppercase tracking-[0.14em] transition-transform duration-75 active:translate-x-[1px] active:translate-y-[1px]',
                             pain === entry
-                              ? 'bg-accent-2 text-white shadow-brutal-sm'
+                              ? 'bg-accent-2 text-on-accent shadow-brutal-sm'
                               : 'bg-card text-ink hover:bg-highlight hover:text-on-accent',
                           )}
                         >
@@ -752,7 +752,7 @@ export function RadarDemo() {
                             setAction(entry.id)
                           }}
                           className={cn(
-                            'w-full border-2 border-outline p-2.5 text-left font-mono text-[10px] font-black uppercase tracking-[0.14em] transition-transform duration-75 active:translate-x-[1px] active:translate-y-[1px]',
+                            'min-h-11 w-full border-2 border-outline p-2.5 text-left font-mono text-[10px] font-black uppercase tracking-[0.14em] transition-transform duration-75 active:translate-x-[1px] active:translate-y-[1px]',
                             action === entry.id
                               ? 'bg-ink text-ink-inverse shadow-brutal-sm'
                               : 'bg-card text-ink hover:bg-highlight hover:text-on-accent',
@@ -921,7 +921,7 @@ export function RadarDemo() {
                               setShowRawJson((shown) => !shown)
                             }}
                             aria-expanded={showRawJson}
-                            className="flex items-center gap-1.5 border-2 border-outline bg-card px-3 py-1.5 font-mono text-[10px] font-black uppercase tracking-[0.14em] text-ink shadow-brutal-sm transition-transform duration-75 hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none"
+                            className="flex min-h-11 min-w-11 items-center gap-1.5 border-2 border-outline bg-card px-3 py-1.5 font-mono text-[10px] font-black uppercase tracking-[0.14em] text-ink shadow-brutal-sm transition-transform duration-75 hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none"
                           >
                             <Braces className="h-3.5 w-3.5" aria-hidden="true" />
                             <span>{showRawJson ? 'Hide raw JSON' : 'View raw JSON'}</span>
@@ -959,7 +959,7 @@ export function RadarDemo() {
                           <button
                             type="button"
                             onClick={copyPaneDraft}
-                            className="flex items-center gap-1.5 border-2 border-outline bg-accent px-3 py-1.5 font-mono text-[10px] font-black uppercase tracking-[0.14em] text-on-accent shadow-brutal-sm transition-transform duration-75 hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none"
+                            className="flex min-h-11 min-w-11 items-center gap-1.5 border-2 border-outline bg-accent px-3 py-1.5 font-mono text-[10px] font-black uppercase tracking-[0.14em] text-on-accent shadow-brutal-sm transition-transform duration-75 hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none"
                           >
                             {paneCopied ? (
                               <Check className="h-3.5 w-3.5" aria-hidden="true" />
@@ -972,7 +972,7 @@ export function RadarDemo() {
                           <button
                             type="button"
                             onClick={() => openDrawer(scanResult.target)}
-                            className="flex items-center gap-1.5 border-2 border-outline bg-card px-3 py-1.5 font-mono text-[10px] font-black uppercase tracking-[0.14em] text-ink shadow-brutal-sm transition-transform duration-75 hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none"
+                            className="flex min-h-11 min-w-11 items-center gap-1.5 border-2 border-outline bg-card px-3 py-1.5 font-mono text-[10px] font-black uppercase tracking-[0.14em] text-ink shadow-brutal-sm transition-transform duration-75 hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none"
                           >
                             <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
                             <span>Expand</span>
@@ -1045,11 +1045,11 @@ export function RadarDemo() {
                   autoComplete="off"
                   spellCheck={false}
                   placeholder="help"
-                  className="flex-1 bg-transparent px-2 py-3 font-mono text-xs text-white outline-none placeholder:text-[#71717A]"
+                  className="min-h-11 flex-1 bg-transparent px-2 py-3 font-mono text-xs text-white outline-none placeholder:text-[#71717A]"
                 />
                 <button
                   type="submit"
-                  className="border-l-4 border-[#3F3F46] bg-accent px-5 font-mono text-[11px] font-black uppercase tracking-[0.18em] text-on-accent transition-colors hover:bg-highlight-strong"
+                  className="min-h-11 min-w-11 border-l-4 border-[#3F3F46] bg-accent px-5 font-mono text-[11px] font-black uppercase tracking-[0.18em] text-on-accent transition-colors hover:bg-highlight-strong"
                 >
                   Run
                 </button>

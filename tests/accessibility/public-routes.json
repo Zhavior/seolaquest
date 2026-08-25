@@ -17,14 +17,15 @@
     },
     {
       "path": "/blog",
-      "title": "SEOlaQuest Blog & Content Engine | Arcade Playbooks & Guild Lore",
+      "title": "SEO Growth & Developer Playbooks | SEOlaQuest Blog",
       "requiredLandmarks": [
         "main"
       ]
     },
     {
       "path": "/blog/no-such-article",
-      "title": "Article Not Found | SEOlaQuest Blog",
+      "title": "Article Not Found | SEOlaQuest",
+      "expectedStatus": 404,
       "requiredLandmarks": [
         "main"
       ]
