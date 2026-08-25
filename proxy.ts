@@ -4,6 +4,7 @@ import { NextResponse } from 'next/server'
 export const PUBLIC_ROUTE_PATTERNS = [
   '/',
   '/pricing',
+  '/radar',
   // Subtree, not prefix. '/blog(.*)' would also have made /blogadmin, /blog-internal
   // and any future /blog<suffix> route public.
   '/blog',
