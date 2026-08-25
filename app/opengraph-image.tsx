@@ -1,6 +1,6 @@
 import { ImageResponse } from 'next/og'
 
-export const alt = 'SEOlaQuest — AI social listening that turns X and Reddit chatter into leads'
+export const alt = 'SEOlaQuest — AI social listening that turns X chatter into leads'
 export const size = { width: 1200, height: 630 }
 export const contentType = 'image/png'
 
@@ -61,7 +61,7 @@ export default function OpengraphImage() {
             </div>
           </div>
           <div style={{ color: '#9CA3AF', fontSize: 30, lineHeight: 1.4 }}>
-            AI scouts watch X and Reddit for your keywords and deliver matched leads automatically.
+            AI scouts watch X for your keywords and deliver matched leads automatically.
           </div>
         </div>
 

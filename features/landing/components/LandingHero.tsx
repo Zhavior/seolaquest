@@ -5,7 +5,6 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { sfx } from '@/lib/sfx'
 import { BadgeCheck, ChevronDown, Compass, Radar, Swords, Zap } from 'lucide-react'
 import Link from 'next/link'
-import PixelParticleBackground from './PixelParticleBackground'
 
 const fadeUp = {
   hidden: { opacity: 0, y: 18 },
@@ -24,7 +23,7 @@ const quests = [
     title: 'Pain spike detected',
     detail: 'Repeated frustration around slow prospecting and weak demand validation.',
     tag: 'Rare',
-    source: 'Reddit thread · SaaS founders',
+    source: 'X posts · SaaS founders',
     snippet:
       'We keep hearing the same thing: teams waste hours scraping scattered conversations and still leave unsure which pain point is real enough to build around.',
   },
@@ -218,8 +217,6 @@ export function LandingHero() {
 
   return (
     <section className="relative z-10 overflow-hidden bg-canvas px-4 pb-16 pt-24 sm:px-6 sm:pb-24 sm:pt-32">
-      <PixelParticleBackground />
-
       {/* Plain opacity, not mix-blend-multiply. axe cannot compute contrast through a
           blended layer that overlaps text, so this one layer produced 14 false
           "black on near-black" violations on an otherwise readable hero. At 4%
@@ -312,7 +309,7 @@ export function LandingHero() {
             variants={fadeUp}
             className="mt-4 flex max-w-xl flex-wrap gap-2"
           >
-            {['Scanning Reddit', 'Scanning X', 'Live signal review', 'Evidence-first workflow'].map((badge) => (
+            {['Scanning X', 'Buyer-intent scoring', 'Live signal review', 'Evidence-first workflow'].map((badge) => (
               <span
                 key={badge}
                 className="inline-flex items-center border-2 border-outline/80 bg-highlight px-3 py-1 text-[10px] font-black uppercase tracking-[0.14em] text-on-accent shadow-brutal-sm"

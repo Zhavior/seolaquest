@@ -46,3 +46,17 @@ jobs:
       # the same three steps locally with .env and .env.local removed.
       - name: Unit and contract tests
         run: npm test
+
+      # The build is what makes the bundle budget measurable — the check reads
+      # the prerendered HTML that `next build` emits. Verified to succeed with no
+      # .env files present, which is the state of this runner: `.env*` is
+      # gitignored and this job requests no secrets.
+      - name: Build
+        run: npm run build
+
+      # Guards against a heavy library reaching a route through a static import.
+      # This exists because `@next/bundle-analyzer` is a webpack plugin and emits
+      # nothing under Turbopack, so `ANALYZE=true` was silently a no-op and a
+      # 875 KB regression sat on the landing page unnoticed.
+      - name: Bundle budget
+        run: npm run bundle:check

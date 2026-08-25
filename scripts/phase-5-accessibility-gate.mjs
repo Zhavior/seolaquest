@@ -522,6 +522,7 @@ async function inspectZoom(client) {
 function evaluateRoute(route, desktop, narrow, zoom, baseUrl) {
   const failures = []
   const expectedUrl = new URL(route.path, `${baseUrl}/`)
+  const expectedStatus = route.expectedStatus ?? 200
 
   for (const result of [desktop, narrow]) {
     const label = result.profile
@@ -532,8 +533,8 @@ function evaluateRoute(route, desktop, narrow, zoom, baseUrl) {
       failures.push(`${label}: browser ended on an invalid URL (${result.page.finalUrl})`)
     }
 
-    if (result.page.status && result.page.status >= 400) {
-      failures.push(`${label}: document returned HTTP ${result.page.status}`)
+    if (result.page.status !== expectedStatus) {
+      failures.push(`${label}: document returned HTTP ${result.page.status}, expected ${expectedStatus}`)
     }
     if (finalUrl && (finalUrl.origin !== expectedUrl.origin || finalUrl.pathname !== expectedUrl.pathname)) {
       failures.push(`${label}: redirected to ${finalUrl.href}`)
@@ -602,6 +603,9 @@ async function main() {
   for (const route of manifest.routes) {
     if (!route.path?.startsWith('/') || !route.title || !Array.isArray(route.requiredLandmarks)) {
       failPrerequisite(`invalid route manifest entry: ${JSON.stringify(route)}`)
+    }
+    if (route.expectedStatus !== undefined && (!Number.isInteger(route.expectedStatus) || route.expectedStatus < 100 || route.expectedStatus > 599)) {
+      failPrerequisite(`invalid expectedStatus in route manifest entry: ${JSON.stringify(route)}`)
     }
     if (routePaths.has(route.path)) failPrerequisite(`duplicate route path in manifest: ${route.path}`)
     if (expectedTitles.has(route.title)) failPrerequisite(`duplicate expected route title in manifest: ${route.title}`)

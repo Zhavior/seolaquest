@@ -1,7 +1,7 @@
 'use client'
 
-import { Canvas, useFrame } from '@react-three/fiber'
-import { useMemo, useRef } from 'react'
+import { Canvas, useFrame, useThree } from '@react-three/fiber'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import * as THREE from 'three'
 
 const PARTICLE_COUNT = 3750
@@ -14,9 +14,26 @@ function createRng(seed: number) {
   }
 }
 
+// `window.devicePixelRatio` is a live property, so reading it inside the frame
+// loop asked the browser for it 60 times a second. It only ever changes when the
+// window moves between displays or the page zooms, which `resize` already covers.
+function useDevicePixelRatio() {
+  const [dpr, setDpr] = useState(1)
+
+  useEffect(() => {
+    const read = () => setDpr(Math.min(window.devicePixelRatio || 1, 2))
+    read()
+    window.addEventListener('resize', read)
+    return () => window.removeEventListener('resize', read)
+  }, [])
+
+  return dpr
+}
+
 function PixelParticleCloud({ count = PARTICLE_COUNT }: { count?: number }) {
   const pointsRef = useRef<THREE.Points>(null)
   const materialRef = useRef<THREE.ShaderMaterial>(null)
+  const pixelRatio = useDevicePixelRatio()
 
   const geometry = useMemo(() => {
     const rng = createRng(1337 + count)
@@ -87,7 +104,7 @@ function PixelParticleCloud({ count = PARTICLE_COUNT }: { count?: number }) {
     if (!points || !material) return
 
     material.uniforms.uTime.value = state.clock.elapsedTime
-    material.uniforms.uPixelRatio.value = Math.min(window.devicePixelRatio || 1, 2)
+    material.uniforms.uPixelRatio.value = pixelRatio
     points.rotation.z = Math.sin(state.clock.elapsedTime * 0.05) * 0.015
     points.rotation.x = Math.cos(state.clock.elapsedTime * 0.04) * 0.01
   })
@@ -154,14 +171,74 @@ function PixelParticleCloud({ count = PARTICLE_COUNT }: { count?: number }) {
   )
 }
 
+// Drives the render loop only while `active`. The Canvas stays in `demand` mode,
+// which paints once on mount (so the field is never blank) and then renders only
+// when we ask it to.
+//
+// Preferred over toggling `frameloop` between 'always' and 'never': a Canvas
+// mounted as 'never' has never started its loop, and whether flipping the prop
+// reliably starts it is version-dependent. `demand` + explicit invalidate has one
+// documented behaviour and does not depend on that.
+function FrameDriver({ active }: { active: boolean }) {
+  const invalidate = useThree((state) => state.invalidate)
+
+  useEffect(() => {
+    if (!active) return
+
+    let raf = 0
+    const tick = () => {
+      invalidate()
+      raf = requestAnimationFrame(tick)
+    }
+    raf = requestAnimationFrame(tick)
+
+    return () => cancelAnimationFrame(raf)
+  }, [active, invalidate])
+
+  return null
+}
+
 export default function PixelParticleBackground() {
+  const containerRef = useRef<HTMLDivElement>(null)
+  // The hero scrolls away but the canvas kept drawing 5,000 shaded points for
+  // the whole session, on a background layer nobody could see. Gating the
+  // frameloop is invisible while the hero is on screen and stops the GPU work
+  // once it isn't — or once the tab is backgrounded.
+  const [isActive, setIsActive] = useState(false)
+
+  useEffect(() => {
+    const node = containerRef.current
+    if (!node) return
+
+    let isOnScreen = false
+
+    const sync = () => setIsActive(isOnScreen && !document.hidden)
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        isOnScreen = entry.isIntersecting
+        sync()
+      },
+      { threshold: 0 },
+    )
+    observer.observe(node)
+    document.addEventListener('visibilitychange', sync)
+
+    return () => {
+      observer.disconnect()
+      document.removeEventListener('visibilitychange', sync)
+    }
+  }, [])
+
   return (
-    <div className="pointer-events-none absolute inset-0 z-[1] overflow-hidden">
+    <div ref={containerRef} className="pointer-events-none absolute inset-0 z-[1] overflow-hidden">
       <Canvas
+        frameloop="demand"
         dpr={[1, 2]}
         camera={{ position: [0, 0, 14], fov: 42 }}
         gl={{ antialias: false, alpha: true, powerPreference: 'high-performance' }}
       >
+        <FrameDriver active={isActive} />
         <PixelParticleCloud count={5000} />
       </Canvas>
     </div>

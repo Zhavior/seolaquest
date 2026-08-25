@@ -6,6 +6,7 @@ import { LandingNav } from '@/features/landing/components/LandingNav'
 import { LandingHero } from '@/features/landing/components/LandingHero'
 import { LandingFeatures } from '@/features/landing/components/LandingFeatures'
 import { HomepageOAuthDisclosure } from '@/features/landing/components/HomepageOAuthDisclosure'
+import { LandingRadarDemo } from '@/features/landing/components/LandingRadarDemo'
 
 // Title, description, and Open Graph defaults come from the root layout; only
 // the URL-bearing fields are declared here, because a canonical set in the
@@ -65,6 +66,7 @@ export default function LandingPage() {
       <main className="relative z-10">
         <LandingHero />
         <ManaEngineDemo />
+        <LandingRadarDemo />
         <LandingFeatures />
         <HomepageOAuthDisclosure />
         <GuildLeaderboardWins />

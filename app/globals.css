@@ -728,3 +728,17 @@ html.sfx-muted .sfx-icon-off {
 html.sfx-muted .sfx-icon-on {
   display: none;
 }
+
+
+/* Entrances for the radar simulator. Defined here rather than inline so the
+   `motion-safe:animate-[...]` utilities on /radar and the homepage demo resolve
+   to real keyframes; both are skipped outright under reduced motion. */
+@keyframes radar-rise {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes radar-fade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}

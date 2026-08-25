@@ -11,6 +11,8 @@
     "test:watch": "vitest",
     "test:integration": "dotenv -e .env.local -- cross-env EVENT_CORE_INTEGRATION_TEST=true PHASE45_INTEGRATION_TEST=true BILLING_INTEGRATION_TEST=true vitest run",
     "test:a11y": "bash scripts/phase-5-accessibility-gate.sh",
+    "bundle:check": "node scripts/check-bundle-size.mjs",
+    "bundle:report": "node scripts/check-bundle-size.mjs --report",
     "db": "dotenv -e .env.local -- prisma",
     "db:migrate": "dotenv -e .env.local -- prisma migrate dev",
     "db:deploy": "dotenv -e .env.local -- prisma migrate deploy",

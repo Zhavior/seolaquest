@@ -67,6 +67,8 @@ describe('Clerk public route boundary', () => {
     '/onboarding',
     '/app',
     '/app/keywords',
+    '/radar-admin',
+    '/radar/extra',
     '/api/v1/user/me',
     '/api/v1/cron/jobs/extra',
     '/api/v1/cron/scan',
@@ -82,6 +84,7 @@ describe('Clerk public route boundary', () => {
   it.each([
     '/',
     '/pricing',
+    '/radar',
     '/blog',
     '/blog/phase-zero',
     '/status',

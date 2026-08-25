@@ -7,7 +7,7 @@ export function LandingNavClient() {
   const { isLoaded, userId } = useAuth()
 
   if (!isLoaded) {
-    return <div className="h-10 w-10 rounded-full border-[3px] border-outline bg-card shadow-brutal-sm motion-safe:animate-pulse" />
+    return <div className="h-11 w-11 rounded-full border-[3px] border-outline bg-card shadow-brutal-sm motion-safe:animate-pulse" />
   }
 
   if (userId) {
@@ -25,10 +25,12 @@ export function LandingNavClient() {
             LVL 01
           </div>
 
-          <div className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-full border-[3px] border-outline bg-card shadow-brutal-sm sm:h-10 sm:w-10">
+          <div className="flex h-11 w-11 items-center justify-center overflow-hidden rounded-full border-[3px] border-outline bg-card shadow-brutal-sm">
             <UserButton
               appearance={{
                 elements: {
+                  rootBox: 'h-full w-full',
+                  userButtonTrigger: 'h-full w-full',
                   avatarBox: 'h-full w-full',
                   userButtonAvatarBox: 'h-full w-full',
                 },
