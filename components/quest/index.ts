@@ -15,6 +15,7 @@ export { QuestPageHeader, type QuestPageHeaderProps } from './QuestPageHeader'
 export { QuestStatusPill, type QuestStatusPillProps } from './QuestStatusPill'
 export { QuestCountGrid, type QuestCount, type QuestCountGridProps } from './QuestCountGrid'
 export { QuestPageSkeleton, type QuestPageSkeletonProps } from './QuestPageSkeleton'
+export { QuestPending, QuestRoutePending, type QuestPendingProps } from './QuestPending'
 export {
   QuestSkeletonBlock,
   QuestListSkeleton,

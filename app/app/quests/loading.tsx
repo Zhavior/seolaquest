@@ -1,15 +1,11 @@
-import { QuestListSkeleton, QuestRouteSkeleton } from '@/components/quest'
+import { QuestPending, QuestRoutePending } from '@/components/quest'
 
 /**
- * Route-level fallback: the full Quest Board shape, shown while the segment
- * streams in on navigation or first load.
+ * Quiet route boundary shown while the segment streams on navigation or first
+ * load.
  */
 export default function QuestBoardLoading() {
-  return (
-    <QuestRouteSkeleton label="Quest Board">
-      <QuestBoardSkeleton />
-    </QuestRouteSkeleton>
-  )
+  return <QuestRoutePending label="Opening Quest Board" />
 }
 
 /**
@@ -18,5 +14,5 @@ export default function QuestBoardLoading() {
  * depend on the same assignment read.
  */
 export function QuestBoardSkeleton() {
-  return <QuestListSkeleton count={4} height="h-44" label="Loading quests" />
+  return <QuestPending label="Loading quests" />
 }

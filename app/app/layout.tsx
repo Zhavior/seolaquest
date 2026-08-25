@@ -1,3 +1,4 @@
+import { ClerkProvider } from '@clerk/nextjs'
 import { redirect } from 'next/navigation'
 import { getCurrentUser } from '@/lib/auth'
 import { toShellUser } from '@/lib/shellUser'
@@ -13,5 +14,9 @@ export default async function AppLayout({ children }: { children: React.ReactNod
 
   // The HUD is built here, on the server, and passed down as an already-rendered
   // slot — so the account record never crosses into the client shell.
-  return <SEOlaQuestShell hud={<ShellHud user={await toShellUser(user)} />}>{children}</SEOlaQuestShell>
+  return (
+    <ClerkProvider>
+      <SEOlaQuestShell hud={<ShellHud user={await toShellUser(user)} />}>{children}</SEOlaQuestShell>
+    </ClerkProvider>
+  )
 }

@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react'
 import { render, screen, within } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 
@@ -7,6 +8,7 @@ vi.mock('@/lib/auth', () => ({
 
 // The shell's Log Out control calls useClerk(), which requires a ClerkProvider.
 vi.mock('@clerk/nextjs', () => ({
+  ClerkProvider: ({ children }: { children: ReactNode }) => children,
   useClerk: () => ({ signOut: vi.fn() }),
 }))
 
@@ -34,4 +36,3 @@ describe('authenticated app layout', () => {
     expect(within(main).getByText('Authenticated content')).toBeInTheDocument()
   })
 })
-

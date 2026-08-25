@@ -1,4 +1,4 @@
-import { SignUp } from '@clerk/nextjs'
+import { ClerkProvider, SignUp } from '@clerk/nextjs'
 import Link from 'next/link'
 import type { Metadata } from 'next'
 
@@ -9,7 +9,8 @@ export const metadata: Metadata = {
 
 export default function Page() {
   return (
-    <main className="flex min-h-screen w-full flex-col items-center justify-center bg-canvas px-4 py-8 text-ink">
+    <ClerkProvider>
+      <main className="flex min-h-screen w-full flex-col items-center justify-center bg-canvas px-4 py-8 text-ink">
       <Link href="/" className="mb-5 inline-flex min-h-11 items-center text-2xl font-black uppercase tracking-widest focus-visible:outline-4 focus-visible:outline-offset-4">
         SEOlaQuest
       </Link>
@@ -45,6 +46,7 @@ export default function Page() {
           }}
         />
       </section>
-    </main>
+      </main>
+    </ClerkProvider>
   )
 }

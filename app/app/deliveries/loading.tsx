@@ -1,12 +1,8 @@
-import { QuestListSkeleton, QuestRouteSkeleton } from '@/components/quest'
+import { QuestPending, QuestRoutePending } from '@/components/quest'
 
-/** Route-level fallback: the full Campaign Broadcast shape. */
+/** Quiet route boundary used while Campaign Broadcast streams. */
 export default function DeliveriesLoading() {
-  return (
-    <QuestRouteSkeleton label="Campaign Broadcast">
-      <DeliveryListSkeleton />
-    </QuestRouteSkeleton>
-  )
+  return <QuestRoutePending label="Opening Campaign Broadcast" />
 }
 
 /**
@@ -14,5 +10,5 @@ export default function DeliveriesLoading() {
  * own chrome synchronously.
  */
 export function DeliveryListSkeleton() {
-  return <QuestListSkeleton count={3} height="h-36" label="Loading CRM deliveries" />
+  return <QuestPending label="Loading CRM deliveries" />
 }

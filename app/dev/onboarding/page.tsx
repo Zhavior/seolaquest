@@ -1,3 +1,4 @@
+import { ClerkProvider } from '@clerk/nextjs'
 import { notFound } from 'next/navigation'
 import OnboardingForm from '@/app/onboarding/OnboardingForm'
 
@@ -29,16 +30,18 @@ async function PreviewBody({ searchParams }: { searchParams: Promise<{ step?: st
   const onboardingStep = Number.isFinite(parsed) ? Math.min(Math.max(parsed, 1), 6) : 1
 
   return (
-    <OnboardingForm
-      initialDraft={{
-        displayName: 'Signal Sage',
-        profileIconKey: 'sword',
-        businessDescription: 'Accessible websites for local service businesses.',
-        targetCustomer: 'Plumbers and electricians without a booking page.',
-        firstKeyword: 'can anyone recommend',
-        preferredSource: 'X',
-        onboardingStep,
-      }}
-    />
+    <ClerkProvider>
+      <OnboardingForm
+        initialDraft={{
+          displayName: 'Signal Sage',
+          profileIconKey: 'sword',
+          businessDescription: 'Accessible websites for local service businesses.',
+          targetCustomer: 'Plumbers and electricians without a booking page.',
+          firstKeyword: 'can anyone recommend',
+          preferredSource: 'X',
+          onboardingStep,
+        }}
+      />
+    </ClerkProvider>
   )
 }
