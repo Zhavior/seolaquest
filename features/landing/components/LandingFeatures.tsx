@@ -5,18 +5,18 @@ import { QuestPanel, questSurface } from '@/components/quest'
 const features = [
   {
     icon: Target,
-    title: 'Spot repeat buyer pain',
-    body: 'Capture recurring public pain points and review the exact posts, phrases, and signals behind each result.'
+    title: 'Find relevant conversations',
+    body: 'Track the problems, competitors, and phrases your potential customers discuss on X.'
   },
   {
     icon: Compass,
-    title: 'Pick the next problem to validate',
-    body: 'Review patterns, compare signals, and decide which customer problems are worth validating next.'
+    title: 'Keep the context',
+    body: 'Review the original source posts alongside scored matches before deciding what deserves attention.'
   },
   {
     icon: Gem,
-    title: 'Keep coverage and limits visible',
-    body: 'Source limits, coverage gaps, and product boundaries stay visible so you can trust what the signal actually means.'
+    title: 'Choose your next conversation',
+    body: 'Use what you find to shape customer interview questions, investigate a feature idea, or prepare a relevant response.'
   },
 ]
 
@@ -28,14 +28,14 @@ export function LandingFeatures() {
           What you get
         </p>
         <h2 className="mt-2 text-3xl font-black uppercase tracking-[-0.04em] text-ink sm:text-4xl">
-          Practical signal research, not vague dashboards
+          Bring evidence to your next decision
         </h2>
       </div>
       <div className="grid gap-5 md:grid-cols-3">
         {features.map((feature) => {
           const Icon = feature.icon
           return (
-            <QuestPanel as="article" key={feature.title} interactive padding="none" className="p-6">
+            <QuestPanel as="article" key={feature.title} padding="none" className="p-6">
               <span
                 aria-hidden="true"
                 className={questSurface({

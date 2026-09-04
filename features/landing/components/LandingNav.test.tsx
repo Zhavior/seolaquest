@@ -24,11 +24,12 @@ describe('LandingNav mobile usability', () => {
 
     const nav = screen.getByRole('navigation', { name: 'SEOlaQuest navigation' })
     const signIn = screen.getByRole('link', { name: 'Sign in' })
-    const createAccount = screen.getByRole('link', { name: 'Start free' })
+    const createAccount = screen.getByRole('link', { name: 'Try the demo' })
 
     expect(nav).toHaveClass('pt-[env(safe-area-inset-top)]')
     expect(signIn).toBeVisible()
     expect(createAccount).toBeVisible()
+    expect(createAccount).toHaveAttribute('href', '/#demo')
     expect(signIn).toHaveClass('min-h-11')
     expect(createAccount).toHaveClass('min-h-11')
     expect(signIn.className).not.toContain('hidden')

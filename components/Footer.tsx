@@ -19,8 +19,8 @@ export function Footer() {
             <Link href="/" className="inline-flex items-center gap-2 text-xl font-black uppercase text-[#FFE600]">
               <Zap className="fill-[#FFE600]" /> SEOlaQuest Engine
             </Link>
-            <p className="mt-2 text-sm font-bold leading-relaxed text-ink-muted">
-              Scan public conversations, review real evidence, and keep product limits visible instead of hidden behind sales copy.
+            <p className="mt-2 text-sm font-bold leading-relaxed text-white/75">
+              Find relevant customer conversations on X. Review the source and decide what to investigate next.
             </p>
           </div>
           <div className="flex flex-col items-start gap-4 md:items-end md:justify-start">
@@ -28,7 +28,7 @@ export function Footer() {
               href="/sign-up"
               className="inline-flex items-center gap-2 border-4 border-outline bg-accent px-5 py-3 text-sm font-black uppercase text-on-accent shadow-[6px_6px_0_0_#ff5a36] transition-transform duration-150 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[8px_8px_0_0_#ff5a36]"
             >
-              Start free
+              Create free account
               <ArrowRight size={16} />
             </Link>
 

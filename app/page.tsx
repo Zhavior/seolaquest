@@ -12,6 +12,8 @@ import { LandingRadarDemo } from '@/features/landing/components/LandingRadarDemo
 // the URL-bearing fields are declared here, because a canonical set in the
 // layout would be inherited by every other page.
 export const metadata = {
+  title: 'SEOlaQuest | Customer Research on X',
+  description: 'Find customer problems and requests for alternatives in public X conversations. Review source posts and buyer signals. Try the interactive sample demo.',
   alternates: { canonical: '/' },
   openGraph: { url: '/' },
 }

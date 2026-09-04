@@ -11,10 +11,10 @@ export function LandingNavClient() {
       </Link>
 
       <Link
-        href="/sign-up"
+        href="/#demo"
         className="inline-flex min-h-11 shrink-0 items-center border-[3px] border-outline bg-accent-2 px-3 py-2 font-black uppercase tracking-[0.14em] text-on-accent shadow-brutal-sm transition-transform duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-brutal-sm active:translate-x-[2px] active:translate-y-[2px] active:shadow-none sm:px-4 sm:text-sm"
       >
-        Start free
+        Try the demo
       </Link>
     </div>
   )
