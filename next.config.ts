@@ -13,6 +13,7 @@ const nextConfig: NextConfig = {
   reactStrictMode: true,
   experimental: {
     optimizePackageImports: ["lucide-react", "framer-motion"],
+    staleTimes: { dynamic: 30 },
   },
   // Turbopack watcher — ignore log files so they don't trigger HMR reloads
   turbopack: {

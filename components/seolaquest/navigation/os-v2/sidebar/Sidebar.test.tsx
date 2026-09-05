@@ -4,6 +4,7 @@ import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 
 const signOutMock = vi.fn()
+const prefetchMock = vi.fn()
 
 vi.mock('@clerk/nextjs', () => ({
   useClerk: () => ({ signOut: signOutMock }),
@@ -11,6 +12,7 @@ vi.mock('@clerk/nextjs', () => ({
 
 vi.mock('next/navigation', () => ({
   usePathname: () => '/app',
+  useRouter: () => ({ prefetch: prefetchMock }),
 }))
 
 vi.mock('next/link', () => ({
@@ -62,6 +64,15 @@ describe('SEOlaQuest OS Sidebar', () => {
     expect(screen.getByRole('link', { name: /QUEST BOARD/ })).toHaveAttribute('href', '/app/quests')
     expect(screen.getByRole('link', { name: /SCAN RUNS/ })).toHaveAttribute('href', '/app/runs')
     expect(screen.getByRole('link', { name: /QUEST BOARD/ })).not.toHaveTextContent('12')
+  })
+
+  it('warms a destination when the user shows intent', async () => {
+    prefetchMock.mockClear()
+    renderSidebar()
+
+    await userEvent.hover(screen.getByRole('link', { name: /QUEST BOARD/ }))
+
+    expect(prefetchMock).toHaveBeenCalledWith('/app/quests')
   })
 
   it('shows Admin only when the server authorizes it, including the mobile drawer and collapsed rail', () => {

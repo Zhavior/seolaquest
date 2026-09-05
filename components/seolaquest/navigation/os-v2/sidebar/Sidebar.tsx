@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { LogOut, X, Sparkles, PanelLeftOpen, ShieldCheck } from 'lucide-react'
 import LogOutButton from '@/components/auth/LogOutButton'
 import { sfx } from '@/lib/sfx'
@@ -150,6 +150,7 @@ function NavigationContent({
   onToggleCollapsed?: () => void
 }) {
   const pathname = usePathname()
+  const router = useRouter()
   const items: NavigationItem[] = isAdmin
     ? [...navigation, { label: 'Admin', href: '/app/admin', icon: ShieldCheck, section: 'system' }]
     : navigation
@@ -196,8 +197,14 @@ function NavigationContent({
                 key={item.href}
                 href={item.href}
                 aria-current={isActive ? 'page' : undefined}
-                onMouseEnter={() => sfx.playSidebarHover()}
-                onFocus={() => sfx.playSidebarHover()}
+                onMouseEnter={() => {
+                  router.prefetch(item.href)
+                  sfx.playSidebarHover()
+                }}
+                onFocus={() => {
+                  router.prefetch(item.href)
+                  sfx.playSidebarHover()
+                }}
                 onClick={() => sfx.playCoinDrop()}
                 title={`${item.label} (${item.hotkey || ''})`}
                 className={`relative group grid size-11 place-items-center rounded-[20px] border border-outline transition-all ${
@@ -297,8 +304,14 @@ function NavigationContent({
                       key={item.href}
                       href={item.href}
                 aria-current={isActive ? 'page' : undefined}
-                      onMouseEnter={() => sfx.playSidebarHover()}
-                      onFocus={() => sfx.playSidebarHover()}
+                      onMouseEnter={() => {
+                        router.prefetch(item.href)
+                        sfx.playSidebarHover()
+                      }}
+                      onFocus={() => {
+                        router.prefetch(item.href)
+                        sfx.playSidebarHover()
+                      }}
                       onClick={() => {
                         sfx.playCoinDrop()
                         onNavigate?.()
