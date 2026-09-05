@@ -19,24 +19,14 @@ export function LandingNav() {
               SEOlaQuest
             </span>
             <span className="font-mono text-[9px] uppercase tracking-[0.22em] text-ink-muted sm:text-[10px]">
-              {'// REALM v1.0'}
+              Customer research on X
             </span>
           </div>
         </div>
 
-        <div className="hidden items-center gap-3 md:flex">
-          <div className="flex items-center gap-2 border-[3px] border-outline bg-card px-3 py-1.5 shadow-brutal-sm">
-            <span className="h-2.5 w-2.5 rounded-full bg-[#00c951] motion-safe:animate-pulse motion-reduce:animate-none" />
-            <span className="font-mono text-[11px] font-black uppercase tracking-[0.18em] text-ink">
-              RADAR ONLINE
-            </span>
-          </div>
-          <Link
-            href="/privacy"
-            className="border-[3px] border-outline bg-card px-3 py-1.5 font-mono text-[11px] font-black uppercase tracking-[0.18em] text-ink shadow-brutal-sm transition-transform duration-75 hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none"
-          >
-            Privacy
-          </Link>
+        <div className="hidden items-center gap-5 lg:flex">
+          <Link href="/#how-it-works" className="inline-flex min-h-11 items-center text-sm font-bold underline-offset-4 hover:underline">How it works</Link>
+          <Link href="/pricing" className="inline-flex min-h-11 items-center text-sm font-bold underline-offset-4 hover:underline">Pricing</Link>
         </div>
 
         <LandingNavClient />

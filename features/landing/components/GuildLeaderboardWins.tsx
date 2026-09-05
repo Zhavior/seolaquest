@@ -1,103 +1,66 @@
 import Link from 'next/link'
-import { LockKeyhole, ShieldCheck, Trophy } from 'lucide-react'
+import { PLAN_CATALOG } from '@/src/modules/billing/domain/catalog'
 
-const EVIDENCE_STATUS = [
+const questions = [
   {
-    title: 'Customer outcomes',
-    status: 'Locked // Evidence in progress',
-    detail: 'SEOlaQuest does not yet have verified customer case studies to display.',
-    progressLabel: 'Verified case studies',
-    progressValue: '0 / 5 unlocked',
-    progressPercent: '0%',
+    question: 'What can I try for free?',
+    answer: 'The interactive demo uses sample data and needs no account. A free account lets you save and manage tracked keywords. Manual scans of real conversations require a paid plan and available credits.',
   },
   {
-    title: 'Performance benchmarks',
-    status: 'Locked // Evidence in progress',
-    detail: 'Revenue, conversion, and response-time claims require real production evidence.',
-    progressLabel: 'Benchmarks published',
-    progressValue: '0 / 3 unlocked',
-    progressPercent: '0%',
+    question: 'Which platforms can I research?',
+    answer: 'SEOlaQuest currently supports public conversations on X. Reddit is not enabled for live scans. The demo may include fictional examples from both platforms.',
   },
   {
-    title: 'Public leaderboard',
-    status: 'Locked // Privacy rules pending',
-    detail: 'Tenant activity stays private until an explicit public opt-in model is shipped.',
-    progressLabel: 'Public modes released',
-    progressValue: '0 / 1 unlocked',
-    progressPercent: '0%',
+    question: 'Does a match mean someone will buy?',
+    answer: 'A match is a starting point for research. Review the original post, check the context, and talk to potential customers before assuming demand or willingness to pay.',
+  },
+  {
+    question: 'Why use this instead of searching X myself?',
+    answer: 'SEOlaQuest brings tracked keywords, scored matches, and source links into a review workflow. The demo lets you see whether that workflow fits how you research customers.',
+  },
+  {
+    question: 'Will every scan find an opportunity?',
+    answer: 'No. Results depend on your keywords and the public conversations available from the source. An empty result does not prove there is no demand for your idea.',
   },
 ]
 
 export default function GuildLeaderboardWins() {
+  const beta = PLAN_CATALOG.BETA
   return (
-    <section className="relative z-10 mx-auto my-12 max-w-7xl px-4 pb-8 sm:px-6" aria-labelledby="evidence-heading">
-      <div className="mb-8 flex items-start gap-3">
-        <div className="border-3 border-outline bg-highlight p-2 shadow-brutal-sm">
-          <Trophy size={28} className="text-on-accent" />
-        </div>
+    <section className="relative z-10 mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-24" aria-labelledby="offer-heading">
+      <p className="text-xs font-black uppercase tracking-widest text-ink-muted">Start with the workflow</p>
+      <h2 id="offer-heading" className="mt-3 max-w-3xl text-3xl font-black uppercase tracking-tight sm:text-5xl">Try the demo. Research your market when you’re ready.</h2>
+      <div className="mt-8 grid gap-6 md:grid-cols-2">
+        <article className="border-4 border-outline bg-card p-6 shadow-brutal">
+          <h3 className="text-2xl font-black">Explore for free</h3>
+          <p className="mt-4 leading-relaxed text-ink-muted">Try sample conversations without signing up. Create a free account to save your tracked keywords; manual scan credits are not included.</p>
+          <Link href="/sign-up" className="mt-6 inline-flex min-h-12 items-center border-2 border-outline px-5 py-3 font-bold shadow-brutal-sm focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-ink">Create free account</Link>
+        </article>
+        <article className="border-4 border-outline bg-highlight p-6 text-on-accent shadow-brutal">
+          <h3 className="text-2xl font-black">Research real conversations</h3>
+          <p className="mt-3 text-3xl font-black">{beta.priceLabel}</p>
+          <p className="mt-4 leading-relaxed">{beta.name} includes {beta.scanLimit.toLocaleString('en-US')} scan credits per paid billing period. Review the available plans and usage terms before choosing.</p>
+          <Link href="/pricing" className="mt-6 inline-flex min-h-12 items-center border-2 border-outline bg-black px-5 py-3 font-bold text-white shadow-brutal-sm focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-ink">Compare plans</Link>
+        </article>
+      </div>
 
-        <div>
-          <h2 id="evidence-heading" className="text-3xl font-black uppercase text-ink sm:text-4xl">
-            Evidence before big claims
-          </h2>
-          <p className="text-xs font-black uppercase tracking-[0.16em] text-ink-muted">
-            Current public proof status
-          </p>
+      <div className="mx-auto mt-20 max-w-3xl">
+        <h2 className="text-3xl font-black uppercase tracking-tight">Before you start</h2>
+        <div className="mt-6 divide-y-2 divide-outline border-y-2 border-outline">
+          {questions.map(({ question, answer }) => (
+            <details key={question} className="group py-1">
+              <summary className="cursor-pointer py-5 pr-4 text-lg font-bold focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-ink">{question}</summary>
+              <p className="pb-6 pr-4 leading-relaxed text-ink-muted">{answer}</p>
+            </details>
+          ))}
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-        {EVIDENCE_STATUS.map((item) => (
-          <article
-            key={item.title}
-            className="flex h-full flex-col justify-between border-4 border-outline bg-card p-6 shadow-brutal"
-          >
-            <div>
-              <div className="mb-4 flex items-center gap-3">
-                <div className="border-2 border-outline bg-accent p-2 shadow-brutal-sm">
-                  <ShieldCheck className="h-5 w-5 text-on-accent" />
-                </div>
-                <h3 className="text-lg font-black uppercase text-ink">{item.title}</h3>
-              </div>
-
-              <p className="font-bold leading-relaxed text-ink-muted">{item.detail}</p>
-
-              <div className="mt-5 border-3 border-outline bg-[#f7f1e8] p-3">
-                <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-[0.14em] text-on-accent sm:text-[11px]">
-                  <span>{item.progressLabel}</span>
-                  <span>{item.progressValue}</span>
-                </div>
-                <div className="mt-2 h-4 border-2 border-outline bg-card">
-                  <div className="h-full w-0 bg-accent" style={{ width: item.progressPercent }} />
-                </div>
-              </div>
-            </div>
-
-            <div className="mt-6 flex items-center gap-2 border-t-2 border-outline pt-3 text-xs font-black uppercase tracking-[0.12em] text-ink">
-              <LockKeyhole className="h-4 w-4" />
-              {item.status}
-            </div>
-          </article>
-        ))}
-      </div>
-
-      <div className="mt-12 border-4 border-outline bg-black px-6 py-10 text-center text-white shadow-[8px_8px_0_0_#ff5a36] sm:px-10">
-        <p className="text-xs font-black uppercase tracking-[0.22em] text-[#FFE600]">Start researching</p>
-        <h3 className="mt-4 text-3xl font-black uppercase leading-none sm:text-5xl">
-          Ready to review your first signal?
-        </h3>
-        <p className="mx-auto mt-4 max-w-2xl text-base font-bold text-white/85 sm:text-lg">
-          Get 50 free scan credits. No credit card required.
-        </p>
-
-        <div className="mt-8 flex justify-center">
-          <Link
-            href="/sign-up"
-            className="inline-flex items-center justify-center border-4 border-outline bg-accent px-8 py-4 text-lg font-black uppercase tracking-[0.14em] text-on-accent shadow-[6px_6px_0_0_#ff5a36] transition-transform duration-150 hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-[3px_3px_0_0_#ff5a36] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none sm:px-10 sm:text-xl"
-          >
-            Start your first scan
-          </Link>
-        </div>
+      <div className="mt-20 border-4 border-outline bg-black px-6 py-12 text-center text-white shadow-[8px_8px_0_0_#ff5a36] sm:px-10">
+        <h2 className="mx-auto max-w-3xl text-3xl font-black uppercase leading-tight sm:text-5xl">Find the conversation behind your next idea.</h2>
+        <p className="mx-auto mt-5 max-w-xl text-lg leading-relaxed text-white/80">Explore a sample from search to signal review. Decide whether the workflow fits your customer research.</p>
+        <Link href="/#demo" className="mt-7 inline-flex min-h-12 items-center justify-center border-4 border-outline bg-accent px-7 py-4 font-black uppercase tracking-wider text-on-accent shadow-[4px_4px_0_0_#ff5a36] transition-transform hover:-translate-y-0.5 focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-white">Try the demo</Link>
+        <p className="mt-4 text-sm text-white/75">Sample data. No signup needed.</p>
       </div>
     </section>
   )

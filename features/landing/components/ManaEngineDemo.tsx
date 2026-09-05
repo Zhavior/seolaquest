@@ -4,40 +4,40 @@ const WORKFLOW = [
   {
     icon: Search,
     stage: 'Stage 01: Define',
-    title: 'Tune the signal lens',
-    body: 'Choose the exact phrases, demand signals, and search angles that matter now.',
+    title: 'Choose a customer problem',
+    body: 'Add keywords for a customer problem, competitor, or request for an alternative.',
   },
   {
     icon: Database,
-    stage: 'Stage 02: Stream',
-    title: 'Watch matches arrive',
-    body: 'Signals appear as a live feed, so the interface feels active instead of batch-processed.',
+    stage: 'Stage 02: Research',
+    title: 'Find relevant conversations',
+    body: 'Scan X for conversations about your problem and review the matches in one place.',
   },
   {
     icon: ShieldCheck,
     stage: 'Stage 03: Inspect',
-    title: 'Open the evidence panel',
-    body: 'Review source matches, confidence notes, and thread context before you move forward.',
+    title: 'Review before you act',
+    body: 'Open the original post, check the context, and decide whether to investigate or respond.',
   },
 ]
 
 export default function ManaEngineDemo() {
   return (
-    <section className="relative z-10 mx-auto max-w-7xl px-4 py-20 sm:px-6 sm:py-32">
+    <section id="how-it-works" className="scroll-mt-24 relative z-10 mx-auto max-w-7xl px-4 py-20 sm:px-6 sm:py-32">
       <div className="mx-auto mb-12 max-w-4xl text-center">
         <div className="mb-4 inline-flex -rotate-1 items-center gap-2 border-4 border-outline bg-[#4169e1] px-4 py-1.5 text-xs font-black uppercase tracking-widest text-white shadow-brutal">
-          <FlaskConical size={16} /> Live signal workflow
+          <FlaskConical size={16} /> From question to evidence
         </div>
 
         <h2 className="text-3xl font-black uppercase leading-none tracking-tight text-ink sm:text-5xl md:text-7xl">
-          Signals stream into decisions
+          Turn a search into a better conversation
         </h2>
 
         <div className="mx-auto mt-6 flex max-w-3xl items-center gap-3 border-4 border-outline bg-[#fff1bf] p-3 text-left font-mono text-[11px] font-bold uppercase tracking-[0.08em] text-on-accent shadow-brutal sm:text-xs">
           <span className="shrink-0 border-2 border-outline bg-accent px-2 py-1 font-black">
-            LIVE MODE
+            HOW IT WORKS
           </span>
-          <span>Streaming preview active // updates pulse in real time inside the demo console.</span>
+          <span>Define your question. Review the sources. Choose your next validation step.</span>
         </div>
       </div>
 
