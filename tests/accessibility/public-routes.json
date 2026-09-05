@@ -3,7 +3,7 @@
   "routes": [
     {
       "path": "/",
-      "title": "SEOlaQuest | AI Social Listening & Lead Monitoring",
+      "title": "SEOlaQuest | Customer Research on X",
       "requiredLandmarks": [
         "main"
       ]
