@@ -117,6 +117,10 @@ describe.skipIf(!enabled)('governed intelligence against PostgreSQL', () => {
     const tracked = await LeadQueryService.tracked(owner)
     expect(tracked.find(row => row.id === item.id)).toMatchObject({ status: 'CONVERTED', outcomes: expect.arrayContaining([expect.objectContaining({ action: 'CONVERT', evidenceKind: 'CUSTOMER_REPORTED' })]) })
     expect((await LeadQueryService.tracked(stranger)).some(row => row.id === item.id)).toBe(false)
+    const pipeline = await LeadQueryService.pipeline(owner)
+    expect(pipeline.reports).toMatchObject({ REPLY: 1, QUALIFY: 1, CONVERT: 1 })
+    expect(pipeline.followUps.some(row => row.id === item.id)).toBe(false)
+    expect((await LeadQueryService.pipeline(stranger)).reports).toEqual({})
     await expect(LeadOutcomeService.history(stranger, item.id)).rejects.toMatchObject({ code: 'NOT_FOUND' })
     await expect(LeadOutcomeService.record({ userId: owner, leadId: item.id,
       idempotencyKey: 'regression', input: { action: 'CONTACT' } })).rejects.toMatchObject({ code: 'CONFLICT' })

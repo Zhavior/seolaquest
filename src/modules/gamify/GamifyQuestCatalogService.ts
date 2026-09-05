@@ -1,5 +1,6 @@
 import type { PrismaClient } from '@prisma/client'
 import { z } from 'zod'
+import { questCompletionAvailable } from './questAvailability'
 import { EventRegistry } from '../core/events/EventRegistry'
 import { DomainError } from '../core/infrastructure/errors'
 import {
@@ -126,7 +127,7 @@ export class GamifyQuestCatalogService {
   }
 
   async listActive(at = new Date(), eventType?: GamifyQuestProgressEvent) {
-    return this.db.gamifyQuest.findMany({
+    const quests = await this.db.gamifyQuest.findMany({
       where: {
         enabled: true,
         ...(eventType ? { eventType } : {}),
@@ -137,5 +138,6 @@ export class GamifyQuestCatalogService {
       },
       orderBy: [{ code: 'asc' }, { version: 'desc' }],
     })
+    return quests.filter(quest => questCompletionAvailable(quest.eventType))
   }
 }

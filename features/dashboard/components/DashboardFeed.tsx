@@ -772,6 +772,16 @@ function DashboardFeedComponent({
               </div>
 
               <div className="space-y-4">
+                <section aria-label="Recommendation evidence" className="rounded-xl border border-hairline bg-canvas p-4">
+                  <h3 className="font-semibold">{activeDetailLead.recommendation?.eligible ? 'Prioritized for review' : 'Needs your review'}</h3>
+                  <p className="mt-1 text-sm text-ink-muted">{activeDetailLead.recommendation?.eligible
+                    ? 'Recent evidence passed the buying-intent and business-fit checks.'
+                    : 'This lead has not passed every current priority check. Review the source before acting.'}</p>
+                  <p className="mt-2 text-xs text-ink-muted">{activeDetailLead.aurora?.evaluatedAt
+                    ? `Evaluated ${new Date(activeDetailLead.aurora.evaluatedAt).toISOString().replace('T', ' ').slice(0, 16)} UTC`
+                    : 'Evaluation time unavailable'} · {activeDetailLead.aurora?.evaluationStatus === 'LIVE' ? 'AI assessment' : 'No live AI assessment'}</p>
+                  <p className="mt-1 text-xs text-ink-muted">Priority scores are estimates, not the probability of making a sale.</p>
+                </section>
                 {/* Intent & Value Banner */}
                 <div className="flex flex-wrap items-center gap-2">
                   {(() => {

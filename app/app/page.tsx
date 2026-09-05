@@ -2,6 +2,7 @@ import nextDynamic from 'next/dynamic'
 import type { Metadata } from 'next'
 import { Suspense } from 'react'
 import AppLoading from './loading'
+import { DashboardOutcomeWorkspace } from '@/features/dashboard/server/outcomeWorkspace'
 import { type DashboardKeyword, type DashboardLead, type DashboardUser } from '@/features/dashboard/types'
 import { requireCurrentUser } from '@/lib/auth'
 import prisma from '@/lib/prisma'
@@ -74,6 +75,7 @@ async function DashboardShellData() {
         dbLeads={dashboardLeads}
         dbAnalytics={[]}
         dbLeaderboard={[]}
+        outcomeWorkspace={<Suspense fallback={<p role="status">Loading follow-up and scan history…</p>}><DashboardOutcomeWorkspace userId={user.id} /></Suspense>}
       />
     </>
   )

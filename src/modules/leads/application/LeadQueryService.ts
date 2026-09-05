@@ -22,6 +22,18 @@ type RankedLead = Omit<DashboardLead, 'sourceCreatedAt' | 'aurora'> & {
 }
 
 export class LeadQueryService {
+  static async pipeline(userId: string) {
+    const [stages, reports, followUps] = await Promise.all([
+      prisma.lead.groupBy({ by: ['status'], where: { userId }, _count: { _all: true } }),
+      prisma.leadOutcome.groupBy({ by: ['action'], where: { lead: { userId }, evidenceKind: 'CUSTOMER_REPORTED' }, _count: { _all: true } }),
+      prisma.lead.findMany({ where: { userId, status: { in: ['CLAIMED', 'CONTACTED', 'REPLIED', 'QUALIFIED'] } },
+        orderBy: [{ createdAt: 'desc' }, { id: 'desc' }], take: 3,
+        select: { id: true, content: true, status: true } }),
+    ])
+    return { stages: Object.fromEntries(stages.map(row => [row.status, row._count._all])),
+      reports: Object.fromEntries(reports.map(row => [row.action, row._count._all])), followUps }
+  }
+
   static async tracked(userId: string) {
     return prisma.lead.findMany({
       where: { userId, status: { in: ['CLAIMED', 'CONTACTED', 'REPLIED', 'QUALIFIED', 'CONVERTED'] } },
