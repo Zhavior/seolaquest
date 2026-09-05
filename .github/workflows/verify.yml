@@ -60,3 +60,37 @@ jobs:
       # 875 KB regression sat on the landing page unnoticed.
       - name: Bundle budget
         run: npm run bundle:check
+
+  governed-postgres:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_PASSWORD: disposable_test_only
+          POSTGRES_DB: governed
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d governed"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      DATABASE_URL: postgresql://postgres:disposable_test_only@127.0.0.1:5432/governed
+      DIRECT_URL: postgresql://postgres:disposable_test_only@127.0.0.1:5432/governed
+      GOVERNED_INTEGRATION_TEST: 'true'
+      PGPASSWORD: disposable_test_only
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx prisma generate
+      - name: Prepare disposable database roles and UTC sessions
+        run: |
+          psql -h 127.0.0.1 -U postgres -d governed -v ON_ERROR_STOP=1 -c 'CREATE ROLE anon; CREATE ROLE authenticated;'
+          psql -h 127.0.0.1 -U postgres -d governed -v ON_ERROR_STOP=1 -c "ALTER DATABASE governed SET timezone TO 'UTC';"
+      - run: npx prisma migrate deploy
+      - run: npx vitest run src/modules/leads/application/GovernedIntelligence.integration.test.ts

@@ -1,7 +1,7 @@
 import clsx from 'clsx'
 
 /**
- * Guild Hall neo-brutalist design tokens.
+ * Quest Journal surface tokens.
  *
  * Single source of truth for the `border-N border-black` + `shadow-[Npx_Npx_0_0_#000]`
  * surface pattern that repeats across the Guild Hall, Quest Log (keywords),
@@ -13,11 +13,11 @@ import clsx from 'clsx'
  */
 
 export const QUEST_COLORS = {
-  parchmentBg: '#FDFBF7',
-  parchmentPanel: '#F4F0EA',
+  parchmentBg: '#FAF8F0',
+  parchmentPanel: '#F3F0E7',
   sand: '#FFF8D9',
-  gold: '#FFE600',
-  ember: '#FF5722',
+  gold: '#E5B75D',
+  ember: '#E5B75D',
   lime: '#A3E635',
   cyan: '#06B6D4',
   mint: '#D9FFE3',
@@ -53,11 +53,11 @@ const TONE_CLASS: Record<QuestTone, string> = {
   parchment: 'bg-canvas text-ink',
   sand: 'bg-highlight text-on-accent',
   gold: 'bg-accent text-on-accent',
-  ember: 'bg-accent-2 text-white',
-  lime: 'bg-success text-on-accent',
-  cyan: 'bg-info text-on-accent',
-  mint: 'bg-[#D9FFE3] text-on-accent',
-  ink: 'bg-black text-white',
+  ember: 'bg-highlight text-on-accent',
+  lime: 'bg-highlight text-on-accent',
+  cyan: 'bg-inset text-ink',
+  mint: 'bg-inset text-ink',
+  ink: 'bg-forest text-on-forest',
   muted: 'bg-inset text-ink',
   none: '',
 }
@@ -77,14 +77,14 @@ const SHADOW_CLASS: Record<QuestShadow, string> = {
 
 const BORDER_CLASS: Record<QuestBorder, string> = {
   0: '',
-  2: 'border-2 border-outline',
-  3: 'border-3 border-outline',
-  4: 'border-4 border-outline',
+  2: 'border border-hairline rounded-xl',
+  3: 'border border-hairline rounded-xl',
+  4: 'border border-hairline rounded-xl',
 }
 
 /** Hover "lift" used by clickable cards (keyword streams, scan runs, features). */
 export const QUEST_LIFT =
-  'transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-brutal-lg motion-reduce:transition-none motion-reduce:hover:translate-x-0 motion-reduce:hover:translate-y-0'
+  'transition-shadow duration-200 hover:shadow-brutal-lg motion-reduce:transition-none'
 
 export type QuestSurfaceOptions = {
   tone?: QuestTone
@@ -103,7 +103,7 @@ export function questSurface({
   className,
 }: QuestSurfaceOptions = {}) {
   return clsx(
-    'min-w-0',
+    'min-w-0 rounded-2xl',
     BORDER_CLASS[border],
     TONE_CLASS[tone],
     SHADOW_CLASS[shadow],
@@ -120,7 +120,7 @@ export function questBadge({
   className,
 }: QuestSurfaceOptions = {}) {
   return clsx(
-    'inline-flex items-center gap-2 px-3 py-1 text-xs font-black uppercase tracking-widest',
+    'inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold tracking-wide',
     BORDER_CLASS[border],
     TONE_CLASS[tone],
     SHADOW_CLASS[shadow],
@@ -136,7 +136,7 @@ export function questButton({
   className,
 }: QuestSurfaceOptions = {}) {
   return clsx(
-    'inline-flex min-h-11 items-center justify-center gap-2 px-6 py-3 text-sm font-black uppercase',
+    'inline-flex min-h-11 rounded-xl items-center justify-center gap-2 px-6 py-3 text-sm font-semibold',
     BORDER_CLASS[border],
     TONE_CLASS[tone],
     SHADOW_CLASS[shadow],
@@ -147,8 +147,8 @@ export function questButton({
 }
 
 /** Section eyebrow text used above panel titles. */
-export const QUEST_EYEBROW = 'text-xs font-black uppercase tracking-wider text-ink-muted'
+export const QUEST_EYEBROW = 'text-xs font-semibold tracking-wider text-ink-muted'
 
 /** Outline applied to large display headings — follows the theme's hard edge. */
-export const QUEST_TITLE_STROKE = { WebkitTextStroke: '2px var(--border-strong)' } as const
-export const QUEST_SUBTITLE_STROKE = { WebkitTextStroke: '1px var(--border-strong)' } as const
+export const QUEST_TITLE_STROKE = { WebkitTextStroke: '0px' } as const
+export const QUEST_SUBTITLE_STROKE = { WebkitTextStroke: '0px' } as const

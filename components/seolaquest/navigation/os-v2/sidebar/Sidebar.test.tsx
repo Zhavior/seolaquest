@@ -21,6 +21,7 @@ vi.mock('next/link', () => ({
   ),
 }))
 
+import { THEME_META } from '@/components/theme/theme-config'
 import { ThemeProvider } from '@/components/theme/ThemeProvider'
 import Sidebar, { SidebarNavigation } from './Sidebar'
 
@@ -44,7 +45,8 @@ describe('SEOlaQuest OS Sidebar', () => {
     expect(screen.getByText('KNOWLEDGE LORE')).toBeInTheDocument()
     expect(screen.getByText('BAZAAR & SUPPLIES')).toBeInTheDocument()
     expect(screen.getByText('ARMORY & SPELLS')).toBeInTheDocument()
-    expect(screen.getByText('Party Status')).toBeInTheDocument()
+    expect(screen.queryByText('Party Status')).not.toBeInTheDocument()
+    expect(screen.getByRole('link', { name: /LIVING HQ/ })).toHaveAttribute('aria-current', 'page')
     expect(screen.getByRole('button', { name: /LOG OUT/i })).toBeInTheDocument()
   })
 
@@ -60,6 +62,27 @@ describe('SEOlaQuest OS Sidebar', () => {
     expect(screen.getByRole('link', { name: /QUEST BOARD/ })).toHaveAttribute('href', '/app/quests')
     expect(screen.getByRole('link', { name: /SCAN RUNS/ })).toHaveAttribute('href', '/app/runs')
     expect(screen.getByRole('link', { name: /QUEST BOARD/ })).not.toHaveTextContent('12')
+  })
+
+  it('shows Admin only when the server authorizes it, including the mobile drawer and collapsed rail', () => {
+    const ordinary = renderSidebar()
+    expect(screen.queryByRole('link', { name: /^Admin/ })).not.toBeInTheDocument()
+    ordinary.unmount()
+
+    const owner = renderSidebar({ isAdmin: true })
+    expect(screen.getByRole('link', { name: /^Admin/ })).toHaveAttribute('href', '/app/admin')
+    owner.unmount()
+
+    const collapsed = renderSidebar({ isAdmin: true, collapsed: true })
+    expect(screen.getByRole('link', { name: /^Admin/ })).toHaveAttribute('href', '/app/admin')
+    collapsed.unmount()
+
+    const mobile = render(<SidebarNavigation mobile isAdmin />, { wrapper: ThemeProvider })
+    expect(screen.getByRole('link', { name: /^Admin/ })).toHaveAttribute('href', '/app/admin')
+    mobile.unmount()
+
+    render(<SidebarNavigation mobile />, { wrapper: ThemeProvider })
+    expect(screen.queryByRole('link', { name: /^Admin/ })).not.toBeInTheDocument()
   })
 
   it('ends the Clerk session instead of only linking to /sign-in', async () => {
@@ -100,7 +123,7 @@ describe('SEOlaQuest OS Sidebar', () => {
       expect(options.every((option) => group.contains(option))).toBe(true)
       // Parchment is the default, so it is the one reporting itself as checked.
       expect(screen.getByRole('radio', { name: 'Parchment (light)' })).toBeChecked()
-      expect(screen.getByRole('radio', { name: 'Grey Mode (dark)' })).not.toBeChecked()
+      expect(screen.getByRole('radio', { name: THEME_META.grey.label })).not.toBeChecked()
     })
 
     it('moves the checked state to the theme the user picks', async () => {
@@ -119,7 +142,7 @@ describe('SEOlaQuest OS Sidebar', () => {
       // Collapsed swatches are colour only — the name has to come from ARIA.
       const group = screen.getByRole('radiogroup', { name: 'Interface theme' })
       expect(screen.getAllByRole('radio')).toHaveLength(3)
-      expect(group.contains(screen.getByRole('radio', { name: 'Grey Mode (dark)' }))).toBe(true)
+      expect(group.contains(screen.getByRole('radio', { name: THEME_META.grey.label }))).toBe(true)
     })
   })
 })

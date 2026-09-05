@@ -1,9 +1,10 @@
 'use client'
 
 import dynamic from 'next/dynamic'
+import Link from 'next/link'
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
-import { Crosshair, Shield, X } from 'lucide-react'
-import { useMemo, useState, useSyncExternalStore } from 'react'
+import { X } from 'lucide-react'
+import { useMemo, useState } from 'react'
 
 import { useDashboardState } from '@/features/dashboard/hooks/useDashboardState'
 import { DashboardStats } from '@/features/dashboard/components/DashboardStats'
@@ -33,28 +34,6 @@ const QuickStrikeReplyModal = dynamic(() => import('@/components/QuickStrikeRepl
 const DashboardScannerModal = dynamic(() =>
   import('@/features/dashboard/components/DashboardScannerModal').then((module) => module.DashboardScannerModal)
 )
-const DeferredBattleAreaCanvas = dynamic(
-  () =>
-    import('@/features/dashboard/components/battle/DeferredBattleAreaCanvas').then(
-      (module) => module.DeferredBattleAreaCanvas
-    ),
-  { ssr: false }
-)
-
-function subscribeDesktop(onChange: () => void) {
-  const mq = window.matchMedia('(min-width: 640px)')
-  mq.addEventListener('change', onChange)
-  return () => mq.removeEventListener('change', onChange)
-}
-
-function getDesktopSnapshot() {
-  return window.matchMedia('(min-width: 640px)').matches
-}
-
-function getDesktopServerSnapshot() {
-  return false
-}
-
 export default function DashboardClient({
   dbUser,
   dbKeywords,
@@ -82,7 +61,6 @@ export default function DashboardClient({
   const [activeMobileTab, setActiveMobileTab] = useState<'overview' | 'signals' | 'guild'>('overview')
   const shouldReduceMotion = useReducedMotion()
   const reveal = dashboardReveal(shouldReduceMotion)
-  const isDesktop = useSyncExternalStore(subscribeDesktop, getDesktopSnapshot, getDesktopServerSnapshot)
 
   const isOverview = activeMobileTab === 'overview'
   const isSignals = activeMobileTab === 'signals'
@@ -134,19 +112,7 @@ export default function DashboardClient({
   }
 
   return (
-    <div className="relative min-h-[100dvh] w-full max-w-full overflow-x-hidden bg-surface px-4 pb-16 pt-4 font-black text-ink select-none md:px-8 md:pb-16 md:pt-6">
-      <div
-        className="pointer-events-none absolute inset-0 z-0 opacity-[0.07]"
-        style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
-          mixBlendMode: 'multiply',
-        }}
-      />
-
-      <div className="pointer-events-none absolute top-0 right-0 -mt-24 -mr-24 hidden opacity-[0.05] md:block">
-        <Crosshair className="h-[650px] w-[650px] text-ink" aria-hidden />
-      </div>
-
+    <div className="relative min-h-[100dvh] w-full max-w-full overflow-x-hidden bg-canvas px-2 pb-12 pt-3 text-ink sm:px-4 md:px-6 md:pb-12 md:pt-5">
       <AnimatePresence mode="wait">
         {state.activeQuickStrikeLead ? (
           <QuickStrikeReplyModal
@@ -179,33 +145,25 @@ export default function DashboardClient({
               className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between"
             >
               <div className="min-w-0">
-                <div className="mb-1 flex items-center gap-3">
-                  <Shield className="h-7 w-7 shrink-0 text-[#FF5722]" aria-hidden />
-                  <span className="-rotate-1 border-2 border-outline bg-black px-3 py-1 text-xs font-black uppercase tracking-widest text-[#FFE600]">
-                    Mission Control
-                  </span>
-                </div>
-                <h1
-                  className="text-4xl uppercase tracking-tight text-white drop-shadow-brutal-lg sm:text-5xl md:text-6xl"
-                  style={{ WebkitTextStroke: '2px black' }}
-                >
-                  Command Center
+                <p className="mb-2 text-xs font-medium tracking-wide text-ink-muted">Your growth journal</p>
+                <h1 className="font-display text-4xl leading-tight tracking-tight text-ink sm:text-5xl">
+                  One useful step at a time.
                 </h1>
-                <p className="mt-2 inline-block border-2 border-outline bg-black px-3 py-1 text-sm uppercase text-white md:text-base">
+                <p className="mt-3 text-sm text-ink-muted">
                   {state.user.name} · Lv {state.user.level} · {state.characterTitle}
                 </p>
               </div>
 
               <div className="flex flex-wrap items-center gap-2">
-                <div className="border-4 border-outline bg-card px-4 py-3 shadow-brutal">
-                  <p className="text-[10px] font-bold uppercase text-ink-muted">Scan credits</p>
-                  <p className="text-lg font-black uppercase leading-none text-ink">
+                <div className="rounded-[20px] border border-outline bg-card px-4 py-3 shadow-sm">
+                  <p className="text-[10px] font-medium normal-case text-ink-muted">Scan credits</p>
+                  <p className="text-lg font-semibold normal-case leading-none text-ink">
                     {`${state.remainingQuests}/${state.maxCredits}`}
                   </p>
                 </div>
-                <div className="border-4 border-outline bg-card px-4 py-3 shadow-brutal">
-                  <p className="text-[10px] font-bold uppercase text-ink-muted">Plan</p>
-                  <p className="max-w-[14rem] truncate text-sm font-black uppercase leading-none text-ink">
+                <div className="rounded-[20px] border border-outline bg-card px-4 py-3 shadow-sm">
+                  <p className="text-[10px] font-medium normal-case text-ink-muted">Plan</p>
+                  <p className="max-w-[14rem] truncate text-sm font-semibold normal-case leading-none text-ink">
                     {state.subscriptionTier}
                   </p>
                 </div>
@@ -240,15 +198,15 @@ export default function DashboardClient({
                 <div
                   role="status"
                   aria-live="polite"
-                  className="flex flex-col gap-3 border-4 border-outline bg-[#FFE0C7] p-4 shadow-brutal sm:flex-row sm:items-center sm:justify-between"
+                  className="flex flex-col gap-3 rounded-[20px] border border-outline bg-highlight p-4 shadow-sm sm:flex-row sm:items-center sm:justify-between"
                 >
-                  <p className="text-sm font-bold text-ink">
+                  <p className="text-sm font-medium text-ink">
                     Lead queue refresh failed. Showing the last known leads — not claiming live freshness.
                   </p>
                   <button
                     type="button"
                     onClick={() => void state.refreshLeadsSlice()}
-                    className="inline-flex min-h-11 items-center justify-center border-3 border-outline bg-card px-4 py-2 text-xs font-black uppercase shadow-brutal-sm"
+                    className="inline-flex min-h-11 items-center justify-center rounded-[20px] border border-outline bg-card px-4 py-2 text-xs font-semibold normal-case shadow-none"
                   >
                     Retry lead refresh
                   </button>
@@ -278,18 +236,20 @@ export default function DashboardClient({
                         ? { duration: 0 }
                         : { duration: 0.2, ease: [0.22, 1, 0.36, 1] }
                     }
-                    className="flex items-center justify-between border-4 border-outline bg-info p-4 text-lg font-black text-on-accent shadow-brutal-lg"
+                    className="flex items-center justify-between rounded-[20px] border border-outline bg-info p-4 text-lg font-semibold text-on-accent shadow-sm"
                   >
                     <span>{state.notice}</span>
                     <button type="button" aria-label="Dismiss notice" onClick={() => state.setNotice('')}>
-                      <X aria-hidden="true" className="h-6 w-6 stroke-[3px]" />
+                      <X aria-hidden="true" className="h-6 w-6 stroke-[1.75px]" />
                     </button>
                   </motion.div>
                 ) : null}
               </AnimatePresence>
 
+              <Link href="/app/leads" className="inline-flex min-h-11 items-center underline">Follow up on claimed leads</Link>
+
               <div
-                className="flex border-4 border-outline bg-card p-1 shadow-brutal sm:hidden"
+                className="flex rounded-[20px] border border-outline bg-card p-1 shadow-sm sm:hidden"
                 role="tablist"
                 aria-label="Mission Control sections"
               >
@@ -298,9 +258,9 @@ export default function DashboardClient({
                   role="tab"
                   aria-selected={isOverview}
                   onClick={() => setActiveMobileTab('overview')}
-                  className={`min-h-11 flex-1 border-2 px-2 py-2.5 text-xs font-black uppercase tracking-[0.08em] transition-all ${
+                  className={`min-h-11 flex-1 rounded-lg border px-2 py-2.5 text-xs font-semibold normal-case tracking-[0.08em] transition-all ${
                     isOverview
-                      ? 'border-outline bg-accent text-on-accent shadow-brutal-sm'
+                      ? 'border-outline bg-accent text-on-accent shadow-none'
                       : 'border-transparent bg-transparent text-ink/55'
                   }`}
                 >
@@ -311,9 +271,9 @@ export default function DashboardClient({
                   role="tab"
                   aria-selected={isSignals}
                   onClick={() => setActiveMobileTab('signals')}
-                  className={`min-h-11 flex-1 border-2 px-2 py-2.5 text-xs font-black uppercase tracking-[0.08em] transition-all ${
+                  className={`min-h-11 flex-1 rounded-lg border px-2 py-2.5 text-xs font-semibold normal-case tracking-[0.08em] transition-all ${
                     isSignals
-                      ? 'border-outline bg-accent text-on-accent shadow-brutal-sm'
+                      ? 'border-outline bg-accent text-on-accent shadow-none'
                       : 'border-transparent bg-transparent text-ink/55'
                   }`}
                 >
@@ -324,9 +284,9 @@ export default function DashboardClient({
                   role="tab"
                   aria-selected={isGuild}
                   onClick={() => setActiveMobileTab('guild')}
-                  className={`min-h-11 flex-1 border-2 px-2 py-2.5 text-xs font-black uppercase tracking-[0.08em] transition-all ${
+                  className={`min-h-11 flex-1 rounded-lg border px-2 py-2.5 text-xs font-semibold normal-case tracking-[0.08em] transition-all ${
                     isGuild
-                      ? 'border-outline bg-accent text-on-accent shadow-brutal-sm'
+                      ? 'border-outline bg-accent text-on-accent shadow-none'
                       : 'border-transparent bg-transparent text-ink/55'
                   }`}
                 >
@@ -407,9 +367,6 @@ export default function DashboardClient({
                 dbLeaderboard={dbLeaderboard}
                 dbAnalytics={dbAnalytics}
               />
-              {isGuild || isDesktop ? (
-                <DeferredBattleAreaCanvas userLevel={state.user.level} />
-              ) : null}
             </div>
           }
         />

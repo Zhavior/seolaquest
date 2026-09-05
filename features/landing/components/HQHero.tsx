@@ -46,7 +46,7 @@ export function HQHero() {
           <div className="text-center lg:text-left">
 
             {/* Plain-English purpose strip — crawlable, scannable */}
-            <p className="mb-5 text-sm sm:text-base font-black uppercase tracking-[0.16em] text-ink/60 text-center lg:text-left">
+            <p className="mb-5 text-sm sm:text-base font-black uppercase tracking-[0.16em] text-ink-muted text-center lg:text-left">
               AI-powered social listening for SaaS founders
             </p>
 
@@ -107,7 +107,7 @@ export function HQHero() {
               {STATS.map(({ value, label }) => (
                 <div key={label} className="text-center lg:text-left">
                   <div className="text-2xl sm:text-3xl font-black">{value}</div>
-                  <div className="text-xs font-bold uppercase tracking-wider text-ink/50">{label}</div>
+                  <div className="text-xs font-bold uppercase tracking-wider text-ink-muted">{label}</div>
                 </div>
               ))}
             </div>
@@ -133,12 +133,12 @@ export function HQHero() {
                 >
                   <span className="text-2xl" aria-hidden="true">{icon}</span>
                   <span className="font-black uppercase tracking-wide text-xs">{name}</span>
-                  <span className="text-[10px] font-bold uppercase tracking-widest text-ink/50 group-hover:text-white/60">{desc}</span>
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-ink-muted group-hover:text-white/60">{desc}</span>
                 </div>
               ))}
             </div>
             <div className="px-5 py-3 border-t-4 border-outline text-center">
-              <span className="text-xs font-black uppercase tracking-widest text-ink/50">
+              <span className="text-xs font-black uppercase tracking-widest text-ink-muted">
                 One Persistent Headquarters
               </span>
             </div>

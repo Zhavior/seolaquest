@@ -43,7 +43,7 @@ describe('ThemeToggle', () => {
     document.documentElement.setAttribute('data-theme', 'grey')
     renderToggle()
 
-    expect(screen.getByRole('radio', { name: /grey mode/i })).toBeChecked()
+    expect(screen.getByRole('radio', { name: /forest ink/i })).toBeChecked()
   })
 
   it('moves the selection with the arrow keys', async () => {
@@ -55,6 +55,6 @@ describe('ThemeToggle', () => {
     await user.keyboard('{ArrowRight}')
 
     expect(document.documentElement.getAttribute('data-theme')).toBe('grey')
-    expect(screen.getByRole('radio', { name: /grey mode/i })).toBeChecked()
+    expect(screen.getByRole('radio', { name: /forest ink/i })).toBeChecked()
   })
 })

@@ -31,8 +31,8 @@ export function HQBadge({ children, className, icon, tone = 'neutral', ...props 
       {...props}
       className={clsx(
         'inline-flex items-center gap-1',
-        'border-2 border-outline px-2 py-0.5',
-        'text-xs font-black uppercase tracking-[0.12em]',
+        'border border-outline px-2 py-0.5 rounded-xl',
+        'text-xs font-semibold normal-case tracking-[0.12em]',
         'shadow-brutal-sm',
         tones[tone],
         className

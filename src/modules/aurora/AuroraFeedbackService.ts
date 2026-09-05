@@ -16,9 +16,9 @@ export const FeedbackTypeSchema = z.enum([
 ])
 
 export const SubmitFeedbackSchema = z.object({
-  decisionId: z.string().min(1),
+  decisionId: z.string().min(1).max(128),
   feedbackType: FeedbackTypeSchema,
-  source: z.string().min(1),
+  source: z.string().min(1).max(120),
   correction: z.object({
     notes: z.string().max(1000, 'Notes cannot exceed 1000 characters.').optional(),
     expectedAction: z.enum(['IGNORE', 'WATCH', 'ENGAGE']).optional(),

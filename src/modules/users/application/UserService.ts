@@ -11,6 +11,11 @@ function cleanText(value: string, maxLength: number) {
 }
 
 export class UserService {
+  static async businessContext(userId: string) {
+    return prisma.user.findUnique({ where: { id: userId },
+      select: { businessDescription: true, targetCustomer: true } })
+  }
+
   static async completeOnboarding(name: string, title: string) {
     const user = await requireCurrentUser()
     const cleanName = cleanText(name, 60)

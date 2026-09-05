@@ -17,9 +17,9 @@ export const DEFAULT_THEME: Theme = 'parchment'
 export const THEME_STORAGE_KEY = 'coquest_theme'
 
 export const THEME_META: Record<Theme, { label: string; short: string; swatch: string }> = {
-  parchment: { label: 'Parchment (light)', short: 'LIGHT', swatch: '#F4F0EA' },
-  grey: { label: 'Grey Mode (dark)', short: 'GREY', swatch: '#161B22' },
-  blue: { label: 'Midnight Blue (dark)', short: 'BLUE', swatch: '#0A1128' },
+  parchment: { label: 'Parchment (light)', short: 'LIGHT', swatch: '#F3F0E7' },
+  grey: { label: 'Forest Ink (dark)', short: 'FOREST', swatch: '#1F3029' },
+  blue: { label: 'Midnight Blue (dark)', short: 'BLUE', swatch: '#111F2C' },
 }
 
 export function isTheme(value: unknown): value is Theme {

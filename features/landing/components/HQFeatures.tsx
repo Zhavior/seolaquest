@@ -68,7 +68,7 @@ export function HQFeatures() {
               One HQ.<br />Six Rooms.
             </h2>
           </div>
-          <p className="max-w-sm text-sm font-bold leading-relaxed text-ink/60 sm:text-right">
+          <p className="max-w-sm text-sm font-bold leading-relaxed text-ink-muted sm:text-right">
             Every room serves a specific operational purpose.
             Navigate the HQ strip to move between them.
           </p>
@@ -91,12 +91,12 @@ export function HQFeatures() {
                 </span>
               </div>
               <div>
-                <div className="text-xs font-black uppercase tracking-widest text-ink/40 group-hover:text-white/50 mb-1">
+                <div className="text-xs font-black uppercase tracking-widest text-ink-muted group-hover:text-white/50 mb-1">
                   {room}
                 </div>
                 <h3 className="text-lg font-black uppercase leading-snug tracking-tight">{headline}</h3>
               </div>
-              <p className="text-sm font-medium leading-relaxed text-ink/70 group-hover:text-white/80">{body}</p>
+              <p className="text-sm font-medium leading-relaxed text-ink-muted group-hover:text-white/80">{body}</p>
             </article>
           ))}
         </div>

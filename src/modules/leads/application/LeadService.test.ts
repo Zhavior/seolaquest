@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 const mocks = vi.hoisted(() => ({
   requireCurrentUser: vi.fn(),
+  recordOutcome: vi.fn(),
   userFindUnique: vi.fn(),
   userUpdate: vi.fn(),
   leadFindUnique: vi.fn(),
@@ -45,6 +46,8 @@ vi.mock('@/lib/prisma', () => ({
   },
 }))
 
+vi.mock('./LeadOutcomeService', () => ({ LeadOutcomeService: { record: mocks.recordOutcome } }))
+
 import { LeadService } from './LeadService'
 
 /*
@@ -72,6 +75,7 @@ const tx = {
 describe('LeadService tenant boundaries', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    mocks.recordOutcome.mockReset().mockResolvedValue({ replayed: false })
     vi.unstubAllGlobals()
     vi.unstubAllEnvs()
     vi.stubEnv('OPENAI_API_KEY', 'test-openai-key')
@@ -99,130 +103,12 @@ describe('LeadService tenant boundaries', () => {
     mocks.aiUsageCheck.mockResolvedValue({ allowed: true })
   })
 
-  it('atomically claims only a NEW lead owned by the current user', async () => {
-    mocks.leadUpdateMany.mockResolvedValue({ count: 1 })
-
-    await expect(LeadService.claimQuest('lead-1')).resolves.toEqual({ ok: true })
-    expect(mocks.leadUpdateMany).toHaveBeenCalledWith({
-      where: { id: 'lead-1', userId: 'user-1', status: 'NEW' },
-      data: {
-        status: 'CONTACTED',
-        claimedAt: expect.any(Date),
-        contactedAt: expect.any(Date),
-      },
-    })
-  })
-
-  /**
-   * Claiming pays nothing here any more, and that is the point of this test.
-   *
-   * Progression belongs to `GamifyProfile`; XP for this claim is minted later by
-   * `GamifyLedgerService` when the outbox delivers `opportunity.engaged`, behind
-   * the eligibility rules every other award goes through. If the claim also wrote
-   * `User.xp` there would be two owners of one number, and two owners of one
-   * number always end up disagreeing. So: no row lock, no read, no write, and no
-   * progression handed back for the client to render optimistically — the ledger
-   * has not decided yet, and it is entitled to decline.
-   */
-  it('claims without locking, reading or writing the user progression columns', async () => {
-    mocks.leadUpdateMany.mockResolvedValue({ count: 1 })
-
-    const result = await LeadService.claimQuest('lead-1')
-
-    expect(result).not.toHaveProperty('user')
-    expect(mocks.queryRaw).not.toHaveBeenCalled()
-    expect(mocks.userFindUnique).not.toHaveBeenCalled()
+  it.each([['CLAIM', 'claimQuest'], ['DISMISS', 'dismissLead']] as const)('routes %s through the owning domain command', async (action, method) => {
+    await expect(LeadService[method]('lead-1')).resolves.toEqual({ ok: true })
+    expect(mocks.recordOutcome).toHaveBeenCalledWith({ userId: 'user-1', leadId: 'lead-1',
+      idempotencyKey: `${action.toLowerCase()}_lead-1`, input: { action } })
     expect(mocks.userUpdate).not.toHaveBeenCalled()
-  })
-
-  /**
-   * Gamify pays XP for `opportunity.engaged`, so this event is the user's reward. It has to
-   * ride the claim's own transaction — if the status update commits and the event does not,
-   * the user did the work and silently earned nothing, with no failure anywhere to notice.
-   */
-  it('emits opportunity.engaged inside the claim transaction', async () => {
-    mocks.leadUpdateMany.mockResolvedValue({ count: 1 })
-
-    await LeadService.claimQuest('lead-1')
-
-    expect(mocks.domainEventCreate).toHaveBeenCalledWith(
-      expect.objectContaining({
-        data: expect.objectContaining({
-          type: 'opportunity.engaged',
-          actorId: 'user-1',
-          status: 'PENDING',
-          // Keyed on the lead, so a replay cannot mint a second reward for one engagement.
-          idempotencyKey: 'opportunity.engaged:lead-1',
-          payload: expect.objectContaining({ leadId: 'lead-1', actionTaken: 'CLAIMED' }),
-        }),
-      }),
-    )
-  })
-
-  it('does not emit opportunity.engaged when the lead was already claimed', async () => {
-    // The `status: 'NEW'` predicate matched nothing: someone else claimed it first.
-    mocks.leadUpdateMany.mockResolvedValue({ count: 0 })
-
-    await expect(LeadService.claimQuest('lead-1')).resolves.toMatchObject({ ok: false })
-
-    expect(mocks.domainEventCreate).not.toHaveBeenCalled()
-    expect(mocks.userUpdate).not.toHaveBeenCalled()
-  })
-
-  /**
-   * Two leads claimed at once must produce two engagement events.
-   *
-   * This used to be the read-modify-write race on `User.xp`, where interleaved
-   * claims could overwrite each other's total and lose an award. Dropping the
-   * column dropped the race, but not the requirement behind it: each claim is a
-   * separate earned reward, so each has to reach the ledger under its own
-   * lead-keyed idempotency key. One event for two claims would still lose XP,
-   * just one layer further down.
-   */
-  it('emits one engagement event per lead when claims overlap', async () => {
-    let transactionQueue = Promise.resolve()
-    mocks.transaction.mockImplementation((callback: (client: typeof tx) => unknown) => {
-      const result = transactionQueue.then(() => callback(tx))
-      transactionQueue = result.then(() => undefined, () => undefined)
-      return result
-    })
-    mocks.leadUpdateMany.mockResolvedValue({ count: 1 })
-
-    const results = await Promise.all([
-      LeadService.claimQuest('lead-1'),
-      LeadService.claimQuest('lead-2'),
-    ])
-
-    expect(results).toEqual([{ ok: true }, { ok: true }])
-    expect(mocks.leadUpdateMany).toHaveBeenCalledWith(expect.objectContaining({
-      where: { id: 'lead-1', userId: 'user-1', status: 'NEW' },
-    }))
-    expect(mocks.leadUpdateMany).toHaveBeenCalledWith(expect.objectContaining({
-      where: { id: 'lead-2', userId: 'user-1', status: 'NEW' },
-    }))
-    expect(mocks.domainEventCreate).toHaveBeenCalledTimes(2)
-    expect(
-      mocks.domainEventCreate.mock.calls.map(([call]) => call.data.idempotencyKey).sort(),
-    ).toEqual(['opportunity.engaged:lead-1', 'opportunity.engaged:lead-2'])
-  })
-
-  it('does not reach the ledger when another request already changed the lead', async () => {
-    mocks.leadUpdateMany.mockResolvedValue({ count: 0 })
-
-    await expect(LeadService.claimQuest('lead-1')).resolves.toMatchObject({ ok: false })
-    expect(mocks.domainEventCreate).not.toHaveBeenCalled()
-    expect(mocks.userUpdate).not.toHaveBeenCalled()
-    expect(mocks.revalidatePath).not.toHaveBeenCalled()
-  })
-
-  it('dismisses with one atomic owner and state predicate', async () => {
-    mocks.leadUpdateMany.mockResolvedValue({ count: 1 })
-
-    await expect(LeadService.dismissLead('lead-1')).resolves.toEqual({ ok: true })
-    expect(mocks.leadUpdateMany).toHaveBeenCalledWith({
-      where: { id: 'lead-1', userId: 'user-1', status: 'NEW' },
-      data: { status: 'DISMISSED', dismissedAt: expect.any(Date) },
-    })
+    expect(mocks.revalidatePath).toHaveBeenCalledWith('/app')
   })
 
   it('cannot read or export a lead belonging to another tenant', async () => {

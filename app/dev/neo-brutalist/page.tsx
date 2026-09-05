@@ -24,7 +24,7 @@ export default function NeoBrutalistPreview() {
     <main className="min-h-screen bg-canvas p-6 md:p-10">
       <div className="mx-auto max-w-5xl space-y-10">
         <header className="border-4 border-outline bg-accent p-6 shadow-brutal-lg">
-          <p className="text-xs font-black uppercase tracking-[0.25em] text-ink/60">
+          <p className="text-xs font-black uppercase tracking-[0.25em] text-ink-muted">
             Design reference — not routable in production
           </p>
           <h1 className="mt-2 text-4xl font-black uppercase tracking-tight">

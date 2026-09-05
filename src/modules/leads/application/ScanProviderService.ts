@@ -218,58 +218,44 @@ async function persistCompletedAttempt(args: {
        * notices. Writing it here rather than after the transaction is what makes
        * "every stored lead was evaluated" true by construction.
        *
-       * Emitting is best-effort per lead only in the sense that a payload we cannot build is
-       * skipped with a warning — a lead whose provider record is missing a required field
-       * must not abort the whole scan transaction and lose the other leads with it.
+       * Invalid event construction fails the transaction so a retry can repair it.
        */
       const recordByExternalPostId = new Map(records.map((record) => [record.externalPostId, record]))
       const newlyDiscovered = persistedLeads.filter((lead) => !previouslySeen.has(lead.externalPostId))
 
       for (const lead of newlyDiscovered) {
         const record = recordByExternalPostId.get(lead.externalPostId)
-        if (!record) continue
+        if (!record) throw new Error('Discovery source record missing')
 
-        try {
-          const event = EventFactory.create({
-            type: 'opportunity.discovered',
-            version: 1,
-            // The scan is machine-initiated; the tenant is carried on the payload instead so
-            // Aurora can meter its classifier spend against the account that owns the lead.
-            actorId: 'scan-pipeline',
-            source: 'ScanProviderService',
-            // Stable per lead, so a replayed scan cannot enqueue a second evaluation of the
-            // same opportunity even if the pre-insert read above were ever to race.
-            idempotencyKey: `opportunity.discovered:${lead.id}`,
-            payload: {
-              // A Lead IS the opportunity — there is no Opportunity table. See the schema
-              // comment on OpportunityDiscoveredPayloadSchema.
-              opportunityId: lead.id,
-              leadId: lead.id,
-              userId,
-              keywordId: keyword.id,
-              keywordPhrase: keyword.phrase,
-              platform: provider === 'X' ? 'TWITTER' : 'REDDIT',
-              externalPostId: record.externalPostId,
-              author: record.author,
-              content: record.content,
-              url: record.url,
-              sourceCreatedAt: record.sourceCreatedAt.toISOString(),
-            },
-          })
+        const event = EventFactory.create({
+          type: 'opportunity.discovered',
+          version: 1,
+          // The scan is machine-initiated; the tenant is carried on the payload instead so
+          // Aurora can meter its classifier spend against the account that owns the lead.
+          actorId: 'scan-pipeline',
+          source: 'ScanProviderService',
+          // Stable per lead, so a replayed scan cannot enqueue a second evaluation of the
+          // same opportunity even if the pre-insert read above were ever to race.
+          idempotencyKey: `opportunity.discovered:${lead.id}`,
+          payload: {
+            // A Lead IS the opportunity — there is no Opportunity table. See the schema
+            // comment on OpportunityDiscoveredPayloadSchema.
+            opportunityId: lead.id,
+            leadId: lead.id,
+            userId,
+            keywordId: keyword.id,
+            keywordPhrase: keyword.phrase,
+            platform: provider === 'X' ? 'TWITTER' : 'REDDIT',
+            externalPostId: record.externalPostId,
+            author: record.author,
+            content: record.content,
+            url: record.url,
+            sourceCreatedAt: record.sourceCreatedAt.toISOString(),
+          },
+        })
 
-          await EventStore.writeOutbox(event, tx)
-        } catch (error) {
-          logger.warn(
-            {
-              err: error,
-              event: 'opportunity_discovered_not_emitted',
-              outcomeCode: 'OPPORTUNITY_EVENT_BUILD_FAILED',
-              leadId: lead.id,
-              scanRunId,
-            },
-            'Stored the lead but could not emit opportunity.discovered',
-          )
-        }
+        await EventStore.writeOutbox(event, tx)
+
       }
     }
 

@@ -1,3 +1,5 @@
+import { AURORA_CLASSIFIER_VERSION } from './policy';
+import { createHash } from 'node:crypto';
 import { Prisma, PrismaClient } from '@prisma/client';
 import { AuroraEvaluationContext } from './types';
 import { DeterministicScorer } from './classifiers/DeterministicScorer';
@@ -22,7 +24,7 @@ export class AuroraService {
         sourceEventId_deterministicScorerVersion_classifierVersion_policyVersion: {
           sourceEventId: context.sourceEventId,
           deterministicScorerVersion: 'v1',
-          classifierVersion: 'v1',
+          classifierVersion: AURORA_CLASSIFIER_VERSION,
           policyVersion: context.policyVersion,
         }
       }
@@ -144,11 +146,16 @@ export class AuroraService {
       semanticFailureCode = 'PROVIDER_ERROR';
     }
 
+    // Persist the exact normalized evaluation context; hashes identify inputs, not truth.
+    const inputSnapshot = JSON.parse(JSON.stringify(context)) as Prisma.InputJsonObject;
+    const inputFingerprint = createHash('sha256').update(JSON.stringify(inputSnapshot)).digest('hex');
+
     // 4. Wrap everything in a database transaction to persist decision + outbox event
     await this.prisma.$transaction(async (tx) => {
       // It's possible someone else raced us and inserted, Prisma unique constraint handles throwing error which aborts tx.
       const decisionRecord = await tx.auroraDecision.create({
         data: {
+          leadId: typeof context.additionalData?.leadId === 'string' ? context.additionalData.leadId : null,
           opportunityId: context.opportunityId,
           sourceEventId: context.sourceEventId,
           finalScore: finalDecision.finalScore,
@@ -160,10 +167,13 @@ export class AuroraService {
             ? semanticResult.semanticSignals as Prisma.InputJsonObject
             : Prisma.DbNull,
           reasons: finalDecision.canonicalReasons,
-          policyFlags: [], // Populated by advanced policy rules if applicable
+          policyFlags: ['HEURISTIC_SCORE', 'UNCALIBRATED_CONFIDENCE'],
+          inputFingerprint,
+          inputSnapshot,
+          outputSchemaVersion: 'v1',
           classifierProvider,
           classifierModel,
-          classifierVersion: 'v1',
+          classifierVersion: AURORA_CLASSIFIER_VERSION,
           deterministicScorerVersion: 'v1',
           policyVersion: context.policyVersion,
           semanticFailureCode,
@@ -178,7 +188,7 @@ export class AuroraService {
         actorId: 'aurora-engine',
         source: 'aurora',
         correlationId: context.sourceEventId,
-        idempotencyKey: `aurora.evaluated:${context.sourceEventId}:v1:v1:${context.policyVersion}`,
+        idempotencyKey: `aurora.evaluated:${context.sourceEventId}:v1:${AURORA_CLASSIFIER_VERSION}:${context.policyVersion}`,
         payload: {
           decisionId: decisionRecord.id,
           opportunityId: decisionRecord.opportunityId,

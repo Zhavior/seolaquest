@@ -102,7 +102,7 @@ describe('BillingPageClient rendering', () => {
     expect(screen.queryByText('Free account')).not.toBeInTheDocument()
   })
 
-  it('renders gamified UI with provided server model data', async () => {
+  it('renders journal UI with provided server model data', async () => {
     const promise = Promise.resolve(readyModel())
 
     await act(async () => {
@@ -114,12 +114,12 @@ describe('BillingPageClient rendering', () => {
     })
 
     // Await the Suspense boundary resolution
-    expect(await screen.findByText('The Alchemist Shop')).toBeInTheDocument()
+    expect(await screen.findByText('Ready for your next discovery.')).toBeInTheDocument()
     
     // Check checkout notice renders
     expect(screen.getByText('Checkout returned — verification pending')).toBeInTheDocument()
     
-    // Check balance renders in the RPG UI
+    // Check balance renders in the billing UI
     expect(screen.getByText('3')).toBeInTheDocument()
   })
 })

@@ -19,7 +19,7 @@ describe('CanonicalPolicyScorer', () => {
     expect(result.canonicalReasons).toContain('KNOWN_NOISE');
   });
 
-  it('should evaluate boundaries for ENGAGE and HIGH priority', () => {
+  it('does not promote deterministic-only keyword matches', () => {
     const scorer = new CanonicalPolicyScorer();
     const deterministic: DeterministicScorerResult = {
       hardReject: false,
@@ -29,10 +29,10 @@ describe('CanonicalPolicyScorer', () => {
 
     // No semantic input
     const result = scorer.score(deterministic);
-    expect(result.finalScore).toBe(80);
+    expect(result.finalScore).toBe(79);
     expect(result.confidence).toBe(0.8); // DETERMINISTIC_ONLY confidence
-    expect(result.recommendedAction).toBe('ENGAGE');
-    expect(result.priority).toBe('HIGH');
+    expect(result.recommendedAction).toBe('WATCH');
+    expect(result.priority).toBe('MEDIUM');
   });
 
   it('should evaluate boundaries for CRITICAL priority with semantic input', () => {
@@ -45,7 +45,7 @@ describe('CanonicalPolicyScorer', () => {
 
     const semantic: AuroraSemanticResult = {
       confidence: 0.9,
-      semanticSignals: { relevance: 'HIGH', commercialIntent: true }, // +20, +15 = 115 (capped at 100)
+      semanticSignals: { relevance: 'HIGH', commercialIntent: true, businessFit: 'HIGH', businessContextAvailable: true }, // +20, +15 = 115 (capped at 100)
       reasons: ['Looks great']
     };
 
@@ -103,4 +103,15 @@ describe('CanonicalPolicyScorer', () => {
     expect(result.recommendedAction).toBe('WATCH');
     expect(result.priority).toBe('MEDIUM');
   });
+  it.each([
+    { commercialIntent: false, relevance: 'HIGH', businessFit: 'HIGH', businessContextAvailable: true },
+    { commercialIntent: true, relevance: 'HIGH', businessFit: 'HIGH', businessContextAvailable: false },
+    { commercialIntent: true, relevance: 'HIGH', businessFit: 'LOW', businessContextAvailable: true },
+  ])('does not turn relevance or invented business fit into buying evidence: %j', semanticSignals => {
+    const result = new CanonicalPolicyScorer().score({ hardReject: false, hardRejectReasons: [], signals: { exactMatch: true } },
+      { confidence: 0.95, semanticSignals, reasons: [] })
+    expect(result.recommendedAction).toBe('WATCH')
+    expect(result.finalScore).toBeLessThan(80)
+  })
+
 });

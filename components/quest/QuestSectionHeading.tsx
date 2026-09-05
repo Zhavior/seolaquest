@@ -36,7 +36,7 @@ export function QuestSectionHeading({
   return (
     <div
       className={clsx(
-        'mb-6 flex flex-col gap-3 border-b-4 border-outline pb-4 sm:flex-row sm:items-center sm:justify-between',
+        'mb-6 flex flex-col gap-3 border-b border-outline pb-4 sm:flex-row sm:items-center sm:justify-between',
         className
       )}
     >
@@ -55,11 +55,11 @@ export function QuestSectionHeading({
           </span>
         ) : null}
         <div className="min-w-0">
-          <Heading id={titleId} className="text-2xl font-black uppercase leading-none md:text-3xl">
+          <Heading id={titleId} className="text-2xl font-semibold normal-case leading-none md:text-3xl">
             {title}
           </Heading>
           {subtitle ? (
-            <p className="mt-1 text-xs font-bold uppercase text-ink-muted">{subtitle}</p>
+            <p className="mt-1 text-xs font-bold normal-case text-ink-muted">{subtitle}</p>
           ) : null}
         </div>
       </div>

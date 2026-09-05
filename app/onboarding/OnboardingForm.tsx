@@ -61,23 +61,23 @@ type Props = {
 
 // RPG Sigil Class Specs for Gamified Selector
 const SIGIL_CLASS_SPECS: Record<string, { title: string; perk: string; color: string }> = {
-  target: { title: 'Sharpshooter', perk: '+15% Intent Focus', color: 'bg-highlight-strong' },
-  star: { title: 'Stargazer', perk: '+10% Discovery Rate', color: 'bg-highlight' },
-  rocket: { title: 'Vanguard', perk: '+20% Speed Scan', color: 'bg-[#BAE6FD]' },
-  lightning: { title: 'Stormbringer', perk: '+25% Signal Burst', color: 'bg-highlight' },
-  crystalBall: { title: 'Oracle', perk: '+15% Prediction Power', color: 'bg-[#DDD6FE]' },
-  shield: { title: 'Guardian', perk: '+10% Lead Defense', color: 'bg-[#BBF7D0]' },
-  crown: { title: 'Sovereign', perk: '+30% Guild Authority', color: 'bg-highlight-strong' },
-  fire: { title: 'Pyromancer', perk: '+20% Hot Signal Tracking', color: 'bg-[#FECACA]' },
-  sword: { title: 'Blade Master', perk: '+25% Strike Accuracy', color: 'bg-[#E9D5FF]' },
-  robot: { title: 'Cyber Scout', perk: '+20% Auto Automation', color: 'bg-[#CFFAFE]' },
+  target: { title: 'Sharpshooter', perk: 'Profile emblem · appearance only', color: 'bg-highlight-strong' },
+  star: { title: 'Stargazer', perk: 'Profile emblem · appearance only', color: 'bg-highlight' },
+  rocket: { title: 'Vanguard', perk: 'Profile emblem · appearance only', color: 'bg-[#BAE6FD]' },
+  lightning: { title: 'Stormbringer', perk: 'Profile emblem · appearance only', color: 'bg-highlight' },
+  crystalBall: { title: 'Oracle', perk: 'Profile emblem · appearance only', color: 'bg-[#DDD6FE]' },
+  shield: { title: 'Guardian', perk: 'Profile emblem · appearance only', color: 'bg-[#BBF7D0]' },
+  crown: { title: 'Sovereign', perk: 'Profile emblem · appearance only', color: 'bg-highlight-strong' },
+  fire: { title: 'Pyromancer', perk: 'Profile emblem · appearance only', color: 'bg-[#FECACA]' },
+  sword: { title: 'Blade Master', perk: 'Profile emblem · appearance only', color: 'bg-[#E9D5FF]' },
+  robot: { title: 'Cyber Scout', perk: 'Profile emblem · appearance only', color: 'bg-[#CFFAFE]' },
 }
 
 // RPG Weapon Presets Rarity Mapping
 const WEAPON_RARITY: Record<string, { label: string; bg: string; text: string }> = {
   'rec-blade': { label: 'RARE [II]', bg: 'bg-blue-100', text: 'text-blue-800' },
   'comp-spear': { label: 'EPIC [III]', bg: 'bg-purple-100', text: 'text-purple-800' },
-  'budget-orb': { label: 'UNCOMMON [I]', bg: 'bg-emerald-100', text: 'text-emerald-800' },
+  'budget-orb': { label: 'UNCOMMON [I]', bg: 'bg-emerald-100', text: 'text-ink' },
   'direct-bow': { label: 'LEGENDARY [MAX]', bg: 'bg-amber-100', text: 'text-amber-800' },
 }
 
@@ -387,33 +387,26 @@ export default function OnboardingForm({ initialDraft }: Props) {
   }
 
   return (
-    <div className="h-screen max-h-screen overflow-hidden bg-canvas px-3 py-3 sm:px-6 flex flex-col justify-between text-ink font-sans selection:bg-success selection:text-on-accent">
+    <div className="min-h-dvh bg-canvas px-3 py-3 sm:px-6 flex flex-col justify-between text-ink font-sans selection:bg-highlight selection:text-on-accent">
       {/* Top Header */}
       <header className="mx-auto flex w-full max-w-6xl items-center justify-between gap-3 shrink-0 py-1">
         <Link
           href="/"
-          className="inline-flex min-h-11 items-center gap-2 text-xl font-black uppercase tracking-widest underline-offset-4 hover:underline focus-visible:outline-4 focus-visible:outline-offset-4 text-ink"
+          className="inline-flex min-h-11 items-center gap-2 text-xl font-semibold normal-case tracking-wide underline-offset-4 hover:underline focus-visible:outline-4 focus-visible:outline-offset-4 text-ink"
         >
-          <Crown className="h-6 w-6 text-[#EAB308]" />
+          <Crown className="h-6 w-6 text-ink-muted" />
           <span>SEOlaQuest</span>
-          <span className="border-2 border-outline bg-accent px-1.5 py-0.5 text-[10px] font-black uppercase shadow-brutal-sm">
+          <span className="border border-outline bg-accent px-1.5 py-0.5 text-[10px] font-semibold normal-case shadow-brutal-sm rounded-xl">
             BETA
           </span>
         </Link>
 
         <div className="flex items-center gap-2">
-          {/* Level & XP Gauge Badge */}
-          <div className="hidden sm:inline-flex items-center gap-2 border-3 border-outline bg-accent px-3 py-1.5 text-xs font-black uppercase shadow-brutal-sm">
-            <Trophy className="h-4 w-4 text-on-accent" />
-            <span>Hunter Lvl 1</span>
-            <span className="border-l-2 border-outline pl-2 text-ink">0 / 100 XP</span>
-          </div>
-
           <button
             type="button"
             onClick={toggleSound}
             aria-pressed={soundOn}
-            className="inline-flex min-h-11 items-center gap-2 border-3 border-outline bg-card px-3 py-1.5 text-xs font-black uppercase shadow-brutal-sm focus-visible:outline-4 focus-visible:outline-offset-4 text-ink"
+            className="inline-flex min-h-11 items-center gap-2 border border-outline bg-card px-3 py-1.5 text-xs font-semibold normal-case shadow-brutal-sm focus-visible:outline-4 focus-visible:outline-offset-4 text-ink rounded-xl"
           >
             {soundOn ? <Volume2 aria-hidden size={16} /> : <VolumeX aria-hidden size={16} />}
             <span className="hidden sm:inline">{soundOn ? 'Sound on' : 'Sound off'}</span>
@@ -422,7 +415,7 @@ export default function OnboardingForm({ initialDraft }: Props) {
           <SignOutButton redirectUrl="/">
             <button
               type="button"
-              className="min-h-11 border-3 border-outline bg-card px-3 py-1.5 text-xs font-black uppercase shadow-brutal-sm focus-visible:outline-4 focus-visible:outline-offset-4 text-ink"
+              className="min-h-11 border border-outline bg-card px-3 py-1.5 text-xs font-semibold normal-case shadow-brutal-sm focus-visible:outline-4 focus-visible:outline-offset-4 text-ink rounded-xl"
             >
               Sign out
             </button>
@@ -431,26 +424,26 @@ export default function OnboardingForm({ initialDraft }: Props) {
       </header>
 
       {/* Main Single-Screen Gamified Card */}
-      <main className="mx-auto w-full max-w-6xl flex-1 min-h-0 flex flex-col justify-between border-4 border-outline bg-card p-4 shadow-brutal-lg overflow-hidden">
+      <main className="mx-auto w-full max-w-6xl flex-1 min-h-0 flex flex-col justify-between border border-outline bg-card p-5 sm:p-8 shadow-brutal-lg rounded-xl">
         {/* Quest Title & Gamified Badges */}
         <div className="shrink-0">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div className="flex items-center gap-2">
-              <span className="inline-flex items-center gap-1.5 border-3 border-outline bg-success px-2.5 py-1 text-xs font-black uppercase shadow-brutal-sm">
-                <ScrollText aria-hidden size={16} /> Level 1 quest
+              <span className="inline-flex items-center gap-1.5 border border-outline bg-highlight px-2.5 py-1 text-xs font-semibold normal-case shadow-brutal-sm rounded-xl">
+                <ScrollText aria-hidden size={16} /> Getting started
               </span>
-              <span className="inline-flex items-center gap-1.5 border-3 border-outline bg-accent px-2.5 py-1 text-xs font-black uppercase shadow-brutal-sm animate-pulse">
+              <span className="inline-flex items-center gap-1.5 border border-outline bg-accent px-2.5 py-1 text-xs font-semibold normal-case shadow-brutal-sm  rounded-xl">
                 <Sparkles aria-hidden size={16} /> Reward: your quest board
               </span>
             </div>
 
-            <span className="inline-flex items-center gap-1 border-2 border-outline bg-highlight-strong px-2 py-0.5 text-xs font-black uppercase shadow-brutal-sm">
+            <span className="inline-flex items-center gap-1 border border-outline bg-highlight-strong px-2 py-0.5 text-xs font-semibold normal-case shadow-brutal-sm rounded-xl">
               <Flame size={14} className="text-amber-600" /> Stage {step} of {LAST_ONBOARDING_STEP}
             </span>
           </div>
 
-          <h1 className="mt-1.5 text-2xl font-black uppercase sm:text-3xl tracking-tight text-ink flex items-center gap-2">
-            <Swords className="h-6 w-6 text-[#EAB308]" />
+          <h1 className="mt-1.5 text-2xl font-semibold normal-case sm:text-3xl tracking-tight text-ink flex items-center gap-2">
+            <Swords className="h-6 w-6 text-ink-muted" />
             {QUEST_TITLE}
           </h1>
           <p className="mt-0.5 max-w-3xl text-xs font-bold text-ink-muted">
@@ -471,7 +464,7 @@ export default function OnboardingForm({ initialDraft }: Props) {
         {error ? (
           <p
             id="onboarding-error"
-            className="mt-2 border-3 border-outline bg-[#FCA5A5] p-2 text-xs font-black shrink-0 text-on-accent shadow-brutal-sm"
+            className="mt-2 border border-outline bg-[#FCA5A5] p-2 text-xs font-semibold shrink-0 text-on-accent shadow-brutal-sm rounded-xl"
             role="alert"
           >
             ⚠️ {error}
@@ -481,18 +474,18 @@ export default function OnboardingForm({ initialDraft }: Props) {
         {signedOut ? (
           <Link
             href="/sign-in?redirect_url=%2Fonboarding"
-            className="mt-2 block border-3 border-outline bg-highlight-strong p-2 text-xs font-black underline hover:bg-[#FCD34D] shrink-0 text-on-accent shadow-brutal-sm"
+            className="mt-2 block border border-outline bg-highlight-strong p-2 text-xs font-semibold underline hover:bg-[#FCD34D] shrink-0 text-on-accent shadow-brutal-sm rounded-xl"
           >
             Your session ended. Sign in to resume your saved setup.
           </Link>
         ) : null}
 
         {/* Main Stage Grid (Form + RPG Adventurer Card) */}
-        <form className="mt-2 flex-1 min-h-0 flex flex-col justify-between overflow-hidden" onSubmit={submit}>
-          <div className="grid grid-cols-1 gap-4 lg:grid-cols-12 flex-1 min-h-0 items-stretch overflow-hidden">
+        <form className="mt-2 flex-1 min-h-0 flex flex-col justify-between" onSubmit={submit}>
+          <div className="grid grid-cols-1 gap-4 lg:grid-cols-12 flex-1 min-h-0 items-stretch">
             {/* Form Stage Panel (8 Cols) */}
-            <div className="lg:col-span-8 flex flex-col justify-between min-h-0 overflow-hidden">
-              <div className="flex-1 min-h-0 overflow-y-auto">
+            <div className="lg:col-span-8 flex flex-col justify-between min-h-0">
+              <div className="flex-1 min-h-0">
                 {step === 1 && (
                   <StepPanel focusRef={stepHeadingRef} objective={currentObjective}>
                     <GuildRegistryStation
@@ -568,64 +561,64 @@ export default function OnboardingForm({ initialDraft }: Props) {
 
             {/* RPG Hunter Card Sidebar (4 Cols) */}
             <aside className="lg:col-span-4 flex flex-col justify-between shrink-0">
-              <div className="border-3 border-outline bg-canvas p-3.5 shadow-brutal h-full flex flex-col justify-between relative">
+              <div className="border border-outline bg-canvas p-3.5 shadow-brutal h-full flex flex-col justify-between relative rounded-xl">
                 <div>
-                  <div className="flex items-center justify-between border-b-2 border-outline pb-1.5 mb-2">
-                    <p className="text-[11px] font-black uppercase text-ink flex items-center gap-1">
-                      <ShieldCheck size={14} className="text-[#EAB308]" /> Adventurer Seal
+                  <div className="flex items-center justify-between border-b border-outline pb-1.5 mb-2">
+                    <p className="text-[11px] font-semibold normal-case text-ink flex items-center gap-1">
+                      <ShieldCheck size={14} className="text-ink-muted" /> Adventurer Seal
                     </p>
-                    <span className="border-2 border-outline bg-success px-1.5 py-0.5 text-[9px] font-black uppercase">
-                      RANK 1
+                    <span className="border border-outline bg-highlight px-1.5 py-0.5 text-[9px] font-semibold normal-case rounded-xl">
+                      Profile emblem
                     </span>
                   </div>
 
                   {/* Character Avatar Box */}
-                  <div className="mt-2 flex items-center gap-3 border-3 border-outline bg-card p-2.5 shadow-brutal-sm">
-                    <div className="flex h-12 w-12 items-center justify-center border-3 border-outline bg-highlight-strong text-on-accent shrink-0">
+                  <div className="mt-2 flex items-center gap-3 border border-outline bg-card p-2.5 shadow-brutal-sm rounded-xl">
+                    <div className="flex h-12 w-12 items-center justify-center border border-outline bg-highlight-strong text-on-accent shrink-0 rounded-xl">
                       {React.createElement(getProfileIconComponent(profileIconKey), { className: 'h-6 w-6 stroke-[2.5]' })}
                     </div>
 
                     <div className="min-w-0">
                       <div className="flex items-center gap-1.5">
-                        <p className="break-words font-black uppercase truncate text-sm text-ink">
+                        <p className="break-words font-semibold normal-case truncate text-sm text-ink">
                           {normalizedDisplayName || 'Your Hunter'}
                         </p>
-                        <span className="text-[9px] font-mono font-black bg-black text-white px-1 py-0.2">
+                        <span className="text-[9px] font-mono font-semibold bg-forest text-white px-1 py-0.2">
                           {selectedIcon.code}
                         </span>
                       </div>
-                      <p className="text-[11px] font-black text-amber-700">
+                      <p className="text-[11px] font-semibold text-ink-muted">
                         {currentClassSpec.title}
                       </p>
-                      <span className="inline-block mt-0.5 rounded bg-amber-100 border border-amber-300 px-1 py-0.2 text-[9px] font-bold text-amber-900">
+                      <span className="inline-block mt-0.5 rounded bg-amber-100 border border-amber-300 px-1 py-0.2 text-[9px] font-bold text-amber-900 rounded-xl">
                         {currentClassSpec.perk}
                       </span>
                     </div>
                   </div>
 
                   {/* Character Stats & Equipment */}
-                  <dl className="mt-3 space-y-1.5 border-t-2 border-outline pt-2 text-xs">
+                  <dl className="mt-3 space-y-1.5 border-t border-outline pt-2 text-xs">
                     <div className="flex justify-between gap-2">
-                      <dt className="font-black uppercase text-ink-muted">Trade Domain:</dt>
+                      <dt className="font-semibold normal-case text-ink-muted">Trade Domain:</dt>
                       <dd className="font-bold truncate max-w-[130px] text-right text-ink">{normalizedBusinessDescription || 'Skipped'}</dd>
                     </div>
                     <div className="flex justify-between gap-2">
-                      <dt className="font-black uppercase text-ink-muted">Quarry Prey:</dt>
+                      <dt className="font-semibold normal-case text-ink-muted">Quarry Prey:</dt>
                       <dd className="font-bold truncate max-w-[130px] text-right text-ink">{normalizedTargetCustomer || 'Skipped'}</dd>
                     </div>
                     <div className="flex justify-between gap-2">
-                      <dt className="font-black uppercase text-ink-muted">Equipped Weapon:</dt>
-                      <dd className="font-bold truncate max-w-[130px] text-right text-emerald-800">{normalizedFirstKeyword || 'Unarmed'}</dd>
+                      <dt className="font-semibold normal-case text-ink-muted">Equipped Weapon:</dt>
+                      <dd className="font-bold truncate max-w-[130px] text-right text-ink">{normalizedFirstKeyword || 'Unarmed'}</dd>
                     </div>
                     <div className="flex justify-between gap-2">
-                      <dt className="font-black uppercase text-ink-muted">Hunting Realm:</dt>
-                      <dd className="font-bold text-right text-ink">{preferredSource === 'X' ? 'X (Live Feed)' : 'Reddit (Locked)'}</dd>
+                      <dt className="font-semibold normal-case text-ink-muted">Hunting Realm:</dt>
+                      <dd className="font-bold text-right text-ink">{preferredSource === 'X' ? 'X' : 'Reddit (Locked)'}</dd>
                     </div>
                   </dl>
                 </div>
 
-                <div className="mt-3 border-t-2 border-outline pt-2 bg-amber-100/60 p-2 border-2 border-amber-400 text-center">
-                  <p className="text-[10px] font-black uppercase text-amber-900 flex items-center justify-center gap-1">
+                <div className="mt-3 border-t border-outline pt-2 bg-amber-100/60 p-2 border border-amber-400 text-center rounded-xl">
+                  <p className="text-[10px] font-semibold normal-case text-amber-900 flex items-center justify-center gap-1">
                     <Coins size={12} /> Claim Payout: quests on your board
                   </p>
                 </div>
@@ -634,7 +627,7 @@ export default function OnboardingForm({ initialDraft }: Props) {
           </div>
 
           {/* Action Navigation Footer */}
-          <div className="mt-3 pt-2.5 border-t-3 border-outline flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between shrink-0">
+          <div className="mt-3 pt-2.5 border-t border-outline flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between shrink-0">
             <button
               type="button"
               onClick={() => {
@@ -642,7 +635,7 @@ export default function OnboardingForm({ initialDraft }: Props) {
                 setStep((current) => Math.max(1, current - 1))
               }}
               disabled={pending || step === 1}
-              className="inline-flex min-h-11 items-center justify-center gap-2 border-3 border-outline bg-card px-4 py-2 text-sm font-black uppercase shadow-brutal-sm disabled:cursor-not-allowed disabled:opacity-50 text-ink"
+              className="inline-flex min-h-11 items-center justify-center gap-2 border border-outline bg-card px-4 py-2 text-sm font-semibold normal-case shadow-brutal-sm disabled:cursor-not-allowed disabled:opacity-50 text-ink rounded-xl"
             >
               <ArrowLeft aria-hidden size={18} /> Back
             </button>
@@ -651,7 +644,7 @@ export default function OnboardingForm({ initialDraft }: Props) {
               <button
                 type="submit"
                 disabled={pending}
-                className="inline-flex min-h-11 items-center justify-center gap-2 border-3 border-outline bg-highlight-strong px-5 py-2 text-sm font-black uppercase shadow-brutal-sm disabled:cursor-not-allowed disabled:opacity-50 text-on-accent hover:bg-[#FCD34D]"
+                className="inline-flex min-h-11 items-center justify-center gap-2 border border-outline bg-highlight-strong px-5 py-2 text-sm font-semibold normal-case shadow-brutal-sm disabled:cursor-not-allowed disabled:opacity-50 text-on-accent hover:bg-[#FCD34D] rounded-xl"
               >
                 Continue <ArrowRight aria-hidden size={18} />
               </button>
@@ -660,7 +653,7 @@ export default function OnboardingForm({ initialDraft }: Props) {
                 type="button"
                 onClick={complete}
                 disabled={pending}
-                className="inline-flex min-h-11 items-center justify-center gap-2 border-3 border-outline bg-success px-6 py-2.5 text-sm font-black uppercase shadow-brutal disabled:cursor-not-allowed disabled:opacity-50 text-on-accent hover:bg-[#86EFAC]"
+                className="inline-flex min-h-11 items-center justify-center gap-2 border border-outline bg-highlight px-6 py-2.5 text-sm font-semibold normal-case shadow-brutal disabled:cursor-not-allowed disabled:opacity-50 text-on-accent hover:bg-[#86EFAC] rounded-xl"
               >
                 <Check aria-hidden size={18} /> Complete setup
               </button>
@@ -696,7 +689,7 @@ function GuildRegistryStation({
   return (
     <div className="grid gap-4 sm:grid-cols-[1.1fr_0.9fr]">
       <div>
-        <label htmlFor="display-name" className="block font-black uppercase text-xs text-ink">
+        <label htmlFor="display-name" className="block font-semibold normal-case text-xs text-ink">
           Display name
         </label>
 
@@ -710,11 +703,11 @@ function GuildRegistryStation({
           aria-describedby={error ? 'onboarding-error' : undefined}
           value={displayName}
           onChange={(event) => setDisplayName(event.target.value)}
-          className="mt-1.5 w-full border-3 border-outline bg-canvas p-2.5 text-sm font-bold text-ink focus-visible:outline-4 focus-visible:outline-offset-2"
+          className="mt-1.5 w-full border border-outline bg-canvas p-2.5 text-sm font-bold text-ink focus-visible:outline-4 focus-visible:outline-offset-2 rounded-xl"
           placeholder="Signal Sage"
         />
 
-        <p className="mt-3 text-xs font-black uppercase text-ink flex items-center gap-1">
+        <p className="mt-3 text-xs font-semibold normal-case text-ink flex items-center gap-1">
           <Zap size={14} className="text-amber-500" /> Choose your hunter sigil & class
         </p>
 
@@ -734,19 +727,19 @@ function GuildRegistryStation({
                 }}
                 aria-pressed={active}
                 className={[
-                  'border-3 p-2 text-left transition relative overflow-hidden',
+                  'border p-2 text-left transition relative overflow-hidden rounded-xl',
                   active
-                    ? 'border-outline bg-success shadow-brutal-sm'
+                    ? 'border-outline bg-highlight shadow-brutal-sm'
                     : 'border-outline bg-card hover:bg-canvas',
                 ].join(' ')}
               >
                 <div className="flex items-center justify-between">
                   <IconComp className="h-5 w-5 stroke-[2.5] text-ink" />
-                  <span className="text-[9px] font-mono font-black border border-outline px-1 bg-card text-ink">
+                  <span className="text-[9px] font-mono font-semibold border border-outline px-1 bg-card text-ink rounded-xl">
                     {option.code}
                   </span>
                 </div>
-                <div className="mt-1 text-[11px] font-black uppercase truncate text-ink">{option.label}</div>
+                <div className="mt-1 text-[11px] font-semibold normal-case truncate text-ink">{option.label}</div>
                 <div className="text-[9px] font-bold text-ink-muted truncate">{spec.title}</div>
               </button>
             )
@@ -754,21 +747,21 @@ function GuildRegistryStation({
         </div>
       </div>
 
-      <div className="border-3 border-outline bg-canvas p-3.5 flex flex-col justify-between">
+      <div className="border border-outline bg-canvas p-3.5 flex flex-col justify-between rounded-xl">
         <div>
-          <p className="text-[11px] font-black uppercase text-ink-muted">Sigil Class Spec</p>
+          <p className="text-[11px] font-semibold normal-case text-ink-muted">Sigil Class Spec</p>
 
-          <div className="mt-2 flex items-center gap-3 border-3 border-outline bg-card p-2.5 shadow-brutal-sm">
-            <div className="flex h-12 w-12 items-center justify-center border-3 border-outline bg-highlight-strong text-on-accent shrink-0">
+          <div className="mt-2 flex items-center gap-3 border border-outline bg-card p-2.5 shadow-brutal-sm rounded-xl">
+            <div className="flex h-12 w-12 items-center justify-center border border-outline bg-highlight-strong text-on-accent shrink-0 rounded-xl">
               {React.createElement(getProfileIconComponent(profileIconKey), { className: 'h-6 w-6 stroke-[2.5]' })}
             </div>
 
             <div className="min-w-0">
-              <p className="break-words font-black uppercase text-sm truncate text-ink">
+              <p className="break-words font-semibold normal-case text-sm truncate text-ink">
                 {displayName || 'Your hunter'}
               </p>
-              <p className="text-xs font-bold text-amber-700">{classSpec.title}</p>
-              <span className="inline-block mt-0.5 rounded bg-emerald-100 border border-emerald-300 px-1 py-0.2 text-[10px] font-black text-emerald-800">
+              <p className="text-xs font-bold text-ink-muted">{classSpec.title}</p>
+              <span className="inline-block mt-0.5 rounded bg-emerald-100 border border-emerald-300 px-1 py-0.2 text-[10px] font-semibold text-ink rounded-xl">
                 ⚡ {classSpec.perk}
               </span>
             </div>
@@ -796,7 +789,7 @@ function TradeLicenseStation({
 }) {
   return (
     <div>
-      <label htmlFor="business-description" className="block font-black uppercase text-xs text-ink">
+      <label htmlFor="business-description" className="block font-semibold normal-case text-xs text-ink">
         Business or product
       </label>
 
@@ -809,14 +802,14 @@ function TradeLicenseStation({
         aria-describedby={error ? 'onboarding-error' : undefined}
         value={businessDescription}
         onChange={(event) => setBusinessDescription(event.target.value)}
-        className="mt-1.5 w-full border-3 border-outline bg-canvas p-2.5 text-sm font-bold text-ink focus-visible:outline-4 focus-visible:outline-offset-2"
+        className="mt-1.5 w-full border border-outline bg-canvas p-2.5 text-sm font-bold text-ink focus-visible:outline-4 focus-visible:outline-offset-2 rounded-xl"
         placeholder="Describe what your business or product does..."
       />
 
       <button
         type="button"
         onClick={onSkip}
-        className="mt-2 text-xs font-black uppercase underline underline-offset-4 text-ink"
+        className="mt-2 text-xs font-semibold normal-case underline underline-offset-4 text-ink"
       >
         Skip for now
       </button>
@@ -837,7 +830,7 @@ function QuarryBountyStation({
 }) {
   return (
     <div>
-      <label htmlFor="target-customer" className="block font-black uppercase text-xs text-ink">
+      <label htmlFor="target-customer" className="block font-semibold normal-case text-xs text-ink">
         Target customer
       </label>
 
@@ -850,14 +843,14 @@ function QuarryBountyStation({
         aria-describedby={error ? 'onboarding-error' : undefined}
         value={targetCustomer}
         onChange={(event) => setTargetCustomer(event.target.value)}
-        className="mt-1.5 w-full border-3 border-outline bg-canvas p-2.5 text-sm font-bold text-ink focus-visible:outline-4 focus-visible:outline-offset-2"
+        className="mt-1.5 w-full border border-outline bg-canvas p-2.5 text-sm font-bold text-ink focus-visible:outline-4 focus-visible:outline-offset-2 rounded-xl"
         placeholder="Describe the customer you want to find..."
       />
 
       <button
         type="button"
         onClick={onSkip}
-        className="mt-2 text-xs font-black uppercase underline underline-offset-4 text-ink"
+        className="mt-2 text-xs font-semibold normal-case underline underline-offset-4 text-ink"
       >
         Skip for now
       </button>
@@ -880,7 +873,7 @@ function WeaponArmoryStation({
 }) {
   return (
     <div>
-      <p className="flex items-center gap-2 text-xs font-black uppercase text-ink">
+      <p className="flex items-center gap-2 text-xs font-semibold normal-case text-ink">
         <Swords aria-hidden size={16} /> Weapon rack — tap one to equip it
       </p>
 
@@ -897,19 +890,19 @@ function WeaponArmoryStation({
               onClick={() => equipPreset(preset)}
               aria-pressed={equipped}
               className={[
-                'border-3 border-outline p-2.5 text-left transition relative',
+                'border border-outline p-2.5 text-left transition relative rounded-xl',
                 equipped
-                  ? 'bg-success shadow-brutal-sm'
+                  ? 'bg-highlight shadow-brutal-sm'
                   : 'bg-card hover:bg-canvas',
               ].join(' ')}
             >
               <div className="flex items-center justify-between">
-                <p className="flex items-center gap-1.5 text-xs font-black uppercase text-ink">
+                <p className="flex items-center gap-1.5 text-xs font-semibold normal-case text-ink">
                   <PresetIcon className="h-4 w-4 stroke-[2.5] text-ink shrink-0" />
-                  <span className="font-mono text-[10px] bg-black text-white px-1 font-black">{preset.code}</span>
+                  <span className="font-mono text-[10px] bg-forest text-white px-1 font-semibold">{preset.code}</span>
                   <span>{preset.name}</span>
                 </p>
-                <span className={`text-[9px] font-black px-1 py-0.5 rounded border border-outline ${rarity.bg} ${rarity.text}`}>
+                <span className={`text-[9px] font-semibold px-1 py-0.5 rounded border border-outline  rounded-xl ${rarity.bg} ${rarity.text}`}>
                   {rarity.label}
                 </span>
               </div>
@@ -922,7 +915,7 @@ function WeaponArmoryStation({
         })}
       </div>
 
-      <label htmlFor="first-keyword" className="mt-3 block font-black uppercase text-xs text-ink">
+      <label htmlFor="first-keyword" className="mt-3 block font-semibold normal-case text-xs text-ink">
         Equipped keyword
       </label>
 
@@ -936,7 +929,7 @@ function WeaponArmoryStation({
         aria-describedby={error ? 'onboarding-error' : undefined}
         value={firstKeyword}
         onChange={(event) => setFirstKeyword(event.target.value)}
-        className="mt-1.5 w-full border-3 border-outline bg-canvas p-2.5 text-sm font-bold text-ink focus-visible:outline-4 focus-visible:outline-offset-2"
+        className="mt-1.5 w-full border border-outline bg-canvas p-2.5 text-sm font-bold text-ink focus-visible:outline-4 focus-visible:outline-offset-2 rounded-xl"
         placeholder="looking for a local piano teacher"
       />
 
@@ -987,7 +980,7 @@ function HuntingRealmStation({
   return (
     <div className="space-y-3">
       <fieldset>
-        <legend className="font-black uppercase text-xs text-ink">Preferred source</legend>
+        <legend className="font-semibold normal-case text-xs text-ink">Preferred source</legend>
 
         <div className="mt-2 grid gap-2.5 sm:grid-cols-2">
           <SourceOption
@@ -1010,8 +1003,8 @@ function HuntingRealmStation({
       </fieldset>
 
       {/* Ritual of Summoning Terminal (Labor Illusion) */}
-      <div className="border-3 border-outline bg-black p-3 font-mono text-xs text-[#A3E635] shadow-brutal">
-        <div className="flex items-center justify-between border-b border-hairline pb-1.5 mb-2 text-[10px] uppercase text-ink-muted font-bold">
+      <div className="border border-outline bg-forest p-3 font-mono text-xs text-ink-muted shadow-brutal rounded-xl">
+        <div className="flex items-center justify-between border-b border-hairline pb-1.5 mb-2 text-[10px] normal-case text-ink-muted font-bold">
           <span>⚡ Ritual of Summoning Terminal</span>
           <span className="text-yellow-400">{progress}% READY</span>
         </div>
@@ -1046,17 +1039,17 @@ function ContractReviewStation({
 }) {
   return (
     <div>
-      <p className="mb-2 text-xs font-black uppercase text-ink-muted">
+      <p className="mb-2 text-xs font-semibold normal-case text-ink-muted">
         Preview — saved setup, not live results
       </p>
 
-      <div className="mb-3 flex items-center gap-3 border-3 border-outline bg-canvas p-2.5">
-        <div className="flex h-10 w-10 items-center justify-center border-3 border-outline bg-card text-ink shrink-0">
+      <div className="mb-3 flex items-center gap-3 border border-outline bg-canvas p-2.5 rounded-xl">
+        <div className="flex h-10 w-10 items-center justify-center border border-outline bg-card text-ink shrink-0 rounded-xl">
           {React.createElement(getProfileIconComponent(selectedIcon.key), { className: 'h-5 w-5 stroke-[2.5]' })}
         </div>
 
         <div>
-          <p className="text-[10px] font-black uppercase text-ink-muted">Hunter Class</p>
+          <p className="text-[10px] font-semibold normal-case text-ink-muted">Hunter Class</p>
           <p className="break-words font-bold text-xs text-ink">{displayName || 'Your hunter'} ({classSpec.title})</p>
         </div>
       </div>
@@ -1074,14 +1067,14 @@ function ContractReviewStation({
         </div>
       </dl>
 
-      <div className="mt-3 flex items-start gap-2.5 border-3 border-outline bg-[#ECFCCB] p-2.5 text-xs text-on-accent">
+      <div className="mt-3 flex items-start gap-2.5 border border-outline bg-[#ECFCCB] p-2.5 text-xs text-on-accent rounded-xl">
         <ShieldCheck className="mt-0.5 shrink-0" aria-hidden size={16} />
         <p className="font-bold">
           Signing creates your first tracked keyword and turns on your schedule. It does not send messages or post content.
         </p>
       </div>
 
-      <div className="mt-2.5 flex items-start gap-2.5 border-3 border-outline bg-accent p-2.5 text-xs text-on-accent animate-pulse">
+      <div className="mt-2.5 flex items-start gap-2.5 border border-outline bg-accent p-2.5 text-xs text-on-accent  rounded-xl">
         <Sparkles className="mt-0.5 shrink-0" aria-hidden size={16} />
         <p className="font-bold">
           Claiming this contract puts the active quests on your board and stocks your queue with three tutorial signals.
@@ -1101,17 +1094,17 @@ function QuestLog({
   onSelectStep: (step: number) => void
 }) {
   return (
-    <section aria-label="Quest objectives" className="mt-2.5 border-3 border-outline bg-canvas p-2.5">
+    <section aria-label="Quest objectives" className="mt-2.5 border border-outline bg-canvas p-2.5 rounded-xl">
       <div className="flex items-center justify-between gap-3 text-xs">
-        <p className="font-black uppercase text-ink flex items-center gap-1">
+        <p className="font-semibold normal-case text-ink flex items-center gap-1">
           <ScrollText size={14} /> Objective {step} of {LAST_ONBOARDING_STEP}
         </p>
-        <p className="font-black uppercase text-ink-muted">{progress}% cleared</p>
+        <p className="font-semibold normal-case text-ink-muted">{progress}% cleared</p>
       </div>
 
-      <div className="mt-1.5 h-3 w-full border-2 border-outline bg-card">
+      <div className="mt-1.5 h-3 w-full border border-outline bg-card rounded-xl">
         <div
-          className="h-full bg-success transition-[width] duration-500"
+          className="h-full bg-highlight transition-[width] duration-500"
           style={{ width: `${progress}%` }}
         />
       </div>
@@ -1127,8 +1120,8 @@ function QuestLog({
               aria-current={active ? 'step' : undefined}
               onClick={() => onSelectStep(objective.step)}
               className={[
-                'cursor-pointer border-2 border-outline p-1.5 text-center text-[10px] font-black uppercase transition',
-                cleared ? 'bg-success' : active ? 'bg-highlight-strong shadow-brutal-sm' : 'bg-card hover:bg-inset',
+                'cursor-pointer border border-outline p-1.5 text-center text-[10px] font-semibold normal-case transition rounded-xl',
+                cleared ? 'bg-highlight' : active ? 'bg-highlight-strong shadow-brutal-sm' : 'bg-card hover:bg-inset',
               ].join(' ')}
             >
               <span className="block text-xs text-ink">
@@ -1165,17 +1158,17 @@ function QuestCompleteOverlay({ questsAssigned }: { questsAssigned: number }) {
       aria-live="assertive"
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-md px-4"
     >
-      <div className="w-full max-w-md border-4 border-outline bg-success p-6 text-center shadow-brutal-lg text-on-accent relative overflow-hidden">
+      <div className="w-full max-w-md border border-outline bg-highlight p-6 text-center shadow-brutal-lg text-on-accent relative overflow-hidden rounded-xl">
         <Trophy className="mx-auto h-16 w-16 stroke-[2.5] text-on-accent animate-bounce mb-2" />
-        <span className="inline-block border-2 border-outline bg-black text-white px-2 py-0.5 text-[10px] font-mono font-black uppercase mb-2">
+        <span className="inline-block border border-outline bg-forest text-white px-2 py-0.5 text-[10px] font-mono font-semibold normal-case mb-2 rounded-xl">
           [RANK_1_UNLOCKED]
         </span>
-        <p className="text-3xl font-black uppercase tracking-wider">VICTORY!</p>
-        <p className="mt-1 text-xl font-black uppercase leading-tight">Quest Complete — Charter Sealed</p>
-        <div className="my-3 inline-block border-3 border-outline bg-accent px-4 py-2 font-black text-3xl shadow-brutal animate-pulse">
+        <p className="text-3xl font-semibold normal-case tracking-wider">VICTORY!</p>
+        <p className="mt-1 text-xl font-semibold normal-case leading-tight">Quest Complete — Charter Sealed</p>
+        <div className="my-3 inline-block border border-outline bg-accent px-4 py-2 font-semibold text-3xl shadow-brutal  rounded-xl">
           {questsAssigned} {questsAssigned === 1 ? 'QUEST IS' : 'QUESTS ARE'} ON YOUR BOARD
         </div>
-        <p className="mt-2 font-black text-xs uppercase bg-black text-white p-2 border-2 border-outline">
+        <p className="mt-2 font-semibold text-xs normal-case bg-forest text-white p-2 border border-outline rounded-xl">
           ⚡ Summoning Workspace & Seeding Tutorial Signals…
         </p>
       </div>
@@ -1193,8 +1186,8 @@ function StepPanel({
   focusRef?: RefObject<HTMLHeadingElement | null>
 }) {
   return (
-    <section className="border-3 border-outline bg-card p-3.5 sm:p-4">
-      <p className="text-[11px] font-black uppercase text-ink-muted">
+    <section className="border border-outline bg-card p-3.5 sm:p-4 rounded-xl">
+      <p className="text-[11px] font-semibold normal-case text-ink-muted">
         Objective {objective.step}
         {objective.optional ? ' — optional' : ''}
       </p>
@@ -1202,7 +1195,7 @@ function StepPanel({
       <h2
         ref={focusRef}
         tabIndex={-1}
-        className="mt-0.5 text-xl font-black uppercase text-ink focus:outline-none"
+        className="mt-0.5 text-xl font-semibold normal-case text-ink focus:outline-none"
       >
         {objective.title}
       </h2>
@@ -1232,7 +1225,7 @@ function SourceOption({
 
   return (
     <label
-      className={`block border-3 border-outline p-3 ${
+      className={`block border border-outline p-3  rounded-xl ${
         disabled
           ? 'cursor-not-allowed bg-[#E7E2DA] opacity-70'
           : selected
@@ -1252,11 +1245,11 @@ function SourceOption({
         }}
         className="sr-only"
       />
-      <p className="flex flex-wrap items-center gap-2 text-base font-black uppercase text-ink">
+      <p className="flex flex-wrap items-center gap-2 text-base font-semibold normal-case text-ink">
         <Search aria-hidden size={16} />
         {title}
         {badge ? (
-          <span className="border-2 border-outline bg-[#F7D046] px-1.5 py-0.5 text-[10px] font-black uppercase text-on-accent">
+          <span className="border border-outline bg-[#F7D046] px-1.5 py-0.5 text-[10px] font-semibold normal-case text-on-accent rounded-xl">
             {badge}
           </span>
         ) : null}
@@ -1268,8 +1261,8 @@ function SourceOption({
 
 function ReviewItem({ label, value }: { label: string; value: string }) {
   return (
-    <div className="border-2 border-outline bg-canvas p-2.5">
-      <dt className="text-[10px] font-black uppercase text-ink-muted">{label}</dt>
+    <div className="border border-outline bg-canvas p-2.5 rounded-xl">
+      <dt className="text-[10px] font-semibold normal-case text-ink-muted">{label}</dt>
       <dd className="mt-0.5 break-words font-bold text-xs text-ink">{value}</dd>
     </div>
   )

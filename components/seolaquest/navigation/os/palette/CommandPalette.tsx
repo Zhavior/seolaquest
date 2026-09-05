@@ -118,8 +118,8 @@ export default function CommandPalette() {
         className="absolute inset-0 cursor-default"
       />
 
-      <div className="relative w-full max-w-2xl overflow-hidden border-2 border-outline bg-highlight shadow-brutal-lg">
-        <div className="flex items-center gap-2 border-b-2 border-outline bg-card px-3 py-3">
+      <div className="relative w-full max-w-2xl overflow-hidden border border-outline bg-highlight shadow-brutal-lg rounded-xl">
+        <div className="flex items-center gap-2 border-b border-outline bg-card px-3 py-3">
           <Search className="h-4 w-4 shrink-0 text-on-accent" />
           <input
             ref={inputRef}
@@ -129,21 +129,21 @@ export default function CommandPalette() {
               setManualActiveIndex(0)
             }}
             placeholder="Jump to a quest, page, or setting..."
-            className="w-full bg-transparent text-sm font-bold uppercase tracking-[0.06em] text-ink outline-none placeholder:text-ink/40"
+            className="w-full bg-transparent text-sm font-bold normal-case tracking-[0.06em] text-ink outline-none placeholder:text-ink-muted"
           />
           <button
             type="button"
             aria-label="Close"
             onClick={() => setOpen(false)}
-            className="flex h-6 w-6 shrink-0 items-center justify-center border-2 border-outline bg-card text-ink transition-all duration-150 hover:-translate-y-[1px]"
+            className="flex h-6 w-6 shrink-0 items-center justify-center border border-outline bg-card text-ink transition-all duration-150 hover:-translate-y-[1px] rounded-xl"
           >
             <X className="h-3.5 w-3.5" />
           </button>
         </div>
 
         {!query.trim() && recentItems.length > 0 && (
-          <div className="border-b-2 border-outline bg-[#FFE9A3] px-3 py-2">
-            <div className="mb-2 flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.18em] text-ink/60">
+          <div className="border-b border-outline bg-[#FFE9A3] px-3 py-2">
+            <div className="mb-2 flex items-center gap-2 text-[10px] font-semibold normal-case tracking-[0.18em] text-ink-muted">
               <History className="h-3.5 w-3.5" />
               Recent Commands
             </div>
@@ -154,7 +154,7 @@ export default function CommandPalette() {
                   key={item.href}
                   type="button"
                   onClick={() => openItem(item.href)}
-                  className="inline-flex items-center gap-2 border-2 border-outline bg-card px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.12em] text-ink shadow-brutal-sm transition-all duration-150 hover:-translate-y-[1px]"
+                  className="inline-flex items-center gap-2 border border-outline bg-card px-2.5 py-1 text-[10px] font-semibold normal-case tracking-[0.12em] text-ink shadow-brutal-sm transition-all duration-150 hover:-translate-y-[1px] rounded-xl"
                 >
                   {item.label}
                 </button>
@@ -166,7 +166,7 @@ export default function CommandPalette() {
         <div className="max-h-[60vh] overflow-y-auto p-2">
           {Object.entries(grouped).map(([section, items]) => (
             <div key={section} className="mb-3 last:mb-0">
-              <div className="px-2 py-1 text-[10px] font-black uppercase tracking-[0.18em] text-ink/50">
+              <div className="px-2 py-1 text-[10px] font-semibold normal-case tracking-[0.18em] text-ink-muted">
                 {sectionLabels[section] ?? section}
               </div>
 
@@ -180,16 +180,16 @@ export default function CommandPalette() {
                       key={item.href}
                       type="button"
                       onClick={() => openItem(item.href)}
-                      className={`flex w-full items-center justify-between gap-3 border-2 border-outline px-3 py-3 text-left transition-all duration-150 ${
+                      className={`flex w-full items-center justify-between gap-3 border border-outline px-3 py-3 text-left transition-all duration-150  rounded-xl ${
                         isActive
                           ? 'bg-accent shadow-brutal-sm'
                           : 'bg-card hover:-translate-y-[1px]'
                       }`}
                     >
                       <div>
-                        <div className="text-xs font-black uppercase tracking-[0.12em] text-ink">{item.label}</div>
+                        <div className="text-xs font-semibold normal-case tracking-[0.12em] text-ink">{item.label}</div>
                         {item.description ? (
-                          <div className="mt-1 text-[11px] font-bold uppercase tracking-[0.08em] text-ink/55">
+                          <div className="mt-1 text-[11px] font-bold normal-case tracking-[0.08em] text-ink/55">
                             {item.description}
                           </div>
                         ) : null}
@@ -197,7 +197,7 @@ export default function CommandPalette() {
 
                       <div className="flex items-center gap-2">
                         {item.hotkey ? (
-                          <span className="border-2 border-outline bg-card px-2 py-1 text-[10px] font-black uppercase text-ink">
+                          <span className="border border-outline bg-card px-2 py-1 text-[10px] font-semibold normal-case text-ink rounded-xl">
                             {item.hotkey}
                           </span>
                         ) : null}
@@ -211,7 +211,7 @@ export default function CommandPalette() {
           ))}
 
           {results.length === 0 ? (
-            <div className="border-2 border-outline bg-card px-4 py-6 text-center text-xs font-black uppercase tracking-[0.12em] text-ink/55">
+            <div className="border border-outline bg-card px-4 py-6 text-center text-xs font-semibold normal-case tracking-[0.12em] text-ink/55 rounded-xl">
               No commands found
             </div>
           ) : null}

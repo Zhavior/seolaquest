@@ -38,18 +38,18 @@ export function QuestPageShell({
   return (
     // `overflow-x-clip` (not `hidden`) contains the watermark without turning
     // this into a scroll container, which would break sticky descendants.
-    <div className={clsx('relative min-h-[100dvh] w-full max-w-full overflow-x-clip bg-surface select-none', className)}>
+    <div className={clsx('relative min-h-[100dvh] w-full max-w-full overflow-x-clip bg-canvas', className)}>
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 z-0 opacity-[0.07]"
+        className="pointer-events-none absolute inset-0 z-0 opacity-[0.025]"
         style={{ backgroundImage: PARCHMENT_NOISE, mixBlendMode: 'multiply' }}
       />
 
-      <div className="relative z-10 mx-auto min-h-[100dvh] w-full max-w-[1400px] p-4 font-black md:p-8">
+      <div className="relative z-10 mx-auto min-h-[100dvh] w-full max-w-[1400px] p-5 font-normal md:p-8">
         {watermark ? (
           <div
             aria-hidden="true"
-            className="pointer-events-none absolute right-0 top-0 -mr-24 -mt-24 hidden opacity-[0.06] md:block"
+            className="pointer-events-none absolute right-0 top-0 -mr-24 -mt-24 hidden opacity-[0.025] md:block"
           >
             {watermark}
           </div>

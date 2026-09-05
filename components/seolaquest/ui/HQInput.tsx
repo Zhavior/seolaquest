@@ -36,7 +36,7 @@ export function HQInput({ label, hint, error, hideLabel = false, className, id, 
       <label
         htmlFor={inputId}
         className={clsx(
-          'text-xs font-black uppercase tracking-[0.12em] text-ink',
+          'text-xs font-semibold normal-case tracking-[0.12em] text-ink',
           hideLabel && 'sr-only'
         )}
       >
@@ -50,7 +50,7 @@ export function HQInput({ label, hint, error, hideLabel = false, className, id, 
         aria-describedby={describedBy || undefined}
         className={clsx(
           'min-h-11 w-full min-w-0',
-          'border-4 border-outline bg-inset px-3 py-2',
+          'border border-outline bg-inset px-3 py-2 rounded-xl',
           'font-bold text-ink placeholder:text-ink-muted',
           // The global :focus-visible ring in globals.css handles focus, so
           // nothing here removes or overrides the outline.
@@ -66,7 +66,7 @@ export function HQInput({ label, hint, error, hideLabel = false, className, id, 
       )}
 
       {error && (
-        <p id={errorId} className="text-xs font-black uppercase text-danger-ink">
+        <p id={errorId} className="text-xs font-semibold normal-case text-danger-ink">
           {error}
         </p>
       )}

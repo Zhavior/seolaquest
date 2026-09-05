@@ -73,6 +73,7 @@ export class GamifyQuestService {
   }
 
   async contributeForEvent(event: DomainEvent): Promise<GamifyQuestContributionResult[]> {
+    if (event.type === 'lead.converted' && event.payload.conversionType === 'CRM_EXPORTED') return []
     if (SYSTEM_ACTORS.has(event.actorId) || event.source.startsWith('system.')) return []
 
     const occurredAt = new Date(event.occurredAt)

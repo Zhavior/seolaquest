@@ -27,13 +27,13 @@ export default function HQSection({
 
         <div className="relative">
 
-          <div className="absolute left-0 top-0 h-10 w-1 rounded-full bg-cyan-400 shadow-[0_0_20px_rgba(34,211,238,.8)]" />
+          <div className="absolute left-0 top-0 h-10 w-1 rounded-full bg-cyan-400 shadow-brutal" />
 
           <div className="pl-6">
 
-            <p className="text-[11px] uppercase tracking-[0.28em] text-cyan-300/70 font-semibold">{subtitle ?? "COMMAND MODULE"}</p>
+            <p className="text-[11px] normal-case tracking-[0.28em] text-cyan-300/70 font-semibold">{subtitle ?? "COMMAND MODULE"}</p>
 
-            <h2 className="mt-2 text-3xl font-black tracking-tight text-white">
+            <h2 className="mt-2 text-3xl font-semibold tracking-tight text-white">
               {title}
             </h2>
 

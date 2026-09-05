@@ -1,7 +1,7 @@
 'use client'
 
 import { useMemo, useState } from 'react'
-import { Search, Sparkles, Sword, Zap, BookOpen, Filter } from 'lucide-react'
+import { Search, Sparkles, Zap, BookOpen, Filter } from 'lucide-react'
 import { Post, filterPosts } from '@/lib/blog-types'
 import { BlogHeroCard } from '@/features/blog/components/BlogHeroCard'
 import { BlogPostCard } from '@/features/blog/components/BlogPostCard'
@@ -31,48 +31,24 @@ export default function BlogIndexClient({ initialPosts, featuredPost }: BlogInde
 
   return (
     <div id="blog-index" className="min-h-screen bg-canvas p-4 sm:p-6 md:p-10 pb-20 relative overflow-hidden">
-      <style>{`
-        @media (max-width: 359px) {
-          body:has(#blog-index) header.sticky > .max-w-7xl {
-            flex-wrap: wrap;
-          }
-
-          body:has(#blog-index) header.sticky > .max-w-7xl > div:last-child {
-            width: 100%;
-            justify-content: space-between;
-          }
-        }
-      `}</style>
-      {/* CRT Scanline Overlay Effect */}
-      <div 
-        className="pointer-events-none fixed inset-0 z-30 opacity-[0.03]"
-        style={{
-          backgroundImage: 'linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%)',
-          backgroundSize: '100% 4px'
-        }}
-      />
 
       <div className="max-w-7xl mx-auto space-y-12 relative z-10">
         
         {/* Arcade Hero Header */}
-        <section className="relative border-4 border-outline bg-accent p-6 md:p-10 shadow-brutal-lg overflow-hidden">
-          {/* Decorative Corner Crest */}
-          <div className="absolute -top-6 -right-6 h-24 w-24 bg-[#00FFFF] border-4 border-outline rotate-12 flex items-center justify-center shadow-brutal">
-            <Sword className="text-on-accent w-10 h-10 -rotate-45" />
-          </div>
+        <section className="relative rounded-[20px] border border-outline bg-accent p-6 md:p-10 overflow-hidden">
 
           <div className="max-w-3xl space-y-4">
-            <div className="inline-flex items-center gap-2 border-3 border-outline bg-black px-4 py-1.5 font-black uppercase text-xs text-[#FFE600] shadow-brutal-sm">
-              <Sparkles size={14} className="text-[#00FFFF]" /> SEOLAQUEST KNOWLEDGE VAULT
+            <div className="inline-flex items-center gap-2 rounded-xl border border-outline bg-forest px-4 py-1.5 font-semibold text-xs text-accent">
+              <Sparkles size={14} className="text-accent" /> SEOLAQUEST KNOWLEDGE VAULT
             </div>
 
             {/* The H1 is the on-page half of the title tag. It carries the same
                 searchable entities; the lore lives in the badge above it. */}
-            <h1 className="text-3xl sm:text-5xl md:text-6xl font-black uppercase tracking-tight text-ink leading-none">
+            <h1 className="font-display text-3xl sm:text-5xl md:text-6xl font-medium tracking-tight text-ink leading-none">
               SEO Growth & Developer Playbooks
             </h1>
 
-            <p className="text-sm md:text-lg font-bold text-ink/80 max-w-2xl leading-relaxed">
+            <p className="text-sm md:text-lg font-medium text-ink/80 max-w-2xl leading-relaxed">
               Implementation guides on SaaS gamification, activation metrics, neo-brutalist React UI, metered API billing, and lead-response speed. Working code, honest numbers.
             </p>
 
@@ -88,7 +64,7 @@ export default function BlogIndexClient({ initialPosts, featuredPost }: BlogInde
                   onChange={(e) => setSearchQuery(e.target.value)}
                   onFocus={() => sfx.playHoverBlip()}
                   placeholder="Search articles by keyword or topic..."
-                  className="w-full border-4 border-outline bg-card py-3.5 pl-12 pr-4 font-bold text-sm text-ink placeholder:text-ink-muted shadow-brutal focus:outline-none focus:bg-highlight transition-colors"
+                  className="w-full rounded-xl border border-outline bg-card py-3.5 pl-12 pr-4 font-medium text-sm text-ink placeholder:text-ink-muted  focus:outline-none focus:bg-highlight transition-colors"
                 />
               </div>
             </div>
@@ -97,7 +73,7 @@ export default function BlogIndexClient({ initialPosts, featuredPost }: BlogInde
 
         {/* Dynamic Tag Filter Bar */}
         <section className="space-y-3">
-          <div className="flex items-center gap-2 font-black uppercase text-xs text-ink-muted">
+          <div className="flex items-center gap-2 font-semibold text-xs text-ink-muted">
             <Filter size={14} /> FILTER QUEST CATEGORY:
           </div>
           <BlogTagFilter tags={tags} activeTag={selectedTag} onSelectTag={setSelectedTag} />
@@ -106,9 +82,9 @@ export default function BlogIndexClient({ initialPosts, featuredPost }: BlogInde
         {/* Featured Post Hero Card (Shown when on [ALL] tag & no search filter) */}
         {featuredPost && selectedTag === ALL_TAG && !searchQuery && (
           <section className="space-y-4">
-            <div className="flex items-center justify-between">
-              <h2 className="text-xl font-black uppercase tracking-tight text-ink flex items-center gap-2">
-                <Zap className="fill-[#FFE600] text-ink stroke-[2.5px]" /> LATEST FEATURED ARTICLE
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <h2 className="font-display text-xl font-medium tracking-tight text-ink flex items-center gap-2">
+                <Zap className="fill-accent text-ink stroke-[2.5px]" /> LATEST FEATURED ARTICLE
               </h2>
             </div>
             <BlogHeroCard post={featuredPost} />
@@ -117,11 +93,11 @@ export default function BlogIndexClient({ initialPosts, featuredPost }: BlogInde
 
         {/* Articles Grid Section */}
         <section className="space-y-6">
-          <div className="flex items-center justify-between border-b-4 border-outline pb-3">
-            <h2 className="text-xl md:text-2xl font-black uppercase tracking-tight text-ink flex items-center gap-2">
+          <div className="flex items-center justify-between border-b border-outline pb-3">
+            <h2 className="font-display text-xl md:text-2xl font-medium tracking-tight text-ink flex items-center gap-2">
               <BookOpen size={22} className="stroke-[3px]" />
               {selectedTag !== ALL_TAG ? `${selectedTag} ARTICLES` : 'ALL QUEST LOGS'}
-              <span className="ml-2 border-2 border-outline bg-black px-2 py-0.5 text-xs text-[#FFE600]">
+              <span className="ml-2 rounded-xl border border-outline bg-forest px-2 py-0.5 text-xs text-accent">
                 {filteredPosts.length}
               </span>
             </h2>
@@ -134,9 +110,9 @@ export default function BlogIndexClient({ initialPosts, featuredPost }: BlogInde
               ))}
             </div>
           ) : (
-            <div className="border-4 border-outline bg-card p-12 text-center shadow-brutal-lg space-y-4">
-              <p className="text-2xl font-black uppercase text-ink">🐉 NO ARTICLES FOUND IN THIS VAULT</p>
-              <p className="text-sm font-bold text-ink-muted">
+            <div className="rounded-xl border border-outline bg-card p-12 text-center space-y-4">
+              <p className="text-2xl font-semibold text-ink">🐉 NO ARTICLES FOUND IN THIS VAULT</p>
+              <p className="text-sm font-medium text-ink-muted">
                 Try adjusting your search query or switching to another category.
               </p>
               <button
@@ -146,7 +122,7 @@ export default function BlogIndexClient({ initialPosts, featuredPost }: BlogInde
                   setSelectedTag(ALL_TAG)
                   setSearchQuery('')
                 }}
-                className="inline-flex min-h-11 items-center border-3 border-outline bg-accent px-6 py-2.5 font-black uppercase text-xs shadow-brutal-sm hover:bg-[#00FFFF]"
+                className="inline-flex min-h-11 items-center rounded-xl border border-outline bg-accent px-6 py-2.5 font-semibold text-xs  hover:bg-highlight"
               >
                 Reset Filters
               </button>

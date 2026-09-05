@@ -1,7 +1,8 @@
 @import "tailwindcss";
 
 @theme {
-  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --font-display: var(--font-fraunces), Georgia, serif;
+  --font-sans: var(--font-dm-sans), ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 }
 
 /* ══ THEME PALETTES ═══════════════════════════════════════════════════════
@@ -22,32 +23,36 @@
 [data-theme="parchment"] {
   color-scheme: light;
 
-  --bg-base: #F4F0EA;
-  --bg-surface: #FDFBF7;
-  --bg-card: #FFFFFF;
-  --bg-inset: #F4F4F5;
+  --bg-base: #F3F0E7;
+  --bg-surface: #FAF8F0;
+  --bg-card: #FFFDF6;
+  --bg-inset: #ECEBDF;
 
-  --border-main: #000000;
-  --border-strong: #000000;
+  --border-main: #D4D6C8;
+  --border-strong: #A9B19F;
 
   /* Light theme keeps the classic cut-paper slab. */
-  --shadow-color: #000000;
-  --shadow-accent: #000000;
+  --shadow-color: rgba(37, 60, 51, 0.07);
+  --shadow-accent: rgba(37, 60, 51, 0.10);
 
-  --ink-primary-base: #0A0A0A;
-  --ink-muted-base: #52525B;
+  --ink-primary-base: #273C32;
+  --ink-muted-base: #5E675B;
   --text-primary: var(--ink-primary-base);
   --text-muted: var(--ink-muted-base);
-  --text-inverse: #FFFFFF;
+  --text-inverse: #FFFDF6;
   --text-on-accent: #000000;
 
-  --accent-primary: #FFE600;
-  --accent-secondary: #FF5722;
+  --forest-surface: #253C33;
+  --forest-ink: #FCF4DC;
+  --forest-muted: #D2DACB;
+
+  --accent-primary: #E5B75D;
+  --accent-secondary: #E5B75D;
 
   /* Highlighter panels stay light in every theme, so the black text they
      carry keeps working — a sticky-note accent, not a surface. */
-  --bg-highlight: #FFF8D9;
-  --bg-highlight-strong: #FFD84D;
+  --bg-highlight: #F3E7C9;
+  --bg-highlight-strong: #EBCB89;
 
   --status-success: #16A34A;
   --status-warning: #D97706;
@@ -59,51 +64,52 @@
   --status-danger-ink: #B91C1C;
   --status-info: #0891B2;
 
-  --focus-ring: #000000;
-  --focus-halo: #FFE600;
+  --focus-ring: #273C32;
+  --focus-halo: #E5B75D;
 
   /* Prose links. The brand violet clears AA on the light surfaces but only
      reaches 2.59:1 on the dark card, so each theme carries its own. */
-  --link-color: #6B21A8;
+  --link-color: #345B43;
 
   /* Ruled notebook paper. */
-  --canvas-texture: repeating-linear-gradient(
-    transparent, transparent 39px,
-    rgba(0, 0, 0, 0.06) 39px, rgba(0, 0, 0, 0.06) 40px
-  );
+  --canvas-texture: none;
 }
 
 [data-theme="grey"] {
   color-scheme: dark;
 
-  --bg-base: #0D1117;
-  --bg-surface: #161B22;
-  --bg-card: #1E252E;
-  --bg-inset: #14191F;
+  --bg-base: #17231F;
+  --bg-surface: #1F3029;
+  --bg-card: #293C32;
+  --bg-inset: #1B2923;
 
-  --border-main: #313A46;
-  --border-strong: #64748B;
+  --border-main: #41584A;
+  --border-strong: #647D6A;
 
   /* A black slab is invisible on a near-black ground, so on dark themes the
      light border carries the silhouette and the offset slab is off by
      default. `shadow-brutal-accent` opts hero/CTA cards back in. */
   --shadow-color: transparent;
-  --shadow-accent: #FFE600;
+  --shadow-accent: rgba(0, 0, 0, 0.16);
 
-  --ink-primary-base: #F3F4F6;
-  --ink-muted-base: #9CA3AF;
+  --ink-primary-base: #F5EFDF;
+  --ink-muted-base: #BAC4B6;
   --text-primary: var(--ink-primary-base);
   --text-muted: var(--ink-muted-base);
-  --text-inverse: #0D1117;
+  --text-inverse: #17231F;
   --text-on-accent: #000000;
 
-  --accent-primary: #FFE600;
-  --accent-secondary: #F97316;
+  --forest-surface: #253C33;
+  --forest-ink: #FCF4DC;
+  --forest-muted: #D2DACB;
+
+  --accent-primary: #E5B75D;
+  --accent-secondary: #E5B75D;
 
   /* Highlighter panels stay light in every theme, so the black text they
      carry keeps working — a sticky-note accent, not a surface. */
-  --bg-highlight: #F4E4A6;
-  --bg-highlight-strong: #FFD84D;
+  --bg-highlight: #F3E7C9;
+  --bg-highlight-strong: #EBCB89;
 
   --status-success: #4ADE80;
   --status-warning: #FBBF24;
@@ -112,47 +118,49 @@
   --status-danger-ink: #F87171;
   --status-info: #38BDF8;
 
-  --focus-ring: #F3F4F6;
-  --focus-halo: #FFE600;
+  --focus-ring: #F5EFDF;
+  --focus-halo: #E5B75D;
 
-  --link-color: #C4B5FD;
+  --link-color: #EBCB89;
 
   /* HUD grid, not ruled paper. */
-  --canvas-texture:
-    linear-gradient(to right, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+  --canvas-texture: none;
 }
 
 [data-theme="blue"] {
   color-scheme: dark;
 
-  --bg-base: #0A1128;
-  --bg-surface: #101B36;
-  --bg-card: #16244A;
-  --bg-inset: #0E1A33;
+  --bg-base: #111F2C;
+  --bg-surface: #192C38;
+  --bg-card: #223846;
+  --bg-inset: #142631;
 
-  --border-main: #2C4370;
-  --border-strong: #4C6D9C;
+  --border-main: #3D5663;
+  --border-strong: #688491;
 
   --shadow-color: transparent;
-  --shadow-accent: #38BDF8;
+  --shadow-accent: rgba(0, 0, 0, 0.16);
 
-  --ink-primary-base: #E2E8F0;
-  --ink-muted-base: #93A7C7;
+  --ink-primary-base: #F3EDDB;
+  --ink-muted-base: #BCC8CA;
   --text-primary: var(--ink-primary-base);
   --text-muted: var(--ink-muted-base);
-  --text-inverse: #0A1128;
+  --text-inverse: #111F2C;
   --text-on-accent: #000000;
 
-  --accent-primary: #FFE600;
+  --forest-surface: #253C33;
+  --forest-ink: #FCF4DC;
+  --forest-muted: #D2DACB;
+
+  --accent-primary: #E5B75D;
   /* #FF007F reads at ~4:1 here — fine on a 900-weight badge, not on 12px
      label text. Rose-400 carries the cyber-coral note and passes AA. */
-  --accent-secondary: #FB7185;
+  --accent-secondary: #E5B75D;
 
   /* Highlighter panels stay light in every theme, so the black text they
      carry keeps working — a sticky-note accent, not a surface. */
-  --bg-highlight: #F2E6B0;
-  --bg-highlight-strong: #FFD84D;
+  --bg-highlight: #F3E7C9;
+  --bg-highlight-strong: #EBCB89;
 
   --status-success: #4ADE80;
   --status-warning: #FBBF24;
@@ -161,14 +169,12 @@
   --status-danger-ink: #F87171;
   --status-info: #38BDF8;
 
-  --focus-ring: #E2E8F0;
-  --focus-halo: #FFE600;
+  --focus-ring: #F3EDDB;
+  --focus-halo: #E5B75D;
 
-  --link-color: #C4B5FD;
+  --link-color: #EBCB89;
 
-  --canvas-texture:
-    linear-gradient(to right, rgba(56, 189, 248, 0.06) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(56, 189, 248, 0.06) 1px, transparent 1px);
+  --canvas-texture: none;
 }
 
 /* Ink for fills that are always dark (bg-black and friends) — identical in
@@ -204,6 +210,9 @@
   --color-link: var(--link-color);
 
   /* Accents + status */
+  --color-forest: var(--forest-surface);
+  --color-on-forest: var(--forest-ink);
+  --color-forest-muted: var(--forest-muted);
   --color-accent: var(--accent-primary);
   --color-accent-2: var(--accent-secondary);
   --color-success: var(--status-success);
@@ -213,10 +222,10 @@
   --color-info: var(--status-info);
 
   /* Neobrutalist offset slabs — theme-aware, no !important overrides needed. */
-  --shadow-brutal-sm: 2px 2px 0 0 var(--shadow-color);
-  --shadow-brutal: 4px 4px 0 0 var(--shadow-color);
-  --shadow-brutal-lg: 8px 8px 0 0 var(--shadow-color);
-  --shadow-brutal-accent: 6px 6px 0 0 var(--shadow-accent);
+  --shadow-brutal-sm: 0 2px 8px var(--shadow-color);
+  --shadow-brutal: 0 4px 16px var(--shadow-color);
+  --shadow-brutal-lg: 0 8px 24px var(--shadow-color);
+  --shadow-brutal-accent: 0 8px 24px var(--shadow-accent);
 }
 
 /* ── Ink on bright surfaces ───────────────────────────────────────────────
@@ -242,6 +251,16 @@
     --text-primary: var(--text-on-accent);
     --text-muted: color-mix(in srgb, var(--text-on-accent) 70%, transparent);
     color: var(--text-primary);
+  }
+
+  .bg-forest {
+    --text-primary: var(--forest-ink);
+    --text-muted: var(--forest-muted);
+    color: var(--text-primary);
+  }
+
+  .bg-accent:disabled {
+    --text-muted: var(--ink-muted-base);
   }
 
   /* Nearest surface wins: a themed panel inside a bright one gets theme ink
@@ -411,6 +430,13 @@
 
   /* Canvas colours live here rather than as an inline style on <body>, which
      no stylesheet (and therefore no theme) could ever override. */
+  h1, h2 {
+    font-family: var(--font-fraunces), Georgia, serif;
+    font-weight: 500;
+    letter-spacing: -0.025em;
+    overflow-wrap: break-word;
+  }
+
   body {
     background-color: var(--bg-base);
     background-image: var(--canvas-texture);
@@ -437,10 +463,10 @@
    retargets every `shadow-brutal*` at once — no per-class !important list. */
 @media (max-width: 639px) {
   :root {
-    --shadow-brutal-sm: 1.5px 1.5px 0 0 var(--shadow-color);
-    --shadow-brutal: 2.5px 2.5px 0 0 var(--shadow-color);
-    --shadow-brutal-lg: 4px 4px 0 0 var(--shadow-color);
-    --shadow-brutal-accent: 3px 3px 0 0 var(--shadow-accent);
+    --shadow-brutal-sm: 0 2px 6px var(--shadow-color);
+    --shadow-brutal: 0 4px 12px var(--shadow-color);
+    --shadow-brutal-lg: 0 4px 16px var(--shadow-color);
+    --shadow-brutal-accent: 0 4px 16px var(--shadow-accent);
   }
 }
 
@@ -640,14 +666,14 @@
   left: 0.75rem;
   z-index: 10000;
   transform: translateY(calc(-100% - 1.5rem));
-  border: 3px solid var(--border-strong);
+  border: 1px solid var(--border-strong);
+  border-radius: 0.75rem;
   background: var(--accent-primary);
   color: var(--text-on-accent);
   padding: 0.75rem 1rem;
-  font-weight: 900;
-  line-height: 1;
-  text-transform: uppercase;
-  box-shadow: 4px 4px 0 var(--focus-ring);
+  font-weight: 600;
+  line-height: 1.4;
+  box-shadow: var(--shadow-brutal);
 }
 
 .skip-link:focus-visible {

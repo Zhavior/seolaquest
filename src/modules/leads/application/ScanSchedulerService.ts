@@ -1,6 +1,7 @@
 import 'server-only'
 
 import prisma from '@/lib/prisma'
+import type { Prisma } from '@prisma/client'
 import { MAX_ACTIVE_KEYWORDS_PER_TENANT } from '@/src/modules/keywords/application/KeywordService'
 import { enqueueScanInTransaction } from './ScanRunService'
 
@@ -25,6 +26,10 @@ function boundedBatchSize(batchSize: number) {
 }
 
 export class ScanSchedulerService {
+  static pauseSchedule(userId: string, tx: Prisma.TransactionClient) {
+    return tx.tenantScanSchedule.updateMany({ where: { userId, enabled: true }, data: { enabled: false } })
+  }
+
   /**
    * Repairs the migration/deploy dual-write window on every cycle. This
    * transaction only locks schedule rows and commits before dispatch acquires

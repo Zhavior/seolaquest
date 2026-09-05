@@ -237,10 +237,10 @@ export class CrmDeliveryService {
       })
       if (marked.count !== 1) return
 
-      const convertedAt = new Date()
+      const exportedAt = new Date()
       const lead = await tx.lead.updateMany({
         where: { id: delivery.leadId, userId: job.userId, crmExportedAt: null },
-        data: { crmExportedAt: convertedAt },
+        data: { crmExportedAt: exportedAt },
       })
       if (lead.count === 1) {
         await tx.user.update({
@@ -248,32 +248,19 @@ export class CrmDeliveryService {
           data: { questsExported: { increment: 1 } },
         })
 
-        /**
-         * `lead.converted`, emitted in the delivery-completion transaction behind the
-         * `crmExportedAt: null` guard.
-         *
-         * Conversion is defined as a successful CRM export: the user cared enough about this
-         * lead to push it into the system they actually sell from. That is the strongest
-         * intent signal the product currently records — `LeadStatus` has no CONVERTED member,
-         * and `VIEWED` is never written by anything.
-         *
-         * The null guard is the exactly-once hook, and it matters more here than elsewhere
-         * because Gamify pays XP on this event: a redelivered job whose lead already carries
-         * `crmExportedAt` updates zero rows and never reaches this branch, so a retry cannot
-         * mint a second reward.
-         */
+        // Delivery proves transport success, not qualification or conversion.
         await EventStore.writeOutbox(
           EventFactory.create({
-            type: 'lead.converted',
+            type: 'lead.crm_exported',
             version: 1,
             actorId: job.userId,
             source: 'CrmDeliveryService',
-            idempotencyKey: `lead.converted:${delivery.leadId}`,
+            idempotencyKey: `lead.crm_exported:${delivery.leadId}`,
             payload: {
               leadId: delivery.leadId,
               opportunityId: delivery.leadId,
-              conversionType: 'CRM_EXPORTED',
-              convertedAt: convertedAt.toISOString(),
+              deliveryId: delivery.id,
+              exportedAt: exportedAt.toISOString(),
             },
           }),
           tx,

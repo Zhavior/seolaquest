@@ -30,14 +30,14 @@ function renderInlineText(text: string): React.ReactNode {
           href={href}
           onMouseEnter={() => sfx.playHoverBlip()}
           onClick={() => sfx.playCoinDrop()}
-          className="font-black text-link underline decoration-2 underline-offset-2 hover:bg-accent hover:text-on-accent px-1 py-0.5 border border-outline shadow-brutal-sm transition-colors"
+          className="font-semibold text-link underline decoration-2 underline-offset-2 hover:bg-accent hover:text-on-accent px-1 py-0.5 border border-outline  transition-colors"
         >
           {linkLabel}
         </Link>
       )
     } else if (boldText !== undefined) {
       parts.push(
-        <strong key={match.index} className="font-black text-ink">
+        <strong key={match.index} className="font-semibold text-ink">
           {boldText}
         </strong>
       )
@@ -45,7 +45,7 @@ function renderInlineText(text: string): React.ReactNode {
       parts.push(
         <code
           key={match.index}
-          className="border-2 border-outline bg-accent/25 px-1 py-0.5 font-mono text-[0.85em] font-bold text-ink"
+          className="rounded-xl border border-outline bg-accent/25 px-1 py-0.5 font-mono text-[0.85em] font-medium text-ink"
         >
           {codeText}
         </code>
@@ -94,7 +94,7 @@ function renderMarkdownContent(content: string) {
           // Horizontal rule (--- or ***)
           if (/^[-*_]{3,}$/.test(trimmed)) {
             return (
-              <hr key={pIdx} className="my-8 border-t-4 border-outline" />
+              <hr key={pIdx} className="my-8 border-t border-outline" />
             )
           }
 
@@ -125,13 +125,13 @@ function renderMarkdownContent(content: string) {
 
             return (
               <div key={pIdx} className="my-6 overflow-x-auto">
-                <table className="w-full border-4 border-outline shadow-brutal text-sm">
+                <table className="w-full border border-outline text-sm">
                   <thead>
-                    <tr className="bg-black text-[#FFE600]">
+                    <tr className="bg-forest text-accent">
                       {headerCells.map((cell, cIdx) => (
                         <th
                           key={cIdx}
-                          className="border-2 border-outline px-4 py-2.5 font-black uppercase text-xs text-left"
+                          className="border border-outline px-4 py-2.5 font-semibold text-xs text-left"
                           style={{ textAlign: alignments[cIdx] || 'left' }}
                         >
                           {renderInlineText(cell)}
@@ -148,7 +148,7 @@ function renderMarkdownContent(content: string) {
                         {row.map((cell, cIdx) => (
                           <td
                             key={cIdx}
-                            className="border-2 border-outline px-4 py-2 font-bold text-ink"
+                            className="border border-outline px-4 py-2 font-medium text-ink"
                             style={{ textAlign: alignments[cIdx] || 'left' }}
                           >
                             {renderInlineText(cell)}
@@ -167,7 +167,7 @@ function renderMarkdownContent(content: string) {
             const text = trimmed.slice(2).trim()
             const id = text.toLowerCase().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-')
             return (
-              <h1 id={id} key={pIdx} className="text-2xl sm:text-3xl md:text-4xl font-black uppercase text-ink pt-6 pb-2 border-b-3 border-outline">
+              <h1 id={id} key={pIdx} className="font-display text-2xl sm:text-3xl md:text-4xl font-medium text-ink pt-6 pb-2 border-b border-outline">
                 {renderInlineText(text)}
               </h1>
             )
@@ -178,7 +178,7 @@ function renderMarkdownContent(content: string) {
             const text = trimmed.slice(3).trim()
             const id = text.toLowerCase().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-')
             return (
-              <h2 id={id} key={pIdx} className="text-xl sm:text-2xl font-black uppercase text-ink pt-5 pb-1 border-b-2 border-outline flex items-center gap-2">
+              <h2 id={id} key={pIdx} className="font-display text-xl sm:text-2xl font-medium text-ink pt-5 pb-1 border-b border-outline flex items-center gap-2">
                 <span className="h-3 w-3 bg-accent border border-outline inline-block"></span>
                 {renderInlineText(text)}
               </h2>
@@ -190,7 +190,7 @@ function renderMarkdownContent(content: string) {
             const text = trimmed.slice(4).trim()
             const id = text.toLowerCase().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-')
             return (
-              <h3 id={id} key={pIdx} className="text-lg font-black uppercase text-ink pt-3">
+              <h3 id={id} key={pIdx} className="font-display text-lg font-medium text-ink pt-3">
                 {renderInlineText(text)}
               </h3>
             )
@@ -212,10 +212,10 @@ function renderMarkdownContent(content: string) {
                   alt={alt}
                   loading="lazy"
                   decoding="async"
-                  className="w-full border-4 border-outline shadow-brutal"
+                  className="w-full border border-outline"
                 />
                 {caption && (
-                  <figcaption className="text-xs font-bold uppercase tracking-wide text-ink-muted">
+                  <figcaption className="text-xs font-medium tracking-wide text-ink-muted">
                     {caption}
                   </figcaption>
                 )}
@@ -231,7 +231,7 @@ function renderMarkdownContent(content: string) {
               // `bg-accent/20` is a different class from `bg-accent`, so the
               // ink-inversion rule in globals.css does not apply to it and the
               // theme's own ink is the correct colour here.
-              <blockquote key={pIdx} className="my-5 border-l-8 border-link bg-accent/20 border-4 border-outline p-4 font-bold text-ink shadow-brutal">
+              <blockquote key={pIdx} className="my-5 border-l border-link bg-accent/20 border border-outline p-4 font-medium text-ink">
                 {renderInlineText(quoteText)}
               </blockquote>
             )
@@ -243,8 +243,8 @@ function renderMarkdownContent(content: string) {
             return (
               <ul key={pIdx} className="my-3 space-y-2 pl-4">
                 {items.map((item, iIdx) => (
-                  <li key={iIdx} className="flex items-start gap-2 font-bold text-ink text-sm md:text-base">
-                    <span className="mt-1 flex h-2 w-2 shrink-0 bg-black rotate-45" />
+                  <li key={iIdx} className="flex items-start gap-2 font-medium text-ink text-sm md:text-base">
+                    <span className="mt-1 flex h-2 w-2 shrink-0 bg-forest rotate-45" />
                     <span>{renderInlineText(item)}</span>
                   </li>
                 ))}
@@ -256,7 +256,7 @@ function renderMarkdownContent(content: string) {
           if (/^\d+\.\s/.test(trimmed)) {
             const items = trimmed.split(/\n/).map((line) => line.replace(/^\d+\.\s*/, '').trim())
             return (
-              <ol key={pIdx} className="my-3 space-y-2 pl-4 list-decimal font-bold text-ink text-sm md:text-base">
+              <ol key={pIdx} className="my-3 space-y-2 pl-4 list-decimal font-medium text-ink text-sm md:text-base">
                 {items.map((item, iIdx) => (
                   <li key={iIdx} className="pl-1">
                     {renderInlineText(item)}
@@ -268,7 +268,7 @@ function renderMarkdownContent(content: string) {
 
           // Standard Paragraph text with inline formatting
           return (
-            <p key={pIdx} className="text-sm md:text-base font-bold text-ink leading-relaxed">
+            <p key={pIdx} className="text-sm md:text-base font-medium text-ink leading-relaxed">
               {renderInlineText(trimmed)}
             </p>
           )

@@ -1,17 +1,8 @@
 'use server'
 
-import { getCurrentUser } from '@/lib/auth'
+import { requireAdmin } from '@/src/modules/admin/authorization'
 import { AuroraFeedbackService, SubmitFeedbackSchema } from '@/src/modules/aurora/AuroraFeedbackService'
 import { withServerAction } from '@/src/modules/core/infrastructure/server-action'
-
-function getAdminIds() {
-  return new Set(
-    (process.env.AURORA_ADMIN_USER_IDS ?? '')
-      .split(',')
-      .map((value) => value.trim())
-      .filter(Boolean)
-  )
-}
 
 /**
  * Returns a `{ success, error }` envelope rather than this repo's `{ ok, message }`, so the
@@ -31,14 +22,7 @@ export const submitAuroraFeedbackAction = withServerAction(
     onError: (failure) => ({ success: false, error: failure.message }),
   },
   async (input: unknown) => {
-    const user = await getCurrentUser()
-    if (!user) {
-      return { success: false, error: 'Unauthorized' }
-    }
-
-    if (!getAdminIds().has(user.id)) {
-      return { success: false, error: 'Forbidden' }
-    }
+    const user = await requireAdmin()
 
     const parsed = SubmitFeedbackSchema.safeParse(input)
     if (!parsed.success) {

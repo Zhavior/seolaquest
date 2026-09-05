@@ -38,18 +38,18 @@ export default function TermsPage() {
   return (
     <div className="min-h-screen bg-canvas text-ink font-sans pb-12">
       {/* Top Banner Nav */}
-      <div className="border-b-4 border-outline bg-accent px-4 py-3">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
+      <div className="border-b border-outline bg-accent px-4 py-3">
+        <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
           <Link 
             href="/" 
             onClick={() => sfx.playCoinDrop()}
-            className="flex items-center gap-2 font-black uppercase text-lg sm:text-xl tracking-tight"
+            className="flex items-center gap-2 font-semibold text-lg sm:text-xl tracking-tight"
           >
             <Zap className="fill-black text-ink w-6 h-6" />
             <span>SEOLAQUEST ENGINE</span>
           </Link>
-          <div className="flex items-center gap-2 text-xs font-black uppercase">
-            <span className="border-2 border-outline bg-card px-2.5 py-1 shadow-brutal-sm">
+          <div className="flex items-center gap-2 text-xs font-semibold">
+            <span className="rounded-xl border border-outline bg-card px-2.5 py-1">
               ⚖️ LEGAL GOVERNANCE
             </span>
           </div>
@@ -60,21 +60,21 @@ export default function TermsPage() {
       <main className="max-w-5xl mx-auto px-4 sm:px-6 pt-10 sm:pt-14 space-y-10">
         
         {/* Header Hero Section */}
-        <div className="border-4 border-outline bg-card p-6 sm:p-10 shadow-brutal-lg relative overflow-hidden">
+        <div className="rounded-xl border border-outline bg-card p-6 sm:p-10 relative overflow-hidden">
           <div className="absolute -right-12 -top-12 opacity-10 pointer-events-none">
             <Scale size={240} strokeWidth={1.5} />
           </div>
 
           <div className="relative z-10 space-y-4">
-            <div className="inline-flex items-center gap-2 border-2 border-outline bg-success px-3 py-1 text-xs font-black uppercase shadow-brutal-sm">
+            <div className="inline-flex items-center gap-2 rounded-xl border border-outline bg-success px-3 py-1 text-xs font-semibold">
               <ShieldCheck size={14} /> EFFECTIVE REVISION: JULY 2026 • v2.4 STABLE
             </div>
 
-            <h1 className="text-3xl sm:text-5xl font-black uppercase tracking-tight text-ink leading-none">
+            <h1 className="font-display text-3xl sm:text-5xl font-medium tracking-tight text-ink leading-none">
               Master Guild Code & Terms of Service
             </h1>
 
-            <p className="text-sm sm:text-base font-bold text-ink-muted max-w-3xl leading-relaxed">
+            <p className="text-sm sm:text-base font-medium text-ink-muted max-w-3xl leading-relaxed">
               Welcome to SEOlaQuest. By using the application, configured scans, or paid credits, you agree to this Master Guild Code of Conduct and Operating Terms.
             </p>
 
@@ -83,7 +83,7 @@ export default function TermsPage() {
               <button
                 onClick={copyTermsSummary}
                 onMouseEnter={() => sfx.playHoverBlip()}
-                className="flex min-h-11 items-center gap-2 border-3 border-outline bg-accent px-4 py-2.5 text-xs font-black uppercase shadow-brutal hover:bg-[#00FFFF] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all cursor-pointer"
+                className="flex min-h-11 items-center gap-2 rounded-xl border border-outline bg-accent px-4 py-2.5 text-xs font-semibold  hover:bg-highlight active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all cursor-pointer"
               >
                 {copied ? <Check size={16} className="text-green-700" /> : <Copy size={16} />}
                 <span>{copied ? 'Summary Copied to Clipboard!' : 'Copy Terms Summary'}</span>
@@ -92,7 +92,7 @@ export default function TermsPage() {
               <a
                 href="#billing-terms"
                 onClick={() => sfx.playHoverBlip()}
-                className="flex items-center gap-1.5 border-3 border-outline bg-card px-4 py-2.5 text-xs font-black uppercase shadow-brutal hover:bg-inset transition-all"
+                className="flex items-center gap-1.5 rounded-xl border border-outline bg-card px-4 py-2.5 text-xs font-semibold  hover:bg-inset transition-all"
               >
                 <span>Jump to Billing Rules</span>
                 <ChevronRight size={16} />
@@ -106,76 +106,76 @@ export default function TermsPage() {
           <a
             href="#code-of-conduct"
             onClick={() => sfx.playHoverBlip()}
-            className="border-3 border-outline bg-card p-4 shadow-brutal hover:bg-highlight transition-all flex flex-col justify-between"
+            className="rounded-xl border border-outline bg-card p-4  hover:bg-highlight transition-all flex flex-col justify-between"
           >
             <div className="flex items-center justify-between">
-              <span className="font-black text-sm uppercase">1. Guild Code</span>
-              <ShieldCheck size={20} className="text-purple-600" />
+              <span className="font-semibold text-sm">1. Guild Code</span>
+              <ShieldCheck size={20} className="text-forest" />
             </div>
-            <p className="text-xs font-bold text-ink-muted mt-2">Ethical B2B hunting standards & system fair play.</p>
+            <p className="text-xs font-medium text-ink-muted mt-2">Ethical B2B hunting standards & system fair play.</p>
           </a>
 
           <a
             href="#billing-terms"
             onClick={() => sfx.playHoverBlip()}
-            className="border-3 border-outline bg-card p-4 shadow-brutal hover:bg-highlight transition-all flex flex-col justify-between"
+            className="rounded-xl border border-outline bg-card p-4  hover:bg-highlight transition-all flex flex-col justify-between"
           >
             <div className="flex items-center justify-between">
-              <span className="font-black text-sm uppercase">2. Subscription & Billing</span>
+              <span className="font-semibold text-sm">2. Subscription & Billing</span>
               <CreditCard size={20} className="text-blue-600" />
             </div>
-            <p className="text-xs font-bold text-ink-muted mt-2">Current enabled billing catalog and credit terms.</p>
+            <p className="text-xs font-medium text-ink-muted mt-2">Current enabled billing catalog and credit terms.</p>
           </a>
 
           <a
             href="#acceptable-use"
             onClick={() => sfx.playHoverBlip()}
-            className="border-3 border-outline bg-card p-4 shadow-brutal hover:bg-highlight transition-all flex flex-col justify-between"
+            className="rounded-xl border border-outline bg-card p-4  hover:bg-highlight transition-all flex flex-col justify-between"
           >
             <div className="flex items-center justify-between">
-              <span className="font-black text-sm uppercase">3. Acceptable Use</span>
+              <span className="font-semibold text-sm">3. Acceptable Use</span>
               <Ban size={20} className="text-red-600" />
             </div>
-            <p className="text-xs font-bold text-ink-muted mt-2">Strict anti-scraping & anti-spam guidelines.</p>
+            <p className="text-xs font-medium text-ink-muted mt-2">Strict anti-scraping & anti-spam guidelines.</p>
           </a>
         </div>
 
         {/* 1. MASTER GUILD CODE OF CONDUCT */}
-        <section id="code-of-conduct" className="border-4 border-outline bg-card p-6 sm:p-8 shadow-brutal-lg space-y-6">
-          <div className="flex items-center gap-3 border-b-4 border-outline pb-4">
-            <div className="w-10 h-10 bg-accent border-3 border-outline flex items-center justify-center font-black text-xl shadow-brutal-sm">
+        <section id="code-of-conduct" className="rounded-[20px] border border-outline bg-card p-6 sm:p-8 space-y-6">
+          <div className="flex items-center gap-3 border-b border-outline pb-4">
+            <div className="w-10 h-10 bg-accent border border-outline flex items-center justify-center font-semibold text-xl">
               1
             </div>
             <div>
-              <h2 className="text-2xl font-black uppercase tracking-tight text-ink">Master Guild Code of Conduct</h2>
-              <p className="text-xs font-bold text-ink-muted uppercase">Honor, Speed, and Ethical Lead Hunting</p>
+              <h2 className="font-display text-2xl font-medium tracking-tight text-ink">Master Guild Code of Conduct</h2>
+              <p className="text-xs font-medium text-ink-muted">Honor, Speed, and Ethical Lead Hunting</p>
             </div>
           </div>
 
-          <div className="space-y-4 text-sm font-bold text-ink leading-relaxed">
+          <div className="space-y-4 text-sm font-medium text-ink leading-relaxed">
             <p>
               SEOlaQuest may surface stored provider results when a configured scan succeeds. Matches are not verified purchase intent. All users must operate under the following core principles:
             </p>
 
             <ul className="space-y-3 pl-2">
-              <li className="flex items-start gap-3 border-2 border-outline bg-inset p-3 shadow-brutal-sm">
+              <li className="flex items-start gap-3 rounded-xl border border-outline bg-inset p-3">
                 <CheckCircle2 size={18} className="text-green-600 shrink-0 mt-0.5" />
                 <div>
-                  <span className="font-black uppercase text-ink">Fair Play & Rate Integrity:</span> Hunters shall not attempt to breach or alter API rate limits using distributed proxy networks, key pooling, or concurrent request spikes designed to degrade service performance.
+                  <span className="font-semibold text-ink">Fair Play & Rate Integrity:</span> Hunters shall not attempt to breach or alter API rate limits using distributed proxy networks, key pooling, or concurrent request spikes designed to degrade service performance.
                 </div>
               </li>
 
-              <li className="flex items-start gap-3 border-2 border-outline bg-inset p-3 shadow-brutal-sm">
+              <li className="flex items-start gap-3 rounded-xl border border-outline bg-inset p-3">
                 <CheckCircle2 size={18} className="text-green-600 shrink-0 mt-0.5" />
                 <div>
-                  <span className="font-black uppercase text-ink">Honorable Outreach:</span> Stored source matches must be used solely for relevant, non-deceptive B2B communication. Impersonation of third-party organizations or deceptive automation may result in account restriction under these terms.
+                  <span className="font-semibold text-ink">Honorable Outreach:</span> Stored source matches must be used solely for relevant, non-deceptive B2B communication. Impersonation of third-party organizations or deceptive automation may result in account restriction under these terms.
                 </div>
               </li>
 
-              <li className="flex items-start gap-3 border-2 border-outline bg-inset p-3 shadow-brutal-sm">
+              <li className="flex items-start gap-3 rounded-xl border border-outline bg-inset p-3">
                 <CheckCircle2 size={18} className="text-green-600 shrink-0 mt-0.5" />
                 <div>
-                  <span className="font-black uppercase text-ink">Security Vigilance:</span> Public API credentials are not currently offered. Do not attempt to access internal endpoints or credentials, and report suspected compromise through an available support channel.
+                  <span className="font-semibold text-ink">Security Vigilance:</span> Public API credentials are not currently offered. Do not attempt to access internal endpoints or credentials, and report suspected compromise through an available support channel.
                 </div>
               </li>
             </ul>
@@ -183,39 +183,39 @@ export default function TermsPage() {
         </section>
 
         {/* 2. SUBSCRIPTION BILLING TERMS */}
-        <section id="billing-terms" className="border-4 border-outline bg-card p-6 sm:p-8 shadow-brutal-lg space-y-6">
-          <div className="flex items-center gap-3 border-b-4 border-outline pb-4">
-            <div className="w-10 h-10 bg-info text-white border-3 border-outline flex items-center justify-center font-black text-xl shadow-brutal-sm">
+        <section id="billing-terms" className="rounded-[20px] border border-outline bg-card p-6 sm:p-8 space-y-6">
+          <div className="flex items-center gap-3 border-b border-outline pb-4">
+            <div className="w-10 h-10 bg-info text-on-accent border border-outline flex items-center justify-center font-semibold text-xl">
               2
             </div>
             <div>
-              <h2 className="text-2xl font-black uppercase tracking-tight text-ink">Subscription Billing & Tier Terms</h2>
-              <p className="text-xs font-bold text-ink-muted uppercase">Free access and the enabled paid Beta</p>
+              <h2 className="font-display text-2xl font-medium tracking-tight text-ink">Subscription Billing & Tier Terms</h2>
+              <p className="text-xs font-medium text-ink-muted">Free access and the enabled paid Beta</p>
             </div>
           </div>
 
-          <div className="space-y-4 text-sm font-bold text-ink leading-relaxed">
+          <div className="space-y-4 text-sm font-medium text-ink leading-relaxed">
             <p>
               The enabled SEOlaQuest Beta subscription is billed monthly through Stripe. A qualifying positive paid invoice adds {PLAN_CATALOG.BETA.scanLimit.toLocaleString()} scan credits. Free access includes no paid scan, AI-reply, or CRM-export entitlement.
             </p>
 
-            <div className="border-3 border-outline bg-inset p-4 space-y-4 shadow-brutal">
-              <div className="flex items-center justify-between border-b-2 border-outline pb-2">
-                <span className="font-black uppercase text-xs text-ink-muted">CURRENT SELLABLE CATALOG</span>
-                <span className="text-xs font-bold text-ink-muted">Server-enforced</span>
+            <div className="rounded-xl border border-outline bg-inset p-4 space-y-4">
+              <div className="flex items-center justify-between border-b border-outline pb-2">
+                <span className="font-semibold text-xs text-ink-muted">CURRENT SELLABLE CATALOG</span>
+                <span className="text-xs font-medium text-ink-muted">Server-enforced</span>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div className="border-3 border-outline bg-card p-4">
-                  <div className="font-black uppercase">Free Scout — $0</div>
+                <div className="rounded-xl border border-outline bg-card p-4">
+                  <div className="font-semibold">Free Scout — $0</div>
                   <p className="mt-2 text-xs">Dashboard access with no paid feature entitlement or included scan credits.</p>
                 </div>
-                <div className="border-3 border-outline bg-success p-4 shadow-brutal-sm">
-                  <div className="font-black uppercase">Beta Hunter — $14.99/month</div>
+                <div className="rounded-xl border border-outline bg-success p-4">
+                  <div className="font-semibold">Beta Hunter — $14.99/month</div>
                   <p className="mt-2 text-xs">50 credits per positive paid subscription-creation or renewal invoice; paid scans, AI replies, and CRM export while the subscription period is current.</p>
                 </div>
-                <div className="border-3 border-outline bg-success p-4 shadow-brutal-sm">
-                  <div className="font-black uppercase">Founder Pass — $29.99/month</div>
+                <div className="rounded-xl border border-outline bg-success p-4">
+                  <div className="font-semibold">Founder Pass — $29.99/month</div>
                   <p className="mt-2 text-xs">
                     Limited to {FOUNDER_SEAT_LIMIT} seats. Same paid entitlements as Beta Hunter at a higher included
                     allowance, plus the rate lock described below.
@@ -223,8 +223,8 @@ export default function TermsPage() {
                 </div>
               </div>
 
-              <div className="border-3 border-outline bg-card p-4 space-y-2">
-                <div className="font-black uppercase text-xs">Founder rate lock</div>
+              <div className="rounded-xl border border-outline bg-card p-4 space-y-2">
+                <div className="font-semibold text-xs">Founder rate lock</div>
                 <ul className="space-y-1 text-xs list-disc pl-4">
                   {FOUNDER_LOCK_TERMS.map((term) => (
                     <li key={term}>{term}</li>
@@ -232,13 +232,13 @@ export default function TermsPage() {
                 </ul>
               </div>
 
-              <div className="border-3 border-outline bg-highlight p-4 text-xs font-bold">
+              <div className="rounded-xl border border-outline bg-highlight p-4 text-xs font-medium">
                 Pro and Agency are preview-only and grant no entitlement. Credit top-ups are disabled until refund and dispute reversal handling is implemented.
               </div>
             </div>
 
             <div className="space-y-3 pt-2">
-              <h3 className="font-black uppercase text-base text-ink flex items-center gap-2">
+              <h3 className="font-display font-medium text-base text-ink flex items-center gap-2">
                 <RotateCcw size={18} className="text-amber-600" /> Automatic Renewal & Upgrades
               </h3>
               <p>
@@ -249,34 +249,34 @@ export default function TermsPage() {
         </section>
 
         {/* 3. MANA NON-REFUNDABILITY & CANCELATION */}
-        <section id="mana-policy" className="border-4 border-outline bg-card p-6 sm:p-8 shadow-brutal-lg space-y-6">
-          <div className="flex items-center gap-3 border-b-4 border-outline pb-4">
-            <div className="w-10 h-10 bg-[#A855F7] text-white border-3 border-outline flex items-center justify-center font-black text-xl shadow-brutal-sm">
+        <section id="mana-policy" className="rounded-[20px] border border-outline bg-card p-6 sm:p-8 space-y-6">
+          <div className="flex items-center gap-3 border-b border-outline pb-4">
+            <div className="w-10 h-10 bg-forest text-on-forest border border-outline flex items-center justify-center font-semibold text-xl">
               3
             </div>
             <div>
-              <h2 className="text-2xl font-black uppercase tracking-tight text-ink">Usage-Based Mana & Cancellation Rules</h2>
-              <p className="text-xs font-bold text-ink-muted uppercase">Non-Refundable Edge Consumption & Account Self-Service</p>
+              <h2 className="font-display text-2xl font-medium tracking-tight text-ink">Usage-Based Mana & Cancellation Rules</h2>
+              <p className="text-xs font-medium text-ink-muted">Non-Refundable Edge Consumption & Account Self-Service</p>
             </div>
           </div>
 
-          <div className="space-y-4 text-sm font-bold text-ink leading-relaxed">
-            <div className="border-3 border-outline bg-highlight p-4 shadow-brutal flex items-start gap-3">
+          <div className="space-y-4 text-sm font-medium text-ink leading-relaxed">
+            <div className="rounded-xl border border-outline bg-highlight p-4 flex items-start gap-3">
               <AlertTriangle size={24} className="text-amber-700 shrink-0 mt-0.5" />
               <div className="space-y-1">
-                <span className="font-black uppercase text-ink text-sm">CRITICAL NOTICE: MANA NON-REFUNDABILITY</span>
-                <p className="text-xs font-bold text-ink leading-normal">
+                <span className="font-semibold text-ink text-sm">CRITICAL NOTICE: MANA NON-REFUNDABILITY</span>
+                <p className="text-xs font-medium text-ink leading-normal">
                   Credits are usage units recorded by the server ledger. Consumed credits are not restored automatically. Contact support for billing disputes; nothing in these terms limits rights that cannot legally be waived.
                 </p>
               </div>
             </div>
 
             <div className="space-y-3 pt-2">
-              <h3 className="font-black uppercase text-base text-ink">Account Cancellation Procedures</h3>
+              <h3 className="font-display font-medium text-base text-ink">Account Cancellation Procedures</h3>
               <p>
-                Hunters may use the available subscription controls through the <Link href="/app/billing" className="underline font-black text-blue-600 hover:text-blue-800">Billing page</Link>. A cancellation is effective only when Stripe and the server-owned billing state confirm it:
+                Hunters may use the available subscription controls through the <Link href="/app/billing" className="underline font-semibold text-blue-600 hover:text-blue-800">Billing page</Link>. A cancellation is effective only when Stripe and the server-owned billing state confirm it:
               </p>
-              <ul className="list-disc pl-5 space-y-1.5 text-xs sm:text-sm font-bold">
+              <ul className="list-disc pl-5 space-y-1.5 text-xs sm:text-sm font-medium">
                 <li>Your subscription will not renew at the next billing interval.</li>
                 <li>You retain full access to remaining active Mana and features until the end of your current paid billing period.</li>
                 <li>Unused credits remain recorded on your account, but paid capabilities are unavailable without a current active subscription period.</li>
@@ -287,55 +287,55 @@ export default function TermsPage() {
         </section>
 
         {/* 4. ACCEPTABLE USE POLICY (AUP) */}
-        <section id="acceptable-use" className="border-4 border-outline bg-card p-6 sm:p-8 shadow-brutal-lg space-y-6">
-          <div className="flex items-center gap-3 border-b-4 border-outline pb-4">
-            <div className="w-10 h-10 bg-accent-2 text-white border-3 border-outline flex items-center justify-center font-black text-xl shadow-brutal-sm">
+        <section id="acceptable-use" className="rounded-[20px] border border-outline bg-card p-6 sm:p-8 space-y-6">
+          <div className="flex items-center gap-3 border-b border-outline pb-4">
+            <div className="w-10 h-10 bg-accent-2 text-on-accent border border-outline flex items-center justify-center font-semibold text-xl">
               4
             </div>
             <div>
-              <h2 className="text-2xl font-black uppercase tracking-tight text-ink">Acceptable Use Policy (AUP)</h2>
-              <p className="text-xs font-bold text-ink-muted uppercase">Strict Anti-Scraping, Anti-Spam & API Safeguards</p>
+              <h2 className="font-display text-2xl font-medium tracking-tight text-ink">Acceptable Use Policy (AUP)</h2>
+              <p className="text-xs font-medium text-ink-muted">Strict Anti-Scraping, Anti-Spam & API Safeguards</p>
             </div>
           </div>
 
-          <div className="space-y-4 text-sm font-bold text-ink leading-relaxed">
+          <div className="space-y-4 text-sm font-medium text-ink leading-relaxed">
             <p>
               SEOlaQuest supports keyword-based source discovery and user-reviewed lead workflows. A source match is not verified purchase intent. The following actions are strictly prohibited:
             </p>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
-              <div className="border-3 border-outline bg-red-50 p-4 shadow-brutal-sm">
-                <div className="flex items-center gap-2 text-red-700 font-black uppercase text-xs mb-2">
+              <div className="rounded-xl border border-outline bg-red-50 p-4">
+                <div className="flex items-center gap-2 text-red-700 font-semibold text-xs mb-2">
                   <Ban size={16} /> 1. UNFAIR AUTOMATED SCRAPING
                 </div>
-                <p className="text-xs font-bold text-ink">
+                <p className="text-xs font-medium text-ink">
                   Using automated tools to scrape, dump, or extract SEOlaQuest&apos;s proprietary lead database or attempt bulk reverse-engineering of Scout signals.
                 </p>
               </div>
 
-              <div className="border-3 border-outline bg-red-50 p-4 shadow-brutal-sm">
-                <div className="flex items-center gap-2 text-red-700 font-black uppercase text-xs mb-2">
+              <div className="rounded-xl border border-outline bg-red-50 p-4">
+                <div className="flex items-center gap-2 text-red-700 font-semibold text-xs mb-2">
                   <Ban size={16} /> 2. UNSOLICITED SPAM OUTREACH
                 </div>
-                <p className="text-xs font-bold text-ink">
+                <p className="text-xs font-medium text-ink">
                   Weaponizing SEOlaQuest leads for mass automated email spam, bot spamming on social channels, or sending deceptive/phishing materials.
                 </p>
               </div>
 
-              <div className="border-3 border-outline bg-red-50 p-4 shadow-brutal-sm">
-                <div className="flex items-center gap-2 text-red-700 font-black uppercase text-xs mb-2">
+              <div className="rounded-xl border border-outline bg-red-50 p-4">
+                <div className="flex items-center gap-2 text-red-700 font-semibold text-xs mb-2">
                   <Ban size={16} /> 3. KEY RESELLING & RE-LICENSING
                 </div>
-                <p className="text-xs font-bold text-ink">
+                <p className="text-xs font-medium text-ink">
                   Sub-licensing, renting, or selling access to SEOlaQuest accounts or internal credentials to third parties without prior written consent.
                 </p>
               </div>
 
-              <div className="border-3 border-outline bg-red-50 p-4 shadow-brutal-sm">
-                <div className="flex items-center gap-2 text-red-700 font-black uppercase text-xs mb-2">
+              <div className="rounded-xl border border-outline bg-red-50 p-4">
+                <div className="flex items-center gap-2 text-red-700 font-semibold text-xs mb-2">
                   <Ban size={16} /> 4. INFRASTRUCTURE DENIAL
                 </div>
-                <p className="text-xs font-bold text-ink">
+                <p className="text-xs font-medium text-ink">
                   Executing Denial of Service (DoS) attacks or flooding application or webhook endpoints to exhaust shared infrastructure.
                 </p>
               </div>
@@ -344,24 +344,24 @@ export default function TermsPage() {
         </section>
 
         {/* Footer Navigation Bar / Link Hub */}
-        <div className="border-4 border-outline bg-accent p-6 shadow-brutal-lg flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="rounded-xl border border-outline bg-accent p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="space-y-1 text-center sm:text-left">
-            <span className="font-black uppercase text-base text-on-accent">Questions regarding Guild Terms?</span>
-            <p className="text-xs font-bold text-ink">Review Privacy Policies or contact our Guildmaster support team.</p>
+            <span className="font-semibold text-base text-on-accent">Questions regarding Guild Terms?</span>
+            <p className="text-xs font-medium text-ink">Review Privacy Policies or contact our Guildmaster support team.</p>
           </div>
 
           <div className="flex items-center gap-3">
             <Link
               href="/privacy"
               onClick={() => sfx.playCoinDrop()}
-              className="border-3 border-outline bg-card px-4 py-2 font-black uppercase text-xs shadow-brutal-sm hover:bg-inset transition-all"
+              className="rounded-xl border border-outline bg-card px-4 py-2 font-semibold text-xs  hover:bg-inset transition-all"
             >
               Privacy Policy
             </Link>
             <Link
               href="/api-terms"
               onClick={() => sfx.playCoinDrop()}
-              className="border-3 border-outline bg-black text-[#FFE600] px-4 py-2 font-black uppercase text-xs shadow-brutal-sm hover:bg-zinc-800 transition-all flex items-center gap-1"
+              className="rounded-xl border border-outline bg-forest text-accent px-4 py-2 font-semibold text-xs  hover:bg-forest/90 transition-all flex items-center gap-1"
             >
               <span>API Terms</span>
               <ArrowRight size={14} />

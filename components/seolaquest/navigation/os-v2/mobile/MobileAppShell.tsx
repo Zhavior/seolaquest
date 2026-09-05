@@ -139,7 +139,7 @@ export default function MobileAppShell({
       <div className="contents" aria-hidden={drawerOpen || undefined}>
         {header && (
           <div
-            className="pt-safe sticky z-40 -mx-4 -mt-4 mb-4 border-b-3 border-outline bg-canvas/95 px-4 backdrop-blur-sm md:hidden"
+            className="pt-safe sticky z-40 -mx-4 -mt-4 mb-4 border-b border-outline bg-canvas/95 px-4 backdrop-blur-sm md:hidden"
             style={{ top: TOP_BAR_OFFSET }}
           >
             {header}
@@ -157,7 +157,7 @@ export default function MobileAppShell({
         </div>
 
         {bottomBar && (
-          <div className="pb-safe fixed inset-x-0 bottom-0 z-40 border-t-4 border-outline bg-card shadow-[0px_-4px_0px_0px_rgba(0,0,0,1)] md:hidden">
+          <div className="pb-safe fixed inset-x-0 bottom-0 z-40 border-t border-outline bg-card shadow-sm md:hidden">
             <div className="flex h-[var(--mobile-tray-height)] items-center px-3">{bottomBar}</div>
           </div>
         )}
@@ -187,7 +187,7 @@ export default function MobileAppShell({
             aria-modal="true"
             aria-label="Navigation"
             tabIndex={-1}
-            className={`apple-spring pt-safe pb-safe absolute inset-y-0 left-0 flex h-[100dvh] w-[88vw] max-w-[320px] flex-col overflow-y-auto border-r-4 border-outline bg-card shadow-[10px_0_0_rgba(0,0,0,0.25)] transition-transform duration-300 ${
+            className={`apple-spring pt-safe pb-safe absolute inset-y-0 left-0 flex h-[100dvh] w-[88vw] max-w-[320px] flex-col overflow-y-auto border-r border-outline bg-card shadow-[10px_0_0_rgba(0,0,0,0.25)] transition-transform duration-300 ${
               drawerOpen ? 'translate-x-0' : '-translate-x-full'
             }`}
           >

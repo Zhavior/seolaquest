@@ -114,3 +114,9 @@ EventRegistry.register({ type: 'opportunity.dismissed', version: 1, schema: Oppo
 EventRegistry.register({ type: 'lead.converted', version: 1, schema: LeadConvertedPayloadSchema })
 EventRegistry.register({ type: 'aurora.opportunity.evaluated', version: 1, schema: AuroraEvaluatedPayloadSchema })
 EventRegistry.register({ type: 'aurora.feedback.recorded', version: 1, schema: AuroraFeedbackRecordedPayloadSchema })
+
+// Operational delivery evidence has its own contract and does not trigger conversion rewards.
+EventRegistry.register({ type: 'lead.crm_exported', version: 1, schema: z.object({
+  leadId: z.string().min(1), opportunityId: z.string().min(1),
+  deliveryId: z.string().min(1), exportedAt: z.string().datetime(),
+}) })

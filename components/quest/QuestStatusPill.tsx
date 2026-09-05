@@ -28,14 +28,14 @@ export function QuestStatusPill({ label, value, state = 'live', className }: Que
         ) : null}
         <span
           className={clsx(
-            'relative inline-flex h-4 w-4 rounded-full border-2 border-outline',
+            'relative inline-flex h-4 w-4 rounded-full border border-outline',
             isLive ? 'bg-emerald-500' : 'bg-zinc-400'
           )}
         />
       </span>
       <div className="flex min-w-0 flex-col">
-        <span className="text-xs font-bold uppercase text-ink-muted">{label}</span>
-        <span className="text-lg font-black uppercase leading-none text-ink">{value}</span>
+        <span className="text-xs font-bold normal-case text-ink-muted">{label}</span>
+        <span className="text-lg font-semibold normal-case leading-none text-ink">{value}</span>
       </div>
     </div>
   )

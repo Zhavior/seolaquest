@@ -6,6 +6,8 @@ import {
   RecommendedAction,
 } from '../types';
 
+import { MIN_ENGAGE_CONFIDENCE } from '../policy';
+
 export class CanonicalPolicyScorer {
   score(
     deterministic: DeterministicScorerResult,
@@ -73,6 +75,19 @@ export class CanonicalPolicyScorer {
 
     // Cap confidence between 0 and 1
     canonicalConfidence = Math.max(0, Math.min(1.0, canonicalConfidence));
+
+    // These are conservative policy thresholds, not calibrated conversion probabilities.
+    const hasBuyingEvidence = !semantic?.failureCode
+      && semantic?.semanticSignals?.commercialIntent === true
+      && semantic.semanticSignals.relevance === 'HIGH'
+      && semantic.semanticSignals.businessContextAvailable === true
+      && ['HIGH', 'MEDIUM'].includes(String(semantic.semanticSignals.businessFit))
+      && canonicalConfidence >= MIN_ENGAGE_CONFIDENCE;
+    if (!hasBuyingEvidence) {
+      finalScore = Math.min(finalScore, 79);
+      canonicalReasons.push('INSUFFICIENT_BUYING_EVIDENCE');
+    }
+    if (semantic?.semanticSignals?.relevance === 'LOW') finalScore = Math.min(finalScore, 39);
 
     // Determine Action & Priority
     let recommendedAction: RecommendedAction = 'WATCH';

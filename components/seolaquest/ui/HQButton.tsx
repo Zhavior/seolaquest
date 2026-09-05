@@ -18,7 +18,7 @@ interface HQButtonProps
 // moves identically — a per-variant hover translate is how a button set starts
 // feeling inconsistent.
 const variants: Record<Variant, string> = {
-  primary: "bg-black text-[#FFE600]",
+  primary: "bg-forest text-accent",
   secondary: "bg-card text-ink",
   // `text-on-accent` is black in every theme, which made this unreadable on the
   // dark grounds — a transparent fill inherits the page, not an accent. Theme
@@ -40,11 +40,11 @@ export default function HQButton({
       {...props}
       className={clsx(
         "inline-flex items-center justify-center gap-2",
-        "border-4 border-outline",
+        "border border-outline rounded-xl",
         // 44px is the minimum touch target. px-4 py-2 on a small label lands
         // under 40, which fails on every phone.
         "min-h-11 px-4 py-2",
-        "font-black uppercase tracking-[0.08em]",
+        "font-semibold normal-case tracking-[0.08em]",
         "shadow-brutal",
         "transition-[transform,box-shadow] duration-100 ease-out",
         // The press has to conserve the footprint: the element moves into its

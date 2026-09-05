@@ -1,6 +1,6 @@
 import './globals.css'
 import type { Metadata, Viewport } from 'next'
-import { Inter } from 'next/font/google'
+import { DM_Sans, Fraunces } from 'next/font/google'
 import { SkipLink } from '@/components/SkipLink'
 import { ThemeProvider } from '@/components/theme/ThemeProvider'
 import { ThemeScript } from '@/components/theme/ThemeScript'
@@ -8,11 +8,17 @@ import { siteUrl } from '@/lib/siteUrl'
 import { Analytics } from '@vercel/analytics/next'
 import { SpeedInsights } from '@vercel/speed-insights/next'
 
-const inter = Inter({
+const bodyFont = DM_Sans({
   subsets: ['latin'],
   display: 'swap',
   adjustFontFallback: true,
-  variable: '--font-inter',
+  variable: '--font-dm-sans',
+})
+
+const displayFont = Fraunces({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-fraunces',
 })
 
 const TITLE = 'SEOlaQuest | AI Social Listening & Lead Monitoring'
@@ -64,7 +70,7 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" className={inter.variable} suppressHydrationWarning>
+    <html lang="en" className={`${bodyFont.variable} ${displayFont.variable}`} suppressHydrationWarning>
       <head>
         {/*
           Both scripts run synchronously while the browser parses the document,

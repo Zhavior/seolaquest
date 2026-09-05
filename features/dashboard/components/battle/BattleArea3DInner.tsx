@@ -437,7 +437,7 @@ export function BattleArea3DInner({ userLevel = 1 }: { userLevel?: number }) {
         <button
           type="button"
           onClick={triggerDemoScanSequence}
-          className="flex items-center gap-1 border-2 border-outline bg-accent-2 px-3 py-1 text-xs font-black uppercase text-white hover:bg-orange-600 shadow-brutal-sm active:translate-x-[1px] active:translate-y-[1px]"
+          className="flex items-center gap-1 border-2 border-outline bg-accent-2 px-3 py-1 text-xs font-black uppercase text-on-accent hover:bg-highlight-strong shadow-brutal-sm active:translate-x-[1px] active:translate-y-[1px]"
           title="Trigger 8-Bit Arcade Pulse"
         >
           <Play className="h-3.5 w-3.5 fill-white" />

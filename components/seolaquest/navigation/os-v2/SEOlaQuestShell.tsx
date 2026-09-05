@@ -70,11 +70,13 @@ interface SEOlaQuestShellProps {
    * it as a slot is what keeps the account record on the server.
    */
   hud?: ReactNode
+  isAdmin?: boolean
   children: ReactNode
 }
 
 export default function SEOlaQuestShell({
   hud,
+  isAdmin = false,
   children,
 }: SEOlaQuestShellProps) {
   const collapsed = useSyncExternalStore(
@@ -114,7 +116,7 @@ export default function SEOlaQuestShell({
       collapsed={collapsed}
       sidebar={
         // Desktop rail only — the mobile drawer is owned by MobileAppShell.
-        <Sidebar collapsed={collapsed} onToggleCollapsed={toggleCollapsed} />
+        <Sidebar isAdmin={isAdmin} collapsed={collapsed} onToggleCollapsed={toggleCollapsed} />
       }
       statusBar={
         <StatusBar
@@ -129,7 +131,7 @@ export default function SEOlaQuestShell({
       <MobileAppShell
         mobileOpen={mobileOpen}
         onCloseMobile={closeMobile}
-        sidebar={<SidebarNavigation mobile onNavigate={closeMobile} />}
+        sidebar={<SidebarNavigation isAdmin={isAdmin} mobile onNavigate={closeMobile} />}
         bottomBar={<MobileBottomNav mobileOpen={mobileOpen} onOpenNavigation={openMobile} />}
       >
         <Workspace>{children}</Workspace>

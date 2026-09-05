@@ -58,7 +58,7 @@ export default function StatusBar({
   return (
     <header
       aria-label="SEOlaQuest navigation"
-      className="sticky inset-x-0 top-0 z-50 border-b-4 border-outline bg-canvas/95 pt-[env(safe-area-inset-top)] backdrop-blur-md select-none"
+      className="sticky inset-x-0 top-0 z-50 border-b border-outline bg-canvas/95 pt-[env(safe-area-inset-top)] backdrop-blur-md select-none"
     >
       <div className="relative z-10 mx-auto flex h-14 max-w-7xl items-center justify-between gap-2 pl-[max(0.5rem,env(safe-area-inset-left))] pr-[max(0.5rem,env(safe-area-inset-right))] sm:h-16 sm:gap-3 sm:px-6">
 
@@ -68,9 +68,9 @@ export default function StatusBar({
             type="button"
             onClick={onOpenNavigation}
             aria-label="Open navigation"
-            className="grid size-9 shrink-0 place-items-center border-2 border-outline bg-highlight-strong shadow-brutal-sm transition-transform duration-150 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none md:hidden"
+            className="grid size-9 shrink-0 place-items-center rounded-lg border border-outline bg-highlight-strong shadow-none transition-transform duration-150 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none md:hidden"
           >
-            <Menu className="size-4 text-on-accent" strokeWidth={3} />
+            <Menu className="size-4 text-on-accent" strokeWidth={1.75} />
           </button>
 
           {onToggleCollapsed && (
@@ -81,26 +81,26 @@ export default function StatusBar({
               onFocus={() => sfx.playSidebarHover()}
               title={collapsed ? 'Expand Sidebar (Cmd+B)' : 'Collapse Sidebar (Cmd+B)'}
               aria-label={collapsed ? 'Expand navigation' : 'Collapse navigation'}
-              className="hidden size-9 shrink-0 place-items-center border-2 border-outline bg-highlight-strong shadow-brutal-sm transition-transform duration-150 hover:-translate-y-0.5 hover:shadow-brutal active:translate-y-0 active:shadow-none md:grid"
+              className="hidden size-9 shrink-0 place-items-center rounded-lg border border-outline bg-highlight-strong shadow-none transition-transform duration-150 hover:-translate-y-0.5 hover:shadow-sm active:translate-y-0 active:shadow-none md:grid"
             >
               {collapsed ? (
-                <PanelLeftOpen className="size-4 text-ink" strokeWidth={3} />
+                <PanelLeftOpen className="size-4 text-ink" strokeWidth={1.75} />
               ) : (
-                <PanelLeftClose className="size-4 text-ink" strokeWidth={3} />
+                <PanelLeftClose className="size-4 text-ink" strokeWidth={1.75} />
               )}
             </button>
           )}
 
           <Link href="/app" className="flex min-w-0 shrink-0 items-center gap-2">
-            <div className="flex h-8 w-8 shrink-0 -rotate-6 items-center justify-center border-2 border-outline bg-highlight-strong shadow-brutal-sm sm:h-9 sm:w-9">
-              <Sword aria-hidden="true" size={16} strokeWidth={3} className="text-on-accent" />
+            <div className="flex h-8 w-8 shrink-0  items-center justify-center rounded-lg border border-outline bg-highlight-strong shadow-none sm:h-9 sm:w-9">
+              <Sword aria-hidden="true" size={16} strokeWidth={1.75} className="text-on-accent" />
             </div>
             <div className="hidden min-[400px]:flex flex-col">
-              <span className="text-base font-black leading-none tracking-[0.04em] text-ink sm:text-xl">
+              <span className="font-display text-base font-semibold leading-none tracking-[0.04em] text-ink sm:text-xl">
                 SEOlaQuest
               </span>
-              <span className="font-mono text-[8px] uppercase tracking-[0.2em] text-ink-muted sm:text-[9px]">
-                {'// REALM v1.0'}
+              <span className="font-mono text-[8px] normal-case tracking-[0.2em] text-ink-muted sm:text-[9px]">
+                Quest journal
               </span>
             </div>
           </Link>
@@ -119,20 +119,20 @@ export default function StatusBar({
             onClick={toggleSfx}
             aria-label="Toggle sound effects"
             title="Toggle sound effects"
-            className="grid size-9 shrink-0 place-items-center border-2 border-outline bg-card shadow-brutal-sm transition-transform duration-150 hover:-translate-y-0.5 hover:shadow-brutal active:translate-y-0 active:shadow-none"
+            className="grid size-9 shrink-0 place-items-center rounded-lg border border-outline bg-card shadow-none transition-transform duration-150 hover:-translate-y-0.5 hover:shadow-sm active:translate-y-0 active:shadow-none"
           >
-            <Volume2 aria-hidden="true" className="sfx-icon-on size-4 text-ink" strokeWidth={3} />
-            <VolumeX aria-hidden="true" className="sfx-icon-off size-4 text-ink" strokeWidth={3} />
+            <Volume2 aria-hidden="true" className="sfx-icon-on size-4 text-ink" strokeWidth={1.75} />
+            <VolumeX aria-hidden="true" className="sfx-icon-off size-4 text-ink" strokeWidth={1.75} />
           </button>
 
           {/* Recharge CTA */}
           <Link
             href="/app/billing?offer=founder"
-            className="flex h-9 shrink-0 items-center gap-1.5 border-2 border-outline bg-accent-2 px-2.5 sm:px-3.5 font-black uppercase tracking-wider text-white text-[11px] shadow-brutal-sm transition-transform duration-150 hover:-translate-y-0.5 hover:shadow-brutal active:translate-y-0 active:shadow-none"
+            className="flex h-9 shrink-0 items-center gap-1.5 rounded-lg border border-outline bg-accent-2 px-2.5 sm:px-3.5 font-semibold normal-case tracking-normal text-on-accent text-[11px] shadow-none transition-transform duration-150 hover:-translate-y-0.5 hover:shadow-sm active:translate-y-0 active:shadow-none"
           >
-            <Zap aria-hidden="true" className="size-3.5 text-white" strokeWidth={3} />
-            <span className="hidden sm:inline">RECHARGE</span>
-            <span className="sm:hidden text-[10px] font-black">+</span>
+            <Zap aria-hidden="true" className="size-3.5 text-white" strokeWidth={1.75} />
+            <span className="hidden sm:inline">Add credits</span>
+            <span className="sm:hidden text-[10px] font-semibold">+</span>
           </Link>
         </div>
       </div>

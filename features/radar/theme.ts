@@ -12,11 +12,11 @@
 export const PARTICLE_COLORS = [
   'rgba(0, 0, 0, 0.10)',
   'rgba(0, 0, 0, 0.06)',
-  'rgba(255, 87, 34, 0.22)',
-  'rgba(255, 230, 0, 0.32)',
+  'rgba(37, 60, 51, 0.22)',
+  'rgba(229, 183, 93, 0.32)',
 ] as const
 
 /** The scope stays a dark instrument well, as the live console does. */
-export const SCOPE_WELL = '#0A0A0A'
-export const SCOPE_SWEEP = '#00FF66'
-export const SCOPE_LOCK = '#FFE600'
+export const SCOPE_WELL = '#253C33'
+export const SCOPE_SWEEP = '#E5B75D'
+export const SCOPE_LOCK = '#F3E7C9'
