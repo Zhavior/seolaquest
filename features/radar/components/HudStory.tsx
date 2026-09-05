@@ -126,7 +126,7 @@ export function HudStory({
     >
       {/* Fixed height so advancing a slide never resizes the panel, and the
           shorter slides sit centred rather than stranded at the top. */}
-      <div className="relative flex min-h-[320px] flex-col justify-center border-4 border-outline bg-inset">
+      <div className="relative flex min-h-[320px] flex-col justify-center border border-outline bg-inset rounded-xl">
         {slide.id === 'scope' ? (
           <div className="w-full">
             <RadarScope
@@ -140,8 +140,8 @@ export function HudStory({
 
         {slide.id === 'telemetry' ? (
           <div className="w-full p-3">
-            <div className="border-2 border-outline bg-[#0A0A0A]">
-              <div className="flex items-center justify-between gap-2 border-b-2 border-[#3F3F46] px-3 py-1.5 font-mono text-[10px] font-black uppercase tracking-[0.18em]">
+            <div className="border border-outline bg-forest rounded-xl">
+              <div className="flex items-center justify-between gap-2 border-b border-[#3F3F46] px-3 py-1.5 font-mono text-[10px] font-semibold normal-case tracking-[0.18em]">
                 <span className="flex items-center gap-1.5 text-[#E4E4E7]">
                   <Radar className="h-3 w-3" aria-hidden="true" />
                   <span>Telemetry stream</span>
@@ -152,7 +152,7 @@ export function HudStory({
                 {telemetry.slice(0, revealed).map((line) => (
                   <p key={line.key} className="flex flex-wrap gap-x-2">
                     <span className="text-[#71717A]">&gt;</span>
-                    <span className={cn('font-black', line.tone)}>{line.label}:</span>
+                    <span className={cn('font-semibold', line.tone)}>{line.label}:</span>
                     <span className="text-[#D4D4D8]">{line.value}</span>
                   </p>
                 ))}
@@ -163,8 +163,8 @@ export function HudStory({
 
         {slide.id === 'source' ? (
           <div className="w-full p-3">
-            <div className="border-2 border-outline bg-card">
-              <p className="flex items-center gap-2 border-b-2 border-outline bg-inset px-3 py-1.5 font-mono text-[10px] font-black uppercase tracking-[0.18em] text-ink">
+            <div className="border border-outline bg-card rounded-xl">
+              <p className="flex items-center gap-2 border-b border-outline bg-inset px-3 py-1.5 font-mono text-[10px] font-semibold normal-case tracking-[0.18em] text-ink">
                 <Radar className="h-3 w-3" aria-hidden="true" />
                 <span>Filtered source thread</span>
               </p>
@@ -173,26 +173,26 @@ export function HudStory({
                   <span className="text-base" aria-hidden="true">
                     {target.avatar}
                   </span>
-                  <span className="mr-auto font-mono text-xs font-black text-ink">{target.handle}</span>
+                  <span className="mr-auto font-mono text-xs font-semibold text-ink">{target.handle}</span>
                   <span
                     className={cn(
-                      'border-2 border-outline px-1.5 py-0.5 font-mono text-[9px] font-black uppercase tracking-[0.12em]',
-                      target.source === 'Reddit' ? 'bg-accent-2 text-white' : 'bg-ink text-ink-inverse',
+                      'border border-outline px-1.5 py-0.5 font-mono text-[9px] font-semibold normal-case tracking-[0.12em] rounded-xl',
+                      target.source === 'Reddit' ? 'bg-accent-2 text-on-accent' : 'bg-ink text-ink-inverse',
                     )}
                   >
                     {target.source}
                   </span>
-                  <span className="border-2 border-outline bg-accent px-1.5 py-0.5 font-mono text-[9px] font-black uppercase tracking-[0.12em] text-on-accent">
+                  <span className="border border-outline bg-accent px-1.5 py-0.5 font-mono text-[9px] font-semibold normal-case tracking-[0.12em] text-on-accent rounded-xl">
                     Demo score {target.intentScore}
                   </span>
                 </div>
-                <p className="font-mono text-[9px] font-black uppercase tracking-[0.16em] text-ink-muted">
+                <p className="font-mono text-[9px] font-semibold normal-case tracking-[0.16em] text-ink-muted">
                   {target.competitor} · {target.painPoint}
                 </p>
-                <p className="line-clamp-4 border-2 border-outline bg-inset p-2 text-xs leading-relaxed text-ink">
+                <p className="line-clamp-4 border border-outline bg-inset p-2 text-xs leading-relaxed text-ink rounded-xl">
                   &ldquo;{target.body}&rdquo;
                 </p>
-                <span className="inline-flex items-center gap-1 border-2 border-dashed border-ink-muted px-2 py-0.5 font-mono text-[9px] font-black uppercase tracking-[0.12em] text-ink-muted">
+                <span className="inline-flex items-center gap-1 border border-dashed border-ink-muted px-2 py-0.5 font-mono text-[9px] font-semibold normal-case tracking-[0.12em] text-ink-muted rounded-xl">
                   <Braces className="h-2.5 w-2.5" aria-hidden="true" />
                   <span>Raw JSON available below</span>
                 </span>
@@ -203,16 +203,16 @@ export function HudStory({
 
         {slide.id === 'draft' ? (
           <div className="w-full p-3">
-            <div className="border-2 border-outline bg-card">
-              <p className="flex items-center gap-2 border-b-2 border-outline bg-accent px-3 py-1.5 font-mono text-[10px] font-black uppercase tracking-[0.18em] text-on-accent">
+            <div className="border border-outline bg-card rounded-xl">
+              <p className="flex items-center gap-2 border-b border-outline bg-accent px-3 py-1.5 font-mono text-[10px] font-semibold normal-case tracking-[0.18em] text-on-accent">
                 <Send className="h-3 w-3" aria-hidden="true" />
                 <span>{draftLabel}</span>
               </p>
               <div className="space-y-2 p-3">
-                <p className="font-mono text-[9px] font-black uppercase tracking-[0.16em] text-ink-muted">
+                <p className="font-mono text-[9px] font-semibold normal-case tracking-[0.16em] text-ink-muted">
                   Generated for {target.handle} · edit before you post
                 </p>
-                <p className="line-clamp-6 border-2 border-outline bg-inset p-2 font-mono text-[11px] leading-relaxed text-ink">
+                <p className="line-clamp-6 border border-outline bg-inset p-2 font-mono text-[11px] leading-relaxed text-ink rounded-xl">
                   {draft}
                 </p>
               </div>
@@ -222,8 +222,8 @@ export function HudStory({
       </div>
 
       {/* Caption + transport */}
-      <div className="mt-3 space-y-2 border-4 border-outline bg-card p-3 shadow-brutal">
-        <p aria-live="polite" className="font-mono text-[11px] font-black uppercase tracking-[0.1em] text-ink">
+      <div className="mt-3 space-y-2 border border-outline bg-card p-3 shadow-brutal rounded-xl">
+        <p aria-live="polite" className="font-mono text-[11px] font-semibold normal-case tracking-[0.1em] text-ink">
           <span className="text-accent-2">
             {index + 1}/{SLIDES.length}
           </span>{' '}
@@ -235,7 +235,7 @@ export function HudStory({
             <button
               type="button"
               onClick={() => go(index - 1)}
-              className="border-2 border-outline bg-card p-1 text-ink transition-transform duration-75 hover:translate-x-[1px] hover:translate-y-[1px]"
+              className="border border-outline bg-card p-1 text-ink transition-transform duration-75 hover:translate-x-[1px] hover:translate-y-[1px] rounded-xl"
             >
               <ChevronLeft className="h-3 w-3" aria-hidden="true" />
               <span className="sr-only">Previous slide</span>
@@ -247,7 +247,7 @@ export function HudStory({
                 onClick={() => go(position)}
                 aria-current={position === index}
                 className={cn(
-                  'h-2 w-6 border-2 border-outline transition-colors',
+                  'h-2 w-6 border border-outline transition-colors rounded-xl',
                   position === index ? 'bg-accent' : 'bg-inset hover:bg-highlight',
                 )}
               >
@@ -257,7 +257,7 @@ export function HudStory({
             <button
               type="button"
               onClick={() => go(index + 1)}
-              className="border-2 border-outline bg-card p-1 text-ink transition-transform duration-75 hover:translate-x-[1px] hover:translate-y-[1px]"
+              className="border border-outline bg-card p-1 text-ink transition-transform duration-75 hover:translate-x-[1px] hover:translate-y-[1px] rounded-xl"
             >
               <ChevronRight className="h-3 w-3" aria-hidden="true" />
               <span className="sr-only">Next slide</span>
@@ -267,7 +267,7 @@ export function HudStory({
           <button
             type="button"
             onClick={onSkip}
-            className="flex items-center gap-1 border-2 border-outline bg-card px-2 py-1 font-mono text-[10px] font-black uppercase tracking-[0.14em] text-ink transition-transform duration-75 hover:translate-x-[1px] hover:translate-y-[1px]"
+            className="flex items-center gap-1 border border-outline bg-card px-2 py-1 font-mono text-[10px] font-semibold normal-case tracking-[0.14em] text-ink transition-transform duration-75 hover:translate-x-[1px] hover:translate-y-[1px] rounded-xl"
           >
             <SkipForward className="h-2.5 w-2.5" aria-hidden="true" />
             <span>Skip intro</span>

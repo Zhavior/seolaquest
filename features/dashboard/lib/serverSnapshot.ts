@@ -17,7 +17,7 @@ export function fingerprintLeads(leads: DashboardLead[]): string {
     .map((lead) => {
       const aurora = lead.aurora
       const auroraKey = aurora
-        ? `${aurora.evaluationStatus}:${aurora.score}:${aurora.recommendedAction}`
+        ? `${aurora.decisionId ?? ""}:${aurora.evaluationStatus}:${aurora.score}:${aurora.recommendedAction}:${lead.recommendation?.eligible ?? false}`
         : 'none'
       return `${lead.id}:${lead.platform}:${auroraKey}`
     })

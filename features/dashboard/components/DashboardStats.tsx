@@ -65,7 +65,7 @@ function ProviderStatusStrip() {
         <li key={provider.label}>
           <span
             title={`${provider.label}: ${provider.state} — ${provider.detail}`}
-            className={`inline-flex min-h-11 min-w-0 items-center gap-2 border-2 border-outline px-3 py-2 text-xs font-black uppercase tracking-wider shadow-brutal-sm ${provider.tone} ${provider.text}`}
+            className={`inline-flex min-h-11 min-w-0 items-center gap-2 rounded-lg border border-outline px-3 py-2 text-xs font-semibold normal-case tracking-normal shadow-none ${provider.tone} ${provider.text}`}
           >
             <span className="sr-only">
               {provider.label}: {provider.state}. {provider.detail}.
@@ -99,15 +99,15 @@ function TelemetryCard({
   return (
     <div
       data-testid={testId}
-      className={`flex h-full flex-col border-4 border-outline p-5 shadow-brutal-lg sm:p-6 ${tone}`}
+      className={`flex h-full flex-col rounded-[20px] border border-outline p-5 shadow-sm sm:p-6 ${tone}`}
     >
       <div className="mb-5 flex items-start justify-between gap-3">
-        <p className="text-xs font-black uppercase tracking-widest text-ink/70">{label}</p>
-        <div className="border-2 border-outline bg-[#FFF4BF] p-2 shadow-brutal-sm">{icon}</div>
+        <p className="text-xs font-semibold normal-case tracking-wide text-ink-muted">{label}</p>
+        <div className="rounded-lg border border-outline bg-highlight p-2 shadow-none">{icon}</div>
       </div>
       <div className="mt-auto">
-        <p className="text-3xl font-black uppercase leading-none text-ink md:text-4xl">{value}</p>
-        <p className="mt-3 text-xs font-bold uppercase leading-relaxed text-ink/80">{detail}</p>
+        <p className="text-3xl font-semibold normal-case leading-none text-ink md:text-4xl">{value}</p>
+        <p className="mt-3 text-xs font-medium normal-case leading-relaxed text-ink/80">{detail}</p>
       </div>
     </div>
   )
@@ -143,7 +143,7 @@ export function DashboardStats({
       label: 'Open leads in queue',
       progressLabel: `${leads.length}`,
       done: leads.length > 0,
-      tone: 'bg-[#C7FFF3]',
+      tone: 'bg-success',
     },
     {
       label: 'LIVE Aurora scores present',
@@ -163,19 +163,19 @@ export function DashboardStats({
     <motion.div variants={item} className="flex w-full min-w-0 max-w-full flex-col gap-6">
       <section
         aria-labelledby="system-health-heading"
-        className="border-4 border-outline bg-highlight p-5 shadow-brutal-lg sm:p-6"
+        className="rounded-[20px] border border-outline bg-highlight p-5 shadow-sm sm:p-6"
       >
         <div className="flex flex-col gap-4">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
-              <p className="text-[10px] font-black uppercase tracking-[0.18em] text-ink/60">System health</p>
-              <h2 id="system-health-heading" className="mt-1 text-xl font-black uppercase text-ink sm:text-2xl">
+              <p className="text-[10px] font-semibold normal-case tracking-[0.18em] text-ink-muted">System health</p>
+              <h2 id="system-health-heading" className="font-display mt-1 text-xl font-semibold normal-case text-ink sm:text-2xl">
                 Providers & entitlements
               </h2>
             </div>
             <span
-              className={`inline-flex min-h-11 items-center border-2 border-outline px-3 py-2 text-xs font-black uppercase shadow-brutal-sm ${
-                leadsSliceStatus === 'degraded' ? 'bg-[#FFE0C7] text-ink' : 'bg-card text-ink'
+              className={`inline-flex min-h-11 items-center rounded-lg border border-outline px-3 py-2 text-xs font-semibold normal-case shadow-none ${
+                leadsSliceStatus === 'degraded' ? 'bg-highlight text-ink' : 'bg-card text-ink'
               }`}
             >
               Queue: {leadsSliceStatus === 'degraded' ? 'degraded' : 'ok'}
@@ -184,7 +184,7 @@ export function DashboardStats({
 
           <ProviderStatusStrip />
 
-          <p className="inline-flex items-start gap-2 text-xs font-bold uppercase leading-snug text-ink/70">
+          <p className="inline-flex items-start gap-2 text-xs font-medium normal-case leading-snug text-ink-muted">
             <Radar className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
             <span>
               {isScanning
@@ -196,14 +196,14 @@ export function DashboardStats({
           <div className="flex flex-wrap gap-2">
             <Link
               href="/app/runs"
-              className="inline-flex min-h-11 items-center gap-2 border-2 border-outline bg-card px-3 py-2 text-xs font-black uppercase shadow-brutal-sm hover:bg-highlight"
+              className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-outline bg-card px-3 py-2 text-xs font-semibold normal-case shadow-none hover:bg-highlight"
             >
               <ScrollText className="h-4 w-4" aria-hidden />
               Open run history
             </Link>
             <Link
               href="/app/billing"
-              className="inline-flex min-h-11 items-center gap-2 border-2 border-outline bg-card px-3 py-2 text-xs font-black uppercase shadow-brutal-sm hover:bg-highlight"
+              className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-outline bg-card px-3 py-2 text-xs font-semibold normal-case shadow-none hover:bg-highlight"
             >
               Open billing
             </Link>
@@ -215,19 +215,19 @@ export function DashboardStats({
         <div className="flex min-w-0 flex-col gap-6">
           <section
             aria-labelledby="progress-path-heading"
-            className="border-4 border-outline bg-highlight p-5 shadow-brutal-lg sm:p-6"
+            className="rounded-[20px] border border-outline bg-highlight p-5 shadow-sm sm:p-6"
           >
             <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
               <div className="flex items-center gap-2">
-                <Crown className="h-6 w-6 text-[#FF5722]" aria-hidden />
+                <Crown className="h-6 w-6 text-accent" aria-hidden />
                 <div>
-                  <p className="text-[10px] font-black uppercase tracking-[0.18em] text-ink/60">Progress path</p>
-                  <h2 id="progress-path-heading" className="text-xl font-black uppercase text-ink sm:text-2xl">
+                  <p className="text-[10px] font-semibold normal-case tracking-[0.18em] text-ink-muted">Progress path</p>
+                  <h2 id="progress-path-heading" className="font-display text-xl font-semibold normal-case text-ink sm:text-2xl">
                     Hunter progression
                   </h2>
                 </div>
               </div>
-              <span className="border-2 border-outline bg-black px-3 py-1 text-xs font-black uppercase tracking-widest text-[#FFE600]">
+              <span className="rounded-lg border border-outline bg-black px-3 py-1 text-xs font-semibold normal-case tracking-wide text-accent">
                 Level {user.level}
               </span>
             </div>
@@ -240,20 +240,20 @@ export function DashboardStats({
               recentLevelUp={recentLevelUp}
             />
 
-            <div className="mt-5 border-3 border-outline bg-black p-3 shadow-brutal-sm">
-              <div className="mb-2 flex items-center justify-between gap-2 text-[11px] font-black uppercase text-[#FFE600]">
+            <div className="mt-5 rounded-[20px] border border-outline bg-black p-3 shadow-none">
+              <div className="mb-2 flex items-center justify-between gap-2 text-[11px] font-semibold normal-case text-accent">
                 <span>XP toward next level</span>
                 <span>{xpReading}</span>
               </div>
               <div
-                className="h-3 w-full overflow-hidden border-2 border-white bg-slate-900"
+                className="h-3 w-full overflow-hidden rounded-lg border border-white bg-slate-900"
                 role="progressbar"
                 aria-valuemin={0}
                 aria-valuemax={100}
                 aria-valuenow={xpPercent}
                 aria-label={`Experience progress ${xpPercent} percent`}
               >
-                <div className="h-full bg-[#FFE600]" style={{ width: `${xpPercent}%` }} />
+                <div className="h-full bg-accent" style={{ width: `${xpPercent}%` }} />
               </div>
             </div>
           </section>
@@ -297,7 +297,7 @@ export function DashboardStats({
                   ? 'Paid scans entitled on this account.'
                   : 'Paid scans are locked by current entitlements.'
               }
-              tone="bg-[#FFE3C7]"
+              tone="bg-highlight"
             />
           </div>
         </div>
@@ -305,13 +305,13 @@ export function DashboardStats({
         <div className="flex min-w-0 flex-col gap-6">
           <section
             aria-labelledby="ops-checklist-heading"
-            className="flex flex-col border-4 border-outline bg-[#FFF9EC] p-5 shadow-brutal-lg sm:p-6"
+            className="flex flex-col rounded-[20px] border border-outline bg-card p-5 shadow-sm sm:p-6"
           >
-            <p className="text-xs font-black uppercase tracking-widest text-ink/60">Operations checklist</p>
-            <h3 id="ops-checklist-heading" className="mt-1 text-2xl font-black uppercase text-on-accent">
+            <p className="text-xs font-semibold normal-case tracking-wide text-ink-muted">Operations checklist</p>
+            <h3 id="ops-checklist-heading" className="font-display mt-1 text-2xl font-semibold normal-case text-on-accent">
               Measured readiness
             </h3>
-            <p className="mt-2 text-xs font-bold text-ink/70">
+            <p className="mt-2 text-xs font-medium text-ink-muted">
               No bonus XP is promised here — progression is decided by the Gamify ledger after real events.
             </p>
 
@@ -319,7 +319,7 @@ export function DashboardStats({
               {measuredChecklist.map((row) => (
                 <div
                   key={row.label}
-                  className={`flex min-w-0 flex-wrap items-center justify-between gap-2 border-3 border-outline px-4 py-3 text-xs font-black uppercase tracking-wider shadow-brutal-sm ${
+                  className={`flex min-w-0 flex-wrap items-center justify-between gap-2 rounded-[20px] border border-outline px-4 py-3 text-xs font-semibold normal-case tracking-normal shadow-none ${
                     row.done ? row.tone : 'bg-card'
                   }`}
                 >
@@ -334,16 +334,16 @@ export function DashboardStats({
 
           <section
             aria-labelledby="unlock-track-heading"
-            className="border-4 border-outline bg-card p-5 shadow-brutal-lg sm:p-6"
+            className="rounded-[20px] border border-outline bg-card p-5 shadow-sm sm:p-6"
           >
             <div className="flex items-start justify-between gap-3 pb-4">
               <div>
-                <p className="text-xs font-black uppercase tracking-widest text-ink/60">Entitlements</p>
-                <h3 id="unlock-track-heading" className="mt-1 text-2xl font-black uppercase text-on-accent">
+                <p className="text-xs font-semibold normal-case tracking-wide text-ink-muted">Entitlements</p>
+                <h3 id="unlock-track-heading" className="font-display mt-1 text-2xl font-semibold normal-case text-on-accent">
                   Unlock track
                 </h3>
               </div>
-              <div className="border-2 border-outline bg-[#FFF4BF] p-2 shadow-brutal-sm">
+              <div className="rounded-lg border border-outline bg-highlight p-2 shadow-none">
                 <Shield className="h-6 w-6 text-on-accent" aria-hidden />
               </div>
             </div>
@@ -379,16 +379,16 @@ export function DashboardStats({
               ].map((perk) => (
                 <li
                   key={perk.title}
-                  className={`border-3 border-outline p-4 shadow-brutal-sm ${
+                  className={`rounded-[20px] border border-outline p-4 shadow-none ${
                     perk.state === 'UNLOCKED' ? 'bg-success' : 'bg-highlight'
                   }`}
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div>
-                      <p className="text-sm font-black uppercase text-ink">{perk.title}</p>
-                      <p className="mt-1 text-xs font-bold text-ink/75">{perk.detail}</p>
+                      <p className="text-sm font-semibold normal-case text-ink">{perk.title}</p>
+                      <p className="mt-1 text-xs font-medium text-ink/75">{perk.detail}</p>
                     </div>
-                    <span className="shrink-0 border-2 border-outline bg-black px-2 py-0.5 text-xs font-black uppercase text-[#FFE600]">
+                    <span className="shrink-0 rounded-lg border border-outline bg-black px-2 py-0.5 text-xs font-semibold normal-case text-accent">
                       {perk.state}
                     </span>
                   </div>
@@ -396,7 +396,7 @@ export function DashboardStats({
               ))}
             </ul>
 
-            <p className="mt-4 inline-flex items-center gap-2 text-xs font-bold text-ink/65">
+            <p className="mt-4 inline-flex items-center gap-2 text-xs font-medium text-ink/65">
               <CheckCircle2 className="h-4 w-4 shrink-0" aria-hidden />
               Entitlements come from EntitlementService — not from hunter level.
             </p>

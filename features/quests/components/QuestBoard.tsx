@@ -25,10 +25,10 @@ function ProgressBar({ percent, target, progress }: { percent: number; target: n
         The bar is a picture of the count stated beside it, so it is hidden from
         assistive tech rather than announced twice.
       */}
-      <div aria-hidden="true" className="h-3 w-full border-2 border-outline bg-inset">
+      <div aria-hidden="true" className="h-3 w-full border border-outline bg-inset rounded-xl">
         <div className="h-full bg-emerald-400" style={{ width: `${percent}%` }} />
       </div>
-      <p className="mt-1 text-xs font-black uppercase tracking-wider text-ink-muted">
+      <p className="mt-1 text-xs font-semibold normal-case tracking-wider text-ink-muted">
         {progress} / {target} complete
       </p>
     </div>
@@ -51,7 +51,7 @@ function QuestCard({
     <QuestPanel as="li" tone={isClaimable ? 'sand' : 'white'} padding="md" className="flex flex-col">
       <div className="flex flex-wrap items-start justify-between gap-2">
         <div className="min-w-0">
-          <p className="text-lg font-black uppercase leading-tight text-ink">{entry.title}</p>
+          <p className="text-lg font-semibold normal-case leading-tight text-ink">{entry.title}</p>
           <p className="mt-1 text-sm font-bold text-ink-muted">{entry.description}</p>
         </div>
         <span className={questBadge({ tone: toneForType(entry.type) })}>{entry.type}</span>
@@ -60,7 +60,7 @@ function QuestCard({
       <ProgressBar percent={entry.progressPercent} target={entry.target} progress={entry.progress} />
 
       <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
-        <span className="inline-flex items-center gap-1.5 text-sm font-black uppercase text-ink">
+        <span className="inline-flex items-center gap-1.5 text-sm font-semibold normal-case text-ink">
           <Trophy aria-hidden="true" className="h-4 w-4" strokeWidth={3} />
           {entry.rewardXp.toLocaleString()} XP
         </span>
@@ -78,19 +78,19 @@ function QuestCard({
         ) : null}
 
         {entry.status === 'CLAIMED' ? (
-          <span className="inline-flex items-center gap-1.5 text-sm font-black uppercase text-ink-muted">
+          <span className="inline-flex items-center gap-1.5 text-sm font-semibold normal-case text-ink-muted">
             <CheckCircle2 aria-hidden="true" className="h-4 w-4" strokeWidth={3} /> Claimed
           </span>
         ) : null}
 
         {isExpired ? (
-          <span className="inline-flex items-center gap-1.5 text-sm font-black uppercase text-ink-muted">
+          <span className="inline-flex items-center gap-1.5 text-sm font-semibold normal-case text-ink-muted">
             <Lock aria-hidden="true" className="h-4 w-4" strokeWidth={3} /> Expired unclaimed
           </span>
         ) : null}
 
         {entry.status === 'IN_PROGRESS' && entry.expiresAt ? (
-          <span className="inline-flex items-center gap-1.5 text-xs font-black uppercase text-ink-muted">
+          <span className="inline-flex items-center gap-1.5 text-xs font-semibold normal-case text-ink-muted">
             <Clock aria-hidden="true" className="h-3.5 w-3.5" strokeWidth={3} />
             Resets {new Date(entry.expiresAt).toUTCString().slice(0, 16)} UTC
           </span>
@@ -117,7 +117,7 @@ export default function QuestBoard({ board }: { board: QuestBoardData }) {
   if (board.catalogEmpty) {
     return (
       <QuestPanel tone="parchment" padding="lg" className="mt-6 text-center">
-        <p className="text-lg font-black uppercase text-ink">No quests are published yet</p>
+        <p className="text-lg font-semibold normal-case text-ink">No quests are published yet</p>
         <p className="mt-2 text-sm font-bold text-ink-muted">
           The quest catalog is empty, so there is nothing to assign. This is a configuration
           state, not a reflection of your account.
@@ -153,7 +153,7 @@ export default function QuestBoard({ board }: { board: QuestBoardData }) {
       <section>
         <QuestSectionHeading title="In progress" as="h2" />
         {board.active.length === 0 ? (
-          <p className="mt-4 border-2 border-dashed border-hairline p-5 text-center text-sm font-bold text-ink-muted">
+          <p className="mt-4 border border-dashed border-hairline p-5 text-center text-sm font-bold text-ink-muted rounded-xl">
             Nothing in progress. Claim a signal in the Battle Area and it will start counting here.
           </p>
         ) : (

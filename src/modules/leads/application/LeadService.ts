@@ -3,8 +3,8 @@ import prisma from '@/lib/prisma'
 import { requireCurrentUser } from '@/lib/auth'
 import { EntitlementService } from '@/src/modules/billing/application/EntitlementService'
 import { logger } from '@/src/modules/core/infrastructure/logger'
-import { EventFactory } from '@/src/modules/core/events/EventFactory'
-import { EventStore } from '@/src/modules/core/events/EventStore'
+import { LeadOutcomeService } from './LeadOutcomeService'
+import { AppError } from '@/src/modules/core/infrastructure/errors'
 import { AiUsageLimiter } from '@/src/modules/core/security/AiUsageLimiter'
 import {
   normalizeCrmWebhookUrl,
@@ -20,84 +20,27 @@ const openAiReplySchema = z.object({
 })
 
 export class LeadService {
-  /**
-   * Claims a lead and emits the engagement event. It does **not** pay XP.
-   *
-   * It used to: the claim transaction wrote `User.xp`/`User.level` directly and
-   * returned the new totals for the HUD. That made two systems own progression —
-   * these columns and `GamifyProfile` — and two owners of one number always end
-   * up disagreeing. Gamify is now the only one. XP for this claim is minted by
-   * `GamifyLedgerService` when the outbox delivers `opportunity.engaged`, behind
-   * the same eligibility rules (Aurora score, velocity, daily cap) every other
-   * award goes through.
-   *
-   * The practical consequence is that the reward is no longer instant, so this
-   * returns no progression for the client to optimistically render. Showing a
-   * number here would mean guessing at a decision the ledger has not made yet —
-   * and the ledger is entitled to decline.
-   */
   static async claimQuest(leadId: string) {
-    const user = await requireCurrentUser()
-
-    const claimed = await prisma.$transaction(async (tx) => {
-      const engagedAt = new Date()
-      const claimed = await tx.lead.updateMany({
-        where: { id: leadId, userId: user.id, status: 'NEW' },
-        data: { status: 'CONTACTED', claimedAt: engagedAt, contactedAt: engagedAt },
-      })
-      if (claimed.count !== 1) return false
-
-      /**
-       * `opportunity.engaged`, emitted inside the claim transaction and behind the
-       * `count !== 1` guard above.
-       *
-       * That guard is what makes this exactly-once: the `status: 'NEW'` predicate means a
-       * second concurrent claim of the same lead updates zero rows and returns before
-       * reaching here, so Gamify can never be paid twice for one engagement. Emitting after
-       * the transaction instead would break that — the commit could succeed and the event be
-       * lost, silently costing the user XP they earned.
-       */
-      await EventStore.writeOutbox(
-        EventFactory.create({
-          type: 'opportunity.engaged',
-          version: 1,
-          actorId: user.id,
-          source: 'LeadService',
-          idempotencyKey: `opportunity.engaged:${leadId}`,
-          payload: {
-            opportunityId: leadId,
-            leadId,
-            actionTaken: 'CLAIMED',
-            engagedAt: engagedAt.toISOString(),
-          },
-        }),
-        tx,
-      )
-
-      return true
-    })
-
-    if (!claimed) {
-      return { ok: false, message: 'Quest no longer available or already claimed.' }
-    }
-
-    revalidatePath('/')
-    return { ok: true }
+    return this.recordAction(leadId, 'CLAIM')
   }
 
   static async dismissLead(leadId: string) {
+    return this.recordAction(leadId, 'DISMISS')
+  }
+
+  private static async recordAction(leadId: string, action: 'CLAIM' | 'DISMISS') {
     const user = await requireCurrentUser()
-    const dismissed = await prisma.lead.updateMany({
-      where: { id: leadId, userId: user.id, status: 'NEW' },
-      data: { status: 'DISMISSED', dismissedAt: new Date() },
-    })
-
-    if (dismissed.count !== 1) {
-      return { ok: false, message: 'Lead no longer available.' }
+    try {
+      await LeadOutcomeService.record({ userId: user.id, leadId,
+        idempotencyKey: `${action.toLowerCase()}_${leadId}`, input: { action } })
+      revalidatePath('/app')
+      return { ok: true }
+    } catch (error) {
+      if (error instanceof AppError && (error.statusCode === 404 || error.statusCode === 409)) {
+        return { ok: false, message: 'Lead no longer available for this action.' }
+      }
+      throw error
     }
-
-    revalidatePath('/')
-    return { ok: true }
   }
 
   static async generateAIReply(leadId: string) {

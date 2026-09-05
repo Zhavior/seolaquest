@@ -22,7 +22,7 @@ export function QuestPending({ label, className }: QuestPendingProps) {
       aria-atomic="true"
       className={clsx('flex min-h-28 items-center justify-center px-4 py-10', className)}
     >
-      <span className="inline-flex items-center gap-3 text-center text-[11px] font-black uppercase tracking-[0.18em] text-ink-muted">
+      <span className="inline-flex items-center gap-3 text-center text-[11px] font-semibold normal-case tracking-[0.18em] text-ink-muted">
         <span
           aria-hidden="true"
           className="size-2 rounded-full bg-accent motion-safe:animate-pulse"

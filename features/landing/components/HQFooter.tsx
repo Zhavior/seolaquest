@@ -22,7 +22,7 @@ export function HQFooter() {
           </span>
           <div>
             <div className="font-black tracking-[0.04em] text-sm">SEOlaQuest</div>
-            <div className="text-[9px] font-bold uppercase tracking-widest text-ink/40">
+            <div className="text-[9px] font-bold uppercase tracking-widest text-ink-muted">
               © {new Date().getFullYear()} SEOlaQuest. All rights reserved.
             </div>
           </div>
@@ -33,7 +33,7 @@ export function HQFooter() {
             <Link
               key={label}
               href={href}
-              className="text-xs font-black uppercase tracking-widest text-ink/50 hover:text-ink transition-colors"
+              className="text-xs font-black uppercase tracking-widest text-ink-muted hover:text-ink transition-colors"
             >
               {label}
             </Link>

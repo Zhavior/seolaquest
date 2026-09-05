@@ -54,7 +54,7 @@ export default function GuildLeaderboardPodium({
   return (
     <div className="w-full space-y-6">
       {/* Timeframe Matrix Bar & Privacy Toggle */}
-      <div className="flex flex-col lg:flex-row justify-between items-stretch lg:items-center gap-4 bg-black p-4 border-4 border-outline shadow-brutal-lg">
+      <div className="flex flex-col lg:flex-row justify-between items-stretch lg:items-center gap-4 bg-black p-4 rounded-[20px] border border-outline shadow-sm">
         
         {/* Season Timeframe Selector Tabs */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 flex-1">
@@ -64,13 +64,13 @@ export default function GuildLeaderboardPodium({
               <button
                 key={tf.id}
                 onClick={() => handleTimeframeChange(tf.id)}
-                className={`px-3 py-2.5 text-xs font-black uppercase tracking-wider transition-all duration-150 border-2 border-outline flex flex-col items-center justify-center text-center ${
+                className={`px-3 py-2.5 text-xs font-semibold normal-case tracking-wider transition-all duration-150 rounded-lg border border-outline flex flex-col items-center justify-center text-center ${
                   isActive
-                    ? 'bg-accent text-on-accent shadow-[3px_3px_0_0_#FFF] translate-x-[-2px] translate-y-[-2px]'
-                    : 'bg-[#1E293B] text-ink-muted hover:bg-[#334155] hover:text-white'
+                    ? 'bg-accent text-on-accent shadow-sm translate-x-[-2px] translate-y-[-2px]'
+                    : 'bg-inset text-ink-muted hover:bg-forest hover:text-white'
                 }`}
               >
-                <span className="font-extrabold">{tf.label}</span>
+                <span className="font-semibold">{tf.label}</span>
               </button>
             )
           })}
@@ -79,10 +79,10 @@ export default function GuildLeaderboardPodium({
         {/* Anonymous Mode Switcher */}
         <button
           onClick={handleToggleAnonymous}
-          className={`px-4 py-2.5 text-xs font-black uppercase tracking-wider border-2 border-outline flex items-center justify-center gap-2 shadow-brutal-sm transition-all ${
+          className={`px-4 py-2.5 text-xs font-semibold normal-case tracking-wider rounded-lg border border-outline flex items-center justify-center gap-2 shadow-none transition-all ${
             isAnonymousMode
-              ? 'bg-accent-2 text-white shadow-[3px_3px_0_0_#FFE600]'
-              : 'bg-success text-on-accent shadow-brutal-sm'
+              ? 'bg-accent-2 text-on-accent shadow-sm'
+              : 'bg-success text-on-accent shadow-none'
           }`}
         >
           {isAnonymousMode ? <Lock className="w-4 h-4" /> : <Unlock className="w-4 h-4" />}
@@ -91,8 +91,8 @@ export default function GuildLeaderboardPodium({
       </div>
 
       {/* Evidence-status banner */}
-      <div className="bg-accent border-4 border-outline p-3 text-center shadow-brutal flex items-center justify-center gap-3">
-        <span className="text-sm font-black uppercase tracking-wider text-on-accent">
+      <div className="bg-accent rounded-[20px] border border-outline p-3 text-center shadow-sm flex items-center justify-center gap-3">
+        <span className="text-sm font-semibold normal-case tracking-wider text-on-accent">
           Rankings remain unavailable until participants explicitly opt in to public profiles.
         </span>
       </div>
@@ -122,54 +122,54 @@ export default function GuildLeaderboardPodium({
               sfx.playHoverBlip()
               onSelectHunter?.(rank2)
             }}
-            className={`border-4 border-outline bg-card p-6 relative shadow-brutal-lg flex flex-col items-center text-center cursor-pointer transition-all ${
-              rank2.isOwner ? 'border-[#06B6D4] ring-4 ring-[#06B6D4]/40 shadow-[0_0_20px_#06B6D4]' : ''
+            className={`rounded-[20px] border border-outline bg-card p-6 relative shadow-sm flex flex-col items-center text-center cursor-pointer transition-all ${
+              rank2.isOwner ? 'border-accent ring-4 ring-accent/40 shadow-sm' : ''
             }`}
           >
             {/* Rank Badge */}
-            <div className="absolute -top-5 bg-[#E2E8F0] border-4 border-outline text-on-accent px-4 py-1 font-black text-sm uppercase shadow-brutal-sm flex items-center gap-1">
+            <div className="absolute -top-5 bg-inset rounded-[20px] border border-outline text-ink px-4 py-1 font-semibold text-sm normal-case shadow-none flex items-center gap-1">
               <span>🥈 RANK #2</span>
             </div>
 
             {rank2.isOwner && (
-              <div className="bg-info text-on-accent border-2 border-outline text-[10px] font-black uppercase px-2 py-0.5 mb-2 mt-2">
+              <div className="bg-info text-on-accent rounded-lg border border-outline text-[10px] font-semibold normal-case px-2 py-0.5 mb-2 mt-2">
                 YOU • RANK #2
               </div>
             )}
 
             {/* Cyan Shield Aura Icon */}
-            <div className="w-16 h-16 bg-info border-4 border-outline rounded-full flex items-center justify-center my-3 shadow-brutal-sm relative">
+            <div className="w-16 h-16 bg-info rounded-[20px] border border-outline rounded-full flex items-center justify-center my-3 shadow-none relative">
               <Shield className="w-9 h-9 text-white fill-white" />
-              <div className="absolute -bottom-1 -right-1 bg-black text-[#06B6D4] text-[10px] px-1 font-black border border-white">
+              <div className="absolute -bottom-1 -right-1 bg-forest text-on-forest text-[10px] px-1 font-semibold border border-white">
                 SILVER
               </div>
             </div>
 
             {/* Alias / Real Name */}
-            <h3 className="text-xl font-black uppercase tracking-tight text-ink truncate max-w-full">
+            <h3 className="font-display text-xl font-semibold normal-case tracking-tight text-ink truncate max-w-full">
               {displayName(rank2)}
             </h3>
 
             {/* Title */}
-            <span className="bg-black text-[#06B6D4] text-xs font-black uppercase px-3 py-1 border border-outline my-2">
+            <span className="bg-forest text-on-forest text-xs font-semibold normal-case px-3 py-1 border border-outline my-2">
               {rank2.classTitle || '[🛡️ KNIGHT]'}
             </span>
 
             {/* Bounties & Streak */}
-            <div className="w-full bg-canvas border-2 border-outline p-3 my-2 space-y-1">
-              <div className="flex justify-between items-center text-xs font-black">
+            <div className="w-full bg-canvas rounded-lg border border-outline p-3 my-2 space-y-1">
+              <div className="flex justify-between items-center text-xs font-semibold">
                 <span className="text-ink-muted">BOUNTIES</span>
-                <span className="text-[#FF5722] text-base">{rank2.bountiesSlayed}</span>
+                <span className="text-ink text-base">{rank2.bountiesSlayed}</span>
               </div>
-              <div className="flex justify-between items-center text-[11px] font-bold">
+              <div className="flex justify-between items-center text-[11px] font-medium">
                 <span className="text-ink-muted">STREAK</span>
                 <span className="text-ink flex items-center gap-1">
-                  <Flame className="w-3.5 h-3.5 text-[#FF5722] fill-[#FF5722]" /> {rank2.activeStreak} Days
+                  <Flame className="w-3.5 h-3.5 text-accent fill-[#FF5722]" /> {rank2.activeStreak} Days
                 </span>
               </div>
             </div>
 
-            <div className="text-[10px] font-black uppercase bg-info/20 border border-outline px-2 py-1 text-on-accent">
+            <div className="text-[10px] font-semibold normal-case bg-info/20 border border-outline px-2 py-1 text-ink">
               Stored tenant activity
             </div>
           </motion.div>
@@ -197,45 +197,45 @@ export default function GuildLeaderboardPodium({
               sfx.playHoverBlip()
               onSelectHunter?.(rank1)
             }}
-            className={`border-4 border-outline bg-accent p-6 md:p-8 relative shadow-brutal-lg flex flex-col items-center text-center -translate-y-4 cursor-pointer transition-all ${
-              rank1.isOwner ? 'ring-4 ring-[#FF5722] shadow-[0_0_25px_#FFE600]' : ''
+            className={`rounded-[20px] border border-outline bg-accent p-6 md:p-8 relative shadow-sm flex flex-col items-center text-center -translate-y-4 cursor-pointer transition-all ${
+              rank1.isOwner ? 'ring-4 ring-accent shadow-sm' : ''
             }`}
           >
             {/* Floating Pixel Crown Badge */}
-            <div className="absolute -top-7 bg-black text-[#FFE600] border-4 border-outline px-5 py-1.5 font-black text-base uppercase shadow-[4px_4px_0_0_#FFF] flex items-center gap-2 animate-bounce">
-              <Crown className="w-5 h-5 text-[#FFE600] fill-[#FFE600]" />
+            <div className="absolute -top-7 bg-black text-accent rounded-[20px] border border-outline px-5 py-1.5 font-semibold text-base normal-case shadow-sm flex items-center gap-2 ">
+              <Crown className="w-5 h-5 text-accent fill-accent" />
               <span>🥇 RANK #1 CHAMPION</span>
             </div>
 
             {rank1.isOwner && (
-              <div className="bg-accent-2 text-on-accent border-2 border-outline text-[10px] font-black uppercase px-2 py-0.5 mb-2 mt-4 shadow-brutal-sm">
+              <div className="bg-accent-2 text-on-accent rounded-lg border border-outline text-[10px] font-semibold normal-case px-2 py-0.5 mb-2 mt-4 shadow-none">
                 YOU • RANK #1
               </div>
             )}
 
             {/* Dynamic Fire Glow Icon */}
-            <div className="w-20 h-20 bg-accent-2 border-4 border-outline rounded-full flex items-center justify-center my-4 shadow-brutal relative">
-              <Crown className="w-11 h-11 text-[#FFE600] fill-[#FFE600]" />
-              <Flame className="w-6 h-6 text-[#FFE600] absolute -top-1 -right-1 animate-pulse" />
+            <div className="w-20 h-20 bg-accent-2 rounded-[20px] border border-outline rounded-full flex items-center justify-center my-4 shadow-sm relative">
+              <Crown className="w-11 h-11 text-accent fill-accent" />
+              <Flame className="w-6 h-6 text-accent absolute -top-1 -right-1 animate-pulse" />
             </div>
 
             {/* Alias / Real Name */}
-            <h3 className="text-2xl md:text-3xl font-black uppercase tracking-tight text-ink truncate max-w-full">
+            <h3 className="font-display text-2xl md:text-3xl font-semibold normal-case tracking-tight text-ink truncate max-w-full">
               {displayName(rank1)}
             </h3>
 
             {/* Champion Title */}
-            <span className="bg-black text-[#FFE600] text-sm font-black uppercase px-4 py-1 border-2 border-outline my-2 shadow-[2px_2px_0_0_#FFF]">
+            <span className="bg-black text-accent text-sm font-semibold normal-case px-4 py-1 rounded-lg border border-outline my-2 shadow-sm">
               {rank1.classTitle || '[👑 DRAGON SLAYER]'}
             </span>
 
             {/* Stats */}
-            <div className="w-full bg-card border-4 border-outline p-4 my-3 space-y-2 shadow-brutal-sm">
-              <div className="flex justify-between items-center text-sm font-black">
+            <div className="w-full bg-card rounded-[20px] border border-outline p-4 my-3 space-y-2 shadow-none">
+              <div className="flex justify-between items-center text-sm font-semibold">
                 <span className="text-ink-muted">BOUNTIES SLAYED</span>
-                <span className="text-3xl font-black text-[#FF5722]">{rank1.bountiesSlayed}</span>
+                <span className="text-3xl font-semibold text-accent">{rank1.bountiesSlayed}</span>
               </div>
-              <div className="flex justify-between items-center text-xs font-black pt-2 border-t-2 border-outline/10">
+              <div className="flex justify-between items-center text-xs font-semibold pt-2 border-t border-outline/10">
                 <span className="text-ink-muted">MANA EFFICIENCY</span>
                 <span className="text-on-accent bg-success px-2 py-0.5 border border-outline">
                   {rank1.manaEfficiency}%
@@ -243,7 +243,7 @@ export default function GuildLeaderboardPodium({
               </div>
             </div>
 
-            <div className="text-xs font-black uppercase bg-black text-[#FFE600] px-3 py-1 border border-outline shadow-[2px_2px_0_0_#FFF]">
+            <div className="text-xs font-semibold normal-case bg-black text-accent px-3 py-1 border border-outline shadow-sm">
               Stored rank position
             </div>
           </motion.div>
@@ -271,54 +271,54 @@ export default function GuildLeaderboardPodium({
               sfx.playHoverBlip()
               onSelectHunter?.(rank3)
             }}
-            className={`border-4 border-outline bg-card p-6 relative shadow-brutal-lg flex flex-col items-center text-center cursor-pointer transition-all ${
-              rank3.isOwner ? 'border-[#A855F7] ring-4 ring-[#A855F7]/40 shadow-[0_0_20px_#A855F7]' : ''
+            className={`rounded-[20px] border border-outline bg-card p-6 relative shadow-sm flex flex-col items-center text-center cursor-pointer transition-all ${
+              rank3.isOwner ? 'border-accent ring-4 ring-accent/40 shadow-sm' : ''
             }`}
           >
             {/* Rank Badge */}
-            <div className="absolute -top-5 bg-[#D97706] border-4 border-outline text-on-accent px-4 py-1 font-black text-sm uppercase shadow-brutal-sm flex items-center gap-1">
+            <div className="absolute -top-5 bg-highlight rounded-[20px] border border-outline text-on-accent px-4 py-1 font-semibold text-sm normal-case shadow-none flex items-center gap-1">
               <span>🥉 RANK #3</span>
             </div>
 
             {rank3.isOwner && (
-              <div className="bg-[#A855F7] text-on-accent border-2 border-outline text-[10px] font-black uppercase px-2 py-0.5 mb-2 mt-2">
+              <div className="bg-forest text-on-forest rounded-lg border border-outline text-[10px] font-semibold normal-case px-2 py-0.5 mb-2 mt-2">
                 YOU • RANK #3
               </div>
             )}
 
             {/* Purple Crystal Aura Icon */}
-            <div className="w-16 h-16 bg-[#A855F7] border-4 border-outline rounded-full flex items-center justify-center my-3 shadow-brutal-sm relative">
-              <Zap className="w-9 h-9 text-[#FFE600] fill-[#FFE600]" />
-              <div className="absolute -bottom-1 -right-1 bg-black text-[#A855F7] text-[10px] px-1 font-black border border-white">
+            <div className="w-16 h-16 bg-forest rounded-[20px] border border-outline rounded-full flex items-center justify-center my-3 shadow-none relative">
+              <Zap className="w-9 h-9 text-accent fill-accent" />
+              <div className="absolute -bottom-1 -right-1 bg-black text-accent text-[10px] px-1 font-semibold border border-white">
                 BRONZE
               </div>
             </div>
 
             {/* Alias / Real Name */}
-            <h3 className="text-xl font-black uppercase tracking-tight text-ink truncate max-w-full">
+            <h3 className="font-display text-xl font-semibold normal-case tracking-tight text-ink truncate max-w-full">
               {displayName(rank3)}
             </h3>
 
             {/* Title */}
-            <span className="bg-black text-[#A855F7] text-xs font-black uppercase px-3 py-1 border border-outline my-2">
+            <span className="bg-black text-accent text-xs font-semibold normal-case px-3 py-1 border border-outline my-2">
               {rank3.classTitle || '[🔮 ARCHMAGE]'}
             </span>
 
             {/* Bounties & Efficiency */}
-            <div className="w-full bg-canvas border-2 border-outline p-3 my-2 space-y-1">
-              <div className="flex justify-between items-center text-xs font-black">
+            <div className="w-full bg-canvas rounded-lg border border-outline p-3 my-2 space-y-1">
+              <div className="flex justify-between items-center text-xs font-semibold">
                 <span className="text-ink-muted">BOUNTIES</span>
-                <span className="text-[#FF5722] text-base">{rank3.bountiesSlayed}</span>
+                <span className="text-ink text-base">{rank3.bountiesSlayed}</span>
               </div>
-              <div className="flex justify-between items-center text-[11px] font-bold">
+              <div className="flex justify-between items-center text-[11px] font-medium">
                 <span className="text-ink-muted">EFFICIENCY</span>
-                <span className="text-on-accent bg-[#A855F7] text-white px-2 py-0.5 border border-outline">
+                <span className="text-on-forest bg-forest text-white px-2 py-0.5 border border-outline">
                   {rank3.manaEfficiency}%
                 </span>
               </div>
             </div>
 
-            <div className="text-[10px] font-black uppercase bg-[#A855F7]/20 border border-outline px-2 py-1 text-on-accent">
+            <div className="text-[10px] font-semibold normal-case bg-inset border border-outline px-2 py-1 text-ink">
               🔮 High Mana Efficiency Aura
             </div>
           </motion.div>

@@ -24,7 +24,7 @@ export function HQNav() {
           </span>
           <div className="hidden sm:flex flex-col">
             <span className="text-xl font-black uppercase tracking-[0.15em] leading-none">SEOlaQuest</span>
-            <span className="text-[9px] font-bold uppercase tracking-widest text-ink/50">AI Lead Guild</span>
+            <span className="text-[9px] font-bold uppercase tracking-widest text-ink-muted">AI Lead Guild</span>
           </div>
         </Link>
 

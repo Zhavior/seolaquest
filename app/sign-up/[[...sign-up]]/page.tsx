@@ -11,19 +11,19 @@ export default function Page() {
   return (
     <ClerkProvider>
       <main className="flex min-h-screen w-full flex-col items-center justify-center bg-canvas px-4 py-8 text-ink">
-      <Link href="/" className="mb-5 inline-flex min-h-11 items-center text-2xl font-black uppercase tracking-widest focus-visible:outline-4 focus-visible:outline-offset-4">
+      <Link href="/" className="mb-5 inline-flex min-h-11 items-center text-2xl font-semibold tracking-tight focus-visible:outline-4 focus-visible:outline-offset-4">
         SEOlaQuest
       </Link>
       <section aria-labelledby="sign-up-heading" className="flex w-full max-w-md flex-col items-center">
-        <div className="mb-4 w-full border-3 border-outline bg-success p-4 text-center shadow-brutal">
-          <h1 id="sign-up-heading" className="text-2xl font-black uppercase">Start one focused customer hunt</h1>
-          <p className="mt-1 font-bold">Create an account, then save your first real keyword in onboarding.</p>
+        <div className="mb-4 w-full rounded-2xl border border-hairline bg-forest p-6 text-center text-on-forest shadow-brutal">
+          <h1 id="sign-up-heading" className="font-display text-3xl font-medium">Start one focused customer hunt</h1>
+          <p className="mt-3 text-sm leading-relaxed">Create an account, then save your first real keyword in onboarding.</p>
         </div>
         <SignUp
           fallbackRedirectUrl="/onboarding"
           signInUrl="/sign-in"
           appearance={{
-            variables: { colorPrimary: '#111111', borderRadius: '0px' },
+            variables: { colorPrimary: '#253C33', colorBackground: '#FFFDF6', colorForeground: '#273C32', colorMutedForeground: '#5E675B', borderRadius: '12px', fontFamily: 'var(--font-dm-sans), sans-serif' },
             options: { autoFocus: false },
             elements: {
               rootBox: 'flex w-full justify-center',

@@ -1,0 +1,3 @@
+export const AURORA_POLICY_VERSION = 'v2'
+export const MIN_ENGAGE_CONFIDENCE = 0.7
+export const AURORA_CLASSIFIER_VERSION = 'v2'

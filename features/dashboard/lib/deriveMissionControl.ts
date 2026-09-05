@@ -61,7 +61,7 @@ function isLiveScored(lead: DashboardLead): boolean {
 }
 
 function pickHighestLiveLead(leads: DashboardLead[]): DashboardLead | null {
-  const live = leads.filter(isLiveScored)
+  const live = leads.filter(lead => isLiveScored(lead) && lead.recommendation?.eligible === true)
   if (!live.length) return null
   return live.reduce((best, lead) =>
     (lead.aurora?.score ?? 0) > (best.aurora?.score ?? 0) ? lead : best
@@ -127,7 +127,7 @@ export function deriveTodaysMission(input: MissionControlInput): TodaysMission {
         ctaLabel: 'Open lead to claim',
         leadId: topLive.id,
       },
-      confidence: 'measured',
+      confidence: 'inferred',
     }
   }
 

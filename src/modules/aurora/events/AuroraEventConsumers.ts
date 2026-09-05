@@ -1,3 +1,5 @@
+import { UserService } from '@/src/modules/users/application/UserService';
+import { AURORA_POLICY_VERSION } from '../policy';
 import { EventDispatcher } from '../../core/events/EventDispatcher';
 import { OpportunityDiscoveredPayloadSchema } from '../../core/events/EventRegistry';
 import { DomainEvent } from '../../core/events/DomainEvent';
@@ -22,6 +24,9 @@ export function registerAuroraConsumers() {
     'aurora-decision-engine',
     async (event: DomainEvent<Record<string, unknown>>) => {
       const payload = OpportunityDiscoveredPayloadSchema.parse(event.payload);
+
+      const business = await UserService.businessContext(payload.userId);
+      if (!business) return; // Deleted tenant: do not spend or recreate their evidence.
 
       const discoveredAt = payload.sourceCreatedAt || new Date().toISOString();
 
@@ -48,7 +53,7 @@ export function registerAuroraConsumers() {
       await auroraService.evaluate({
         opportunityId: payload.opportunityId,
         sourceEventId: event.id,
-        policyVersion: 'v1', // This could be dynamically configured
+        policyVersion: AURORA_POLICY_VERSION,
         text: payload.content,
         source: payload.platform,
         discoveredAt,
@@ -56,6 +61,8 @@ export function registerAuroraConsumers() {
           // Carried so the semantic classifier can meter its spend against the tenant that
           // owns the lead; the outbox worker has no session to derive one from.
           userId: payload.userId,
+          businessDescription: business.businessDescription?.slice(0, 1000) ?? null,
+          targetCustomer: business.targetCustomer?.slice(0, 500) ?? null,
           leadId: payload.leadId,
           keywordId: payload.keywordId,
           keywordPhrase: payload.keywordPhrase,

@@ -65,7 +65,7 @@ export function DashboardHeader({
             </span>
           </div>
 
-          <p className="mt-4 sm:mt-5 text-[10px] sm:text-[11px] font-black uppercase tracking-[0.2em] text-ink/60">
+          <p className="mt-4 sm:mt-5 text-[10px] sm:text-[11px] font-black uppercase tracking-[0.2em] text-ink-muted">
             Current Primary Objective
           </p>
 
@@ -124,7 +124,7 @@ export function DashboardHeader({
       </div>
 
       {/* Upgraded Quest Counter & Capacity Box */}
-      <div className="relative z-10 w-full lg:w-[380px] bg-accent-2 p-4 sm:p-6 text-white flex flex-col justify-between border-t-4 lg:border-t-0 border-outline shadow-[inset_0_0_30px_rgba(0,0,0,0.15)] min-w-0">
+      <div className="relative z-10 w-full lg:w-[380px] bg-accent-2 p-4 sm:p-6 text-on-accent flex flex-col justify-between border-t-4 lg:border-t-0 border-outline shadow-[inset_0_0_30px_rgba(0,0,0,0.15)] min-w-0">
         <div>
           <div className="flex items-center justify-between gap-2">
             <span className="bg-black text-[#FFE600] text-[10px] font-black uppercase tracking-widest px-2.5 py-1 border-2 border-white shadow-brutal-sm truncate">

@@ -10,7 +10,7 @@ import { LandingHero } from './LandingHero'
 describe('LandingHero offer', () => {
   it('offers a sample demo without promising free real scans', () => {
     render(<LandingHero />)
-    expect(screen.getByTestId('particles')).toBeInTheDocument()
+    expect(screen.queryByTestId('particles')).not.toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'Try the demo' })).toHaveAttribute('href', '/#demo')
     expect(screen.getByRole('link', { name: 'View plans' })).toHaveAttribute('href', '/pricing')
     expect(screen.getByText(/Real scans require a paid plan/)).toBeInTheDocument()

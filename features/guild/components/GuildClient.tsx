@@ -1,13 +1,12 @@
 'use client'
 
 import { motion, Variants } from 'framer-motion'
-import { Swords, Shield, Sparkles } from 'lucide-react'
+import { Shield } from 'lucide-react'
 import {
   QuestPageHeader,
   QuestPageShell,
   QuestPanel,
   QuestStatusPill,
-  QuestTicker,
 } from '@/components/quest'
 import GuildLeaderboardPodium from '@/features/guild/components/GuildLeaderboardPodium'
 import GuildLedgerTable from '@/features/guild/components/GuildLedgerTable'
@@ -39,27 +38,19 @@ export default function GuildClient({ stats }: { stats: GuildStats }) {
 
   return (
     <>
-      <QuestPageShell watermark={<Swords className="h-[650px] w-[650px] text-ink" />} gap="none">
+      <QuestPageShell gap="none">
         <motion.div
           variants={container}
           initial="hidden"
           animate="show"
           className="space-y-8 relative z-10"
         >
-          {/* Neo-Brutalist Ticker Banner */}
-          <motion.div variants={item}>
-            <QuestTicker label="Tenant activity ledger. Measured rows only.">
-              <Sparkles className="h-5 w-5 text-ink" /> ⚔️ TENANT ACTIVITY LEDGER{' '}
-              <Sparkles className="h-5 w-5 text-ink" /> 🛡️ MEASURED ROWS ONLY
-            </QuestTicker>
-          </motion.div>
-
           {/* Header */}
           <motion.div variants={item}>
             <QuestPageHeader
               className="mt-6"
               icon={<Shield className="h-8 w-8" />}
-              eyebrow={<>COMMANDER&apos;S MAP &amp; ANALYTICS</>}
+              eyebrow="Your activity journal"
               title="Guild Hall"
               subtitle="Tenant Activity & Outcome Ledger"
               status={<QuestStatusPill state="idle" label="Provider status" value="Not shown here" />}
@@ -70,10 +61,10 @@ export default function GuildClient({ stats }: { stats: GuildStats }) {
           {state.topThree.length === 0 && state.tableHunters.length === 0 ? (
             <motion.div variants={item}>
               <QuestPanel padding="lg" className="mt-8" aria-labelledby="guild-rankings-heading">
-                <h2 id="guild-rankings-heading" className="text-2xl font-black uppercase">
+                <h2 id="guild-rankings-heading" className="font-display text-2xl font-semibold normal-case">
                   Guild rankings unavailable
                 </h2>
-                <p className="mt-2 max-w-2xl text-sm font-bold leading-relaxed text-ink-muted">
+                <p className="mt-2 max-w-2xl text-sm font-medium leading-relaxed text-ink-muted">
                   SEOlaQuest does not publish cross-account rankings until a consented public-profile model exists. Your private,
                   tenant-scoped activity remains visible below.
                 </p>

@@ -59,100 +59,98 @@ export function HomepageOAuthDisclosure() {
   return (
     <section
       id="app-transparency"
-      className="relative z-10 border-t-4 border-outline bg-canvas px-4 py-20 sm:px-6 sm:py-28"
+      className="relative z-10 border-t border-outline bg-canvas px-4 py-20 sm:px-6 sm:py-28"
       aria-labelledby="transparency-heading"
     >
       <div className="mx-auto max-w-7xl">
 
         {/* ── Section header ─────────────────────────────────── */}
-        <div className="mb-12">
-          <span className="inline-flex items-center gap-2 border-4 border-outline bg-[#4169e1] px-4 py-1.5 text-xs font-black uppercase tracking-widest text-white shadow-brutal">
+      <div className="mb-12">
+          <span className="inline-flex items-center gap-2 rounded-[20px] border border-outline bg-forest px-4 py-1.5 text-xs font-semibold tracking-wide text-on-forest">
             <ShieldCheck size={14} /> App transparency
           </span>
           <h2
             id="transparency-heading"
-            className="mt-4 text-3xl font-black uppercase leading-none tracking-tight text-ink sm:text-5xl"
+      className="font-display mt-4 text-3xl font-medium leading-none tracking-tight text-ink sm:text-5xl"
           >
             What SEOlaQuest is,<br />
-            {/* Darker than the #ff5a36 brand orange: that shade only reaches 2.73:1
-                on the canvas background, below the 3:1 axe requires for large text. */}
-            <span className="text-[#D93B0F]">what it does, and why.</span>
+            <span className="text-forest">what it does, and why.</span>
           </h2>
-          <p className="mt-4 max-w-3xl text-base font-bold leading-relaxed text-ink/70">
+          <p className="mt-4 max-w-3xl text-base font-medium leading-relaxed text-ink-muted">
             This section exists so you can make an informed decision before creating an account.
             No inflated claims, no hidden data practices.
           </p>
         </div>
 
         {/* ── App identity card ──────────────────────────────── */}
-        <div className="mb-10 flex flex-col gap-4 border-4 border-outline bg-black p-6 text-white shadow-[8px_8px_0_0_#FFE600] sm:p-8 md:flex-row md:items-start md:gap-8">
-          <div className="flex h-16 w-16 shrink-0 items-center justify-center border-4 border-outline bg-accent shadow-brutal">
+      <div className="mb-10 flex flex-col gap-4 rounded-[20px] border border-outline bg-forest p-6 text-on-forest sm:p-8 md:flex-row md:items-start md:gap-8">
+      <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-xl border border-outline bg-accent">
             <Sword className="h-8 w-8 text-on-accent" />
           </div>
           <div>
-            <p className="text-[10px] font-black uppercase tracking-[0.22em] text-[#FFE600]">Application identity</p>
-            <h3 className="mt-1 text-2xl font-black uppercase text-white">SEOlaQuest</h3>
-            <p className="mt-3 max-w-3xl text-sm font-bold leading-relaxed text-white/80">
+            <p className="text-[10px] font-semibold text-accent">Application identity</p>
+            <h3 className="font-display mt-1 text-2xl font-medium text-on-forest">SEOlaQuest</h3>
+          <p className="mt-3 max-w-3xl text-sm font-medium leading-relaxed text-on-forest/80">
               SEOlaQuest is an AI-powered social listening and lead monitoring platform built for founders and operators.
               It monitors X (Twitter) for your tracked keywords in real time, uses AI agents to classify and score
               matching public posts for buyer intent, and delivers qualified leads directly to your dashboard —
               so you can reach potential customers before your competitors do.
             </p>
-            <p className="mt-3 text-xs font-black uppercase tracking-[0.14em] text-white/50">
+          <p className="mt-3 text-xs font-semibold text-on-forest/75">
               Built by the SEOlaQuest team · Version 1.0
             </p>
           </div>
         </div>
 
         {/* ── What the app does ──────────────────────────────── */}
-        <div className="mb-10">
-          <h3 className="mb-6 text-xl font-black uppercase tracking-tight text-ink">
+      <div className="mb-10">
+          <h3 className="font-display mb-6 text-xl font-medium tracking-tight text-ink">
             App functionality
           </h3>
-          <div className="grid gap-5 md:grid-cols-3">
+      <div className="grid gap-5 md:grid-cols-3">
             {WHAT_IT_DOES.map(({ icon: Icon, title, body }) => (
               <article
                 key={title}
-                className="flex flex-col gap-4 border-4 border-outline bg-card p-6 shadow-brutal-lg"
+      className="flex flex-col gap-4 rounded-[20px] border border-outline bg-card p-6"
               >
-                <div className="inline-flex h-12 w-12 items-center justify-center border-2 border-outline bg-accent shadow-brutal-sm">
+      <div className="inline-flex h-12 w-12 items-center justify-center rounded-xl border border-outline bg-accent">
                   <Icon className="h-6 w-6 text-on-accent" />
                 </div>
-                <h4 className="text-lg font-black uppercase text-ink">{title}</h4>
-                <p className="text-sm font-bold leading-relaxed text-ink/70">{body}</p>
+                <h4 className="text-lg font-semibold text-ink">{title}</h4>
+                <p className="text-sm font-medium leading-relaxed text-ink-muted">{body}</p>
               </article>
             ))}
           </div>
         </div>
 
         {/* ── Data transparency ──────────────────────────────── */}
-        <div className="mb-10">
-          <div className="mb-6 flex items-start gap-3">
-            <div className="border-2 border-outline bg-highlight p-2 shadow-brutal-sm">
+      <div className="mb-10">
+      <div className="mb-6 flex items-start gap-3">
+      <div className="rounded-[20px] border border-outline bg-highlight p-2">
               <Eye className="h-5 w-5 text-on-accent" />
             </div>
             <div>
-              <h3 className="text-xl font-black uppercase tracking-tight text-ink">
+          <h3 className="font-display text-xl font-medium tracking-tight text-ink">
                 Why we request your data
               </h3>
-              <p className="mt-1 text-sm font-bold text-ink/60">
+          <p className="mt-1 text-sm font-medium text-ink-muted">
                 A plain-language breakdown of every data category the app collects and what it is used for.
               </p>
             </div>
           </div>
 
-          <div className="grid gap-5 md:grid-cols-2">
+      <div className="grid gap-5 md:grid-cols-2">
             {DATA_REQUESTED.map(({ icon: Icon, label, purpose }) => (
               <div
                 key={label}
-                className="flex gap-4 border-4 border-outline bg-card p-6 shadow-brutal"
+      className="flex gap-4 rounded-[20px] border border-outline bg-card p-6"
               >
-                <div className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center border-2 border-outline bg-highlight shadow-brutal-sm">
+      <div className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-[20px] border border-outline bg-highlight">
                   <Icon className="h-5 w-5 text-on-accent" />
                 </div>
                 <div>
-                  <p className="text-sm font-black uppercase tracking-[0.12em] text-ink">{label}</p>
-                  <p className="mt-2 text-sm font-bold leading-relaxed text-ink/70">{purpose}</p>
+                  <p className="text-sm font-semibold text-ink">{label}</p>
+                  <p className="mt-2 text-sm font-medium leading-relaxed text-ink-muted">{purpose}</p>
                 </div>
               </div>
             ))}
@@ -160,22 +158,22 @@ export function HomepageOAuthDisclosure() {
         </div>
 
         {/* ── Privacy policy CTA ─────────────────────────────── */}
-        <div className="flex flex-col gap-4 border-4 border-outline bg-highlight p-6 shadow-brutal sm:flex-row sm:items-center sm:justify-between sm:p-8">
+      <div className="flex flex-col gap-4 rounded-[20px] border border-outline bg-highlight p-6 sm:flex-row sm:items-center sm:justify-between sm:p-8">
           <div>
-            <p className="text-xs font-black uppercase tracking-[0.2em] text-ink/60">
+          <p className="text-xs font-semibold text-ink-muted">
               Full details
             </p>
-            <h3 className="mt-1 text-xl font-black uppercase text-ink">
+          <h3 className="font-display mt-1 text-xl font-medium text-ink">
               Read our privacy policy
             </h3>
-            <p className="mt-1 max-w-xl text-sm font-bold leading-relaxed text-ink/70">
+          <p className="mt-1 max-w-xl text-sm font-medium leading-relaxed text-ink-muted">
               Our privacy policy provides a complete account of all data stored, current safeguards in place,
               and how to request account deletion.
             </p>
           </div>
           <Link
             href="/privacy"
-            className="inline-flex shrink-0 items-center gap-2 border-4 border-outline bg-black px-6 py-3 text-sm font-black uppercase tracking-widest text-white shadow-brutal-lg transition-transform duration-75 hover:-translate-x-[2px] hover:-translate-y-[2px] hover:bg-[#1a1a1a] hover:shadow-[6px_6px_0_0_#FFE600] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#FFE600] focus-visible:ring-offset-2"
+      className="inline-flex shrink-0 items-center gap-2 rounded-[20px] border border-outline bg-forest px-6 py-3 text-sm font-semibold tracking-wide text-on-forest transition-transform duration-75 hover:-translate-x-[2px] hover:-translate-y-[2px] hover:bg-forest/90 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-accent focus-visible:ring-offset-2"
           >
             <Lock size={16} />
             Privacy policy

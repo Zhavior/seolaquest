@@ -1,3 +1,4 @@
+import { getAdminIdentity, OWNER_ADMIN_EMAIL } from '@/src/modules/admin/authorization'
 import { ClerkProvider } from '@clerk/nextjs'
 import { redirect } from 'next/navigation'
 import { getCurrentUser } from '@/lib/auth'
@@ -12,11 +13,15 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   if (!user) redirect('/sign-in?redirect_url=%2Fapp')
   if (!user.onboardingComplete) redirect('/onboarding?returnTo=%2Fapp')
 
+  const admin = user.email?.trim().toLowerCase() === OWNER_ADMIN_EMAIL ? await getAdminIdentity() : null
+
   // The HUD is built here, on the server, and passed down as an already-rendered
   // slot — so the account record never crosses into the client shell.
   return (
     <ClerkProvider>
-      <SEOlaQuestShell hud={<ShellHud user={await toShellUser(user)} />}>{children}</SEOlaQuestShell>
+      <SEOlaQuestShell isAdmin={Boolean(admin)} hud={<ShellHud user={await toShellUser(user)} />}>
+        {children}
+      </SEOlaQuestShell>
     </ClerkProvider>
   )
 }

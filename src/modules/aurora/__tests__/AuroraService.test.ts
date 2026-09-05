@@ -38,6 +38,7 @@ function stubClassifier(result: Partial<AuroraSemanticResult> = {}): AuroraSeman
         // MEDIUM, not HIGH: the scorer adds 15 for a HIGH fit, which would cap this fixture
         // at 100/CRITICAL and stop it exercising the ENGAGE/HIGH band.
         businessFit: 'MEDIUM',
+        businessContextAvailable: true,
       },
       reasons: ['Strong intent detected'],
       ...result,

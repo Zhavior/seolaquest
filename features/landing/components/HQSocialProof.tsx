@@ -68,7 +68,7 @@ export function HQSocialProof() {
                   >
                     <td className="px-4 py-3 font-black text-sm">{badge}</td>
                     <td className="px-4 py-3 font-black text-sm uppercase tracking-wider">{name}</td>
-                    <td className="px-4 py-3 text-xs font-bold text-ink/50 group-hover:text-white/60">{cls}</td>
+                    <td className="px-4 py-3 text-xs font-bold text-ink-muted group-hover:text-white/60">{cls}</td>
                     <td className="px-4 py-3 font-black text-sm tabular-nums">{leads.toLocaleString()}</td>
                   </tr>
                 ))}
@@ -104,7 +104,7 @@ export function HQSocialProof() {
                 >
                   {cls}
                 </span>
-                <cite className="text-xs font-bold text-ink/50 not-italic">{author}</cite>
+                <cite className="text-xs font-bold text-ink-muted not-italic">{author}</cite>
               </footer>
             </blockquote>
           ))}

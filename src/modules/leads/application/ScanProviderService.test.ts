@@ -265,7 +265,7 @@ describe('ScanProviderService', () => {
       expect(mocks.leadMatchCreateMany).toHaveBeenCalled()
     })
 
-    it('keeps the scan alive when an event payload cannot be built', async () => {
+    it('fails persistence when the source record for a discovery is missing', async () => {
       oneFreshPost()
       // A lead whose provider record vanished from the batch: skipped with a warning rather
       // than aborting the transaction and losing every other lead in the same scan.
@@ -273,12 +273,8 @@ describe('ScanProviderService', () => {
         select?.id ? [{ id: 'lead-1', externalPostId: 'tw_does_not_match' }] : [],
       )
 
-      await expect(ScanProviderService.scanTenant('user-1', 'run-1')).resolves.toMatchObject({
-        providerSucceeded: true,
-      })
-
+      await expect(ScanProviderService.scanTenant('user-1', 'run-1')).resolves.toMatchObject({ providerSucceeded: false, leadsCreated: 0 })
       expect(mocks.domainEventCreate).not.toHaveBeenCalled()
-      expect(mocks.attemptUpdate).toHaveBeenCalled()
     })
   })
 })

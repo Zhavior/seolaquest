@@ -45,7 +45,7 @@ export function DashboardCard({
   return (
     <article
       className={clsx(
-        'group relative border-4 border-outline bg-card p-4',
+        'group relative border border-outline bg-card p-4 rounded-xl',
         // On the light theme the black slab is the depth cue. On dark themes
         // `--shadow-color` is transparent, so the light border carries the
         // silhouette instead and only emphasis cards keep a (tinted) slab.
@@ -59,11 +59,11 @@ export function DashboardCard({
         <div className="flex min-w-0 items-center gap-2">
           <span
             aria-hidden
-            className="grid size-8 shrink-0 place-items-center border-2 border-outline bg-accent text-on-accent"
+            className="grid size-8 shrink-0 place-items-center border border-outline bg-accent text-on-accent rounded-xl"
           >
             <Icon className="size-4" strokeWidth={3} />
           </span>
-          <h3 className="truncate-safe text-[11px] font-black uppercase tracking-[0.14em] text-ink-muted">
+          <h3 className="truncate-safe text-[11px] font-semibold normal-case tracking-[0.14em] text-ink-muted">
             {title}
           </h3>
         </div>
@@ -71,8 +71,8 @@ export function DashboardCard({
         {statusLabel && (
           <span
             className={clsx(
-              'shrink-0 border-2 border-outline px-2 py-0.5',
-              'text-[10px] font-black uppercase leading-none tracking-wider',
+              'shrink-0 border border-outline px-2 py-0.5 rounded-xl',
+              'text-[10px] font-semibold normal-case leading-none tracking-wider',
               STATUS_STYLES[status],
             )}
           >
@@ -81,7 +81,7 @@ export function DashboardCard({
         )}
       </header>
 
-      <p className="mt-3 font-mono text-3xl font-black tabular-nums text-ink">{value}</p>
+      <p className="mt-3 font-mono text-3xl font-semibold tabular-nums text-ink">{value}</p>
 
       {hint && <p className="mt-1 break-word-safe text-xs font-medium text-ink-muted">{hint}</p>}
 
@@ -92,7 +92,7 @@ export function DashboardCard({
           aria-valuemin={0}
           aria-valuemax={100}
           aria-label={`${title} progress`}
-          className="mt-4 h-3 w-full border-2 border-outline bg-inset"
+          className="mt-4 h-3 w-full border border-outline bg-inset rounded-xl"
         >
           <div
             className="h-full bg-accent-2 transition-[width] duration-500 ease-out"

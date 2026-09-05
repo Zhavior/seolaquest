@@ -79,20 +79,20 @@ const SCAN_DURATION_MS = 800
 const TELEMETRY_STEP_MS = 180
 
 /** Shared chrome. Every panel on the page is the same slab. */
-const PANEL = 'border-4 border-outline bg-card shadow-brutal'
+const PANEL = 'border border-outline bg-card shadow-brutal rounded-xl'
 const EYEBROW =
-  'inline-flex items-center gap-2 border-2 border-outline bg-accent px-3 py-1.5 text-[11px] font-black uppercase tracking-[0.24em] text-on-accent shadow-brutal sm:text-xs'
-const HEADING = 'text-3xl font-black uppercase leading-[1.05] tracking-tight text-ink sm:text-4xl lg:text-5xl'
+  'inline-flex items-center gap-2 border border-outline bg-accent px-3 py-1.5 text-[11px] font-semibold normal-case tracking-[0.24em] text-on-accent shadow-brutal sm:text-xs rounded-xl'
+const HEADING = 'text-3xl font-semibold normal-case leading-[1.05] tracking-tight text-ink sm:text-4xl lg:text-5xl'
 
 const RARITY_STYLE: Record<SampleTarget['rarity'], string> = {
   LEGENDARY: 'bg-accent text-on-accent',
-  EPIC: 'bg-[#7C3AED] text-white',
+  EPIC: 'bg-forest text-white',
   RARE: 'bg-[#16A34A] text-white',
   COMMON: 'bg-inset text-ink',
 }
 
 const SOURCE_STYLE: Record<SampleTarget['source'], string> = {
-  Reddit: 'bg-accent-2 text-white',
+  Reddit: 'bg-accent-2 text-on-accent',
   X: 'bg-ink text-ink-inverse',
 }
 
@@ -487,7 +487,7 @@ export function RadarDemo() {
   return (
     <>
         {/* ── 2 · The scope ────────────────────────────────────────────── */}
-        <section id="scope" className="scroll-mt-24 border-y-4 border-outline bg-surface px-4 py-20 sm:px-6">
+        <section id="scope" className="scroll-mt-24 border-y border-outline bg-surface px-4 py-20 sm:px-6">
           <div className="mx-auto max-w-7xl space-y-10">
             <Reveal className="max-w-3xl space-y-4">
               <p className={EYEBROW}>
@@ -504,8 +504,8 @@ export function RadarDemo() {
 
             <div className="grid gap-8 lg:grid-cols-2">
               <Reveal className={cn('p-5', PANEL)}>
-                <div className="mb-4 flex items-center justify-between gap-3 border-b-4 border-outline pb-3">
-                  <h3 className="font-mono text-sm font-black uppercase tracking-[0.18em] text-ink">
+                <div className="mb-4 flex items-center justify-between gap-3 border-b border-outline pb-3">
+                  <h3 className="font-mono text-sm font-semibold normal-case tracking-[0.18em] text-ink">
                     Scope
                   </h3>
                   <div className="flex items-center gap-2">
@@ -513,7 +513,7 @@ export function RadarDemo() {
                       <button
                         type="button"
                         onClick={replayStory}
-                        className="flex min-h-11 items-center gap-1 border-2 border-outline bg-card px-2 py-1 font-mono text-[10px] font-black uppercase tracking-[0.14em] text-ink shadow-brutal-sm transition-transform duration-75 hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none"
+                        className="flex min-h-11 items-center gap-1 border border-outline bg-card px-2 py-1 font-mono text-[10px] font-semibold normal-case tracking-[0.14em] text-ink shadow-brutal-sm transition-transform duration-75 hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none rounded-xl"
                       >
                         <Play className="h-2.5 w-2.5" aria-hidden="true" />
                         <span>Replay intro</span>
@@ -524,7 +524,7 @@ export function RadarDemo() {
                       onClick={toggleSound}
                       aria-pressed={soundOn}
                       className={cn(
-                        'flex min-h-11 min-w-11 items-center gap-1.5 border-2 border-outline px-2 py-1 font-mono text-[10px] font-black uppercase tracking-[0.16em] shadow-brutal-sm transition-transform duration-75 hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none',
+                        'flex min-h-11 min-w-11 items-center gap-1.5 border border-outline px-2 py-1 font-mono text-[10px] font-semibold normal-case tracking-[0.16em] shadow-brutal-sm transition-transform duration-75 hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none rounded-xl',
                         soundOn ? 'bg-accent text-on-accent' : 'bg-card text-ink-muted',
                       )}
                     >
@@ -536,7 +536,7 @@ export function RadarDemo() {
                       <span className="sr-only">Toggle interface sound</span>
                       <span aria-hidden="true">{soundOn ? 'On' : 'Off'}</span>
                     </button>
-                    <span className="border-2 border-outline bg-highlight px-2 py-1 font-mono text-[10px] font-black uppercase tracking-[0.16em] text-on-accent">
+                    <span className="border border-outline bg-highlight px-2 py-1 font-mono text-[10px] font-semibold normal-case tracking-[0.16em] text-on-accent rounded-xl">
                       {visibleTargets.length} shown
                     </span>
                   </div>
@@ -577,7 +577,7 @@ export function RadarDemo() {
                           setFilter(entry)
                         }}
                         className={cn(
-                          'min-h-11 min-w-11 border-2 border-outline px-2.5 py-1 font-mono text-[10px] font-black uppercase tracking-[0.16em] transition-transform duration-75 active:translate-x-[1px] active:translate-y-[1px]',
+                          'min-h-11 min-w-11 border border-outline px-2.5 py-1 font-mono text-[10px] font-semibold normal-case tracking-[0.16em] transition-transform duration-75 active:translate-x-[1px] active:translate-y-[1px] rounded-xl',
                           filter === entry
                             ? 'bg-accent text-on-accent shadow-brutal-sm'
                             : 'bg-card text-ink-muted hover:bg-highlight hover:text-on-accent',
@@ -599,7 +599,7 @@ export function RadarDemo() {
                         aria-pressed={target.id === selected.id}
                         onClick={() => selectTarget(target)}
                         className={cn(
-                          'flex min-h-11 w-full items-center justify-between gap-3 border-4 border-outline px-3 py-2.5 text-left font-mono text-xs font-black uppercase tracking-[0.12em] transition-transform duration-75 hover:translate-x-[1px] hover:translate-y-[1px]',
+                          'flex min-h-11 w-full items-center justify-between gap-3 border border-outline px-3 py-2.5 text-left font-mono text-xs font-semibold normal-case tracking-[0.12em] transition-transform duration-75 hover:translate-x-[1px] hover:translate-y-[1px] rounded-xl',
                           target.id === selected.id
                             ? 'bg-accent text-on-accent shadow-brutal'
                             : 'bg-card text-ink shadow-brutal-sm',
@@ -622,17 +622,17 @@ export function RadarDemo() {
                         {selected.avatar}
                       </span>
                       <span>
-                        <span className="block font-mono text-xs font-black text-ink">
+                        <span className="block font-mono text-xs font-semibold text-ink">
                           {selected.handle}
                         </span>
-                        <span className="block font-mono text-[10px] uppercase tracking-[0.16em] text-ink-muted">
+                        <span className="block font-mono text-[10px] normal-case tracking-[0.16em] text-ink-muted">
                           {selected.source} · {selected.timestamp}
                         </span>
                       </span>
                     </div>
                     <span
                       className={cn(
-                        'border-2 border-outline px-2 py-1 font-mono text-[10px] font-black uppercase tracking-[0.12em] shadow-brutal-sm',
+                        'border border-outline px-2 py-1 font-mono text-[10px] font-semibold normal-case tracking-[0.12em] shadow-brutal-sm rounded-xl',
                         RARITY_STYLE[selected.rarity],
                       )}
                     >
@@ -640,14 +640,14 @@ export function RadarDemo() {
                     </span>
                   </div>
 
-                  <p className="line-clamp-3 border-2 border-outline bg-inset p-3 text-sm text-ink">
+                  <p className="line-clamp-3 border border-outline bg-inset p-3 text-sm text-ink rounded-xl">
                     &ldquo;{selected.body}&rdquo;
                   </p>
 
                   <button
                     type="button"
                     onClick={() => openDrawer(selected)}
-                    className="flex min-h-11 w-full items-center justify-center gap-2 border-2 border-outline bg-ink px-4 py-2.5 font-mono text-[11px] font-black uppercase tracking-[0.18em] text-ink-inverse shadow-brutal-sm transition-transform duration-75 hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none"
+                    className="flex min-h-11 w-full items-center justify-center gap-2 border border-outline bg-ink px-4 py-2.5 font-mono text-[11px] font-semibold normal-case tracking-[0.18em] text-ink-inverse shadow-brutal-sm transition-transform duration-75 hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none rounded-xl"
                   >
                     <MessageSquare className="h-3.5 w-3.5" aria-hidden="true" />
                     <span>Open draft</span>
@@ -693,7 +693,7 @@ export function RadarDemo() {
                             setPrey(entry)
                           }}
                           className={cn(
-                            'min-h-11 min-w-11 border-2 border-outline p-2.5 text-left font-mono text-[10px] font-black uppercase tracking-[0.14em] transition-transform duration-75 active:translate-x-[1px] active:translate-y-[1px]',
+                            'min-h-11 min-w-11 border border-outline p-2.5 text-left font-mono text-[10px] font-semibold normal-case tracking-[0.14em] transition-transform duration-75 active:translate-x-[1px] active:translate-y-[1px] rounded-xl',
                             prey === entry
                               ? 'bg-accent text-on-accent shadow-brutal-sm'
                               : 'bg-card text-ink hover:bg-highlight hover:text-on-accent',
@@ -722,7 +722,7 @@ export function RadarDemo() {
                             setPain(entry)
                           }}
                           className={cn(
-                            'flex min-h-11 w-full items-center justify-between border-2 border-outline p-2.5 text-left font-mono text-[10px] font-black uppercase tracking-[0.14em] transition-transform duration-75 active:translate-x-[1px] active:translate-y-[1px]',
+                            'flex min-h-11 w-full items-center justify-between border border-outline p-2.5 text-left font-mono text-[10px] font-semibold normal-case tracking-[0.14em] transition-transform duration-75 active:translate-x-[1px] active:translate-y-[1px] rounded-xl',
                             pain === entry
                               ? 'bg-accent-2 text-on-accent shadow-brutal-sm'
                               : 'bg-card text-ink hover:bg-highlight hover:text-on-accent',
@@ -752,7 +752,7 @@ export function RadarDemo() {
                             setAction(entry.id)
                           }}
                           className={cn(
-                            'min-h-11 w-full border-2 border-outline p-2.5 text-left font-mono text-[10px] font-black uppercase tracking-[0.14em] transition-transform duration-75 active:translate-x-[1px] active:translate-y-[1px]',
+                            'min-h-11 w-full border border-outline p-2.5 text-left font-mono text-[10px] font-semibold normal-case tracking-[0.14em] transition-transform duration-75 active:translate-x-[1px] active:translate-y-[1px] rounded-xl',
                             action === entry.id
                               ? 'bg-ink text-ink-inverse shadow-brutal-sm'
                               : 'bg-card text-ink hover:bg-highlight hover:text-on-accent',
@@ -768,7 +768,7 @@ export function RadarDemo() {
                 <Reveal key={step.key} delay={index * 0.08}>
                   <fieldset className={cn('h-full space-y-4 p-5', PANEL)}>
                     <legend className="sr-only">{step.legend}</legend>
-                    <p className="flex items-center gap-2 border-b-4 border-outline pb-3 font-mono text-xs font-black uppercase tracking-[0.18em] text-ink">
+                    <p className="flex items-center gap-2 border-b border-outline pb-3 font-mono text-xs font-semibold normal-case tracking-[0.18em] text-ink">
                       {step.icon}
                       <span>{step.title}</span>
                     </p>
@@ -784,7 +784,7 @@ export function RadarDemo() {
                 onClick={runScan}
                 disabled={isScanning}
                 className={cn(
-                  'inline-flex items-center gap-3 border-4 border-outline px-8 py-5 text-lg font-black uppercase tracking-[0.14em] shadow-brutal-lg transition-all duration-75 hover:-translate-x-[1px] hover:-translate-y-[1px] active:translate-x-[3px] active:translate-y-[3px] active:shadow-brutal-sm sm:text-xl',
+                  'inline-flex items-center gap-3 border border-outline px-8 py-5 text-lg font-semibold normal-case tracking-[0.14em] shadow-brutal-lg transition-all duration-75 hover:-translate-x-[1px] hover:-translate-y-[1px] active:translate-x-[3px] active:translate-y-[3px] active:shadow-brutal-sm sm:text-xl rounded-xl',
                   isScanning
                     ? 'cursor-wait bg-highlight-strong text-on-accent'
                     : 'bg-accent text-on-accent hover:bg-highlight-strong',
@@ -812,11 +812,11 @@ export function RadarDemo() {
 
         {/* ── 4 · Telemetry + split-pane output ────────────────────────── */}
         {telemetry.length > 0 || scanResult ? (
-          <section className="border-y-4 border-outline bg-ink px-4 py-16 sm:px-6" ref={outputRef}>
+          <section className="border-y border-outline bg-ink px-4 py-16 sm:px-6" ref={outputRef}>
             <div className="mx-auto max-w-7xl space-y-8">
               {telemetry.length > 0 ? (
-                <div className="mx-auto max-w-3xl border-4 border-[#3F3F46] bg-[#0A0A0A] shadow-[6px_6px_0_0_var(--accent-primary)]">
-                  <div className="flex items-center justify-between gap-2 border-b-4 border-[#3F3F46] px-4 py-2 font-mono text-[10px] font-black uppercase tracking-[0.18em]">
+                <div className="mx-auto max-w-3xl border border-[#3F3F46] bg-forest shadow-brutal rounded-xl">
+                  <div className="flex items-center justify-between gap-2 border-b border-[#3F3F46] px-4 py-2 font-mono text-[10px] font-semibold normal-case tracking-[0.18em]">
                     <span className="flex items-center gap-2 text-[#E4E4E7]">
                       <Radar className="h-3 w-3" aria-hidden="true" />
                       <span>Telemetry stream</span>
@@ -833,7 +833,7 @@ export function RadarDemo() {
                     {telemetry.slice(0, revealed).map((line) => (
                       <p key={line.key} className="flex flex-wrap gap-x-2">
                         <span className="text-[#71717A]">&gt;</span>
-                        <span className={cn('font-black', line.tone)}>{line.label}:</span>
+                        <span className={cn('font-semibold', line.tone)}>{line.label}:</span>
                         <span className="text-[#D4D4D8]">{line.value}</span>
                       </p>
                     ))}
@@ -851,30 +851,30 @@ export function RadarDemo() {
                     className="space-y-5 motion-safe:animate-[radar-rise_0.4s_cubic-bezier(0.16,1,0.3,1)_both]"
                   >
                     {scanResult.note ? (
-                      <p className="mx-auto max-w-3xl border-4 border-outline bg-accent p-3 text-center font-mono text-[11px] font-black uppercase tracking-[0.14em] text-on-accent shadow-brutal">
+                      <p className="mx-auto max-w-3xl border border-outline bg-accent p-3 text-center font-mono text-[11px] font-semibold normal-case tracking-[0.14em] text-on-accent shadow-brutal rounded-xl">
                         {scanResult.note}
                       </p>
                     ) : null}
 
                     <div className="grid items-start gap-6 lg:grid-cols-2">
                       {/* Left — filtered source thread */}
-                      <section className="border-4 border-outline bg-card shadow-brutal-lg">
-                        <h3 className="flex items-center gap-2 border-b-4 border-outline bg-inset px-4 py-3 font-mono text-[11px] font-black uppercase tracking-[0.18em] text-ink">
+                      <section className="border border-outline bg-card shadow-brutal-lg rounded-xl">
+                        <h3 className="flex items-center gap-2 border-b border-outline bg-inset px-4 py-3 font-mono text-[11px] font-semibold normal-case tracking-[0.18em] text-ink">
                           <Radar className="h-3.5 w-3.5" aria-hidden="true" />
                           <span>Filtered source thread</span>
                         </h3>
 
                         <div className="space-y-3 p-4">
                           <div className="flex flex-wrap items-center gap-2">
-                            <span className="flex h-9 w-9 items-center justify-center border-2 border-outline bg-highlight text-lg" aria-hidden="true">
+                            <span className="flex h-9 w-9 items-center justify-center border border-outline bg-highlight text-lg rounded-xl" aria-hidden="true">
                               {scanResult.target.avatar}
                             </span>
-                            <span className="mr-auto font-mono text-sm font-black text-ink">
+                            <span className="mr-auto font-mono text-sm font-semibold text-ink">
                               {scanResult.target.handle}
                             </span>
                             <span
                               className={cn(
-                                'border-2 border-outline px-2 py-0.5 font-mono text-[10px] font-black uppercase tracking-[0.12em] shadow-brutal-sm',
+                                'border border-outline px-2 py-0.5 font-mono text-[10px] font-semibold normal-case tracking-[0.12em] shadow-brutal-sm rounded-xl',
                                 SOURCE_STYLE[scanResult.target.source],
                               )}
                             >
@@ -885,7 +885,7 @@ export function RadarDemo() {
                                 model, and a confidence pill would claim otherwise. */}
                             <span
                               className={cn(
-                                'border-2 border-outline px-2 py-0.5 font-mono text-[10px] font-black uppercase tracking-[0.12em] shadow-brutal-sm',
+                                'border border-outline px-2 py-0.5 font-mono text-[10px] font-semibold normal-case tracking-[0.12em] shadow-brutal-sm rounded-xl',
                                 RARITY_STYLE[scanResult.target.rarity],
                               )}
                             >
@@ -893,27 +893,27 @@ export function RadarDemo() {
                             </span>
                           </div>
 
-                          <p className="font-mono text-[10px] font-black uppercase tracking-[0.16em] text-ink-muted">
+                          <p className="font-mono text-[10px] font-semibold normal-case tracking-[0.16em] text-ink-muted">
                             {scanResult.target.competitor} · {scanResult.target.painPoint} ·{' '}
                             {scanResult.target.timestamp}
                           </p>
 
-                          <h4 className="text-lg font-black leading-snug text-ink">
+                          <h4 className="text-lg font-semibold leading-snug text-ink">
                             {scanResult.target.title}
                           </h4>
 
-                          <p className="border-2 border-outline bg-inset p-3 text-sm leading-relaxed text-ink">
+                          <p className="border border-outline bg-inset p-3 text-sm leading-relaxed text-ink rounded-xl">
                             &ldquo;{scanResult.target.body}&rdquo;
                           </p>
 
                           {showRawJson ? (
-                            <pre className="max-h-64 overflow-auto border-2 border-outline bg-[#0A0A0A] p-3 font-mono text-[11px] leading-relaxed text-[#4ADE80]">
+                            <pre className="max-h-64 overflow-auto border border-outline bg-forest p-3 font-mono text-[11px] leading-relaxed text-[#4ADE80] rounded-xl">
                               {rawRecord(scanResult.target)}
                             </pre>
                           ) : null}
                         </div>
 
-                        <div className="flex flex-wrap gap-2 border-t-4 border-outline px-4 py-3">
+                        <div className="flex flex-wrap gap-2 border-t border-outline px-4 py-3">
                           <button
                             type="button"
                             onClick={() => {
@@ -921,7 +921,7 @@ export function RadarDemo() {
                               setShowRawJson((shown) => !shown)
                             }}
                             aria-expanded={showRawJson}
-                            className="flex min-h-11 min-w-11 items-center gap-1.5 border-2 border-outline bg-card px-3 py-1.5 font-mono text-[10px] font-black uppercase tracking-[0.14em] text-ink shadow-brutal-sm transition-transform duration-75 hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none"
+                            className="flex min-h-11 min-w-11 items-center gap-1.5 border border-outline bg-card px-3 py-1.5 font-mono text-[10px] font-semibold normal-case tracking-[0.14em] text-ink shadow-brutal-sm transition-transform duration-75 hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none rounded-xl"
                           >
                             <Braces className="h-3.5 w-3.5" aria-hidden="true" />
                             <span>{showRawJson ? 'Hide raw JSON' : 'View raw JSON'}</span>
@@ -930,7 +930,7 @@ export function RadarDemo() {
                           {/* Sample rows have no source URL, so this is a disabled
                               stub rather than a link that would go nowhere. */}
                           <span
-                            className="flex cursor-not-allowed items-center gap-1.5 border-2 border-dashed border-ink-muted px-3 py-1.5 font-mono text-[10px] font-black uppercase tracking-[0.14em] text-ink-muted"
+                            className="flex cursor-not-allowed items-center gap-1.5 border border-dashed border-ink-muted px-3 py-1.5 font-mono text-[10px] font-semibold normal-case tracking-[0.14em] text-ink-muted rounded-xl"
                             title="Sample data has no source URL. On a connected account this opens the original thread."
                           >
                             <Ban className="h-3.5 w-3.5" aria-hidden="true" />
@@ -940,26 +940,26 @@ export function RadarDemo() {
                       </section>
 
                       {/* Right — outreach action */}
-                      <section className="border-4 border-outline bg-card shadow-[8px_8px_0_0_var(--accent-primary)]">
-                        <h3 className="flex items-center gap-2 border-b-4 border-outline bg-accent px-4 py-3 font-mono text-[11px] font-black uppercase tracking-[0.18em] text-on-accent">
+                      <section className="border border-outline bg-card shadow-brutal rounded-xl">
+                        <h3 className="flex items-center gap-2 border-b border-outline bg-accent px-4 py-3 font-mono text-[11px] font-semibold normal-case tracking-[0.18em] text-on-accent">
                           <Send className="h-3.5 w-3.5" aria-hidden="true" />
                           <span>{actionMeta.outputLabel}</span>
                         </h3>
 
                         <div className="space-y-3 p-4">
-                          <p className="font-mono text-[10px] font-black uppercase tracking-[0.16em] text-ink-muted">
+                          <p className="font-mono text-[10px] font-semibold normal-case tracking-[0.16em] text-ink-muted">
                             Generated for {scanResult.target.handle} · edit before you post
                           </p>
-                          <pre className="max-h-64 overflow-auto whitespace-pre-wrap border-2 border-outline bg-inset p-3 font-mono text-xs leading-relaxed text-ink">
+                          <pre className="max-h-64 overflow-auto whitespace-pre-wrap border border-outline bg-inset p-3 font-mono text-xs leading-relaxed text-ink rounded-xl">
                             {draftFor(action, scanResult.target)}
                           </pre>
                         </div>
 
-                        <div className="flex flex-wrap gap-2 border-t-4 border-outline px-4 py-3">
+                        <div className="flex flex-wrap gap-2 border-t border-outline px-4 py-3">
                           <button
                             type="button"
                             onClick={copyPaneDraft}
-                            className="flex min-h-11 min-w-11 items-center gap-1.5 border-2 border-outline bg-accent px-3 py-1.5 font-mono text-[10px] font-black uppercase tracking-[0.14em] text-on-accent shadow-brutal-sm transition-transform duration-75 hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none"
+                            className="flex min-h-11 min-w-11 items-center gap-1.5 border border-outline bg-accent px-3 py-1.5 font-mono text-[10px] font-semibold normal-case tracking-[0.14em] text-on-accent shadow-brutal-sm transition-transform duration-75 hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none rounded-xl"
                           >
                             {paneCopied ? (
                               <Check className="h-3.5 w-3.5" aria-hidden="true" />
@@ -972,7 +972,7 @@ export function RadarDemo() {
                           <button
                             type="button"
                             onClick={() => openDrawer(scanResult.target)}
-                            className="flex min-h-11 min-w-11 items-center gap-1.5 border-2 border-outline bg-card px-3 py-1.5 font-mono text-[10px] font-black uppercase tracking-[0.14em] text-ink shadow-brutal-sm transition-transform duration-75 hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none"
+                            className="flex min-h-11 min-w-11 items-center gap-1.5 border border-outline bg-card px-3 py-1.5 font-mono text-[10px] font-semibold normal-case tracking-[0.14em] text-ink shadow-brutal-sm transition-transform duration-75 hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none rounded-xl"
                           >
                             <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
                             <span>Expand</span>
@@ -980,7 +980,7 @@ export function RadarDemo() {
 
                           <Link
                             href="/sign-up"
-                            className="flex items-center gap-1.5 border-2 border-outline bg-ink px-3 py-1.5 font-mono text-[10px] font-black uppercase tracking-[0.14em] text-ink-inverse shadow-brutal-sm transition-transform duration-75 hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none"
+                            className="flex items-center gap-1.5 border border-outline bg-ink px-3 py-1.5 font-mono text-[10px] font-semibold normal-case tracking-[0.14em] text-ink-inverse shadow-brutal-sm transition-transform duration-75 hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none rounded-xl"
                           >
                             <SquareArrowOutUpRight className="h-3.5 w-3.5" aria-hidden="true" />
                             <span>Open in app</span>
@@ -1003,8 +1003,8 @@ export function RadarDemo() {
         {/* ── 7 · Terminal ─────────────────────────────────────────────── */}
         <section className="px-4 py-20 sm:px-6">
           <Reveal className="mx-auto max-w-7xl">
-            <div className="border-4 border-outline bg-[#0A0A0A] shadow-brutal-lg">
-              <div className="flex items-center justify-between gap-3 border-b-4 border-[#3F3F46] px-4 py-2.5 font-mono text-[11px] font-black uppercase tracking-[0.18em]">
+            <div className="border border-outline bg-forest shadow-brutal-lg rounded-xl">
+              <div className="flex items-center justify-between gap-3 border-b border-[#3F3F46] px-4 py-2.5 font-mono text-[11px] font-semibold normal-case tracking-[0.18em]">
                 <span className="text-[#E4E4E7]">radar-simulator</span>
                 <span className="text-[#4ADE80]">Sample data only</span>
               </div>
@@ -1018,7 +1018,7 @@ export function RadarDemo() {
                   <p
                     key={`${index}-${line.text}`}
                     className={cn(
-                      line.type === 'input' && 'font-black text-accent',
+                      line.type === 'input' && 'font-semibold text-accent',
                       line.type === 'output' && 'text-[#4ADE80]',
                       line.type === 'system' && 'text-[#A1A1AA]',
                     )}
@@ -1028,10 +1028,10 @@ export function RadarDemo() {
                 ))}
               </div>
 
-              <form onSubmit={runCommand} className="flex border-t-4 border-[#3F3F46]">
+              <form onSubmit={runCommand} className="flex border-t border-[#3F3F46]">
                 <label
                   htmlFor="radar-command"
-                  className="flex items-center px-3 font-mono text-xs font-black text-accent"
+                  className="flex items-center px-3 font-mono text-xs font-semibold text-accent"
                 >
                   quest@sample:~$
                   <span className="sr-only">Simulator command</span>
@@ -1049,7 +1049,7 @@ export function RadarDemo() {
                 />
                 <button
                   type="submit"
-                  className="min-h-11 min-w-11 border-l-4 border-[#3F3F46] bg-accent px-5 font-mono text-[11px] font-black uppercase tracking-[0.18em] text-on-accent transition-colors hover:bg-highlight-strong"
+                  className="min-h-11 min-w-11 border-l border-[#3F3F46] bg-accent px-5 font-mono text-[11px] font-semibold normal-case tracking-[0.18em] text-on-accent transition-colors hover:bg-highlight-strong"
                 >
                   Run
                 </button>

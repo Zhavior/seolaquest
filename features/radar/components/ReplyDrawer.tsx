@@ -139,13 +139,13 @@ export function ReplyDrawer({
           'transition-[opacity,transform] duration-[180ms] motion-reduce:transition-none',
           leaving && 'translate-y-2 opacity-0',
           !reducedMotion && !leaving && 'motion-safe:animate-[radar-rise_0.18s_ease-out_both]',
-          'max-h-[90vh] w-full max-w-2xl overflow-y-auto border-4 border-outline bg-card text-ink shadow-[10px_10px_0_0_var(--accent-primary)]',
+          'max-h-[90vh] w-full max-w-2xl overflow-y-auto border border-outline bg-card text-ink shadow-brutal rounded-xl',
         )}
       >
-            <div className="flex items-center justify-between gap-3 border-b-4 border-outline bg-accent px-4 py-3">
+            <div className="flex items-center justify-between gap-3 border-b border-outline bg-accent px-4 py-3">
               <h2
                 id="reply-drawer-title"
-                className="flex items-center gap-2 font-mono text-xs font-black uppercase tracking-[0.18em] text-on-accent"
+                className="flex items-center gap-2 font-mono text-xs font-semibold normal-case tracking-[0.18em] text-on-accent"
               >
                 <MessageSquare className="h-4 w-4" aria-hidden="true" />
                 <span>{draftLabel} · sample thread</span>
@@ -153,7 +153,7 @@ export function ReplyDrawer({
               <button
                 type="button"
                 onClick={onClose}
-                className="flex h-8 w-8 items-center justify-center border-2 border-outline bg-card text-ink shadow-brutal-sm transition-transform duration-75 hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none"
+                className="flex h-8 w-8 items-center justify-center border border-outline bg-card text-ink shadow-brutal-sm transition-transform duration-75 hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none rounded-xl"
               >
                 <X className="h-4 w-4" aria-hidden="true" />
                 <span className="sr-only">Close dialog</span>
@@ -161,12 +161,12 @@ export function ReplyDrawer({
             </div>
 
             <div className="space-y-5 p-6">
-              <div className="space-y-2 border-2 border-outline bg-inset p-4">
+              <div className="space-y-2 border border-outline bg-inset p-4 rounded-xl">
                 <div className="flex flex-wrap items-center justify-between gap-2 font-mono text-xs">
-                  <span className="font-black text-ink">
+                  <span className="font-semibold text-ink">
                     {target.handle} · {target.source}
                   </span>
-                  <span className="border-2 border-outline bg-highlight px-2 py-0.5 font-black uppercase tracking-[0.12em] text-on-accent">
+                  <span className="border border-outline bg-highlight px-2 py-0.5 font-semibold normal-case tracking-[0.12em] text-on-accent rounded-xl">
                     Demo score {target.intentScore}
                   </span>
                 </div>
@@ -174,8 +174,8 @@ export function ReplyDrawer({
               </div>
 
               <div className="space-y-2">
-                <h3 className="font-mono text-[10px] font-black uppercase tracking-[0.18em] text-ink-muted">{draftLabel}</h3>
-                <pre className="overflow-x-auto whitespace-pre-wrap border-2 border-outline bg-inset p-4 font-mono text-xs leading-relaxed text-ink">
+                <h3 className="font-mono text-[10px] font-semibold normal-case tracking-[0.18em] text-ink-muted">{draftLabel}</h3>
+                <pre className="overflow-x-auto whitespace-pre-wrap border border-outline bg-inset p-4 font-mono text-xs leading-relaxed text-ink rounded-xl">
                   {draft}
                 </pre>
               </div>
@@ -184,7 +184,7 @@ export function ReplyDrawer({
                 <button
                   type="button"
                   onClick={onCopy}
-                  className="flex flex-1 items-center justify-center gap-2 border-2 border-outline bg-accent py-3 font-mono text-[11px] font-black uppercase tracking-[0.18em] text-on-accent shadow-brutal-sm transition-transform duration-75 hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none"
+                  className="flex flex-1 items-center justify-center gap-2 border border-outline bg-accent py-3 font-mono text-[11px] font-semibold normal-case tracking-[0.18em] text-on-accent shadow-brutal-sm transition-transform duration-75 hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none rounded-xl"
                 >
                   {copied ? (
                     <>
@@ -201,7 +201,7 @@ export function ReplyDrawer({
                 <button
                   type="button"
                   onClick={onClose}
-                  className="border-2 border-outline bg-ink px-6 py-3 font-mono text-[11px] font-black uppercase tracking-[0.18em] text-ink-inverse shadow-brutal-sm transition-transform duration-75 hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none"
+                  className="border border-outline bg-ink px-6 py-3 font-mono text-[11px] font-semibold normal-case tracking-[0.18em] text-ink-inverse shadow-brutal-sm transition-transform duration-75 hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none rounded-xl"
                 >
                   Close
                 </button>

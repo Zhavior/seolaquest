@@ -81,6 +81,10 @@ model TrackedKeyword {
 enum LeadStatus {
   NEW
   VIEWED
+  CLAIMED
+  REPLIED
+  QUALIFIED
+  CONVERTED
   CONTACTED
   DISMISSED
 }
@@ -107,6 +111,8 @@ model Lead {
   createdAt       DateTime           @default(now())
   crmDelivery     CrmExportDelivery?
   matches         LeadMatch[]
+  outcomes        LeadOutcome[]
+  decisions       AuroraDecision[]
 
   @@unique([userId, externalPostId])
   @@index([userId, status, createdAt])
@@ -377,17 +383,17 @@ model OperationalHeartbeat {
 }
 
 model AuditTrail {
-  id          String   @id @default(uuid())
-  userId      String?
-  user        User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
-  action      String
-  entityType  String
-  entityId    String?
-  status      String
-  metadata    Json?
-  ipAddress   String?
-  userAgent   String?
-  createdAt   DateTime @default(now())
+  id         String   @id @default(uuid())
+  userId     String?
+  user       User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  action     String
+  entityType String
+  entityId   String?
+  status     String
+  metadata   Json?
+  ipAddress  String?
+  userAgent  String?
+  createdAt  DateTime @default(now())
 
   @@index([userId, createdAt])
   @@index([action, createdAt])
@@ -441,6 +447,8 @@ model DomainEventConsumerReceipt {
 }
 
 model AuroraDecision {
+  leadId                     String?
+  lead                       Lead?    @relation(fields: [leadId], references: [id], onDelete: Cascade)
   id                         String   @id @default(uuid())
   opportunityId              String
   sourceEventId              String
@@ -459,12 +467,16 @@ model AuroraDecision {
   policyVersion              String
   semanticFailureCode        String?
   evaluationStatus           String // LIVE, DETERMINISTIC_ONLY, FALLBACK, UNAVAILABLE
+  inputFingerprint           String?
+  inputSnapshot              Json?
+  outputSchemaVersion        String?
   createdAt                  DateTime @default(now())
 
+  outcomes  LeadOutcome[]
   feedbacks AuroraFeedback[]
 
   @@unique([sourceEventId, deterministicScorerVersion, classifierVersion, policyVersion])
-  @@index([opportunityId])
+  @@index([opportunityId, createdAt, id])
   @@index([recommendedAction, priority])
 }
 
@@ -608,32 +620,32 @@ model GamifyQuestContribution {
 /// read-only on Vercel: the generator writes drafts at runtime, so there is
 /// nowhere on disk for them to go.
 model BlogPost {
-  id              String         @id @default(uuid())
-  slug            String         @unique
-  title           String
-  description     String
-  body            String
-  tag             String         @default("[ALL]")
-  author          String
-  authorRole      String
-  authorAvatar    String
-  coverColor      String         @default("#FFE600")
-  readTimeMinutes Int            @default(1)
-  featured        Boolean        @default(false)
-  status          BlogPostStatus @default(DRAFT)
-  source          BlogPostSource @default(AI_GENERATED)
+  id               String         @id @default(uuid())
+  slug             String         @unique
+  title            String
+  description      String
+  body             String
+  tag              String         @default("[ALL]")
+  author           String
+  authorRole       String
+  authorAvatar     String
+  coverColor       String         @default("#FFE600")
+  readTimeMinutes  Int            @default(1)
+  featured         Boolean        @default(false)
+  status           BlogPostStatus @default(DRAFT)
+  source           BlogPostSource @default(AI_GENERATED)
   /// The topic the generator was working from. Kept so the picker can avoid
   /// proposing something already covered, including by drafts never published.
-  topic           String?
+  topic            String?
   /// Display date, and the sitemap's lastModified. Set on import from the
   /// original frontmatter date, so publishing an imported article does not
   /// silently re-date it; otherwise stamped at publish time.
-  publishedAt     DateTime?
-  reviewedBy      String?
+  publishedAt      DateTime?
+  reviewedBy       String?
   /// Discord message carrying the approve/reject buttons for this draft.
-  discordMessageId String?       @unique
-  createdAt       DateTime       @default(now())
-  updatedAt       DateTime       @updatedAt
+  discordMessageId String?        @unique
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
 
   @@index([status, publishedAt])
 }
@@ -648,4 +660,27 @@ enum BlogPostSource {
   AI_GENERATED
   IMPORTED
   MANUAL
+}
+
+// Domain-owned transition journal. Customer reports are never verified sales evidence.
+model LeadOutcome {
+  id                 String          @id @default(uuid())
+  leadId             String
+  lead               Lead            @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  decisionId         String?
+  decision           AuroraDecision? @relation(fields: [decisionId], references: [id], onDelete: SetNull)
+  actorId            String
+  idempotencyKey     String
+  requestFingerprint String
+  action             String
+  previousStatus     LeadStatus
+  resultingStatus    LeadStatus
+  evidenceKind       String
+  policyVersion      String
+  policyReasons      Json
+  notes              String?
+  createdAt          DateTime        @default(now())
+
+  @@unique([leadId, idempotencyKey])
+  @@index([leadId, createdAt, id])
 }

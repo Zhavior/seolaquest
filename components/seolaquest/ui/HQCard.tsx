@@ -48,7 +48,7 @@ export default function HQCard({
         "backdrop-blur-2xl",
         "transition-all duration-300",
         "hover:-translate-y-1",
-        "hover:shadow-[0_25px_60px_rgba(0,0,0,.45)]",
+        "hover:shadow-brutal",
         "before:absolute before:inset-0",
         "before:bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,.08),transparent_55%)]",
         "before:pointer-events-none",
@@ -62,7 +62,7 @@ export default function HQCard({
         {(title || subtitle) && (
           <header className="mb-6">
             {subtitle && (
-              <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.24em] text-white/45">
+              <p className="mb-2 text-[11px] font-semibold normal-case tracking-[0.24em] text-white/45">
                 {subtitle}
               </p>
             )}

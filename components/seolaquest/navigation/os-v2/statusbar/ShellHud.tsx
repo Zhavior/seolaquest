@@ -81,9 +81,9 @@ export default function ShellHud({ user }: { user?: Partial<ShellUser> }) {
           href="/app"
           aria-label={questLabel}
           title={`${openQuests} signals waiting for action`}
-          className="flex h-9 items-center gap-1 border-2 border-outline bg-accent-2 px-2 text-[9px] font-black uppercase text-white shadow-brutal-sm"
+          className="flex h-9 items-center gap-1 rounded-lg border border-outline bg-accent-2 px-2 text-[9px] font-semibold normal-case text-on-accent shadow-none"
         >
-          <Scroll aria-hidden="true" className="size-2.5 shrink-0" strokeWidth={3} />
+          <Scroll aria-hidden="true" className="size-2.5 shrink-0" strokeWidth={1.75} />
           <span>{openQuests}</span>
         </Link>
 
@@ -95,16 +95,16 @@ export default function ShellHud({ user }: { user?: Partial<ShellUser> }) {
         <div
           role="img"
           aria-label={mpLabel}
-          className="flex h-9 items-center gap-1 border-2 border-outline bg-card px-2 text-[9px] font-black uppercase shadow-brutal-sm"
+          className="flex h-9 items-center gap-1 rounded-lg border border-outline bg-card px-2 text-[9px] font-semibold normal-case shadow-none"
         >
-          <Zap aria-hidden="true" className="size-2.5 shrink-0 text-[#06B6D4] animate-pulse" strokeWidth={3} />
+          <Zap aria-hidden="true" className="size-2.5 shrink-0 text-[#06B6D4] animate-pulse" strokeWidth={1.75} />
           <span>{`${currentMp}/${maxMp}`}</span>
         </div>
 
         <div
           role="img"
           aria-label={levelLabel}
-          className="flex h-9 items-center border-2 border-outline bg-highlight-strong px-2 font-mono text-[9px] font-black uppercase text-on-accent shadow-brutal-sm"
+          className="flex h-9 items-center rounded-lg border border-outline bg-highlight-strong px-2 font-mono text-[9px] font-semibold normal-case text-on-accent shadow-none"
         >
           {`L${playerLevel}`}
         </div>
@@ -122,19 +122,19 @@ export default function ShellHud({ user }: { user?: Partial<ShellUser> }) {
         <Link
           href="/app"
           title={`${openQuests} signals waiting for action`}
-          className="flex h-9 items-center gap-1.5 border-2 border-outline bg-accent-2 px-2.5 text-[11px] font-black uppercase tracking-wider text-white shadow-brutal-sm transition-transform duration-150 hover:-translate-y-0.5 hover:shadow-brutal active:translate-y-0 active:shadow-none"
+          className="flex h-9 items-center gap-1.5 rounded-lg border border-outline bg-accent-2 px-2.5 text-[11px] font-semibold normal-case tracking-normal text-on-accent shadow-none transition-transform duration-150 hover:-translate-y-0.5 hover:shadow-sm active:translate-y-0 active:shadow-none"
         >
-          <Scroll aria-hidden="true" className="size-3.5 shrink-0" strokeWidth={3} />
+          <Scroll aria-hidden="true" className="size-3.5 shrink-0" strokeWidth={1.75} />
           <span>{questLabel}</span>
         </Link>
 
         {/* EXP toward the next level */}
         <div
           title={`${playerXp} of ${xpRequired} XP toward level ${playerLevel + 1}`}
-          className="flex h-9 items-center gap-1.5 border-2 border-outline bg-card px-2.5 text-[11px] font-black uppercase tracking-wider shadow-brutal-sm"
+          className="flex h-9 items-center gap-1.5 rounded-lg border border-outline bg-card px-2.5 text-[11px] font-semibold normal-case tracking-normal shadow-none"
         >
-          <Sparkles aria-hidden="true" className="size-3.5 shrink-0 text-warning" strokeWidth={3} />
-          <span className="border-2 border-outline bg-highlight-strong px-1 font-mono text-[9px] font-black text-on-accent">
+          <Sparkles aria-hidden="true" className="size-3.5 shrink-0 text-warning" strokeWidth={1.75} />
+          <span className="rounded-lg border border-outline bg-highlight-strong px-1 font-mono text-[9px] font-semibold text-on-accent">
             {levelLabel}
           </span>
           <Meter filled={segmentsFor(playerXp, xpRequired)} fillClass="bg-accent" />
@@ -144,19 +144,19 @@ export default function ShellHud({ user }: { user?: Partial<ShellUser> }) {
         {/* MP / scan credits */}
         <div
           title={`${currentMp} scan credits — each scan costs 1 MP`}
-          className="flex h-9 items-center gap-1.5 border-2 border-outline bg-card px-2.5 text-[11px] font-black uppercase tracking-wider shadow-brutal-sm"
+          className="flex h-9 items-center gap-1.5 rounded-lg border border-outline bg-card px-2.5 text-[11px] font-semibold normal-case tracking-normal shadow-none"
         >
-          <Zap aria-hidden="true" className="size-3.5 shrink-0 text-[#06B6D4] animate-pulse" strokeWidth={3} />
+          <Zap aria-hidden="true" className="size-3.5 shrink-0 text-[#06B6D4] animate-pulse" strokeWidth={1.75} />
           <Meter filled={segmentsFor(currentMp, maxMp)} fillClass="bg-info" />
           <span className="text-ink">{mpLabel}</span>
         </div>
 
         {/* User name badge */}
-        <div className="hidden lg:flex items-center gap-2 border-2 border-outline bg-card px-2.5 h-9 shadow-brutal-sm">
-          <div className="grid size-5 shrink-0 place-items-center border-2 border-outline bg-highlight-strong">
-            <User aria-hidden="true" className="size-3 text-on-accent" strokeWidth={3} />
+        <div className="hidden lg:flex items-center gap-2 rounded-lg border border-outline bg-card px-2.5 h-9 shadow-none">
+          <div className="grid size-5 shrink-0 place-items-center rounded-lg border border-outline bg-highlight-strong">
+            <User aria-hidden="true" className="size-3 text-on-accent" strokeWidth={1.75} />
           </div>
-          <span className="max-w-[8rem] truncate font-mono text-[11px] font-black uppercase tracking-wider text-ink">
+          <span className="max-w-[8rem] truncate font-mono text-[11px] font-semibold normal-case tracking-normal text-ink">
             {userName}
           </span>
         </div>

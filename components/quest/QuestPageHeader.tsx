@@ -1,6 +1,5 @@
 import type { ReactNode } from 'react'
 import clsx from 'clsx'
-import { QUEST_TITLE_STROKE } from './questStyles'
 
 export interface QuestPageHeaderProps {
   /** Small uppercase kicker inside the black chip, e.g. "COMMANDER'S MAP". */
@@ -39,22 +38,21 @@ export function QuestPageHeader({
     >
       <div className="min-w-0">
         <div className="mb-1 flex items-center gap-3">
-          {icon ? <span aria-hidden="true" className="shrink-0 text-[#FF5722]">{icon}</span> : null}
-          <span className="-rotate-1 border-2 border-outline bg-black px-3 py-1 text-xs font-black uppercase tracking-widest text-[#FFE600]">
+          {icon ? <span aria-hidden="true" className="shrink-0 text-ink-muted">{icon}</span> : null}
+          <span className="rounded-full border border-hairline bg-inset px-3 py-1.5 text-xs font-semibold tracking-wide text-ink-muted">
             {eyebrow}
           </span>
         </div>
 
         <h1
           id={titleId}
-          className="text-4xl uppercase tracking-tight text-white drop-shadow-brutal-lg sm:text-5xl md:text-7xl"
-          style={QUEST_TITLE_STROKE}
+          className="mt-4 font-display text-4xl font-medium tracking-tight text-ink sm:text-5xl"
         >
           {title}
         </h1>
 
         {subtitle ? (
-          <p className="mt-2 inline-block -rotate-1 border-2 border-outline bg-black px-4 py-1 text-xl uppercase text-white md:text-2xl">
+          <p className="mt-3 max-w-2xl text-sm leading-relaxed text-ink-muted md:text-base">
             {subtitle}
           </p>
         ) : null}

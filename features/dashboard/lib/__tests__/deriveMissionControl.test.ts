@@ -69,6 +69,7 @@ describe('deriveTodaysMission', () => {
         leads: [
           lead({
             id: 'hot',
+            recommendation: { eligible: true, policyVersion: 'v1', reason: 'RECENT_BUYING_EVIDENCE' },
             aurora: {
               score: 91,
               confidence: 0.8,

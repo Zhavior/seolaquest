@@ -1,4 +1,4 @@
-import { detectBuyerIntentNoise } from '@/src/modules/leads/domain/buyerIntentNoise';
+import { detectBuyerIntentNoise } from './buyerIntentNoise';
 import { AuroraEvaluationContext, DeterministicScorerResult } from '../types';
 
 export class DeterministicScorer {

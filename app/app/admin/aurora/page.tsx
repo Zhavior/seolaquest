@@ -1,27 +1,10 @@
-import { getCurrentUser } from '@/lib/auth'
-import { redirect } from 'next/navigation'
+import { requireAdminPage } from '../access'
 import { AuroraMetricsService } from '@/src/modules/aurora/AuroraMetricsService'
 
 export const dynamic = 'force-dynamic'
 
-function configuredAdminIds() {
-  return new Set(
-    (process.env.AURORA_ADMIN_USER_IDS ?? '')
-      .split(',')
-      .map((value) => value.trim())
-      .filter(Boolean)
-  )
-}
-
 export default async function AuroraObservatoryPage() {
-  const user = await getCurrentUser()
-  if (!user) {
-    redirect('/sign-in')
-  }
-
-  if (!configuredAdminIds().has(user.id)) {
-    redirect('/app')
-  }
+  await requireAdminPage()
 
   const [metrics, recentDecisions] = await Promise.all([
     AuroraMetricsService.getOverviewMetrics(),

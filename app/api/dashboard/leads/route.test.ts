@@ -9,12 +9,7 @@ const mocks = vi.hoisted(() => ({
 }))
 
 vi.mock('@/lib/auth', () => ({ getCurrentUser: mocks.getCurrentUser }))
-vi.mock('@/lib/prisma', () => ({
-  default: {
-    lead: { findMany: mocks.leadFindMany },
-    auroraDecision: { findMany: mocks.auroraDecisionFindMany },
-  },
-}))
+vi.mock('@/src/modules/leads/application/LeadQueryService', () => ({ LeadQueryService: { openQueue: mocks.leadFindMany } }))
 // Rate limiting is covered by RateLimiter.test.ts; these cases exercise route behaviour.
 vi.mock('@/src/modules/core/security/RateLimiter', () => ({
   RateLimiterService: { enforce: vi.fn() },
@@ -46,13 +41,13 @@ describe('dashboard leads route', () => {
     await GET(request(), context)
 
     expect(mocks.leadFindMany).toHaveBeenCalledWith(
-      expect.objectContaining({ where: expect.objectContaining({ userId: 'user-1' }) }),
+      'user-1',
     )
   })
 
   it('serialises the source timestamp and tolerates a null one', async () => {
     mocks.leadFindMany.mockResolvedValue([
-      { id: 'a', sourceCreatedAt: new Date('2026-08-01T00:00:00.000Z') },
+      { id: 'a', sourceCreatedAt: '2026-08-01T00:00:00.000Z' },
       { id: 'b', sourceCreatedAt: null },
     ])
 

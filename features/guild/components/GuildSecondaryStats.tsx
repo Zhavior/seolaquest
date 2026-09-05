@@ -1,6 +1,6 @@
 import { motion, Variants } from 'framer-motion'
 import { FileText, Share2 } from 'lucide-react'
-import { questSurface, QUEST_SUBTITLE_STROKE, type QuestTone } from '@/components/quest'
+import { questSurface, type QuestTone } from '@/components/quest'
 
 type GuildSecondaryStatsProps = {
   item: Variants
@@ -15,7 +15,7 @@ export function GuildSecondaryStats({ item, spellsCast, questsExported }: GuildS
     <div className="flex flex-col gap-6 md:col-span-4 md:gap-8">
       <StatCard
         item={item}
-        tone="cyan"
+        tone="white"
         headingId="guild-ai-drafts-heading"
         title="AI drafts"
         caption="Successful generations recorded"
@@ -26,7 +26,7 @@ export function GuildSecondaryStats({ item, spellsCast, questsExported }: GuildS
 
       <StatCard
         item={item}
-        tone="lime"
+        tone="parchment"
         headingId="guild-crm-deliveries-heading"
         title="CRM deliveries"
         caption="Server-recorded completed exports"
@@ -65,17 +65,17 @@ function StatCard({
     >
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <h2 id={headingId} className="text-2xl md:text-3xl font-black uppercase text-white" style={QUEST_SUBTITLE_STROKE}>
+          <h2 id={headingId} className="font-display text-2xl md:text-3xl font-normal text-ink">
             {title}
           </h2>
-          <span className="mt-1 inline-block border border-outline bg-white/90 px-2 py-0.5 text-xs font-bold uppercase">
+          <span className="mt-1 inline-block border border-outline bg-white/90 px-2 py-0.5 text-xs font-medium normal-case">
             {caption}
           </span>
         </div>
         {icon}
       </div>
-      <p className="my-5 text-6xl font-black leading-none text-ink md:text-7xl">{value.toLocaleString()}</p>
-      <p className={questSurface({ border: 2, shadow: 'sm', className: 'p-3 text-xs font-black uppercase' })}>
+      <p className="my-5 text-6xl font-semibold leading-none text-ink md:text-7xl">{value.toLocaleString()}</p>
+      <p className={questSurface({ border: 2, shadow: 'sm', className: 'p-3 text-xs font-semibold normal-case' })}>
         {footnote}
       </p>
     </motion.section>

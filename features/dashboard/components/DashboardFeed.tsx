@@ -50,7 +50,7 @@ const signalBadgeStyles: Record<
     wrap: 'bg-[#FFFBEB]',
     badge: 'bg-highlight-strong text-amber-950 border-amber-500',
     border: 'border-l-8 border-l-amber-500',
-    accent: 'bg-amber-500 hover:bg-amber-600 text-on-accent font-black',
+    accent: 'bg-amber-500 hover:bg-amber-600 text-on-accent font-semibold',
   },
   UNSCORED: {
     label: 'NOT SCORED',
@@ -84,7 +84,7 @@ function getPlatformTone(platform: string) {
   if (normalized.includes('REDDIT')) {
     return {
       label: 'REDDIT',
-      icon: <RedditIcon className="h-4 w-4 text-[#FF5722]" />,
+      icon: <RedditIcon className="h-4 w-4 text-accent" />,
       chip: 'bg-card text-ink',
     }
   }
@@ -128,7 +128,7 @@ function getSignalBadge(lead: DashboardLead): SignalBadge {
  * judge. What is not acceptable is implying a machine judged it when none did.
  */
 type IntentDisplay =
-  | { kind: 'scored'; score: number; action: string }
+  | { kind: 'scored'; score: number; action: string; reasons: string[] }
   | { kind: 'unscored'; label: string }
 
 function getIntentDisplay(lead: DashboardLead): IntentDisplay {
@@ -143,7 +143,7 @@ function getIntentDisplay(lead: DashboardLead): IntentDisplay {
     return { kind: 'unscored', label: 'Scoring unavailable' }
   }
 
-  return { kind: 'scored', score: aurora.score, action: aurora.recommendedAction }
+  return { kind: 'scored', score: aurora.score, action: aurora.recommendedAction, reasons: aurora.reasons ?? [] }
 }
 
 /**
@@ -158,16 +158,11 @@ function getTacticalRead(intent: IntentDisplay): string {
   if (intent.kind !== 'scored') {
     return 'Pending Aurora evaluation.'
   }
-  if (intent.score >= 90) {
-    return 'Urgent buyer language detected. Active switch decision with strong commercial intent.'
-  }
-  if (intent.score >= 80) {
-    return 'Comparison or replacement intent present. Good candidate for a fast reply.'
-  }
-  if (intent.score >= 70) {
-    return 'Problem-aware prospect with relevant keywords. Worth drafting early.'
-  }
-  return 'Early-stage market pain mention. Lower urgency, but useful for visibility.'
+  const evidence = intent.reasons.filter(reason => !/^[A-Z_]+$/.test(reason)).slice(0, 3)
+  return evidence.length
+    ? `${evidence.join('. ')}. Review the source before acting.`
+    : 'Heuristic priority only. Review the source to assess relevance and buying intent.'
+
 }
 
 /**
@@ -210,27 +205,27 @@ function formatTimestamp(sourceCreatedAt: string | null) {
 
 function EmptyRadarState({ handlePresetClick }: { handlePresetClick: (phrase: string) => void }) {
   return (
-    <div className="relative mt-6 overflow-hidden border-4 border-outline bg-card p-6 shadow-brutal-lg md:p-8">
+    <div className="relative mt-6 overflow-hidden rounded-[20px] border border-outline bg-card p-6 shadow-sm md:p-8">
       <div className="pointer-events-none absolute inset-0 opacity-25 [background-image:linear-gradient(to_right,#00000014_1px,transparent_1px),linear-gradient(to_bottom,#00000014_1px,transparent_1px)] [background-size:28px_28px]" />
 
       <div className="relative flex flex-col items-center text-center">
-        <div className="relative mb-6 flex h-28 w-28 items-center justify-center rounded-full border-4 border-outline bg-accent shadow-brutal-lg">
-          <div className="absolute inset-3 rounded-full border-2 border-outline/20" />
-          <div className="absolute inset-6 rounded-full border-2 border-outline/15" />
+        <div className="relative mb-6 flex h-28 w-28 items-center justify-center rounded-full rounded-[20px] border border-outline bg-accent shadow-sm">
+          <div className="absolute inset-3 rounded-full rounded-lg border border-outline/20" />
+          <div className="absolute inset-6 rounded-full rounded-lg border border-outline/15" />
           <div className="absolute h-[2px] w-12 origin-left -rotate-12 bg-black animate-pulse" />
           <Radar className="relative z-10 h-12 w-12 text-ink" />
         </div>
 
-        <div className="inline-flex items-center gap-2 border-2 border-outline bg-black px-3 py-1.5 text-xs font-mono font-black uppercase tracking-widest text-[#FFE600] shadow-brutal-sm">
+        <div className="inline-flex items-center gap-2 rounded-lg border border-outline bg-black px-3 py-1.5 text-xs font-mono font-semibold normal-case tracking-wide text-accent shadow-none">
           <ShieldAlert className="h-4 w-4" />
           [ RADAR CLEAR // NO ACTIVE SIGNALS IN SECTOR ]
         </div>
 
-        <h3 className="mt-6 text-3xl md:text-4xl font-black uppercase tracking-tight text-ink leading-none">
+        <h3 className="font-display mt-6 text-3xl md:text-4xl font-semibold normal-case tracking-tight text-ink leading-none">
           Arm a keyword and cast your first scan
         </h3>
 
-        <p className="mt-4 max-w-2xl text-base font-bold leading-relaxed text-ink/75">
+        <p className="mt-4 max-w-2xl text-base font-medium leading-relaxed text-ink/75">
           Your loot board wakes up when the hunt begins. Target buyer pain, comparison intent, and replacement language to reveal high-value leads.
         </p>
 
@@ -240,7 +235,7 @@ function EmptyRadarState({ handlePresetClick }: { handlePresetClick: (phrase: st
               key={phrase}
               type="button"
               onClick={() => handlePresetClick(phrase)}
-              className="border-3 border-outline bg-card px-4 py-2 text-xs font-black uppercase shadow-brutal-sm transition hover:-translate-x-0.5 hover:-translate-y-0.5 hover:bg-accent min-h-[44px]"
+              className="rounded-[20px] border border-outline bg-card px-4 py-2 text-xs font-semibold normal-case shadow-none transition hover:-translate-x-0.5 hover:-translate-y-0.5 hover:bg-accent min-h-[44px]"
             >
               {phrase}
             </button>
@@ -250,7 +245,7 @@ function EmptyRadarState({ handlePresetClick }: { handlePresetClick: (phrase: st
         <button
           type="button"
           onClick={() => handlePresetClick('looking for crm')}
-          className="mt-6 inline-flex min-h-[44px] items-center gap-3 border-4 border-outline bg-accent-2 px-6 py-3 text-sm font-black uppercase text-white shadow-brutal-lg transition active:translate-x-[2px] active:translate-y-[2px] active:shadow-brutal-sm"
+          className="mt-6 inline-flex min-h-[44px] items-center gap-3 rounded-[20px] border border-outline bg-accent-2 px-6 py-3 text-sm font-semibold normal-case text-on-accent shadow-sm transition active:translate-x-[2px] active:translate-y-[2px] active:shadow-none"
         >
           <Sword className="h-5 w-5" />
           Arm keyword & cast scan
@@ -320,14 +315,14 @@ function DashboardFeedComponent({
       variants={item}
       initial="hidden"
       animate="show"
-      className="relative overflow-hidden border-4 border-outline bg-highlight p-4 sm:p-6 md:p-8 shadow-brutal-lg"
+      className="relative overflow-hidden rounded-[20px] border border-outline bg-highlight p-4 sm:p-6 md:p-8 shadow-sm"
     >
       {/* Resilient Warming / Stale Data Indicator */}
       {isPending && (
         <div
           role="status"
           aria-live="polite"
-          className="mb-4 flex items-center justify-between border-3 border-outline bg-accent px-3.5 py-2 text-xs font-black uppercase shadow-brutal-sm"
+          className="mb-4 flex items-center justify-between rounded-[20px] border border-outline bg-accent px-3.5 py-2 text-xs font-semibold normal-case shadow-none"
         >
           <span className="flex items-center gap-2">
             <RefreshCw
@@ -336,7 +331,7 @@ function DashboardFeedComponent({
             />
             Updating queue — keeping current leads visible
           </span>
-          <span className="hidden sm:inline-block border border-outline bg-card text-ink px-2 py-0.5 text-[10px] font-black uppercase">
+          <span className="hidden sm:inline-block border border-outline bg-card text-ink px-2 py-0.5 text-[10px] font-semibold normal-case">
             Measured queue
           </span>
         </div>
@@ -345,31 +340,30 @@ function DashboardFeedComponent({
       {/* Compact Header & Controls */}
       <div className="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between mb-6">
         <div className="flex items-start gap-3 sm:gap-4">
-          <div className="mt-1 border-4 border-outline bg-accent-2 p-2.5 shadow-brutal-sm sm:p-4 sm:shadow-brutal">
-            <Flame className="h-6 w-6 text-white sm:h-10 sm:w-10" />
+          <div className="mt-1 rounded-[20px] border border-outline bg-accent-2 p-2.5 shadow-none sm:p-4 sm:shadow-sm">
+            <Flame className="h-6 w-6 text-on-accent sm:h-10 sm:w-10" />
           </div>
 
           <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-2 mb-1">
-              <span className="bg-black text-[#FFE600] uppercase text-[10px] sm:text-xs font-black tracking-widest px-2.5 py-0.5 sm:px-3 sm:py-1 border-2 border-outline -rotate-1">
+              <span className="bg-black text-accent normal-case text-[10px] sm:text-xs font-semibold tracking-wide px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-lg border border-outline ">
                 Opportunity Queue
               </span>
             </div>
 
             <h2
-              className="text-2xl sm:text-4xl md:text-5xl uppercase tracking-tight text-white drop-shadow-brutal mt-0.5"
-              style={{ WebkitTextStroke: '1.5px black' }}
+              className="font-display text-2xl sm:text-3xl normal-case tracking-tight text-ink mt-0.5"
             >
               Open leads to triage
             </h2>
 
             <div className="mt-3 flex flex-wrap items-center gap-2">
-              <div className="inline-flex items-center gap-1.5 border-2 sm:border-3 border-outline bg-accent px-2.5 py-1 text-[11px] sm:text-xs font-black uppercase shadow-brutal-sm sm:shadow-brutal-sm">
+              <div className="inline-flex items-center gap-1.5 rounded-lg border sm:rounded-[20px] border border-outline bg-accent px-2.5 py-1 text-[11px] sm:text-xs font-semibold normal-case shadow-none sm:shadow-none">
                 <Crosshair className="h-3.5 w-3.5" />
                 {displayedLeads.length} {displayedLeads.length === 1 ? 'signal' : 'signals'}
               </div>
 
-              <div className="inline-flex items-center gap-1.5 border-2 sm:border-3 border-outline bg-info px-2.5 py-1 text-[11px] sm:text-xs font-black uppercase shadow-brutal-sm sm:shadow-brutal-sm text-on-accent">
+              <div className="inline-flex items-center gap-1.5 rounded-lg border sm:rounded-[20px] border border-outline bg-info px-2.5 py-1 text-[11px] sm:text-xs font-semibold normal-case shadow-none sm:shadow-none text-on-accent">
                 <Sparkles className="h-3.5 w-3.5" />
                 Fresh intent
               </div>
@@ -378,15 +372,15 @@ function DashboardFeedComponent({
         </div>
 
         {/* View Mode Toggle Controls */}
-        <div className="flex items-center gap-1 border-3 border-outline bg-card p-1 shadow-brutal-sm shrink-0 self-start xl:self-auto">
+        <div className="flex items-center gap-1 rounded-[20px] border border-outline bg-card p-1 shadow-none shrink-0 self-start xl:self-auto">
           <button
             type="button"
             onClick={() => setViewMode('grid')}
             aria-label="Grid view"
             aria-pressed={viewMode === 'grid'}
-            className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-black uppercase transition ${
+            className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold normal-case transition ${
               viewMode === 'grid'
-                ? 'bg-accent text-on-accent border-2 border-outline shadow-brutal-sm'
+                ? 'bg-accent text-on-accent rounded-lg border border-outline shadow-none'
                 : 'text-ink-muted hover:text-on-accent'
             }`}
           >
@@ -399,9 +393,9 @@ function DashboardFeedComponent({
             onClick={() => setViewMode('compact')}
             aria-label="Compact list view"
             aria-pressed={viewMode === 'compact'}
-            className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-black uppercase transition ${
+            className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold normal-case transition ${
               viewMode === 'compact'
-                ? 'bg-accent text-on-accent border-2 border-outline shadow-brutal-sm'
+                ? 'bg-accent text-on-accent rounded-lg border border-outline shadow-none'
                 : 'text-ink-muted hover:text-on-accent'
             }`}
           >
@@ -414,20 +408,20 @@ function DashboardFeedComponent({
       {/* Primary Search Row & Horizontally Scrollable Tactical Filters */}
       <div className="mb-6 space-y-3">
         {/* Full-width Search Bar */}
-        <div className="relative flex items-center border-4 border-outline bg-card shadow-brutal">
-          <Search className="absolute left-3.5 h-4 w-4 text-ink/60 pointer-events-none" />
+        <div className="relative flex items-center rounded-[20px] border border-outline bg-card shadow-sm">
+          <Search className="absolute left-3.5 h-4 w-4 text-ink-muted pointer-events-none" />
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="SEARCH SIGNALS, PLAYERS, KEYWORDS..."
-            className="w-full bg-transparent py-2.5 pl-10 pr-10 text-xs sm:text-sm font-black uppercase text-ink placeholder:text-ink/40 focus:outline-none focus:ring-4 focus:ring-[#FFE600]"
+            className="w-full bg-transparent py-2.5 pl-10 pr-10 text-xs sm:text-sm font-semibold normal-case text-ink placeholder:text-ink-muted focus:outline-none focus:ring-4 focus:ring-[#FFE600]"
           />
           {searchQuery && (
             <button
               type="button"
               onClick={() => setSearchQuery('')}
-              className="absolute right-3 p-1 text-ink/60 hover:text-ink"
+              className="absolute right-3 p-1 text-ink-muted hover:text-ink"
               aria-label="Clear search"
             >
               <X className="h-4 w-4" />
@@ -447,12 +441,12 @@ function DashboardFeedComponent({
                 key={platform}
                 type="button"
                 onClick={() => setFilter(platform)}
-                className={`flex shrink-0 min-h-[40px] items-center gap-2 border-3 border-outline px-3.5 py-1.5 text-xs font-black uppercase shadow-brutal-sm transition active:translate-x-[2px] active:translate-y-[2px] active:shadow-none ${
+                className={`flex shrink-0 min-h-[40px] items-center gap-2 rounded-[20px] border border-outline px-3.5 py-1.5 text-xs font-semibold normal-case shadow-none transition active:translate-x-[2px] active:translate-y-[2px] active:shadow-none ${
                   filter === platform ? 'bg-accent text-ink' : 'bg-card text-ink hover:bg-accent'
                 }`}
               >
                 {isTw ? <XTwitterIcon className="h-3.5 w-3.5 text-ink" /> : null}
-                {isRd ? <RedditIcon className="h-3.5 w-3.5 text-[#FF5722]" /> : null}
+                {isRd ? <RedditIcon className="h-3.5 w-3.5 text-accent" /> : null}
                 {platform === 'TWITTER' ? 'TWITTER / X' : platform}
               </button>
             )
@@ -485,25 +479,25 @@ function DashboardFeedComponent({
                       }
                     }}
                     aria-label={`Open lead from ${lead.author} on ${lead.platform}`}
-                    className={`cursor-pointer border-3 border-outline bg-card p-3 ${badgeStyle.border} shadow-brutal-sm hover:-translate-y-0.5 transition flex flex-col md:flex-row md:items-center justify-between gap-3 focus-visible:outline-none`}
+                    className={`cursor-pointer rounded-[20px] border border-outline bg-card p-3 ${badgeStyle.border} shadow-none hover:-translate-y-0.5 transition flex flex-col md:flex-row md:items-center justify-between gap-3 focus-visible:outline-none`}
                   >
                     <div className="flex items-center gap-3 min-w-0 flex-1">
-                      <span className={`inline-flex items-center gap-1 border-2 border-outline px-2 py-0.5 text-[10px] font-black uppercase shrink-0 ${badgeStyle.badge} shadow-brutal-sm`}>
+                      <span className={`inline-flex items-center gap-1 rounded-lg border border-outline px-2 py-0.5 text-[10px] font-semibold normal-case shrink-0 ${badgeStyle.badge} shadow-none`}>
                         {intentDisplay.kind === 'scored' ? `${intentDisplay.score}% MATCH` : 'UNSCORED'}
                       </span>
 
-                      <span className={`inline-flex items-center gap-1 border border-outline px-2 py-0.5 text-[10px] font-black uppercase shrink-0 ${platformTone.chip}`}>
+                      <span className={`inline-flex items-center gap-1 border border-outline px-2 py-0.5 text-[10px] font-semibold normal-case shrink-0 ${platformTone.chip}`}>
                         {platformTone.icon}
                         {platformTone.label}
                       </span>
 
-                      <p className="text-xs sm:text-sm font-bold text-ink truncate flex-1">
+                      <p className="text-xs sm:text-sm font-medium text-ink truncate flex-1">
                         “{lead.content}”
                       </p>
                     </div>
 
                     <div className="flex items-center gap-2 shrink-0 border-t pt-2 md:border-t-0 md:pt-0 border-outline/20">
-                      <span className="text-[10px] font-mono font-black text-ink-muted uppercase mr-1">
+                      <span className="text-[10px] font-mono font-semibold text-ink-muted normal-case mr-1">
                         {freshness}
                       </span>
 
@@ -514,7 +508,7 @@ function DashboardFeedComponent({
                           generateAIReply(lead)
                         }}
                         disabled={isPending}
-                        className="inline-flex min-h-[34px] items-center gap-1 border-2 border-outline bg-accent px-2.5 py-1 text-[11px] font-black uppercase shadow-brutal-sm hover:bg-yellow-300 disabled:opacity-60"
+                        className="inline-flex min-h-[34px] items-center gap-1 rounded-lg border border-outline bg-accent px-2.5 py-1 text-[11px] font-semibold normal-case shadow-none hover:bg-highlight-strong disabled:opacity-60"
                       >
                         <Sparkles className="h-3 w-3" />
                         Draft
@@ -527,7 +521,7 @@ function DashboardFeedComponent({
                           handleClaimBounty(lead)
                         }}
                         disabled={isPending}
-                        className={`inline-flex min-h-[34px] items-center gap-1 border-2 border-outline px-2.5 py-1 text-[11px] font-black uppercase shadow-brutal-sm disabled:opacity-60 ${badgeStyle.accent}`}
+                        className={`inline-flex min-h-[34px] items-center gap-1 rounded-lg border border-outline px-2.5 py-1 text-[11px] font-semibold normal-case shadow-none disabled:opacity-60 ${badgeStyle.accent}`}
                       >
                         <Sword className="h-3 w-3" />
                         Claim
@@ -539,7 +533,7 @@ function DashboardFeedComponent({
                           e.stopPropagation()
                           setActiveDetailLead(lead)
                         }}
-                        className="inline-flex min-h-[34px] items-center justify-center border-2 border-outline bg-card px-2 py-1 text-[10px] font-black uppercase shadow-brutal-sm hover:bg-inset"
+                        className="inline-flex min-h-[34px] items-center justify-center rounded-lg border border-outline bg-card px-2 py-1 text-[10px] font-semibold normal-case shadow-none hover:bg-inset"
                         aria-label="Inspect signal"
                       >
                         <SlidersHorizontal className="h-3 w-3" />
@@ -572,24 +566,24 @@ function DashboardFeedComponent({
                         ? { duration: 0 }
                         : { type: 'spring', stiffness: 300, damping: 25, delay: index * 0.04 }
                     }
-                    className={`group flex h-full flex-col overflow-hidden bg-card border-4 border-outline ${badgeStyle.border} shadow-brutal-lg transition hover:-translate-x-1 hover:-translate-y-1 hover:shadow-brutal-lg`}
+                    className={`group flex h-full flex-col overflow-hidden bg-card rounded-[20px] border border-outline ${badgeStyle.border} shadow-sm transition hover:-translate-x-1 hover:-translate-y-1 hover:shadow-sm`}
                   >
                     {/* Header Bar */}
-                    <div className={`border-b-3 border-outline px-4 py-2.5 ${badgeStyle.wrap}`}>
+                    <div className={`border-b border-outline px-4 py-2.5 ${badgeStyle.wrap}`}>
                       <div className="flex flex-wrap items-center justify-between gap-2">
                         <div className="flex flex-wrap items-center gap-1.5">
-                          <span className={`inline-flex items-center gap-1 border-2 border-outline px-2 py-0.5 text-[11px] font-black uppercase ${badgeStyle.badge} shadow-brutal-sm`}>
+                          <span className={`inline-flex items-center gap-1 rounded-lg border border-outline px-2 py-0.5 text-[11px] font-semibold normal-case ${badgeStyle.badge} shadow-none`}>
                             {badge === 'LIVE_SCORED' ? <Crown className="h-3.5 w-3.5" /> : <Sparkles className="h-3.5 w-3.5" />}
                             {badgeStyle.label}
                           </span>
 
-                          <span className={`inline-flex items-center gap-1 border-2 border-outline px-2 py-0.5 text-[11px] font-black uppercase shadow-brutal-sm ${platformTone.chip}`}>
+                          <span className={`inline-flex items-center gap-1 rounded-lg border border-outline px-2 py-0.5 text-[11px] font-semibold normal-case shadow-none ${platformTone.chip}`}>
                             {platformTone.icon}
                             {platformTone.label}
                           </span>
                         </div>
 
-                        <span className="text-[11px] font-mono font-black uppercase tracking-wider text-ink/70">
+                        <span className="text-[11px] font-mono font-semibold normal-case tracking-normal text-ink-muted">
                           {freshness}
                         </span>
                       </div>
@@ -602,16 +596,16 @@ function DashboardFeedComponent({
                         <div className="flex flex-wrap items-center gap-2">
                           {intentDisplay.kind === 'scored' ? (
                             <>
-                              <span className="inline-flex items-center gap-1.5 border-2 border-outline bg-accent px-2.5 py-1 text-xs font-black uppercase shadow-brutal-sm">
+                              <span className="inline-flex items-center gap-1.5 rounded-lg border border-outline bg-accent px-2.5 py-1 text-xs font-semibold normal-case shadow-none">
                                 <Crosshair className="h-3.5 w-3.5" />
                                 {intentDisplay.score}% intent match
                               </span>
-                              <span className="inline-flex items-center gap-1.5 border-2 border-outline bg-info px-2.5 py-1 text-xs font-black uppercase shadow-brutal-sm text-on-accent">
+                              <span className="inline-flex items-center gap-1.5 rounded-lg border border-outline bg-info px-2.5 py-1 text-xs font-semibold normal-case shadow-none text-on-accent">
                                 {intentDisplay.action}
                               </span>
                             </>
                           ) : (
-                            <span className="inline-flex items-center gap-1.5 border-2 border-outline bg-card px-2.5 py-1 text-xs font-black uppercase shadow-brutal-sm text-ink/60">
+                            <span className="inline-flex items-center gap-1.5 rounded-lg border border-outline bg-card px-2.5 py-1 text-xs font-semibold normal-case shadow-none text-ink-muted">
                               <Crosshair className="h-3.5 w-3.5" />
                               {intentDisplay.label}
                             </span>
@@ -619,22 +613,22 @@ function DashboardFeedComponent({
                         </div>
 
                         {/* Sentence-Case Lead Quote with Line Clamp 3 */}
-                        <p className="text-base font-bold leading-relaxed text-ink line-clamp-3">
+                        <p className="text-base font-medium leading-relaxed text-ink line-clamp-3">
                           “{lead.content}”
                         </p>
 
                         {intentDisplay.kind === 'scored' ? (
-                          <div className="border-l-4 border-l-black bg-inset p-3 border-2 border-outline shadow-brutal-sm">
-                            <p className="text-[10px] font-black uppercase tracking-wider text-ink-muted">
+                          <div className="border-l border-l-black bg-inset p-3 rounded-lg border border-outline shadow-none">
+                            <p className="text-[10px] font-semibold normal-case tracking-normal text-ink-muted">
                               Tactical read
                             </p>
-                            <p className="mt-1 text-xs font-bold leading-relaxed text-ink">
+                            <p className="mt-1 text-xs font-medium leading-relaxed text-ink">
                               {getTacticalRead(intentDisplay)}
                             </p>
                           </div>
                         ) : (
                           <span
-                            className={`inline-flex items-center gap-1.5 border-2 border-outline bg-inset px-2.5 py-1 text-[10px] font-black uppercase tracking-wider text-ink/70 shadow-brutal-sm ${
+                            className={`inline-flex items-center gap-1.5 rounded-lg border border-outline bg-inset px-2.5 py-1 text-[10px] font-semibold normal-case tracking-normal text-ink-muted shadow-none ${
                               shouldReduceMotion ? '' : 'animate-pulse'
                             }`}
                           >
@@ -649,26 +643,26 @@ function DashboardFeedComponent({
                           keywords.map((keyword) => (
                             <span
                               key={`${lead.id}-${keyword}`}
-                              className="border-2 border-outline bg-highlight-strong px-2 py-0.5 text-[10px] font-mono font-black uppercase shadow-brutal-sm"
+                              className="rounded-lg border border-outline bg-highlight-strong px-2 py-0.5 text-[10px] font-mono font-semibold normal-case shadow-none"
                             >
                               #{keyword}
                             </span>
                           ))
                         ) : (
-                          <span className="border-2 border-outline bg-card px-2 py-0.5 text-[10px] font-mono font-black uppercase shadow-brutal-sm">
+                          <span className="rounded-lg border border-outline bg-card px-2 py-0.5 text-[10px] font-mono font-semibold normal-case shadow-none">
                             #general-intent
                           </span>
                         )}
                       </div>
 
                       {/* Action Buttons Row - Positioned INSIDE Card Flex Container */}
-                      <div className="mt-auto pt-3 border-t-2 border-outline space-y-2">
+                      <div className="mt-auto pt-3 border-t border-outline space-y-2">
                         <div className="grid grid-cols-2 gap-2">
                           <button
                             type="button"
                             onClick={() => generateAIReply(lead)}
                             disabled={isPending}
-                            className="inline-flex min-h-[40px] items-center justify-center gap-1.5 border-3 border-outline bg-accent px-3 py-2 text-xs font-black uppercase shadow-brutal-sm hover:bg-yellow-300 disabled:opacity-60 transition active:translate-x-[1px] active:translate-y-[1px]"
+                            className="inline-flex min-h-[40px] items-center justify-center gap-1.5 rounded-[20px] border border-outline bg-accent px-3 py-2 text-xs font-semibold normal-case shadow-none hover:bg-highlight-strong disabled:opacity-60 transition active:translate-x-[1px] active:translate-y-[1px]"
                           >
                             <Sparkles className="h-3.5 w-3.5" />
                             Cast AI draft
@@ -678,7 +672,7 @@ function DashboardFeedComponent({
                             type="button"
                             onClick={() => handleClaimBounty(lead)}
                             disabled={isPending}
-                            className={`inline-flex min-h-[40px] items-center justify-center gap-1.5 border-3 border-outline px-3 py-2 text-xs font-black uppercase shadow-brutal-sm disabled:opacity-60 transition active:translate-x-[1px] active:translate-y-[1px] ${badgeStyle.accent}`}
+                            className={`inline-flex min-h-[40px] items-center justify-center gap-1.5 rounded-[20px] border border-outline px-3 py-2 text-xs font-semibold normal-case shadow-none disabled:opacity-60 transition active:translate-x-[1px] active:translate-y-[1px] ${badgeStyle.accent}`}
                           >
                             <Sword className="h-3.5 w-3.5" />
                             Claim lead
@@ -691,7 +685,7 @@ function DashboardFeedComponent({
                             href={lead.url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1 text-[11px] font-black uppercase text-ink underline-offset-4 hover:underline"
+                            className="inline-flex items-center gap-1 text-[11px] font-semibold normal-case text-ink underline-offset-4 hover:underline"
                           >
                             {isSampleQuest(lead) ? 'Add keyword' : 'Inspect thread'}
                             <ChevronRight className="h-3.5 w-3.5" />
@@ -703,7 +697,7 @@ function DashboardFeedComponent({
                               onClick={() => exportToCRM(lead)}
                               disabled={isPending}
                               title="Export lead to CRM"
-                              className="inline-flex min-h-[32px] items-center gap-1 border-2 border-outline bg-card px-2 py-1 text-[10px] font-black uppercase shadow-brutal-sm hover:bg-accent disabled:opacity-60"
+                              className="inline-flex min-h-[32px] items-center gap-1 rounded-lg border border-outline bg-card px-2 py-1 text-[10px] font-semibold normal-case shadow-none hover:bg-accent disabled:opacity-60"
                             >
                               <Coins className="h-3 w-3" />
                               CRM
@@ -715,7 +709,7 @@ function DashboardFeedComponent({
                               disabled={isPending}
                               title="Dismiss lead from queue"
                               aria-label={`Dismiss ${lead.author || 'lead'}`}
-                              className="inline-flex min-h-[32px] items-center gap-1 border-2 border-outline bg-inset px-2 py-1 text-[10px] font-black uppercase shadow-brutal-sm hover:bg-rose-100 text-rose-800 disabled:opacity-60"
+                              className="inline-flex min-h-[32px] items-center gap-1 rounded-lg border border-outline bg-inset px-2 py-1 text-[10px] font-semibold normal-case shadow-none hover:bg-rose-100 text-rose-800 disabled:opacity-60"
                             >
                               <X className="h-3 w-3" />
                               Dismiss
@@ -748,21 +742,21 @@ function DashboardFeedComponent({
                   ? { duration: 0 }
                   : { type: 'spring', damping: 25, stiffness: 280 }
               }
-              className="w-full max-w-xl max-h-[85dvh] overflow-y-auto border-t-4 sm:border-4 border-outline bg-highlight p-4 sm:p-6 shadow-[0_-8px_0_0_#000] sm:shadow-brutal-lg"
+              className="w-full max-w-xl max-h-[85dvh] overflow-y-auto rounded-t-[20px] sm:rounded-[20px] border border-outline bg-highlight p-4 sm:p-6 shadow-lg sm:shadow-sm"
               role="dialog"
               aria-modal="true"
               aria-labelledby="lead-detail-title"
               aria-label="Lead detail"
             >
-              <div className="flex items-center justify-between border-b-3 border-outline pb-3 mb-4">
+              <div className="flex items-center justify-between border-b border-outline pb-3 mb-4">
                 <div className="flex items-center gap-2">
                   <span
                     id="lead-detail-title"
-                    className="border-2 border-outline bg-accent px-2.5 py-1 text-xs font-black uppercase shadow-brutal-sm"
+                    className="rounded-lg border border-outline bg-accent px-2.5 py-1 text-xs font-semibold normal-case shadow-none"
                   >
                     Lead detail
                   </span>
-                  <span className="text-xs font-bold uppercase text-ink/70">
+                  <span className="text-xs font-medium normal-case text-ink-muted">
                     {formatTimestamp(activeDetailLead.sourceCreatedAt)}
                   </span>
                 </div>
@@ -770,7 +764,7 @@ function DashboardFeedComponent({
                   ref={detailCloseRef}
                   type="button"
                   onClick={() => setActiveDetailLead(null)}
-                  className="flex h-11 w-11 items-center justify-center border-2 border-outline bg-card text-ink shadow-brutal-sm"
+                  className="flex h-11 w-11 items-center justify-center rounded-lg border border-outline bg-card text-ink shadow-none"
                   aria-label="Close detail sheet"
                 >
                   <X className="h-5 w-5" />
@@ -784,7 +778,7 @@ function DashboardFeedComponent({
                     const detailIntent = getIntentDisplay(activeDetailLead)
                     if (detailIntent.kind !== 'scored') {
                       return (
-                        <div className="inline-flex items-center gap-1.5 border-2 border-outline bg-card px-3 py-1 text-xs font-black uppercase shadow-brutal-sm text-ink/60">
+                        <div className="inline-flex items-center gap-1.5 rounded-lg border border-outline bg-card px-3 py-1 text-xs font-semibold normal-case shadow-none text-ink-muted">
                           <Crosshair className="h-4 w-4" />
                           {detailIntent.label}
                         </div>
@@ -792,11 +786,11 @@ function DashboardFeedComponent({
                     }
                     return (
                       <>
-                        <div className="inline-flex items-center gap-1.5 border-2 border-outline bg-accent px-3 py-1 text-xs font-black uppercase shadow-brutal-sm">
+                        <div className="inline-flex items-center gap-1.5 rounded-lg border border-outline bg-accent px-3 py-1 text-xs font-semibold normal-case shadow-none">
                           <Crosshair className="h-4 w-4" />
                           {detailIntent.score}% intent match
                         </div>
-                        <div className="inline-flex items-center gap-1.5 border-2 border-outline bg-info px-3 py-1 text-xs font-black uppercase shadow-brutal-sm text-on-accent">
+                        <div className="inline-flex items-center gap-1.5 rounded-lg border border-outline bg-info px-3 py-1 text-xs font-semibold normal-case shadow-none text-on-accent">
                           {detailIntent.action}
                         </div>
                       </>
@@ -805,13 +799,13 @@ function DashboardFeedComponent({
                 </div>
 
                 {/* Full Quote Content */}
-                <div className="border-3 border-outline bg-card p-4 shadow-brutal">
-                  <p className="text-xs font-black uppercase text-ink/50 mb-1">Raw Signal Content</p>
-                  <p className="text-base font-black uppercase leading-relaxed text-ink">
+                <div className="rounded-[20px] border border-outline bg-card p-4 shadow-sm">
+                  <p className="text-xs font-semibold normal-case text-ink-muted mb-1">Raw Signal Content</p>
+                  <p className="text-base font-semibold normal-case leading-relaxed text-ink">
                     “{activeDetailLead.content}”
                   </p>
                   {activeDetailLead.author && (
-                    <p className="mt-2 text-xs font-bold text-ink/70 uppercase">
+                    <p className="mt-2 text-xs font-medium text-ink-muted normal-case">
                       Author: @{activeDetailLead.author}
                     </p>
                   )}
@@ -823,7 +817,7 @@ function DashboardFeedComponent({
                   if (detailIntent.kind !== 'scored') {
                     return (
                       <span
-                        className={`inline-flex w-fit items-center gap-1.5 border-2 border-outline bg-inset px-2.5 py-1 text-[10px] font-black uppercase tracking-wider text-ink/70 shadow-brutal-sm ${
+                        className={`inline-flex w-fit items-center gap-1.5 rounded-lg border border-outline bg-inset px-2.5 py-1 text-[10px] font-semibold normal-case tracking-normal text-ink-muted shadow-none ${
                           shouldReduceMotion ? '' : 'animate-pulse'
                         }`}
                       >
@@ -832,11 +826,11 @@ function DashboardFeedComponent({
                     )
                   }
                   return (
-                    <div className="border-l-4 border-outline bg-highlight p-4 border-3 border-outline shadow-brutal-sm">
-                      <p className="text-xs font-black uppercase tracking-wider text-ink/60">
+                    <div className="border-l border-outline bg-highlight p-4 rounded-[20px] border border-outline shadow-none">
+                      <p className="text-xs font-semibold normal-case tracking-normal text-ink-muted">
                         Tactical read & Buyer state
                       </p>
-                      <p className="mt-1.5 text-xs font-bold leading-relaxed text-ink/90">
+                      <p className="mt-1.5 text-xs font-medium leading-relaxed text-ink/90">
                         {getTacticalRead(detailIntent)}
                       </p>
                     </div>
@@ -848,7 +842,7 @@ function DashboardFeedComponent({
                   {getKeywords(activeDetailLead).map((keyword) => (
                     <span
                       key={`modal-${keyword}`}
-                      className="border-2 border-outline bg-highlight-strong px-2.5 py-1 text-xs font-black uppercase shadow-brutal-sm"
+                      className="rounded-lg border border-outline bg-highlight-strong px-2.5 py-1 text-xs font-semibold normal-case shadow-none"
                     >
                       #{keyword}
                     </span>
@@ -856,12 +850,12 @@ function DashboardFeedComponent({
                 </div>
 
                 {/* Action Suite */}
-                <div className="border-t-3 border-outline pt-4 space-y-3">
+                <div className="border-t border-outline pt-4 space-y-3">
                   <a
                     href={activeDetailLead.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center justify-between border-2 border-outline bg-card p-3 text-xs font-black uppercase shadow-brutal-sm hover:bg-accent"
+                    className="flex items-center justify-between rounded-lg border border-outline bg-card p-3 text-xs font-semibold normal-case shadow-none hover:bg-accent"
                   >
                     <span>
                       {isSampleQuest(activeDetailLead) ? 'Add a real keyword' : 'Inspect source thread'}
@@ -876,7 +870,7 @@ function DashboardFeedComponent({
                         generateAIReply(activeDetailLead)
                         setActiveDetailLead(null)
                       }}
-                      className="inline-flex min-h-[44px] items-center justify-center gap-1.5 border-3 border-outline bg-accent px-3 py-2.5 text-xs font-black uppercase shadow-brutal-sm hover:bg-yellow-300"
+                      className="inline-flex min-h-[44px] items-center justify-center gap-1.5 rounded-[20px] border border-outline bg-accent px-3 py-2.5 text-xs font-semibold normal-case shadow-none hover:bg-highlight-strong"
                     >
                       <Sparkles className="h-4 w-4" />
                       AI Reply
@@ -888,7 +882,7 @@ function DashboardFeedComponent({
                         handleClaimBounty(activeDetailLead)
                         setActiveDetailLead(null)
                       }}
-                      className="inline-flex min-h-[44px] items-center justify-center gap-1.5 border-3 border-outline bg-accent-2 px-3 py-2.5 text-xs font-black uppercase text-white shadow-brutal-sm"
+                      className="inline-flex min-h-[44px] items-center justify-center gap-1.5 rounded-[20px] border border-outline bg-accent-2 px-3 py-2.5 text-xs font-semibold normal-case text-on-accent shadow-none"
                     >
                       <Sword className="h-4 w-4" />
                       Claim Lead
@@ -902,7 +896,7 @@ function DashboardFeedComponent({
                         exportToCRM(activeDetailLead)
                         setActiveDetailLead(null)
                       }}
-                      className="inline-flex min-h-[44px] items-center justify-center gap-1.5 border-3 border-outline bg-card px-3 py-2.5 text-xs font-black uppercase shadow-brutal-sm hover:bg-accent"
+                      className="inline-flex min-h-[44px] items-center justify-center gap-1.5 rounded-[20px] border border-outline bg-card px-3 py-2.5 text-xs font-semibold normal-case shadow-none hover:bg-accent"
                     >
                       <Coins className="h-4 w-4" />
                       Export to CRM
@@ -914,7 +908,7 @@ function DashboardFeedComponent({
                         dismissLead(activeDetailLead.id)
                         setActiveDetailLead(null)
                       }}
-                      className="inline-flex min-h-[44px] items-center justify-center border-3 border-outline bg-[#F3E5E5] px-4 py-2.5 text-xs font-black uppercase shadow-brutal-sm hover:bg-[#F7C7C7]"
+                      className="inline-flex min-h-[44px] items-center justify-center rounded-[20px] border border-outline bg-[#F3E5E5] px-4 py-2.5 text-xs font-semibold normal-case shadow-none hover:bg-[#F7C7C7]"
                     >
                       Dismiss
                     </button>

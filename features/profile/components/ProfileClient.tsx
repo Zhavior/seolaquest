@@ -20,7 +20,7 @@ export default function ProfileClient({
   const initials = (user.name || 'Hunter').slice(0, 2).toUpperCase()
 
   return (
-    <div className="min-h-screen max-w-7xl mx-auto p-4 md:p-8 text-ink font-mono select-none space-y-8">
+    <div className="min-h-screen max-w-7xl mx-auto p-4 md:p-8 text-ink font-sans space-y-8">
       {/* ------------------ HERO BANNER / HUD ------------------ */}
       <ProfileHeader user={user} initials={initials} />
 

@@ -45,12 +45,12 @@ export function QuestCountGrid({
     >
       {counts.map((count) => (
         <div key={count.label} className={clsx('min-w-0 p-3.5', count.accent)}>
-          <dt className="text-[10px] font-black uppercase tracking-wider text-ink/60">
+          <dt className="text-[10px] font-semibold normal-case tracking-wider text-ink-muted">
             {count.label}
           </dt>
           <dd
             className={clsx(
-              'mt-1 font-black text-ink',
+              'mt-1 font-semibold text-ink',
               size === 'md' ? 'text-xl sm:text-2xl' : 'text-2xl'
             )}
           >

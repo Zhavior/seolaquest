@@ -43,8 +43,8 @@ export function ShareBar({ title, url }: ShareBarProps) {
   return (
     <div className="relative">
       {/* High contrast Retro Share Bar */}
-      <div className="flex flex-wrap items-center justify-between gap-3 border-4 border-outline bg-accent p-4 shadow-brutal-lg">
-        <div className="flex items-center gap-2 font-black uppercase text-sm text-on-accent">
+      <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-outline bg-accent p-4">
+        <div className="flex items-center gap-2 font-semibold text-sm text-on-accent">
           <Share2 size={18} strokeWidth={3} /> SHARE THIS GUILD QUEST:
         </div>
 
@@ -53,7 +53,7 @@ export function ShareBar({ title, url }: ShareBarProps) {
           <button
             onMouseEnter={() => sfx.playHoverBlip()}
             onClick={handleShareX}
-            className="flex items-center gap-1.5 border-3 border-outline bg-black px-4 py-2 text-xs font-black uppercase text-white shadow-brutal-sm hover:bg-[#8A2BE2] transition-colors hover:scale-105 active:scale-95"
+            className="flex items-center gap-1.5 rounded-xl border border-outline bg-forest px-4 py-2 text-xs font-semibold text-on-forest  hover:bg-forest transition-colors hover:scale-105 active:scale-95"
           >
             <span>𝕏 Share on X</span>
           </button>
@@ -62,7 +62,7 @@ export function ShareBar({ title, url }: ShareBarProps) {
           <button
             onMouseEnter={() => sfx.playHoverBlip()}
             onClick={handleCopyLink}
-            className="flex items-center gap-1.5 border-3 border-outline bg-card px-4 py-2 text-xs font-black uppercase text-ink shadow-brutal-sm hover:bg-[#00FFFF] transition-colors hover:scale-105 active:scale-95"
+            className="flex items-center gap-1.5 rounded-xl border border-outline bg-card px-4 py-2 text-xs font-semibold text-ink  hover:bg-highlight transition-colors hover:scale-105 active:scale-95"
           >
             {copied ? (
               <>
@@ -80,7 +80,7 @@ export function ShareBar({ title, url }: ShareBarProps) {
       {/* Floating High-Contrast Retro Toast Notification */}
       {toastMessage && (
           <div
-            className="fixed bottom-6 right-6 z-50 flex items-center gap-2 border-4 border-outline bg-success px-5 py-3 font-black uppercase text-on-accent text-xs shadow-brutal-lg animate-bounce"
+            className="fixed bottom-6 right-6 z-50 flex items-center gap-2 rounded-xl border border-outline bg-success px-5 py-3 font-semibold text-on-accent text-xs"
           >
             <Sparkles size={16} className="text-on-accent" />
             {toastMessage}

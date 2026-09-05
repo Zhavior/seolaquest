@@ -54,12 +54,12 @@ export default function FirstQuestBanner() {
       aria-live="polite"
       className="pointer-events-none fixed inset-x-0 top-20 z-50 flex justify-center px-3"
     >
-      <div className="pointer-events-auto w-full max-w-xl border-4 border-outline bg-success p-4 shadow-brutal-lg">
+      <div className="pointer-events-auto w-full max-w-xl rounded-2xl border border-outline bg-highlight p-4 shadow-brutal-lg">
         <div className="flex items-start gap-3">
           <Sparkles aria-hidden className="mt-0.5 h-6 w-6 shrink-0" strokeWidth={3} />
 
           <div className="min-w-0 flex-1">
-            <p className="text-lg font-black uppercase leading-tight">
+            <p className="text-lg font-semibold leading-tight">
               Quest complete — first hunt armed
             </p>
 
@@ -71,7 +71,7 @@ export default function FirstQuestBanner() {
             </p>
 
             {Number.isFinite(sampleCount) && sampleCount > 0 ? (
-              <p className="mt-2 flex items-start gap-2 border-3 border-outline bg-card p-2 text-xs font-black uppercase">
+              <p className="mt-2 flex items-start gap-2 rounded-xl border border-outline bg-card p-2 text-xs font-semibold">
                 <Swords aria-hidden className="mt-px h-4 w-4 shrink-0" strokeWidth={3} />
                 <span>
                   {sampleCount} tutorial signals loaded so you can practise claiming and
@@ -85,7 +85,7 @@ export default function FirstQuestBanner() {
             type="button"
             onClick={() => setVisible(false)}
             aria-label="Dismiss"
-            className="shrink-0 border-3 border-outline bg-card p-1 shadow-brutal-sm"
+            className="shrink-0 rounded-xl border border-outline bg-card p-3 shadow-brutal-sm"
           >
             <X aria-hidden className="h-4 w-4" strokeWidth={3} />
           </button>

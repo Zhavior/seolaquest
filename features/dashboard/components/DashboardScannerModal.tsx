@@ -156,17 +156,17 @@ export function DashboardScannerModal({
             ? { duration: 0 }
             : { type: 'spring', stiffness: 350, damping: 25 }
         }
-        className="max-h-[calc(100dvh-1rem)] sm:max-h-[calc(100dvh-2rem)] w-full max-w-4xl overflow-y-auto overscroll-contain border-4 border-outline bg-[#13D7C2] shadow-brutal-lg md:shadow-brutal-lg"
+        className="max-h-[calc(100dvh-1rem)] sm:max-h-[calc(100dvh-2rem)] w-full max-w-4xl overflow-y-auto overscroll-contain rounded-[20px] border border-outline bg-highlight shadow-sm md:shadow-sm"
         role="dialog"
         aria-modal="true"
         aria-labelledby="scanner-modal-title"
       >
         {/* Header Bar */}
-        <div className="relative border-b-4 border-outline bg-[#13D7C2] px-4 py-3.5 md:px-5">
+        <div className="relative border-b border-outline bg-highlight px-4 py-3.5 md:px-5">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_rgba(255,255,255,0.26),_transparent_34%),linear-gradient(135deg,_rgba(10,23,33,0.12),_transparent_60%)] pointer-events-none" />
           <div className="relative flex items-center justify-between gap-3">
             <div className="flex min-w-0 items-center gap-3">
-              <div className="flex h-11 w-11 shrink-0 items-center justify-center border-3 border-outline bg-card shadow-brutal-sm">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[20px] border border-outline bg-card shadow-none">
                 <Radar
                   className={`h-5 w-5 text-ink ${scanOutcome === 'succeeded' || scanOutcome === 'failed' || shouldReduceMotion ? '' : 'animate-spin'}`}
                   style={shouldReduceMotion ? undefined : { animationDuration: '4s' }}
@@ -176,16 +176,16 @@ export function DashboardScannerModal({
 
               <div className="min-w-0">
                 <div className="flex items-center gap-2">
-                  <p className="text-[10px] md:text-xs font-black uppercase tracking-[0.14em] text-ink/75">
+                  <p className="text-[10px] md:text-xs font-semibold normal-case tracking-[0.14em] text-ink/75">
                     Durable scan run
                   </p>
                   {scanRunId && (
-                    <span className="hidden sm:inline-block bg-black text-[#FFE600] text-[9px] font-mono font-black px-1.5 py-0.5 border border-outline -rotate-1">
+                    <span className="hidden sm:inline-block bg-black text-accent text-[9px] font-mono font-semibold px-1.5 py-0.5 border border-outline ">
                       RUN #{scanRunId.slice(0, 8)}
                     </span>
                   )}
                 </div>
-                <h2 id="scanner-modal-title" className="truncate text-base font-black uppercase text-ink md:text-2xl tracking-wide">
+                <h2 id="scanner-modal-title" className="font-display truncate text-base font-semibold normal-case text-ink md:text-2xl tracking-wide">
                   Scan status
                 </h2>
               </div>
@@ -197,7 +197,7 @@ export function DashboardScannerModal({
                   type="button"
                   onClick={copyRunId}
                   title="Copy durable run reference ID"
-                  className="hidden sm:flex min-h-11 items-center gap-1 border-3 border-outline bg-card px-2.5 py-1 text-[10px] font-black uppercase text-ink shadow-brutal-sm hover:bg-accent active:translate-x-[1px] active:translate-y-[1px] transition-all"
+                  className="hidden sm:flex min-h-11 items-center gap-1 rounded-[20px] border border-outline bg-card px-2.5 py-1 text-[10px] font-semibold normal-case text-ink shadow-none hover:bg-accent active:translate-x-[1px] active:translate-y-[1px] transition-all"
                 >
                   {copied ? <Check className="size-3.5 text-green-600" /> : <Copy className="size-3.5" />}
                   <span>{copied ? 'COPIED!' : 'COPY ID'}</span>
@@ -208,17 +208,17 @@ export function DashboardScannerModal({
                 ref={closeButtonRef}
                 type="button"
                 onClick={close}
-                className="flex h-11 w-11 shrink-0 items-center justify-center border-3 border-outline bg-card text-ink shadow-brutal-sm hover:bg-accent-2 hover:text-white active:translate-x-[1px] active:translate-y-[1px] transition-all"
+                className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[20px] border border-outline bg-card text-ink shadow-none hover:bg-accent-2 hover:text-on-accent active:translate-x-[1px] active:translate-y-[1px] transition-all"
                 aria-label="Close scanner modal"
               >
-                <X className="h-5 w-5" strokeWidth={3} />
+                <X className="h-5 w-5" strokeWidth={1.75} />
               </button>
             </div>
           </div>
 
           {/* Live Tactial Progress Bar */}
           <div
-            className="mt-3 relative h-3 w-full border-2 border-outline bg-black/20 overflow-hidden shadow-brutal-sm"
+            className="mt-3 relative h-3 w-full rounded-lg border border-outline bg-black/20 overflow-hidden shadow-none"
             role="progressbar"
             aria-valuemin={0}
             aria-valuemax={100}
@@ -226,7 +226,7 @@ export function DashboardScannerModal({
             aria-label={`Scan progress ${progressPercent} percent`}
           >
             <motion.div
-              className="h-full bg-gradient-to-r from-[#FFE600] via-[#06B6D4] to-[#A3E635]"
+              className="h-full bg-accent"
               initial={false}
               animate={{ width: `${progressPercent}%` }}
               transition={shouldReduceMotion ? { duration: 0 } : { duration: 0.4, ease: 'easeOut' }}
@@ -235,25 +235,25 @@ export function DashboardScannerModal({
         </div>
 
         {/* Modal Main Grid */}
-        <div className="grid gap-4 bg-[#F4EFE2] p-4 md:grid-cols-[minmax(0,1.2fr)_300px] md:p-5">
+        <div className="grid gap-4 bg-canvas p-4 md:grid-cols-[minmax(0,1.2fr)_300px] md:p-5">
           
           {/* Left Column: Terminal Execution Console */}
-          <div className="flex flex-col min-w-0 border-4 border-outline bg-[#0C1F2E] p-4 text-[#8CF3E7] shadow-brutal-lg">
-            <div className="mb-3 flex flex-wrap items-center justify-between gap-2 border-b-2 border-[#8CF3E7]/30 pb-3 text-xs font-black uppercase tracking-[0.1em]">
+          <div className="flex flex-col min-w-0 rounded-[20px] border border-outline bg-forest p-4 text-on-forest shadow-sm">
+            <div className="mb-3 flex flex-wrap items-center justify-between gap-2 border-b border-on-forest/30 pb-3 text-xs font-semibold normal-case tracking-[0.1em]">
               <div className="flex items-center gap-2">
-                <span className="h-2 w-2 rounded-full bg-[#8CF3E7] animate-pulse" />
+                <span className="h-2 w-2 rounded-full bg-on-forest animate-pulse" />
                 <span>&gt; Tactical Signal Terminal</span>
               </div>
 
               {/* Log Search Filter Input */}
               <div className="relative flex items-center">
-                <Search className="absolute left-2 size-3 text-[#8CF3E7]/60 pointer-events-none" />
+                <Search className="absolute left-2 size-3 text-on-forest/60 pointer-events-none" />
                 <input
                   type="text"
                   value={logFilter}
                   onChange={(e) => setLogFilter(e.target.value)}
                   placeholder="Filter logs..."
-                  className="w-28 sm:w-36 bg-[#06121C] text-[#8CF3E7] placeholder-[#8CF3E7]/40 border border-[#8CF3E7]/40 pl-6 pr-2 py-0.5 text-[10px] font-mono font-bold focus:outline-none focus:border-[#8CF3E7]"
+                  className="w-28 sm:w-36 bg-forest text-on-forest placeholder-on-forest/40 border border-on-forest/40 pl-6 pr-2 py-0.5 text-[10px] font-mono font-medium focus:outline-none focus:border-on-forest"
                 />
               </div>
             </div>
@@ -264,7 +264,7 @@ export function DashboardScannerModal({
               className="max-h-[280px] sm:max-h-[340px] overflow-y-auto space-y-2.5 font-mono text-xs sm:text-sm leading-relaxed pr-1"
             >
               {filteredLogs.length === 0 ? (
-                <div className="text-xs text-[#8CF3E7]/50 italic py-4 text-center">
+                <div className="text-xs text-on-forest/50 italic py-4 text-center">
                   No execution logs match filter &quot;{logFilter}&quot;.
                 </div>
               ) : (
@@ -274,17 +274,17 @@ export function DashboardScannerModal({
                   return (
                     <div key={`${index}-${log.slice(0, 20)}`} className="space-y-1">
                       <div className="flex min-w-0 items-start gap-2">
-                        <span className="shrink-0 font-bold text-[#FFE600]">{getStepLabel(status)}</span>
+                        <span className="shrink-0 font-medium text-accent">{getStepLabel(status)}</span>
                         <span className="min-w-0 break-words">{log}</span>
                       </div>
 
                       {status === 'active' && (
-                        <div className="ml-6 h-1.5 w-32 overflow-hidden border border-[#8CF3E7]/40 bg-[#8CF3E7]/10">
+                        <div className="ml-6 h-1.5 w-32 overflow-hidden border border-on-forest/40 bg-on-forest/10">
                           {shouldReduceMotion ? (
-                            <div className="h-full w-1/2 bg-[#8CF3E7]" />
+                            <div className="h-full w-1/2 bg-on-forest" />
                           ) : (
                             <motion.div
-                              className="h-full bg-[#8CF3E7]"
+                              className="h-full bg-on-forest"
                               initial={{ x: '-100%' }}
                               animate={{ x: '100%' }}
                               transition={{ repeat: Infinity, duration: 1.1, ease: 'linear' }}
@@ -303,11 +303,11 @@ export function DashboardScannerModal({
           <div className="space-y-4">
             
             {/* Scan Status Card */}
-            <div className="border-4 border-outline bg-card p-4 shadow-brutal-lg">
-              <p className="text-xs font-black uppercase tracking-[0.12em] text-ink/60">
+            <div className="rounded-[20px] border border-outline bg-card p-4 shadow-sm">
+              <p className="text-xs font-semibold normal-case tracking-[0.12em] text-ink-muted">
                 Scan Status
               </p>
-              <div className="mt-2 flex items-center gap-2 text-sm font-black uppercase text-ink">
+              <div className="mt-2 flex items-center gap-2 text-sm font-semibold normal-case text-ink">
                 {scanOutcome === 'succeeded' ? (
                   <>
                     <CheckCircle2 className="h-4 w-4 text-[#16A34A]" />
@@ -329,32 +329,32 @@ export function DashboardScannerModal({
                   </>
                 )}
               </div>
-              <p className="mt-2 text-xs font-bold uppercase tracking-[0.04em] text-ink/70 leading-normal">
+              <p className="mt-2 text-xs font-medium normal-case tracking-[0.04em] text-ink-muted leading-normal">
                 Status comes from the durable run API — this panel does not invent match quality.
               </p>
             </div>
 
             {/* Tactical Yield Metrics */}
-            <div className="border-4 border-outline bg-highlight p-4 shadow-brutal-lg">
-              <p className="text-xs font-black uppercase tracking-[0.12em] text-ink/60">
+            <div className="rounded-[20px] border border-outline bg-highlight p-4 shadow-sm">
+              <p className="text-xs font-semibold normal-case tracking-[0.12em] text-ink-muted">
                 Tactical Yield
               </p>
 
               <div className="mt-3 grid grid-cols-2 gap-3">
-                <div className="border-3 border-outline bg-card p-2.5 text-center shadow-brutal-sm">
-                  <p className="text-[10px] font-black uppercase tracking-[0.1em] text-ink/60">
+                <div className="rounded-[20px] border border-outline bg-card p-2.5 text-center shadow-none">
+                  <p className="text-[10px] font-semibold normal-case tracking-[0.1em] text-ink-muted">
                     Leads
                   </p>
-                  <p className="mt-1 text-2xl font-black uppercase text-ink">
+                  <p className="mt-1 text-2xl font-semibold normal-case text-ink">
                     {matchedLeadCount}
                   </p>
                 </div>
 
-                <div className="border-3 border-outline bg-card p-2.5 text-center shadow-brutal-sm">
-                  <p className="text-[10px] font-black uppercase tracking-[0.1em] text-ink/60">
+                <div className="rounded-[20px] border border-outline bg-card p-2.5 text-center shadow-none">
+                  <p className="text-[10px] font-semibold normal-case tracking-[0.1em] text-ink-muted">
                     Posts
                   </p>
-                  <p className="mt-1 text-2xl font-black uppercase text-ink">
+                  <p className="mt-1 text-2xl font-semibold normal-case text-ink">
                     {matchedPostCount}
                   </p>
                 </div>
@@ -362,12 +362,12 @@ export function DashboardScannerModal({
             </div>
 
             {/* Command Notes */}
-            <div className="border-4 border-outline bg-card p-4 shadow-brutal-lg">
-              <p className="text-xs font-black uppercase tracking-[0.12em] text-ink/60">
+            <div className="rounded-[20px] border border-outline bg-card p-4 shadow-sm">
+              <p className="text-xs font-semibold normal-case tracking-[0.12em] text-ink-muted">
                 Command Notes
               </p>
 
-              <div className="mt-2.5 space-y-2 text-xs font-bold uppercase tracking-[0.04em] text-ink/80">
+              <div className="mt-2.5 space-y-2 text-xs font-medium normal-case tracking-[0.04em] text-ink/80">
                 <div className="flex items-start gap-2">
                   <ShieldAlert className="mt-0.5 h-3.5 w-3.5 shrink-0 text-ink" />
                   <span>Review fresh matches first for highest conversion.</span>
@@ -387,15 +387,15 @@ export function DashboardScannerModal({
                   initial={{ opacity: 0, y: 8 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: 6 }}
-                  className="border-4 border-outline bg-[#D9FFE3] p-3.5 shadow-brutal-lg"
+                  className="rounded-[20px] border border-outline bg-[#D9FFE3] p-3.5 shadow-sm"
                 >
                   <div className="flex items-start gap-2.5">
                     <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-[#15803D]" />
                     <div className="min-w-0">
-                      <p className="text-[10px] font-black uppercase tracking-[0.12em] text-ink/60">
+                      <p className="text-[10px] font-semibold normal-case tracking-[0.12em] text-ink-muted">
                         Outcome Report
                       </p>
-                      <p className="mt-1 text-xs font-black uppercase tracking-[0.04em] text-ink">
+                      <p className="mt-1 text-xs font-semibold normal-case tracking-[0.04em] text-ink">
                         Hunt Completed Successfully!
                       </p>
                     </div>
@@ -407,15 +407,15 @@ export function DashboardScannerModal({
                   initial={{ opacity: 0, y: 8 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: 6 }}
-                  className="border-4 border-outline bg-[#FFF1F2] p-3.5 shadow-brutal-lg"
+                  className="rounded-[20px] border border-outline bg-[#FFF1F2] p-3.5 shadow-sm"
                 >
                   <div className="flex items-start gap-3">
                     <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-[#E11D48]" />
                     <div className="min-w-0">
-                      <p className="text-[10px] font-black uppercase tracking-[0.12em] text-ink/60">
+                      <p className="text-[10px] font-semibold normal-case tracking-[0.12em] text-ink-muted">
                         Scan Interrupted
                       </p>
-                      <p className="mt-1 text-xs font-black uppercase tracking-[0.04em] text-ink">
+                      <p className="mt-1 text-xs font-semibold normal-case tracking-[0.04em] text-ink">
                         Scan credit was refunded or paused.
                       </p>
                     </div>
@@ -427,7 +427,7 @@ export function DashboardScannerModal({
                   initial={{ opacity: 0, y: 8 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: 6 }}
-                  className="border-4 border-outline bg-highlight p-3.5 shadow-brutal-lg"
+                  className="rounded-[20px] border border-outline bg-highlight p-3.5 shadow-sm"
                 >
                   <div className="flex items-start gap-2.5">
                     <Clock3
@@ -435,10 +435,10 @@ export function DashboardScannerModal({
                       aria-hidden
                     />
                     <div className="min-w-0">
-                      <p className="text-[10px] font-black uppercase tracking-[0.12em] text-ink/60">
+                      <p className="text-[10px] font-semibold normal-case tracking-[0.12em] text-ink-muted">
                         Awaiting result
                       </p>
-                      <p className="mt-1 text-xs font-black uppercase tracking-[0.04em] text-ink leading-snug">
+                      <p className="mt-1 text-xs font-semibold normal-case tracking-[0.04em] text-ink leading-snug">
                         Polling the durable run. You can close this and reopen from Intel or the run URL.
                       </p>
                     </div>
@@ -453,7 +453,7 @@ export function DashboardScannerModal({
                 <Link
                   href="/app/runs"
                   onClick={close}
-                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 border-3 border-outline bg-accent px-4 py-2.5 text-xs font-black uppercase tracking-[0.08em] text-on-accent shadow-brutal hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-brutal-lg active:translate-x-0 active:translate-y-0 transition-all"
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-[20px] border border-outline bg-accent px-4 py-2.5 text-xs font-semibold normal-case tracking-[0.08em] text-on-accent shadow-sm hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-sm active:translate-x-0 active:translate-y-0 transition-all"
                 >
                   <ExternalLink className="h-4 w-4" />
                   <span>VIEW QUEST BOARD</span>
@@ -462,7 +462,7 @@ export function DashboardScannerModal({
                 <button
                   type="button"
                   onClick={close}
-                  className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 border-3 border-outline bg-accent-2 text-white px-3 py-2 text-xs font-black uppercase tracking-[0.08em] shadow-brutal-sm hover:bg-red-600 transition-all"
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 rounded-[20px] border border-outline bg-accent-2 text-on-accent px-3 py-2 text-xs font-semibold normal-case tracking-[0.08em] shadow-none hover:bg-highlight-strong transition-all"
                 >
                   <Ban className="h-3.5 w-3.5" />
                   <span>CANCEL SCAN</span>
@@ -472,7 +472,7 @@ export function DashboardScannerModal({
               <button
                 type="button"
                 onClick={close}
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 border-3 border-outline bg-black px-4 py-2.5 text-xs font-black uppercase tracking-[0.08em] text-[#FFE600] shadow-brutal hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-brutal-lg active:translate-x-0 active:translate-y-0 transition-all"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-[20px] border border-outline bg-black px-4 py-2.5 text-xs font-semibold normal-case tracking-[0.08em] text-accent shadow-sm hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-sm active:translate-x-0 active:translate-y-0 transition-all"
               >
                 <span>RETURN TO COMMAND</span>
                 <ArrowRight className="h-4 w-4" />

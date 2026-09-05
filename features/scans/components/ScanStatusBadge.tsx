@@ -6,7 +6,7 @@ const styles: Record<ScanStatus, string> = {
   RUNNING: 'bg-sky-300 text-on-accent',
   SUCCEEDED: 'bg-success text-on-accent',
   FAILED_REFUNDED: 'bg-orange-300 text-on-accent',
-  DEAD: 'bg-accent-2 text-white',
+  DEAD: 'bg-accent-2 text-on-accent',
   CANCELLED: 'bg-zinc-700 text-white',
   UNKNOWN: 'bg-inset text-ink',
 }

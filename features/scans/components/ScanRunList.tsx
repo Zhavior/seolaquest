@@ -95,7 +95,7 @@ export function ScanRunList({ runs: initialRuns, hasMore: initialHasMore }: Scan
         <QuestBadge tone="gold" className="mx-auto mb-4" icon={<ShieldAlert aria-hidden="true" className="h-4 w-4" />}>
           No scan runs recorded
         </QuestBadge>
-        <h2 className="text-2xl font-black uppercase sm:text-3xl">
+        <h2 className="text-2xl font-semibold normal-case sm:text-3xl">
           Durable scans will appear here after they are queued.
         </h2>
         <p className="mx-auto mt-3 max-w-xl text-sm font-bold text-ink-muted">
@@ -120,7 +120,7 @@ export function ScanRunList({ runs: initialRuns, hasMore: initialHasMore }: Scan
         variants={item}
         className={questSurface({ shadow: 'md', className: 'relative flex items-center' })}
       >
-        <Search aria-hidden="true" className="pointer-events-none absolute left-3.5 h-4 w-4 text-ink/60" />
+        <Search aria-hidden="true" className="pointer-events-none absolute left-3.5 h-4 w-4 text-ink-muted" />
         <label htmlFor="scan-run-search" className="sr-only">
           Search run ID, trigger, or status
         </label>
@@ -130,13 +130,13 @@ export function ScanRunList({ runs: initialRuns, hasMore: initialHasMore }: Scan
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder="SEARCH RUN ID, TRIGGER, OR STATUS..."
-          className="min-h-11 w-full bg-transparent py-3 pl-10 pr-12 text-xs font-black uppercase text-ink placeholder:text-ink/40 focus:outline-none sm:text-sm"
+          className="min-h-11 w-full bg-transparent py-3 pl-10 pr-12 text-xs font-semibold normal-case text-ink placeholder:text-ink-muted focus:outline-none sm:text-sm"
         />
         {searchQuery && (
           <button
             type="button"
             onClick={() => setSearchQuery('')}
-            className="absolute right-0 flex h-11 w-11 items-center justify-center text-ink/60 hover:text-ink"
+            className="absolute right-0 flex h-11 w-11 items-center justify-center text-ink-muted hover:text-ink"
             aria-label="Clear search"
           >
             <X aria-hidden="true" className="h-4 w-4" />
@@ -162,13 +162,13 @@ export function ScanRunList({ runs: initialRuns, hasMore: initialHasMore }: Scan
                       {run.trigger}
                     </QuestBadge>
                   </div>
-                  <p className="mt-3 break-word-safe text-base font-black uppercase text-ink">{run.statusMessage}</p>
-                  <p className="mt-1.5 break-word-safe text-xs font-bold uppercase text-ink/70">{run.providerSummary}</p>
+                  <p className="mt-3 break-word-safe text-base font-semibold normal-case text-ink">{run.statusMessage}</p>
+                  <p className="mt-1.5 break-word-safe text-xs font-bold normal-case text-ink-muted">{run.providerSummary}</p>
                 </div>
                 <div className="shrink-0 text-left sm:text-right">
-                  <p className="text-[10px] font-black uppercase tracking-wider text-ink/50">Last updated</p>
-                  <p className="mt-0.5 text-xs font-black uppercase text-ink">{formatScanTime(run.updatedAt)}</p>
-                  <p className="mt-2 text-[10px] font-black uppercase tracking-wider text-ink/50">
+                  <p className="text-[10px] font-semibold normal-case tracking-wider text-ink-muted">Last updated</p>
+                  <p className="mt-0.5 text-xs font-semibold normal-case text-ink">{formatScanTime(run.updatedAt)}</p>
+                  <p className="mt-2 text-[10px] font-semibold normal-case tracking-wider text-ink-muted">
                     Completed: {formatScanTime(run.completedAt)}
                   </p>
                 </div>
@@ -201,7 +201,7 @@ export function ScanRunList({ runs: initialRuns, hasMore: initialHasMore }: Scan
       {!hasMore && runs.length > 0 && (
         <motion.p
           variants={item}
-          className={questSurface({ border: 3, shadow: 'sm', className: 'p-3 text-center text-xs font-black uppercase' })}
+          className={questSurface({ border: 3, shadow: 'sm', className: 'p-3 text-center text-xs font-semibold normal-case' })}
         >
           End of scan runs.
         </motion.p>

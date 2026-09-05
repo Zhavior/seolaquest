@@ -11,28 +11,28 @@ export const metadata = {
 export default function NotFound() {
   return (
     <main className="flex min-h-screen items-center justify-center bg-canvas p-6">
-      <section className="max-w-xl border-4 border-outline bg-card p-8 shadow-brutal-lg">
-        <p className="text-xs font-black uppercase text-ink-muted">SEOlaQuest could not find this page</p>
-        <h1 className="mt-3 text-3xl font-black uppercase">Nothing here.</h1>
-        <p className="mt-4 font-bold text-ink-muted">
+      <section className="max-w-xl rounded-[20px] border border-outline bg-card p-8">
+        <p className="text-xs font-semibold text-ink-muted">SEOlaQuest could not find this page</p>
+        <h1 className="font-display mt-3 text-3xl font-medium">Nothing here.</h1>
+        <p className="mt-4 font-medium text-ink-muted">
           The address may be mistyped, or the page may have been retired. The links below still work.
         </p>
         <nav aria-label="Recovery links" className="mt-6 flex flex-wrap gap-3">
           <Link
             href="/"
-            className="border-4 border-outline bg-accent px-5 py-3 font-black uppercase text-on-accent shadow-brutal"
+            className="rounded-xl border border-outline bg-accent px-5 py-3 font-semibold text-on-accent"
           >
             Home
           </Link>
           <Link
             href="/blog"
-            className="border-4 border-outline bg-card px-5 py-3 font-black uppercase shadow-brutal"
+            className="rounded-xl border border-outline bg-card px-5 py-3 font-semibold"
           >
             Blog
           </Link>
           <Link
             href="/pricing"
-            className="border-4 border-outline bg-card px-5 py-3 font-black uppercase shadow-brutal"
+            className="rounded-xl border border-outline bg-card px-5 py-3 font-semibold"
           >
             Pricing
           </Link>

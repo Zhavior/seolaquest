@@ -17,6 +17,7 @@ vi.mock('@/lib/prisma', () => ({
     billingSubscription: { findUnique: mocks.subscriptionFindUnique },
   },
 }))
+vi.mock('@/src/modules/leads/application/LeadQueryService', () => ({ LeadQueryService: { openQueue: mocks.leadFindMany } }))
 // Rate limiting is covered by RateLimiter.test.ts; these cases exercise route behaviour.
 vi.mock('@/src/modules/core/security/RateLimiter', () => ({
   RateLimiterService: { enforce: vi.fn() },
@@ -62,9 +63,7 @@ describe('dashboard hydration route', () => {
     expect(mocks.keywordFindMany).toHaveBeenCalledWith(
       expect.objectContaining({ where: expect.objectContaining({ userId: 'user-1' }) }),
     )
-    expect(mocks.leadFindMany).toHaveBeenCalledWith(
-      expect.objectContaining({ where: expect.objectContaining({ userId: 'user-1' }) }),
-    )
+    expect(mocks.leadFindMany).toHaveBeenCalledWith('user-1')
     expect(mocks.subscriptionFindUnique).toHaveBeenCalledWith(
       expect.objectContaining({ where: { userId: 'user-1' } }),
     )
@@ -79,7 +78,7 @@ describe('dashboard hydration route', () => {
         content: 'needs seo help',
         matched: 'seo',
         url: 'https://example.com/1',
-        sourceCreatedAt: new Date('2026-08-01T00:00:00.000Z'),
+        sourceCreatedAt: '2026-08-01T00:00:00.000Z',
       },
     ])
 

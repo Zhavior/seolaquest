@@ -18,7 +18,7 @@ export default function AudioNavbarToggle() {
       whileHover={{ scale: 1.05 }}
       whileTap={{ scale: 0.95 }}
       onClick={handleToggle}
-      className={`font-black text-xs md:text-sm uppercase px-3 py-2 border-2 border-outline flex items-center gap-2 shadow-brutal-sm cursor-pointer transition-colors ${
+      className={`font-semibold text-xs md:text-sm normal-case px-3 py-2 border border-outline flex items-center gap-2 shadow-brutal-sm cursor-pointer transition-colors  rounded-xl ${
         enabled
           ? 'bg-accent text-on-accent hover:bg-yellow-300'
           : 'bg-zinc-800 text-ink-muted hover:bg-zinc-700'

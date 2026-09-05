@@ -23,7 +23,7 @@ export function BillingEffectsLayer({ activeEffect }: BillingEffectsLayerProps) 
               className="flex flex-col items-center text-ink-muted"
             >
               <Sprout className="w-36 h-36 stroke-[3px]" />
-              <div className="bg-zinc-300 text-ink font-black text-2xl p-4 border-4 border-outline mt-4 shadow-[4px_4px_0_0_#fff]">
+              <div className="bg-zinc-300 text-ink font-semibold text-2xl p-4 border border-outline mt-4 shadow-brutal rounded-xl">
                 🌱 PEASANT AWAKENED! (Time to work)
               </div>
             </motion.div>
@@ -34,10 +34,10 @@ export function BillingEffectsLayer({ activeEffect }: BillingEffectsLayerProps) 
               initial={{ scale: 0, rotate: -45 }}
               animate={{ scale: 1.5, rotate: 45 }}
               transition={{ duration: 0.4 }}
-              className="flex flex-col items-center text-[#A3E635]"
+              className="flex flex-col items-center text-ink-muted"
             >
               <Sword className="w-36 h-36 stroke-[3px]" />
-              <div className="bg-success text-on-accent font-black text-2xl p-4 border-4 border-outline mt-4">
+              <div className="bg-success text-on-accent font-semibold text-2xl p-4 border border-outline mt-4 rounded-xl">
                 🗡️ SWORDSMAN RECRUITED! (+1.5x XP Boost)
               </div>
             </motion.div>
@@ -53,8 +53,8 @@ export function BillingEffectsLayer({ activeEffect }: BillingEffectsLayerProps) 
                   <Sword className="w-64 h-64 text-cyan-300 stroke-[3px]" />
                 </motion.div>
               </div>
-              <div className="bg-[#3B82F6] text-white font-black text-3xl p-6 border-4 border-white shadow-[6px_6px_0_0_#fff] uppercase text-center max-w-lg leading-tight">
-                Knight Contract Signed! <br/><span className="text-[#FFE600]">Shield Equipped.</span>
+              <div className="bg-[#3B82F6] text-white font-semibold text-3xl p-6 border border-white shadow-brutal normal-case text-center max-w-lg leading-tight rounded-xl">
+                Knight Contract Signed! <br/><span className="text-accent">Shield Equipped.</span>
               </div>
             </div>
           )}
@@ -66,9 +66,9 @@ export function BillingEffectsLayer({ activeEffect }: BillingEffectsLayerProps) 
               transition={{ duration: 1 }}
               className="flex flex-col items-center gap-8 text-purple-400"
             >
-              <Sparkles className="w-48 h-48 animate-pulse text-[#A855F7]" />
-              <div className="bg-[#8B5CF6] text-white font-black text-3xl p-6 border-4 border-white shadow-[6px_6px_0_0_#fff] uppercase text-center max-w-lg leading-tight">
-                Sorcerer Contract Signed! <br/><span className="text-[#FFE600]">Arcane Nova Unleashed.</span>
+              <Sparkles className="w-48 h-48 animate-pulse text-ink-muted" />
+              <div className="bg-forest text-white font-semibold text-3xl p-6 border border-white shadow-brutal normal-case text-center max-w-lg leading-tight rounded-xl">
+                Sorcerer Contract Signed! <br/><span className="text-accent">Arcane Nova Unleashed.</span>
               </div>
             </motion.div>
           )}
@@ -82,10 +82,10 @@ export function BillingEffectsLayer({ activeEffect }: BillingEffectsLayerProps) 
             >
               <div className="flex items-center gap-2">
                 <Flame className="w-48 h-48 fill-orange-500 text-yellow-400" />
-                <span className="text-9xl font-black">🐉</span>
+                <span className="text-9xl font-semibold">🐉</span>
               </div>
-              <div className="bg-danger text-white font-black text-3xl p-6 border-4 border-white shadow-[6px_6px_0_0_#F59E0B] uppercase text-center max-w-lg leading-tight">
-                Dragon Overlord Summoned! <br/><span className="text-[#FFE600]">Fire Breathed.</span>
+              <div className="bg-danger text-white font-semibold text-3xl p-6 border border-white shadow-brutal normal-case text-center max-w-lg leading-tight rounded-xl">
+                Dragon Overlord Summoned! <br/><span className="text-accent">Fire Breathed.</span>
               </div>
             </motion.div>
           )}

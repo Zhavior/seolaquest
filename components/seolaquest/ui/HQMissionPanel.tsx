@@ -27,15 +27,15 @@ export default function HQMissionPanel({
 
       <div className="relative z-10 space-y-6">
         <div>
-          <p className="text-xs font-black uppercase tracking-[0.22em] text-ink/60">
+          <p className="text-xs font-semibold normal-case tracking-[0.22em] text-ink-muted">
             {eyebrow}
           </p>
 
-          <h1 className="mt-2 text-4xl font-black tracking-tight">
+          <h1 className="mt-2 text-4xl font-semibold tracking-tight">
             {title}
           </h1>
 
-          <p className="mt-3 max-w-3xl text-base font-medium text-ink/70">
+          <p className="mt-3 max-w-3xl text-base font-medium text-ink-muted">
             {description}
           </p>
         </div>

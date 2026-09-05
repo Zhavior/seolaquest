@@ -76,29 +76,29 @@ export default function ManaShopModal({ onClose }: ManaShopModalProps) {
       describedBy="mana-shop-dialog-description"
       closeOnBackdrop={selected === null}
       overlayClassName="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-md"
-      panelClassName="relative max-h-[92vh] w-full max-w-4xl overflow-y-auto border-4 border-outline bg-canvas p-5 text-ink shadow-brutal-lg sm:p-8"
+      panelClassName="relative max-h-[92vh] w-full max-w-4xl overflow-y-auto border border-outline bg-canvas p-5 text-ink shadow-brutal-lg sm:p-8 rounded-xl"
       initial={{ scale: 0.92, opacity: 0 }}
       animate={{ scale: 1, opacity: 1 }}
     >
         <button
           onClick={onClose}
           aria-label="Close mana shop"
-          className="absolute top-4 right-4 bg-card hover:bg-black hover:text-white border-2 border-outline p-2 z-20"
+          className="absolute top-4 right-4 bg-card hover:bg-black hover:text-white border border-outline p-2 z-20 rounded-xl"
         >
           <X className="w-6 h-6" />
         </button>
 
-        <div className="bg-accent border-4 border-outline p-5 shadow-brutal-lg">
-          <h2 id="mana-shop-dialog-title" className="text-3xl sm:text-4xl font-black uppercase">The Alchemist Shop</h2>
+        <div className="bg-accent border border-outline p-5 shadow-brutal-lg rounded-xl">
+          <h2 id="mana-shop-dialog-title" className="text-3xl sm:text-4xl font-semibold normal-case">The Alchemist Shop</h2>
           <p id="mana-shop-dialog-description" className="text-sm font-bold mt-2 pr-10">{message}</p>
         </div>
 
-        <div className="mt-6 bg-black text-white border-4 border-outline p-4 shadow-[6px_6px_0_#06B6D4]">
-          <div className="flex justify-between gap-4 text-sm font-black uppercase">
+        <div className="mt-6 bg-forest text-white border border-outline p-4 shadow-brutal rounded-xl">
+          <div className="flex justify-between gap-4 text-sm font-semibold normal-case">
             <span>Server-verified scan balance</span>
-            <span className="text-[#FFE600]">{balance.toLocaleString()} / {capacity.toLocaleString()}</span>
+            <span className="text-accent">{balance.toLocaleString()} / {capacity.toLocaleString()}</span>
           </div>
-          <div className="mt-3 h-8 border-2 border-white bg-zinc-900 overflow-hidden">
+          <div className="mt-3 h-8 border border-white bg-zinc-900 overflow-hidden rounded-xl">
             <div className="h-full bg-gradient-to-r from-[#06B6D4] to-[#A3E635]" style={{ width: `${percentage}%` }} />
           </div>
         </div>
@@ -108,17 +108,17 @@ export default function ManaShopModal({ onClose }: ManaShopModalProps) {
             const potion = POTION_CATALOG[id]
             const Icon = ICONS[id]
             return (
-              <div key={id} className="bg-card border-4 border-outline p-5 shadow-brutal flex flex-col justify-between">
+              <div key={id} className="bg-card border border-outline p-5 shadow-brutal flex flex-col justify-between rounded-xl">
                 <div>
                   <Icon className="w-12 h-12 mb-3" />
-                  <h3 className="text-xl font-black uppercase">{potion.name}</h3>
-                  <p className="text-3xl font-black text-[#06B6D4]">+{potion.quests.toLocaleString()}</p>
-                  <p className="font-mono font-black">${(potion.priceCents / 100).toFixed(2)}</p>
+                  <h3 className="text-xl font-semibold normal-case">{potion.name}</h3>
+                  <p className="text-3xl font-semibold text-ink-muted">+{potion.quests.toLocaleString()}</p>
+                  <p className="font-mono font-semibold">${(potion.priceCents / 100).toFixed(2)}</p>
                 </div>
                 <button
                   onClick={() => void buy(id)}
                   disabled={!enabled || selected !== null}
-                  className="mt-5 bg-accent disabled:bg-inset disabled:text-ink-muted border-3 border-outline py-3 font-black uppercase disabled:cursor-not-allowed"
+                  className="mt-5 bg-accent disabled:bg-inset disabled:text-ink-muted border border-outline py-3 font-semibold normal-case disabled:cursor-not-allowed rounded-xl"
                 >
                   {selected === id ? <Zap className="w-5 h-5 animate-spin mx-auto" /> : enabled ? 'Open Stripe Checkout' : 'Top-ups paused'}
                 </button>

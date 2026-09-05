@@ -261,7 +261,7 @@ export function RadarScope({ targets, selectedId, onSelect, reducedMotion }: Pro
   }
 
   return (
-    <div className="relative aspect-[4/3] w-full border-4 border-outline bg-[#0A0A0A] shadow-brutal">
+    <div className="relative aspect-[4/3] w-full border border-outline bg-forest shadow-brutal rounded-xl">
       <canvas
         ref={canvasRef}
         aria-hidden="true"

@@ -24,10 +24,10 @@ export function LandingFeatures() {
   return (
     <section className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 pb-20 sm:pb-24">
       <div className="mb-5 max-w-2xl sm:mb-4">
-        <p className="text-[11px] font-black uppercase tracking-[0.24em] text-ink/55">
+        <p className="text-[11px] font-semibold text-ink-muted">
           What you get
         </p>
-        <h2 className="mt-2 text-3xl font-black uppercase tracking-[-0.04em] text-ink sm:text-4xl">
+        <h2 className="font-display mt-2 text-3xl font-medium text-ink sm:text-4xl">
           Bring evidence to your next decision
         </h2>
       </div>
@@ -42,13 +42,13 @@ export function LandingFeatures() {
                   border: 2,
                   shadow: 'xs',
                   tone: 'none',
-                  className: 'mb-4 inline-flex h-11 w-11 items-center justify-center bg-[#fff3b0]',
+                  className: 'mb-4 inline-flex h-11 w-11 items-center justify-center bg-highlight',
                 })}
               >
                 <Icon className="h-4 w-4" />
               </span>
-              <h3 className="text-2xl font-black uppercase">{feature.title}</h3>
-              <p className="mt-3 text-base font-bold leading-relaxed text-ink-muted">
+              <h3 className="font-display text-2xl font-medium">{feature.title}</h3>
+              <p className="mt-3 text-base font-medium leading-relaxed text-ink-muted">
                 {feature.body}
               </p>
             </QuestPanel>

@@ -38,18 +38,18 @@ export function IntelLogPanel({
       initial="hidden"
       animate="show"
       aria-labelledby="intel-log-heading"
-      className="w-full min-w-0 border-4 border-outline bg-card shadow-brutal"
+      className="w-full min-w-0 rounded-[20px] border border-outline bg-card shadow-sm"
     >
-      <div className="flex flex-wrap items-center justify-between gap-2 border-b-4 border-outline bg-highlight px-4 py-3">
+      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-outline bg-highlight px-4 py-3">
         <div className="flex items-center gap-2">
           <ScrollText className="size-4 shrink-0" aria-hidden />
-          <h2 id="intel-log-heading" className="text-sm font-black uppercase tracking-wide sm:text-base">
+          <h2 id="intel-log-heading" className="font-display text-sm font-semibold normal-case tracking-wide sm:text-base">
             Intel log
           </h2>
         </div>
         <Link
           href="/app/runs"
-          className="inline-flex min-h-11 items-center border-2 border-outline bg-card px-3 py-2 text-xs font-black uppercase shadow-brutal-sm hover:bg-highlight"
+          className="inline-flex min-h-11 items-center rounded-lg border border-outline bg-card px-3 py-2 text-xs font-semibold normal-case shadow-none hover:bg-highlight"
         >
           Run history
         </Link>
@@ -57,7 +57,7 @@ export function IntelLogPanel({
 
       <div className="space-y-3 p-4">
         {outcomeLabel ? (
-          <p className="text-sm font-bold text-ink">
+          <p className="text-sm font-medium text-ink">
             {outcomeLabel}
             {isScannerOpen || scanOutcome === 'pending' || scanOutcome === 'succeeded' || scanOutcome === 'failed' ? (
               <>
@@ -73,13 +73,13 @@ export function IntelLogPanel({
             ) : null}
           </p>
         ) : (
-          <p className="text-sm font-bold text-ink/65">No scan outcome recorded in this session yet.</p>
+          <p className="text-sm font-medium text-ink/65">No scan outcome recorded in this session yet.</p>
         )}
 
         {hasNotice ? (
-          <p className="border-2 border-outline bg-inset px-3 py-2 text-sm font-bold text-ink">{notice}</p>
+          <p className="rounded-lg border border-outline bg-inset px-3 py-2 text-sm font-medium text-ink">{notice}</p>
         ) : (
-          <p className="text-sm font-bold text-ink/65">No dashboard notice right now.</p>
+          <p className="text-sm font-medium text-ink/65">No dashboard notice right now.</p>
         )}
       </div>
     </motion.section>

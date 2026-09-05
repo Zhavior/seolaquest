@@ -40,6 +40,7 @@ export class DeterministicGamifyRuleEngine {
       }
 
       case 'lead.converted': {
+        if (event.payload.conversionType === 'CRM_EXPORTED') return []
         const leadId = stringPayloadValue(event, 'leadId')
         if (!leadId) return []
 

@@ -12,11 +12,11 @@ export function RetryDeliveryForm({ deliveryId }: { deliveryId: string }) {
   )
 
   return (
-    <form action={formAction} className="mt-5 border-t-2 border-outline pt-5">
+    <form action={formAction} className="mt-5 border-t border-outline pt-5">
       <button
         type="submit"
         disabled={pending}
-        className="border-4 border-outline bg-accent px-5 py-3 font-black uppercase shadow-brutal hover:bg-highlight-strong disabled:cursor-wait disabled:bg-inset disabled:text-ink-muted"
+        className="border border-outline bg-accent px-5 py-3 font-semibold normal-case shadow-brutal hover:bg-highlight-strong disabled:cursor-wait disabled:bg-inset disabled:text-ink-muted rounded-xl"
       >
         {pending ? 'Queueing retry…' : 'Retry delivery'}
       </button>

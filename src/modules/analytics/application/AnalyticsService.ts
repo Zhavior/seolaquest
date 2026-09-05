@@ -3,6 +3,7 @@ import prisma from '@/lib/prisma'
 import { requireCurrentUser } from '@/lib/auth'
 import { readHunterProgression } from '@/src/modules/gamify/hunterProgression'
 
+const PROGRESSED_STATUSES = [LeadStatus.CLAIMED, LeadStatus.CONTACTED, LeadStatus.REPLIED, LeadStatus.QUALIFIED, LeadStatus.CONVERTED]
 const DAY_MS = 24 * 60 * 60 * 1000
 
 function utcDateKey(date: Date) {
@@ -36,25 +37,25 @@ export class AnalyticsService {
     const leads = await prisma.lead.findMany({
       where: {
         userId: user.id,
-        status: { in: [LeadStatus.CONTACTED, LeadStatus.DISMISSED] },
-        OR: [{ contactedAt: { gte: start } }, { dismissedAt: { gte: start } }],
+        status: { in: [...PROGRESSED_STATUSES, LeadStatus.DISMISSED] },
+        OR: [{ claimedAt: { gte: start } }, { dismissedAt: { gte: start } }],
       },
-      select: { status: true, contactedAt: true, dismissedAt: true },
+      select: { status: true, claimedAt: true, contactedAt: true, dismissedAt: true },
     })
 
     return days.map((date) => {
       const dayStart = date.getTime()
       const dayEnd = dayStart + DAY_MS
       const dayLeads = leads.filter((lead) => {
-        const timestamp = lead.status === LeadStatus.CONTACTED
-          ? lead.contactedAt?.getTime()
+        const timestamp = lead.status !== LeadStatus.DISMISSED
+          ? lead.claimedAt?.getTime()
           : lead.dismissedAt?.getTime()
         return timestamp !== undefined && timestamp >= dayStart && timestamp < dayEnd
       })
 
       return {
         day: date.toLocaleDateString('en-US', { weekday: 'short', timeZone: 'UTC' }),
-        claimed: dayLeads.filter((lead) => lead.status === LeadStatus.CONTACTED).length,
+        claimed: dayLeads.filter((lead) => lead.status !== LeadStatus.DISMISSED).length,
         dismissed: dayLeads.filter((lead) => lead.status === LeadStatus.DISMISSED).length,
       }
     })
@@ -85,10 +86,10 @@ export class AnalyticsService {
         }),
         prisma.trackedKeyword.count({ where: { userId: user.id } }),
         prisma.lead.count({
-          where: { userId: user.id, status: { in: [LeadStatus.CONTACTED, LeadStatus.DISMISSED] } },
+          where: { userId: user.id, status: { in: [...PROGRESSED_STATUSES, LeadStatus.DISMISSED] } },
         }),
         prisma.lead.findMany({
-          where: { userId: user.id, status: LeadStatus.CONTACTED },
+          where: { userId: user.id, contactedAt: { not: null } },
           select: {
             platform: true,
             keywordId: true,
@@ -103,10 +104,10 @@ export class AnalyticsService {
         prisma.lead.findMany({
           where: {
             userId: user.id,
-            status: { in: [LeadStatus.CONTACTED, LeadStatus.DISMISSED] },
+            status: { in: [...PROGRESSED_STATUSES, LeadStatus.DISMISSED] },
             claimedAt: { gte: thirtyDaysAgo },
           },
-          select: { status: true, contactedAt: true, dismissedAt: true },
+          select: { status: true, claimedAt: true, contactedAt: true, dismissedAt: true },
         }),
       ])
 
@@ -143,7 +144,7 @@ export class AnalyticsService {
 
     const heatmapDetails: Record<string, { count: number; autoReplies: number }> = {}
     for (const lead of recentLeads) {
-      const activityAt = lead.status === LeadStatus.CONTACTED ? lead.contactedAt : lead.dismissedAt
+      const activityAt = lead.status === LeadStatus.DISMISSED ? lead.dismissedAt : lead.claimedAt
       if (!activityAt) continue
       const date = utcDateKey(activityAt)
       const current = heatmapDetails[date] ?? { count: 0, autoReplies: 0 }

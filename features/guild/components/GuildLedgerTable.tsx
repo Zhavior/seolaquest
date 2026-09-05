@@ -29,8 +29,8 @@ export default function GuildLedgerTable({ hunters, isAnonymousMode, onSelectHun
 
       {hunters.length === 0 ? (
         <QuestPanel padding="lg" className="text-center">
-          <h3 className="text-xl font-black uppercase">No public hunters</h3>
-          <p className="mt-2 font-bold text-ink-muted">Public rankings require explicit participant opt-in.</p>
+          <h3 className="font-display text-xl font-semibold normal-case">No public hunters</h3>
+          <p className="mt-2 font-medium text-ink-muted">Public rankings require explicit participant opt-in.</p>
         </QuestPanel>
       ) : (
         <>
@@ -42,15 +42,15 @@ export default function GuildLedgerTable({ hunters, isAnonymousMode, onSelectHun
               className={questSurface({ shadow: 'md', className: 'p-3.5' })}
             >
               <div className="flex items-start gap-3">
-                <span className={questSurface({ tone: 'gold', border: 2, shadow: 'xs', className: 'shrink-0 px-2 py-1 text-xs font-black' })}>
+                <span className={questSurface({ tone: 'gold', border: 2, shadow: 'xs', className: 'shrink-0 px-2 py-1 text-xs font-semibold' })}>
                   #{hunter.rank}
                 </span>
-                <div className="min-w-0 flex-1 text-sm font-black uppercase">
+                <div className="min-w-0 flex-1 text-sm font-semibold normal-case">
                   {onSelectHunter ? (
                     <button
                       type="button"
                       onClick={() => onSelectHunter(hunter)}
-                      className="min-h-[44px] flex items-center font-black underline decoration-2 underline-offset-4 text-left break-word-safe"
+                      className="min-h-[44px] flex items-center font-semibold underline decoration-2 underline-offset-4 text-left break-word-safe"
                     >
                       View {displayName(hunter)} details
                     </button>
@@ -60,14 +60,14 @@ export default function GuildLedgerTable({ hunters, isAnonymousMode, onSelectHun
                 </div>
               </div>
 
-              <dl className="mt-3 grid grid-cols-2 gap-3 border-t-2 border-outline pt-3">
+              <dl className="mt-3 grid grid-cols-2 gap-3 border-t border-outline pt-3">
                 <div className="min-w-0">
-                  <dt className="text-[11px] font-black uppercase text-ink-muted">Processed leads</dt>
-                  <dd className="mt-0.5 text-base font-black">{hunter.bountiesSlayed.toLocaleString()}</dd>
+                  <dt className="text-[11px] font-semibold normal-case text-ink-muted">Processed leads</dt>
+                  <dd className="mt-0.5 text-base font-semibold">{hunter.bountiesSlayed.toLocaleString()}</dd>
                 </div>
                 <div className="min-w-0">
-                  <dt className="text-[11px] font-black uppercase text-ink-muted">Active streak</dt>
-                  <dd className="mt-0.5 text-base font-black">{hunter.activeStreak} days</dd>
+                  <dt className="text-[11px] font-semibold normal-case text-ink-muted">Active streak</dt>
+                  <dd className="mt-0.5 text-base font-semibold">{hunter.activeStreak} days</dd>
                 </div>
               </dl>
             </li>
@@ -77,20 +77,20 @@ export default function GuildLedgerTable({ hunters, isAnonymousMode, onSelectHun
         <div className={questSurface({ className: 'hidden overflow-x-auto sm:block' })}>
           <table className="min-w-[620px] w-full border-collapse text-left">
             <thead>
-              <tr className="border-b-4 border-outline bg-black text-xs font-black uppercase text-white">
+              <tr className="border-b border-outline bg-black text-xs font-semibold normal-case text-white">
                 <th className="p-4">Stored rank</th>
                 <th className="p-4">Hunter</th>
                 <th className="p-4 text-right">Processed leads</th>
                 <th className="p-4 text-right">Active streak</th>
               </tr>
             </thead>
-            <tbody className="divide-y-2 divide-black text-sm font-black">
+            <tbody className="divide-y divide-black text-sm font-semibold">
               {hunters.map((hunter) => (
                 <tr key={hunter.id} className={onSelectHunter ? 'hover:bg-canvas focus-within:bg-canvas' : ''}>
                   <td className="p-4">#{hunter.rank}</td>
-                  <td className="p-4 uppercase">
+                  <td className="p-4 normal-case">
                     {onSelectHunter ? (
-                      <button type="button" onClick={() => onSelectHunter(hunter)} className="min-h-[44px] flex items-center font-black underline decoration-2 underline-offset-4">
+                      <button type="button" onClick={() => onSelectHunter(hunter)} className="min-h-[44px] flex items-center font-semibold underline decoration-2 underline-offset-4">
                         View {displayName(hunter)} details
                       </button>
                     ) : displayName(hunter)}
