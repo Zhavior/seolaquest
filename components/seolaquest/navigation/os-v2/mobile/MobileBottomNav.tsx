@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { MoreHorizontal } from 'lucide-react'
 
 import { navigation } from '../../os/shared/navigation'
@@ -25,6 +25,7 @@ export default function MobileBottomNav({
   onOpenNavigation,
 }: MobileBottomNavProps) {
   const pathname = usePathname()
+  const router = useRouter()
 
   return (
     <nav aria-label="Primary mobile navigation" className="flex w-full items-stretch gap-1.5">
@@ -43,6 +44,8 @@ export default function MobileBottomNav({
             key={item.href}
             href={item.href}
             aria-current={isActive ? 'page' : undefined}
+            onPointerDown={() => router.prefetch(item.href)}
+            onFocus={() => router.prefetch(item.href)}
             className={`flex flex-1 flex-col items-center justify-center gap-1 rounded-[20px] border border-outline py-2 text-xs font-semibold normal-case tracking-wide transition-all ${
               isActive
                 ? `${colorClass} -translate-y-0.5 shadow-none`
