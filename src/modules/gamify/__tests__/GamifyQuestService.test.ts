@@ -385,3 +385,18 @@ describe('GamifyQuestService', () => {
     expect(db.state.xp).toHaveLength(0)
   })
 })
+
+describe('governed quest suspension', () => {
+  it('rejects conversion enrollment and a legacy completed reward without issuing XP', async () => {
+    const db = createDb()
+    db.seedQuest(quest({ target: 1 }))
+    const service = new GamifyQuestService(db as never)
+    const assignment = await service.assignQuest('user_1', 'quest_1', ASSIGNMENT_AT)
+    await service.contributeForEvent(engagementEvent('legacy_complete'))
+    db.seedQuest(quest({ target: 1, eventType: 'lead.converted' }))
+    await expect(service.assignQuest('user_1', 'quest_1', ASSIGNMENT_AT)).rejects.toMatchObject({ code: 'QUEST_NOT_ACTIVE' })
+    await expect(service.claimQuest('user_1', assignment.id)).rejects.toMatchObject({ code: 'QUEST_SUSPENDED' })
+    expect(db.state.xp).toHaveLength(0)
+    await expect(service.contributeForEvent({ ...engagementEvent('report'), type: 'lead.converted' } as never)).resolves.toEqual([])
+  })
+})

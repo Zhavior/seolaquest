@@ -4,6 +4,7 @@ import type { DomainEvent } from '../core/events/DomainEvent'
 import { DomainError, NotFoundError } from '../core/infrastructure/errors'
 import { GamifyLedgerService } from './GamifyLedgerService'
 import { assignmentCycle, earliestDate } from './questCycle'
+import { questCompletionAvailable } from './questAvailability'
 
 type Tx = Prisma.TransactionClient
 type QuestRewardLedger = Pick<GamifyLedgerService, 'awardQuestRewardInTransaction'>
@@ -43,7 +44,7 @@ export class GamifyQuestService {
     return this.db.$transaction(async (tx) => {
       const quest = await tx.gamifyQuest.findUnique({ where: { id: questId } })
       if (!quest) throw new NotFoundError('Quest definition not found')
-      if (!quest.enabled || (quest.startsAt && quest.startsAt > at) || (quest.endsAt && quest.endsAt <= at)) {
+      if (!questCompletionAvailable(quest.eventType) || !quest.enabled || (quest.startsAt && quest.startsAt > at) || (quest.endsAt && quest.endsAt <= at)) {
         throw new DomainError('Quest is not active', 'QUEST_NOT_ACTIVE')
       }
 
@@ -73,7 +74,7 @@ export class GamifyQuestService {
   }
 
   async contributeForEvent(event: DomainEvent): Promise<GamifyQuestContributionResult[]> {
-    if (event.type === 'lead.converted' && event.payload.conversionType === 'CRM_EXPORTED') return []
+    if (!questCompletionAvailable(event.type)) return []
     if (SYSTEM_ACTORS.has(event.actorId) || event.source.startsWith('system.')) return []
 
     const occurredAt = new Date(event.occurredAt)
@@ -189,6 +190,10 @@ export class GamifyQuestService {
         })
         if (!profile) throw new NotFoundError('Gamify profile not found')
         return { claimed: false, assignmentId, profile }
+      }
+
+      if (!questCompletionAvailable(assignment.quest.eventType)) {
+        throw new DomainError('Conversion quests are paused until sales can be verified. Existing awarded XP is unchanged.', 'QUEST_SUSPENDED')
       }
 
       const profile = await this.ledger.awardQuestRewardInTransaction({

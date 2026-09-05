@@ -12,6 +12,7 @@ export interface QuestBoardEntry {
   description: string
   type: string
   status: GamifyQuestStatus
+  completionAvailable: boolean
   progress: number
   target: number
   progressPercent: number
@@ -52,6 +53,7 @@ export async function loadQuestBoard(): Promise<QuestBoardData> {
     new GamifyQuestQueryService().getAssignments(user.id),
     readHunterProgression(user.id),
   ])
+  const now = new Date()
 
   const entries: QuestBoardEntry[] = assignments.map((assignment) => ({
     id: assignment.id,
@@ -59,7 +61,10 @@ export async function loadQuestBoard(): Promise<QuestBoardData> {
     title: assignment.title,
     description: assignment.description,
     type: assignment.type,
-    status: assignment.status as GamifyQuestStatus,
+    status: assignment.status === 'IN_PROGRESS' && assignment.expiresAt && assignment.expiresAt <= now
+      ? 'EXPIRED'
+      : assignment.status as GamifyQuestStatus,
+    completionAvailable: assignment.completionAvailable,
     progress: assignment.progress,
     target: assignment.target,
     progressPercent: assignment.progressPercent,
@@ -67,12 +72,15 @@ export async function loadQuestBoard(): Promise<QuestBoardData> {
     expiresAt: assignment.expiresAt?.toISOString() ?? null,
     claimedAt: assignment.claimedAt?.toISOString() ?? null,
   }))
+  const visibleEntries = entries.filter(
+    entry => entry.status === 'CLAIMED' || entry.completionAvailable
+  )
 
   return {
     progression,
-    claimable: entries.filter((entry) => entry.status === 'COMPLETED'),
-    active: entries.filter((entry) => entry.status === 'IN_PROGRESS'),
-    finished: entries.filter((entry) => TERMINAL.includes(entry.status)),
+    claimable: visibleEntries.filter((entry) => entry.status === 'COMPLETED'),
+    active: visibleEntries.filter((entry) => entry.status === 'IN_PROGRESS'),
+    finished: visibleEntries.filter((entry) => TERMINAL.includes(entry.status)),
     catalogEmpty: entries.length === 0,
   }
 }

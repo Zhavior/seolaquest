@@ -432,6 +432,7 @@ export function useDashboardState({
         setClaimedCount((current) => current + 1)
         setLeads((current) => current.filter((lead) => lead.id !== leadId))
         setNotice(result.message ?? 'Quest claimed.')
+        router.refresh()
         return
       }
 

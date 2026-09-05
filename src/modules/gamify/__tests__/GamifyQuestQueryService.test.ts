@@ -36,3 +36,13 @@ describe('GamifyQuestQueryService', () => {
     })
   })
 })
+
+it('marks suspended conversion assignments for truthful board filtering', async () => {
+  const base = { progress: 1, target: 1, rewardXp: 200, quest: { code: 'first_conversion', version: 1, title: 'Legacy', description: 'Legacy', type: 'ONBOARDING', eventType: 'lead.converted' } }
+  const service = new GamifyQuestQueryService({ gamifyQuestAssignment: { findMany: vi.fn().mockResolvedValue([
+    { ...base, id: 'pending', status: 'IN_PROGRESS' }, { ...base, id: 'completed', status: 'COMPLETED' }, { ...base, id: 'claimed', status: 'CLAIMED' },
+  ]) } } as never)
+  expect((await service.getAssignments('owner')).map(row => [row.id, row.completionAvailable])).toEqual([
+    ['pending', false], ['completed', false], ['claimed', false],
+  ])
+})

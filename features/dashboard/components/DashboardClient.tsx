@@ -1,7 +1,7 @@
 'use client'
 
 import dynamic from 'next/dynamic'
-import Link from 'next/link'
+import type { ReactNode } from 'react'
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import { X } from 'lucide-react'
 import { useMemo, useState } from 'react'
@@ -40,12 +40,14 @@ export default function DashboardClient({
   dbLeads,
   dbAnalytics,
   dbLeaderboard,
+  outcomeWorkspace,
 }: {
   dbUser: DashboardUser
   dbKeywords: DashboardKeyword[]
   dbLeads: DashboardLead[]
   dbAnalytics: AnalyticsData
   dbLeaderboard: LeaderboardUser[]
+  outcomeWorkspace?: ReactNode
 }) {
   const state = useDashboardState({
     dbUser,
@@ -246,7 +248,7 @@ export default function DashboardClient({
                 ) : null}
               </AnimatePresence>
 
-              <Link href="/app/leads" className="inline-flex min-h-11 items-center underline">Follow up on claimed leads</Link>
+              {outcomeWorkspace}
 
               <div
                 className="flex rounded-[20px] border border-outline bg-card p-1 shadow-sm sm:hidden"

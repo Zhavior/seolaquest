@@ -112,8 +112,9 @@ Apply the forward migration to a restored preview first, then deploy this code. 
 code against the old schema. Keep workers stopped across the preview migration/deploy boundary.
 Existing decisions remain immutable; new scans use classifier v2/policy v2. This change does not
 replay historical scans, charge existing customers for reevaluation, or reinterpret old contacts.
-Conversion quests relying on verified lead.converted events will not advance on CRM exports or
-customer reports; hide or revise that catalog before offering those quests commercially.
+Conversion quests relying on verified lead.converted events are suspended. The catalog does not
+publish them, event consumption cannot progress them, and unclaimed legacy assignments cannot issue
+XP. Claimed history remains visible. CRM exports and customer reports do not complete these quests.
 
 Before a paid launch, prove the mounted authenticated customer journey, real provider coverage and
 cost, Stripe reconciliation, backup restoration and operational alerts. The previous Phase 7
@@ -165,3 +166,29 @@ configuration and provider issues remain unresolved by connecting the follow-up 
 
 Full mounted authenticated owner and customer journeys remain unverified. No live migration,
 deployment, payment, model switch or provider bypass was performed.
+
+## Dashboard outcome workspace — September 5, 2026
+
+The dashboard now composes a server-rendered account pipeline, customer-reported all-time
+outcome totals, the three newest in-progress follow-ups with existing outcome controls, and
+the three most recently updated saved scan records. Scan state/provider text reuses the
+existing scan view contract. Saved snapshots link to scan history for current status; this
+panel does not poll or claim continuously live health. Claims and outcome saves refresh
+the server-rendered dashboard. Failed queries show unavailable states, never zero counts.
+
+Lead details explain priority eligibility and evaluation time; scores remain heuristic.
+48 focused tests, seven PostgreSQL integration checks, TypeScript, scoped lint and the
+production build passed. A labeled empty-state component fixture was visually inspected;
+this does not certify the full authenticated dashboard or live provider operation.
+These dashboard additions remain local until separately published.
+
+## Quest board evolution — September 5, 2026
+
+The quest board now guides the real follow-up loop: review evidence, contact a saved lead, record the
+outcome, and refine keywords. Claiming a lead is described as saving it for follow-up rather than
+contacting it. Expired daily and weekly assignments no longer appear as active on read.
+
+Conversion reward quests are suspended at catalog, enrollment, contribution, claim, and presentation
+boundaries until verified sales evidence exists. Historical claimed XP remains unchanged. Focused
+quest tests, TypeScript, scoped lint, a production build, and the signed-in local Quest Board passed.
+This is local runtime evidence; it is not a hosted deployment or production provider check.
