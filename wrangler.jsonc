@@ -11,6 +11,9 @@
   "observability": {
     "enabled": true
   },
+  "limits": {
+    "cpu_ms": 300000
+  },
   "routes": [
     {
       "pattern": "seolaquest.com/*",
