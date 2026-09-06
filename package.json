@@ -6,13 +6,17 @@
     "dev": "next dev",
     "build": "prisma generate && next build",
     "start": "next start",
-    "lint": "eslint app components lib features src prisma/seed.ts proxy.ts --ignore-pattern '**/* 2.*' --max-warnings=0",
+    "lint": "eslint app components lib features src prisma/seed.ts middleware.ts --ignore-pattern '**/* 2.*' --max-warnings=0",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:integration": "dotenv -e .env.local -- cross-env EVENT_CORE_INTEGRATION_TEST=true PHASE45_INTEGRATION_TEST=true BILLING_INTEGRATION_TEST=true vitest run",
     "test:a11y": "bash scripts/phase-5-accessibility-gate.sh",
     "bundle:check": "node scripts/check-bundle-size.mjs",
     "bundle:report": "node scripts/check-bundle-size.mjs --report",
+    "cf:build": "opennextjs-cloudflare build",
+    "cf:preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
+    "cf:deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
+    "cf:typegen": "wrangler types --env-interface CloudflareEnv cloudflare-env.d.ts",
     "db": "dotenv -e .env.local -- prisma",
     "db:migrate": "dotenv -e .env.local -- prisma migrate dev",
     "db:deploy": "dotenv -e .env.local -- prisma migrate deploy",
@@ -24,6 +28,8 @@
   "dependencies": {
     "@clerk/nextjs": "^7.6.2",
     "@google/genai": "^2.15.0",
+    "@opennextjs/cloudflare": "1.20.0",
+    "@prisma/adapter-pg": "5.10.2",
     "@react-three/drei": "^10.7.7",
     "@react-three/fiber": "^9.7.0",
     "@sentry/nextjs": "^10.69.0",
@@ -38,6 +44,7 @@
     "framer-motion": "^12.42.2",
     "lucide-react": "^1.28.0",
     "next": "16.2.12",
+    "pg": "8.16.3",
     "pino": "^9.0.0",
     "pino-pretty": "^11.0.0",
     "pixi.js": "^8.19.0",
@@ -60,6 +67,7 @@
     "@testing-library/user-event": "^14.6.1",
     "@types/canvas-confetti": "^1.9.0",
     "@types/node": "^20",
+    "@types/pg": "8.15.5",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@vitejs/plugin-react": "^6.0.4",
@@ -75,6 +83,7 @@
     "tailwindcss": "^4.3.3",
     "tsx": "^4.23.1",
     "typescript": "^5",
-    "vitest": "^4.1.10"
+    "vitest": "^4.1.10",
+    "wrangler": "4.129.0"
   }
 }
