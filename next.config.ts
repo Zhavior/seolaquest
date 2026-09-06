@@ -1,5 +1,8 @@
 import { withSentryConfig } from "@sentry/nextjs";
+import { initOpenNextCloudflareForDev } from "@opennextjs/cloudflare";
 import type { NextConfig } from "next";
+
+initOpenNextCloudflareForDev();
 
 const isProduction = process.env.NODE_ENV === "production";
 
@@ -11,6 +14,7 @@ const nextConfig: NextConfig = {
   compress: true,
   poweredByHeader: false,
   reactStrictMode: true,
+  serverExternalPackages: ["@prisma/client", ".prisma/client", "pg", "pg-cloudflare"],
   experimental: {
     optimizePackageImports: ["lucide-react", "framer-motion"],
     staleTimes: { dynamic: 30 },

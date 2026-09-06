@@ -15,6 +15,7 @@
 
 # next.js
 /.next/
+/.open-next/
 /out/
 /hypequest-engine/
 
@@ -63,6 +64,11 @@ next-env.d.ts
 
 # Sentry Config File
 .env.sentry-build-plugin
+
+# Cloudflare local state and unencrypted development secrets
+/.wrangler/
+/.dev.vars*
+!/.dev.vars.example
 
 # Local agent context. Points at ~/Desktop/business-brain, which holds personal
 # material — this must never be committed.

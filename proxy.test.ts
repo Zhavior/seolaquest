@@ -19,7 +19,7 @@ vi.mock('@clerk/nextjs/server', () => ({
   }),
 }))
 
-import { PUBLIC_ROUTE_PATTERNS } from './proxy'
+import { PUBLIC_ROUTE_PATTERNS } from './middleware'
 
 const ORIGIN = 'https://seolaquest.example'
 
@@ -56,7 +56,7 @@ describe('Clerk public route boundary', () => {
     vi.stubEnv('NODE_ENV', 'production')
     vi.resetModules()
 
-    const { PUBLIC_ROUTE_PATTERNS: productionPatterns } = await import('./proxy')
+    const { PUBLIC_ROUTE_PATTERNS: productionPatterns } = await import('./middleware')
     expect(productionPatterns).not.toContain('/dev(.*)')
 
     vi.unstubAllEnvs()
