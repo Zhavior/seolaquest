@@ -54,6 +54,7 @@ model User {
   accountDeletionRequest AccountDeletionRequest?
   auditTrails            AuditTrail[]
   gamifyProfile          GamifyProfile?
+  geoQueries             GeoQuery[]
 
   @@index([createdAt])
 }
@@ -224,6 +225,43 @@ model DurableJob {
   @@index([status, nextAttemptAt, createdAt])
   @@index([userId, status, nextAttemptAt])
   @@index([leaseExpiresAt])
+}
+
+/// One AI-answer-engine scan: a query sent to an engine, the sources it came
+/// back with, whether the user's domain was among them, and what the call cost.
+///
+/// Single-user prototype (decision 2026-10-04): hangs off User like
+/// TrackedKeyword. No workspace/org scoping, no competitor model, no cache.
+/// `sources` is the classified list from `parseAgentResponse`; it is JSON
+/// rather than a child table because nothing queries individual sources yet.
+model GeoQuery {
+  id                 String   @id @default(uuid())
+  userId             String
+  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  query              String
+  brandDomain        String
+  engine             String // PERPLEXITY
+  engineModel        String?
+  enginePreset       String?
+  providerResponseId String?
+  status             String // COMPLETED, FAILED
+  errorCode          String?
+  answerText         String?
+  sources            Json     @default("[]")
+  sourceCount        Int      @default(0)
+  citedCount         Int      @default(0)
+  brandCited         Boolean?
+  brandCitedRank     Int?
+  brandRetrieved     Boolean?
+  inputTokens        Int?
+  outputTokens       Int?
+  /// USD as reported by the engine's own usage.cost.total_cost — never estimated.
+  costUsd            Decimal? @db.Decimal(12, 6)
+  costDetails        Json?
+  latencyMs          Int?
+  createdAt          DateTime @default(now())
+
+  @@index([userId, createdAt])
 }
 
 model TenantScanSchedule {

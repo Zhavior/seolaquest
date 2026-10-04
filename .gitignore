@@ -73,3 +73,6 @@ next-env.d.ts
 # Local agent context. Points at ~/Desktop/business-brain, which holds personal
 # material — this must never be committed.
 CLAUDE.local.md
+
+# Raw Perplexity response from scripts/geo-probe.ts
+.geo-probe-last.json
