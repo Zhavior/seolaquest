@@ -21,9 +21,9 @@ const displayFont = Fraunces({
   variable: '--font-fraunces',
 })
 
-const TITLE = 'SEOlaQuest | AI Social Listening & Lead Monitoring'
+const TITLE = 'SEOlaQuest | Find Buyers on X'
 const DESCRIPTION =
-  'SEOlaQuest monitors X (Twitter) for your target keywords in real time. AI scouts flag posts from potential customers and deliver matched leads to your dashboard automatically. Reddit support is in development.'
+  'Scan X for the problems you solve. Every match is scored for buyer intent and arrives with its source post. Play it as a daily quest: claim leads, earn XP, level up.'
 
 export const metadata: Metadata = {
   // Without `metadataBase` every relative URL below resolves against the

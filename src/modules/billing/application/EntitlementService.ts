@@ -1,6 +1,7 @@
 import 'server-only'
 
 import prisma from '@/lib/prisma'
+import type { BillingSubscription } from '@prisma/client'
 import { PLAN_CATALOG, isPlanCode, type PlanCode } from '@/src/modules/billing/domain/catalog'
 import { buildCapabilityDecision, type CapabilityDecision } from '@/src/modules/billing/domain/capabilities'
 import { isCurrentPaidSubscription } from '@/src/modules/billing/domain/entitlements'
@@ -24,6 +25,10 @@ export type BillingEntitlements = {
 export class EntitlementService {
   static async forUser(userId: string): Promise<BillingEntitlements> {
     const subscription = await prisma.billingSubscription.findUnique({ where: { userId } })
+    return this.fromSubscription(subscription)
+  }
+
+  static fromSubscription(subscription: BillingSubscription | null): BillingEntitlements {
     const storedPlan = subscription?.plan ?? 'FREE'
     const plan = isPlanCode(storedPlan) ? storedPlan : 'FREE'
     const definition = PLAN_CATALOG[plan]

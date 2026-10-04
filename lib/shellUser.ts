@@ -3,7 +3,6 @@ import 'server-only'
 import type { User } from '@prisma/client'
 import prisma from '@/lib/prisma'
 import { logger } from '@/src/modules/core/infrastructure/logger'
-import { GamifyEnrollmentService } from '@/src/modules/gamify/GamifyEnrollmentService'
 import { readHunterProgression } from '@/src/modules/gamify/hunterProgression'
 
 /**
@@ -43,34 +42,7 @@ async function countOpenQuests(userId: string) {
   }
 }
 
-/**
- * Puts the hunter on the quest board.
- *
- * This runs from the authenticated shell layout, so it is the earliest point at
- * which every signed-in request passes through one place. Enrollment has to
- * happen before the user can claim anything: quest progress is only recorded
- * against assignments that already exist, and the source event is consumed once.
- *
- * Failure is swallowed on purpose. Missing an enrollment pass costs a cycle of
- * quest progress; throwing here would take down every authenticated page.
- */
-async function ensureOnTheBoard(userId: string) {
-  try {
-    await new GamifyEnrollmentService().ensureEnrolled(userId)
-  } catch (error) {
-    logger.warn(
-      { err: error, userId, outcomeCode: 'GAMIFY_ENROLLMENT_FAILED' },
-      'Could not enroll the hunter in the active quest catalog',
-    )
-  }
-}
-
 export async function toShellUser(user: User): Promise<ShellUser> {
-  // Enrollment first, and awaited: it creates the GamifyProfile the progression
-  // read below depends on, so racing them would render a brand-new account as
-  // unranked on its very first page load.
-  await ensureOnTheBoard(user.id)
-
   const [progression, openQuests] = await Promise.all([
     readHunterProgression(user.id),
     countOpenQuests(user.id),

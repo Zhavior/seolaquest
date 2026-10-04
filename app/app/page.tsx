@@ -31,7 +31,7 @@ export default function AppHomePage() {
 async function DashboardShellData() {
   const user = await requireCurrentUser()
 
-  const [keywords, leads, billingSubscription, entitlements, progression] = await Promise.all([
+  const [keywords, leads, billingSubscription, progression] = await Promise.all([
     prisma.trackedKeyword.findMany({
       where: { userId: user.id },
       orderBy: { createdAt: 'desc' },
@@ -40,11 +40,11 @@ async function DashboardShellData() {
     fetchDashboardLeads(user.id),
     prisma.billingSubscription.findUnique({
       where: { userId: user.id },
-      select: { plan: true, status: true },
     }),
-    EntitlementService.forUser(user.id),
     readHunterProgression(user.id),
   ])
+
+  const entitlements = EntitlementService.fromSubscription(billingSubscription)
 
   const dashboardUser: DashboardUser = {
     name: user.name ?? user.email?.split('@')[0] ?? 'Hunter',

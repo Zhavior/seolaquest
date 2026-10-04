@@ -22,7 +22,7 @@ export const metadata: Metadata = {
  * contribution and a source event. The route that used to carry this name lists
  * scan runs and now says so; it lives at /app/runs.
  */
-export default function QuestBoardPage() {
+export default function QuestBoardPage({ searchParams }: { searchParams: Promise<{ before?: string | string[] }> }) {
   return (
     <QuestPageShell watermark={<Scroll className="h-[650px] w-[650px] text-ink" />}>
       <QuestTicker label="Quest board. Active bounties and rewards.">
@@ -31,14 +31,16 @@ export default function QuestBoardPage() {
       </QuestTicker>
 
       <Suspense fallback={<QuestBoardSkeleton />}>
-        <QuestBoardData />
+        <QuestBoardData searchParams={searchParams} />
       </Suspense>
     </QuestPageShell>
   )
 }
 
-async function QuestBoardData() {
-  const board = await loadQuestBoard()
+async function QuestBoardData({ searchParams }: { searchParams: Promise<{ before?: string | string[] }> }) {
+  const { before } = await searchParams
+  const cursor = typeof before === 'string' && before.length <= 256 ? before : undefined
+  const board = await loadQuestBoard(cursor)
   const claimable = board.claimable.length
 
   return (

@@ -42,7 +42,7 @@ export function UrgentSignalsStrip({
       initial="hidden"
       animate="show"
       aria-labelledby="urgent-signals-heading"
-      className="w-full min-w-0 rounded-[20px] border border-outline bg-card shadow-sm"
+      className="w-full min-w-0 overflow-hidden rounded-[20px] border border-outline bg-card shadow-sm"
     >
       <div className="flex flex-wrap items-center justify-between gap-2 border-b border-outline bg-highlight px-4 py-3">
         <div className="flex min-w-0 items-center gap-2">
@@ -70,7 +70,7 @@ export function UrgentSignalsStrip({
             <button
               type="button"
               onClick={() => onOpenLead(lead)}
-              className="flex min-h-11 w-full flex-col gap-1 px-4 py-3 text-left transition-colors hover:bg-highlight focus-visible:bg-highlight focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-accent"
+              className="flex min-h-11 w-full flex-col gap-1 px-4 py-3 text-left transition-colors hover:bg-highlight focus-visible:bg-highlight focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-inset focus-visible:ring-accent"
             >
               <span className="text-xs font-semibold normal-case text-ink">
                 {lead.platform} · {lead.author}

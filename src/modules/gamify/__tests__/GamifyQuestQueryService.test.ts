@@ -46,3 +46,21 @@ it('marks suspended conversion assignments for truthful board filtering', async 
     ['pending', false], ['completed', false], ['claimed', false],
   ])
 })
+
+it('bounds settled history without truncating actionable quests and scopes cursors to the actor', async () => {
+  const at = new Date('2026-09-07T00:00:00Z')
+  const row = { progress: 0, target: 1, status: 'CLAIMED', assignedAt: at,
+    quest: { code: 'daily', version: 1, type: 'DAILY', eventType: 'opportunity.engaged' } }
+  const active = Array.from({ length: 30 }, (_, i) => ({ ...row, id: `active-${i}`, status: 'COMPLETED' }))
+  const history = Array.from({ length: 26 }, (_, i) => ({ ...row, id: `history-${i}` }))
+  const findMany = vi.fn().mockResolvedValueOnce(active).mockResolvedValueOnce(history)
+  const findFirst = vi.fn().mockResolvedValue({ id: 'cursor', assignedAt: at })
+  const service = new GamifyQuestQueryService({ gamifyQuestAssignment: { findMany, findFirst } } as never)
+  const page = await service.getBoardPage('owner', 'cursor', at)
+  expect(page.assignments).toHaveLength(55)
+  expect(page.nextHistoryCursor).toBe('history-24')
+  expect(findFirst).toHaveBeenCalledWith(expect.objectContaining({ where: expect.objectContaining({ actorId: 'owner', id: 'cursor' }) }))
+  expect(findMany.mock.calls[0][0]).not.toHaveProperty('take')
+  expect(findMany.mock.calls[1][0]).toMatchObject({ take: 26, where: { actorId: 'owner' }, orderBy: [{ assignedAt: 'desc' }, { id: 'desc' }] })
+  expect(findMany.mock.calls[1][0].where.AND[1]).toEqual({ OR: [{ assignedAt: { lt: at } }, { assignedAt: at, id: { lt: 'cursor' } }] })
+})

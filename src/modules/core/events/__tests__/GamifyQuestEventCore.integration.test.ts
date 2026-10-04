@@ -11,7 +11,8 @@ describe('Gamify Quest controlled Event Core integration', () => {
 
   it('registers only canonical verified-action events and forwards their envelopes', async () => {
     const contributeForEvent = vi.fn().mockResolvedValue([])
-    registerGamifyQuestConsumers({ contributeForEvent })
+    const ensureEnrolled = vi.fn().mockResolvedValue({ enrolled: true, assigned: 0 })
+    registerGamifyQuestConsumers({ contributeForEvent }, { ensureEnrolled })
 
     expect(EventDispatcher.getConsumers('opportunity.discovered')).toEqual([])
     expect(EventDispatcher.getConsumers('opportunity.engaged')[0]?.consumerKey).toBe(GAMIFY_QUEST_CONSUMER_KEY)
@@ -30,6 +31,11 @@ describe('Gamify Quest controlled Event Core integration', () => {
     })
     await EventDispatcher.getConsumers('lead.converted')[0].handler(event)
 
+    expect(ensureEnrolled).toHaveBeenCalledWith(event.actorId, new Date(event.occurredAt))
+    expect(ensureEnrolled.mock.invocationCallOrder[0]).toBeLessThan(contributeForEvent.mock.invocationCallOrder[0])
     expect(contributeForEvent).toHaveBeenCalledWith(event)
+    ensureEnrolled.mockRejectedValueOnce(new Error('database unavailable'))
+    await expect(EventDispatcher.getConsumers('lead.converted')[0].handler(event)).rejects.toThrow('database unavailable')
+    expect(contributeForEvent).toHaveBeenCalledTimes(1)
   })
 })

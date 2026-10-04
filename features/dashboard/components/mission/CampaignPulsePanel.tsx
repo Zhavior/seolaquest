@@ -36,7 +36,7 @@ export function CampaignPulsePanel({
       initial="hidden"
       animate="show"
       aria-labelledby="campaign-pulse-heading"
-      className="w-full min-w-0 rounded-[20px] border border-outline bg-card shadow-sm"
+      className="w-full min-w-0 overflow-hidden rounded-[20px] border border-outline bg-card shadow-sm"
     >
       <div className="flex flex-col gap-4 border-b border-outline bg-highlight p-4 sm:flex-row sm:items-start sm:justify-between sm:p-5">
         <div className="min-w-0">

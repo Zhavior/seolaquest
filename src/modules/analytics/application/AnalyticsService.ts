@@ -75,7 +75,7 @@ export class AnalyticsService {
     const thirtyDays = buildRecentUtcDays(30)
     const thirtyDaysAgo = thirtyDays[0]
 
-    const [dbUser, totalKeywords, monstersDefeated, contactedLeads, platformGroups, recentLeads] =
+    const [dbUser, totalKeywords, monstersDefeated, topKeywords, platformGroups, recentLeads] =
       await Promise.all([
         prisma.user.findUnique({
           where: { id: user.id },
@@ -88,14 +88,13 @@ export class AnalyticsService {
         prisma.lead.count({
           where: { userId: user.id, status: { in: [...PROGRESSED_STATUSES, LeadStatus.DISMISSED] } },
         }),
-        prisma.lead.findMany({
-          where: { userId: user.id, contactedAt: { not: null } },
-          select: {
-            platform: true,
-            keywordId: true,
-            keyword: { select: { phrase: true } },
-          },
-        }),
+        prisma.$queryRaw<Array<{ phrase: string; count: number; platform: string }>>`
+          SELECT k."phrase", COUNT(*)::integer AS "count", MIN(l."platform") AS "platform"
+          FROM "Lead" l JOIN "TrackedKeyword" k ON k."id" = l."keywordId"
+          WHERE l."userId" = ${user.id} AND k."userId" = ${user.id} AND l."contactedAt" IS NOT NULL
+          GROUP BY l."keywordId", k."phrase"
+          ORDER BY "count" DESC, l."keywordId" ASC LIMIT 1
+        `,
         prisma.lead.groupBy({
           by: ['platform'],
           where: { userId: user.id },
@@ -111,17 +110,7 @@ export class AnalyticsService {
         }),
       ])
 
-    const keywordCounts = new Map<string, { phrase: string; count: number; platform: string }>()
-    for (const lead of contactedLeads) {
-      const current = keywordCounts.get(lead.keywordId)
-      keywordCounts.set(lead.keywordId, {
-        phrase: lead.keyword.phrase,
-        platform: lead.platform,
-        count: (current?.count ?? 0) + 1,
-      })
-    }
-
-    const topKeyword = [...keywordCounts.values()].sort((a, b) => b.count - a.count)[0]
+    const topKeyword = topKeywords[0]
     const deadliestWeapon = topKeyword
       ? {
           phrase: topKeyword.phrase,

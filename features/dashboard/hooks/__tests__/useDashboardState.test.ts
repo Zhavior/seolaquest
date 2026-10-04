@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { renderHook, act } from '@testing-library/react'
+import { sfx } from '@/lib/sfx'
 import { useDashboardState } from '../useDashboardState'
 import { DashboardUser, DashboardLead, AnalyticsData } from '../../types'
 
@@ -18,6 +19,9 @@ vi.mock('../../actions', () => actionMocks)
 vi.mock('@/lib/sfx', () => ({
   sfx: {
     playCoinDrop: vi.fn(),
+    playConfirm: vi.fn(),
+    playDiscovery: vi.fn(),
+    playQuestComplete: vi.fn(),
     playHit: vi.fn(),
     playBountyUnlock: vi.fn(),
     playSwordSlash: vi.fn(),
@@ -30,6 +34,13 @@ vi.mock('@/lib/sfx', () => ({
     playSidebarExpand: vi.fn(),
     playSidebarCollapse: vi.fn(),
   },
+}))
+
+const navigation = vi.hoisted(() => ({ replace: vi.fn(), refresh: vi.fn(), push: vi.fn() }))
+vi.mock('next/navigation', () => ({
+  useRouter: () => navigation,
+  usePathname: () => window.location.pathname,
+  useSearchParams: () => new URLSearchParams(window.location.search),
 }))
 
 const keywordDto = { id: 'database-keyword-id', phrase: 'CRM', active: true }
@@ -87,6 +98,7 @@ const mockAnalytics: AnalyticsData = [
 
 describe('useDashboardState', () => {
   beforeEach(() => {
+    window.history.replaceState(null, '', '/app')
     vi.clearAllMocks()
     resetActionMocks()
     vi.stubGlobal(
@@ -148,6 +160,22 @@ describe('useDashboardState', () => {
     expect(result.current.filteredLeads).toHaveLength(2)
   })
 
+  it('filters locally while preserving URL parameters and hash', () => {
+    window.history.replaceState(null, '', '/app?view=grid#queue')
+    const { result, rerender } = renderHook(() => useDashboardState({ dbUser: mockUser, dbKeywords: [], dbLeads: mockLeads, dbAnalytics: [], dbLeaderboard: [] }))
+    act(() => result.current.setFilter('TWITTER'))
+    rerender()
+    expect(window.location.search).toBe('?view=grid&platform=TWITTER')
+    expect(window.location.hash).toBe('#queue')
+    expect(result.current.filteredLeads.map(lead => lead.id)).toEqual(['lead-2'])
+    act(() => result.current.setFilter('ALL'))
+    rerender()
+    expect(window.location.search).toBe('?view=grid')
+    expect(result.current.filteredLeads).toHaveLength(2)
+    expect(navigation.replace).not.toHaveBeenCalled()
+    expect(fetch).not.toHaveBeenCalled()
+  })
+
   it('keeps an empty tenant dashboard empty', () => {
     const { result } = renderHook(() =>
       useDashboardState({
@@ -191,6 +219,22 @@ describe('useDashboardState', () => {
     expect(result.current.claimedCount).toBe(1)
     expect(result.current.user.xp).toBe(1250)
     expect(result.current.notice).toBe('Quest claimed.')
+  })
+
+  it('only confirms a keyword after it is saved, and stays quiet on failure', async () => {
+    let resolve!: (result: { ok: boolean; message: string }) => void
+    actionMocks.addKeywordAction.mockReturnValue(new Promise((done) => { resolve = done }))
+    const { result } = renderHook(() => useDashboardState({ dbUser: mockUser, dbKeywords: [], dbLeads: [], dbAnalytics: [], dbLeaderboard: [] }))
+    act(() => result.current.setNewKeyword('CRM'))
+    act(() => result.current.addKeyword())
+    expect(sfx.playConfirm).not.toHaveBeenCalled()
+    expect(sfx.playCoinDrop).not.toHaveBeenCalled()
+    await act(async () => resolve({ ok: false, message: 'Unable to save' }))
+    expect(sfx.playConfirm).not.toHaveBeenCalled()
+    expect(result.current.notice).toBe('Unable to save')
+    actionMocks.addKeywordAction.mockResolvedValue({ ok: true, keyword: keywordDto })
+    await act(async () => result.current.addKeyword())
+    expect(sfx.playConfirm).toHaveBeenCalledTimes(1)
   })
 
   it('uses the persisted keyword ID so a new keyword can be deleted immediately', async () => {
@@ -249,6 +293,8 @@ describe('useDashboardState', () => {
     ])
     expect(result.current.scanOutcome).toBe('succeeded')
     expect(result.current.remainingQuests).toBe(49)
+    expect(navigation.refresh).toHaveBeenCalledOnce()
+    expect(vi.mocked(fetch).mock.calls.some(([url]) => String(url).includes('/api/dashboard/leads'))).toBe(false)
   })
 
   it('adopts newer server lead props after refresh without remounting', async () => {

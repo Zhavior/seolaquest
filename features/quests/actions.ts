@@ -6,6 +6,7 @@ import { withServerAction } from '@/src/modules/core/infrastructure/server-actio
 
 type ClaimRewardResult = {
   ok: boolean
+  claimed?: boolean
   message?: string
   /** Lifetime XP after the claim, so the board can confirm the ledger moved. */
   lifetimeXp?: number
@@ -38,6 +39,7 @@ export const claimQuestRewardAction = withServerAction(
 
       return {
         ok: true,
+        claimed: result.claimed,
         message: result.claimed ? 'Reward claimed.' : 'This reward was already claimed.',
         lifetimeXp: result.profile.lifetimeXp,
         level: result.profile.level,

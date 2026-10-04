@@ -1,3 +1,5 @@
+import type { User as DatabaseUser } from '@prisma/client'
+import { toShellUser } from '@/lib/shellUser'
 import Link from 'next/link'
 import { Scroll, Sparkles, User, Zap } from 'lucide-react'
 
@@ -163,4 +165,8 @@ export default function ShellHud({ user }: { user?: Partial<ShellUser> }) {
       </div>
     </>
   )
+}
+
+export async function ShellHudData({ user }: { user: DatabaseUser }) {
+  return <ShellHud user={await toShellUser(user)} />
 }

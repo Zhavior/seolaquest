@@ -54,7 +54,10 @@ export class GamifyEnrollmentService {
     const cycles = new Map(quests.map((quest) => [quest.id, assignmentCycle(quest.type, at)]))
 
     const existing = await this.db.gamifyQuestAssignment.findMany({
-      where: { actorId: userId, questId: { in: quests.map((quest) => quest.id) } },
+      where: {
+        actorId: userId,
+        OR: quests.map(quest => ({ questId: quest.id, cycleKey: cycles.get(quest.id)!.key })),
+      },
       select: { questId: true, cycleKey: true },
     })
     const held = new Set(existing.map(({ questId, cycleKey }) => `${questId}:${cycleKey}`))

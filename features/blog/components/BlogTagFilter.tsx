@@ -1,6 +1,5 @@
 'use client'
 
-import { sfx } from '@/lib/sfx'
 import type { Post } from '@/lib/blog-types'
 
 export const ALL_TAG = '[ALL]'
@@ -39,7 +38,7 @@ export function BlogTagFilter({ tags, activeTag, onSelectTag }: BlogTagFilterPro
   if (tags.length <= 2) return null
 
   return (
-    <div className="flex flex-wrap items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
+    <div className="hb-row" role="group" aria-label="Filter by category">
       {tags.map((tag) => {
         const isActive = activeTag === tag
         return (
@@ -47,18 +46,10 @@ export function BlogTagFilter({ tags, activeTag, onSelectTag }: BlogTagFilterPro
             key={tag}
             type="button"
             aria-pressed={isActive}
-            onMouseEnter={() => sfx.playHoverBlip()}
-            onClick={() => {
-              sfx.playCoinDrop()
-              onSelectTag(tag)
-            }}
-            className={`min-h-11 border border-outline px-4 py-2 text-xs font-semibold tracking-wide transition-all ${
-              isActive
-                ? 'bg-forest text-accent  translate-x-0.5 translate-y-0.5'
-                : 'bg-card text-ink  hover:bg-inset'
-            }`}
+            onClick={() => onSelectTag(tag)}
+            className={isActive ? 'hb-btn hb-btn--small' : 'hb-btn hb-btn--label hb-btn--small'}
           >
-            {tag}
+            {tag.replace(/[\p{Extended_Pictographic}\uFE0F\u200D]+/gu, '').trim()}
           </button>
         )
       })}

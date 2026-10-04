@@ -71,6 +71,9 @@ describe('GamifyEnrollmentService', () => {
     // Two reads, and that is the entire cost of a warm request.
     expect(db.gamifyQuest.findMany).toHaveBeenCalledOnce()
     expect(db.gamifyQuestAssignment.findMany).toHaveBeenCalledOnce()
+    expect(db.gamifyQuestAssignment.findMany).toHaveBeenCalledWith(expect.objectContaining({
+      where: { actorId: 'user_1', OR: [{ questId: 'quest_daily', cycleKey: '2026-08-10' }] },
+    }))
   })
 
   /**

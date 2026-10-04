@@ -23,6 +23,10 @@ vi.mock('next/navigation', () => ({
 }))
 
 import { ThemeProvider } from '@/components/theme/ThemeProvider'
+vi.mock('@/components/seolaquest/navigation/os-v2/statusbar/ShellHud', () => ({
+  ShellHudData: () => <span>Account status slot</span>,
+}))
+
 import AppLayout from './layout'
 
 describe('authenticated app layout', () => {

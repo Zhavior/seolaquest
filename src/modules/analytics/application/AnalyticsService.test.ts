@@ -8,11 +8,13 @@ const mocks = vi.hoisted(() => ({
   leadCount: vi.fn(),
   leadFindMany: vi.fn(),
   leadGroupBy: vi.fn(),
+  queryRaw: vi.fn(),
 }))
 
 vi.mock('@/lib/auth', () => ({ requireCurrentUser: mocks.requireCurrentUser }))
 vi.mock('@/lib/prisma', () => ({
   default: {
+    $queryRaw: mocks.queryRaw,
     user: { findUnique: mocks.userFindUnique },
     // Progression is read from the gamify ledger now, not from `User.xp`.
     gamifyProfile: { findUnique: mocks.gamifyProfileFindUnique },
@@ -40,6 +42,7 @@ describe('AnalyticsService truth boundaries', () => {
     mocks.leadCount.mockResolvedValue(0)
     mocks.leadFindMany.mockResolvedValue([])
     mocks.leadGroupBy.mockResolvedValue([])
+    mocks.queryRaw.mockResolvedValue([])
   })
 
   it('returns no cross-user leaderboard until participation consent exists', async () => {
@@ -112,12 +115,7 @@ describe('AnalyticsService truth boundaries', () => {
   it('derives keyword and channel values from tenant rows without calling contact state a conversion', async () => {
     mocks.trackedKeywordCount.mockResolvedValue(2)
     mocks.leadCount.mockResolvedValue(4)
-    mocks.leadFindMany
-      .mockResolvedValueOnce([
-        { keywordId: 'k1', platform: 'REDDIT', keyword: { phrase: 'crm help' } },
-        { keywordId: 'k1', platform: 'REDDIT', keyword: { phrase: 'crm help' } },
-      ])
-      .mockResolvedValueOnce([])
+    mocks.queryRaw.mockResolvedValue([{ phrase: 'crm help', count: 2, platform: 'REDDIT' }])
     mocks.leadGroupBy.mockResolvedValue([
       { platform: 'REDDIT', _count: { id: 3 } },
       { platform: 'TWITTER', _count: { id: 1 } },
@@ -125,6 +123,7 @@ describe('AnalyticsService truth boundaries', () => {
 
     const result = await AnalyticsService.getGuildStats()
 
+    expect(mocks.queryRaw.mock.calls[0].slice(1)).toEqual(['user-1', 'user-1'])
     expect(result.conversionRate).toBe(0)
     expect(result.deadliestWeapon).toMatchObject({ phrase: 'crm help', count: 2, platform: 'REDDIT' })
     expect(result.channels).toEqual([
