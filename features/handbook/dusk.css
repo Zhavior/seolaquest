@@ -540,6 +540,109 @@
   box-shadow: 0 0 0 6px var(--night);
 }
 
+/* ── hero sample hunt: quest log over the valley ───────────────────── */
+
+.hb-herohunt {
+  display: grid;
+  gap: 0.9rem;
+  padding: 1rem 1.1rem 1.1rem;
+  font-family: var(--font-sans);
+}
+
+.hb-herohunt-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 0.4rem 0.7rem;
+}
+
+.hb-herohunt-head .hb-mono {
+  flex: 1 1 14rem;
+  font-size: 0.72rem;
+  line-height: 1.4;
+}
+
+.hb-herohunt-hud .hb-hud-level {
+  margin: 0 0 0.35rem;
+  font-size: 1.15rem;
+}
+
+.hb-questlog {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.4rem;
+}
+
+.hb-questrow {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.7rem;
+  width: 100%;
+  min-height: 3rem;
+  padding: 0.35rem 0.7rem;
+  background: var(--panel);
+  border: 1px solid var(--gold-edge);
+  color: var(--ink);
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
+}
+
+.hb-questrow[aria-pressed='true'] {
+  background: #1d1740;
+  border-color: var(--gold);
+  box-shadow: 0 0 18px rgb(216 169 59 / 0.25);
+}
+
+.hb-questrow-text {
+  display: grid;
+  min-width: 0;
+}
+
+.hb-questrow-text .hb-mono {
+  font-size: 0.72rem;
+  overflow-wrap: anywhere;
+}
+
+.hb-questrow-score {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--gold-hi);
+}
+
+.hb-herolead {
+  display: grid;
+  gap: 0.6rem;
+  padding: 0.85rem 0.9rem;
+  background: var(--panel);
+  border: 1px solid var(--gold-edge);
+}
+
+.hb-herolead .hb-quote {
+  margin: 0;
+  font-size: 1.12rem;
+  line-height: 1.35;
+}
+
+.hb-herolead .hb-mono {
+  font-size: 0.74rem;
+}
+
+.hb-herohunt-quest {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  margin: 0;
+  padding: 0.6rem 0.8rem;
+  border: 1px solid var(--teal);
+  background: rgb(93 214 176 / 0.1);
+}
+
 /* ── hero valley controls ──────────────────────────────────────────── */
 
 .hb-valley-ctl {

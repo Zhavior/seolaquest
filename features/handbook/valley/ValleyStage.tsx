@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { PHASE_LABEL, SKY_MODES, skyInfo, type SkyMode } from './phase'
-import type { ValleyHandle } from './scene'
+import type { BeaconView, ValleyHandle } from './scene'
 
 const CALM_KEY = 'sq-calm'
 
@@ -31,8 +31,18 @@ function canRenderWebGL(): boolean {
  * The sky follows the visitor's own clock; nothing is sent anywhere and no
  * location is requested. Calm mode stops all movement and is remembered.
  */
-export function ValleyStage({ scores }: { scores: number[] }) {
+export function ValleyStage({
+  scores,
+  beacons,
+  burst,
+}: {
+  scores: number[]
+  beacons?: BeaconView[]
+  /** Bump `n` to fire a claim surge at beacon `index`. */
+  burst?: { index: number; n: number } | null
+}) {
   const scoresRef = useRef(scores)
+  const beaconsRef = useRef(beacons)
   const hostRef = useRef<HTMLDivElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const handle = useRef<ValleyHandle | null>(null)
@@ -76,6 +86,7 @@ export function ValleyStage({ scores }: { scores: number[] }) {
         return
       }
       handle.current = valley
+      if (beaconsRef.current) valley.setBeacons(beaconsRef.current)
       setLive(true)
 
       const onScroll = () => {
@@ -116,6 +127,15 @@ export function ValleyStage({ scores }: { scores: number[] }) {
   useEffect(() => {
     handle.current?.setMode(mode)
   }, [mode])
+
+  useEffect(() => {
+    beaconsRef.current = beacons
+    if (beacons) handle.current?.setBeacons(beacons)
+  }, [beacons])
+
+  useEffect(() => {
+    if (burst) handle.current?.burst(burst.index)
+  }, [burst])
 
   const toggleCalm = useCallback(() => {
     setCalm((current) => {

@@ -1,18 +1,12 @@
 import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
 import { Board, Leaf } from '../components/primitives'
-import { ValleyStage } from '../valley/ValleyStage'
-import { SAMPLE_SETS } from '../sample/data'
-import { LeadCard } from './LeadCard'
-
-// Invented scores from the labelled sample set, one beacon each.
-const BEACON_SCORES = [0, 2, 3, 4].map((i) => SAMPLE_SETS[0].posts[i].score)
+import { HeroStage } from './HeroStage'
 
 export function Hero() {
   return (
     <Board volume="start" first id="start" labelledBy="hero-title" className="hb-board--valley">
-      <ValleyStage scores={BEACON_SCORES} />
-      <div className="hb-hero hb-hero--valley">
+      <HeroStage>
         <Leaf>
           <div className="hb-hero-copy hb-stack" style={{ '--gap': '1.6rem' } as React.CSSProperties}>
             <h1 id="hero-title" className="hb-display">
@@ -35,10 +29,7 @@ export function Hero() {
             </p>
           </div>
         </Leaf>
-        <div className="hb-hero-ply">
-          <LeadCard />
-        </div>
-      </div>
+      </HeroStage>
     </Board>
   )
 }

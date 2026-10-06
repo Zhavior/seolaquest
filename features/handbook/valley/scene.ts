@@ -31,10 +31,17 @@ export type ValleyHandle = {
   setProgress: (progress: number) => void
   setPaused: (paused: boolean) => void
   setReducedMotion: (reduced: boolean) => void
+  /** Sync each beacon to the sample hunt: which are open, claimed or dismissed, and which is selected. */
+  setBeacons: (beacons: BeaconView[]) => void
+  /** Light-pillar surge, expanding ring and sparks at one beacon (a claim). */
+  burst: (index: number) => void
   /** Jump the sky to its target immediately (used when a still frame is wanted). */
   snap: () => void
   dispose: () => void
 }
+
+export type BeaconState = 'open' | 'claimed' | 'dismissed'
+export type BeaconView = { state: BeaconState; selected: boolean }
 
 type Tier = 'high' | 'low'
 
@@ -400,6 +407,8 @@ export function createValley(opts: ValleyOptions): ValleyHandle {
   const stoneMat = track(new THREE.MeshStandardMaterial({ color: 0x4a4458, roughness: 1, flatShading: true }))
   const bowlMat = track(new THREE.MeshStandardMaterial({ color: 0x2a2535, roughness: 0.8, metalness: 0.4, flatShading: true }))
   const stoneGeo = track(new THREE.CylinderGeometry(2.2, 3.4, 15, 8))
+  const beamGeo = track(new THREE.CylinderGeometry(1.1, 2.2, 340, 20, 1, true))
+  const ringGeo = track(new THREE.RingGeometry(0.9, 1.25, 56))
   const bowlGeo = track(new THREE.CylinderGeometry(3.6, 2, 2, 8))
   const scores = opts.scores.slice(0, 4)
   while (scores.length < 4) scores.push(60)
@@ -422,9 +431,43 @@ export function createValley(opts: ValleyOptions): ValleyHandle {
     mk.position.y = 32; mk.scale.set(i === 0 ? 0.095 : 0.07, i === 0 ? 0.095 : 0.07, 1); mk.renderOrder = 20; g.add(mk)
     const ring = new THREE.Sprite(track(new THREE.SpriteMaterial({ map: glowTex, color: new THREE.Color(fill), blending: THREE.AdditiveBlending, depthWrite: false, transparent: true, sizeAttenuation: false, depthTest: false, fog: false })))
     ring.position.y = 32; ring.scale.set(0.16, 0.16, 1); ring.renderOrder = 19; ring.visible = i === 0; g.add(ring)
+    const beam = new THREE.Mesh(beamGeo, track(new THREE.ShaderMaterial({
+      transparent: true, depthWrite: false, side: THREE.DoubleSide, blending: THREE.AdditiveBlending,
+      uniforms: { uA: { value: 0 }, uC: { value: new THREE.Color(0x5dd6b0) }, uT: { value: 0 } },
+      vertexShader: 'varying vec2 vU; void main(){ vU=uv; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.); }',
+      fragmentShader: 'varying vec2 vU; uniform float uA,uT; uniform vec3 uC; void main(){ float a=pow(1.-vU.y,1.6)*uA*(.75+.25*sin(vU.y*60.-uT*5.)); gl_FragColor=vec4(uC*1.6,a); }',
+    })))
+    beam.position.y = 170; beam.frustumCulled = false; g.add(beam)
+    const rg = new THREE.Mesh(ringGeo, track(new THREE.MeshBasicMaterial({ color: 0x5dd6b0, transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide })))
+    rg.rotation.x = -Math.PI / 2; rg.position.y = 0.6; g.add(rg)
     scene.add(g)
-    return { fire, halo, light, mk, ring, seed: i * 1.7 }
+    return { g, fire, halo, light, mk, ring, beam, rg, seed: i * 1.7, lit: true, claimed: false, burstT: -10, lastKey: '' }
   })
+
+  const markerCache = new Map<string, THREE.CanvasTexture>()
+  const markerFor = (score: number, fill: string) => {
+    const key = `${score}${fill}`
+    let tex = markerCache.get(key)
+    if (!tex) { tex = markerTex(score, fill); markerCache.set(key, tex) }
+    return tex
+  }
+  function applyBeacon(i: number, view: BeaconView) {
+    const b = beacons[i]
+    if (!b) return
+    const base = tierColor(scores[i]).fill
+    const fill = view.state === 'claimed' ? '#5DD6B0' : view.state === 'dismissed' ? '#6E6590' : base
+    const key = `${fill}${view.selected}${view.state}`
+    if (key === b.lastKey) return
+    b.lastKey = key
+    b.mk.material.map = markerFor(scores[i], fill)
+    b.mk.material.needsUpdate = true
+    const size = view.selected ? 0.095 : 0.07
+    b.mk.scale.set(size, size, 1)
+    b.ring.material.color.set(fill)
+    b.ring.visible = view.selected
+    b.lit = view.state === 'open'
+    b.claimed = view.state === 'claimed'
+  }
 
   /* keep landmark */
   {
@@ -486,6 +529,35 @@ export function createValley(opts: ValleyOptions): ValleyHandle {
   const embers = new THREE.Points(eg, emberMat)
   embers.frustumCulled = false
   scene.add(embers)
+
+  /* claim sparks */
+  const SN = 160
+  const sp = new Float32Array(SN * 3), svel = new Float32Array(SN * 3)
+  const sg = track(new THREE.BufferGeometry())
+  sg.setAttribute('position', new THREE.BufferAttribute(sp, 3))
+  const sparkMat = track(new THREE.PointsMaterial({ map: sparkTex, size: 2.4, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, color: 0xbff7e6, sizeAttenuation: true }))
+  const sparks = new THREE.Points(sg, sparkMat)
+  sparks.frustumCulled = false
+  sparks.visible = false
+  scene.add(sparks)
+  let sparkT = -10
+
+  function doBurst(i: number) {
+    const b = beacons[i]
+    if (!b) return
+    const now = performance.now() / 1000
+    b.burstT = now
+    sparkT = now
+    const ox = b.g.position.x, oy = b.g.position.y + 19, oz = b.g.position.z
+    for (let j = 0; j < SN; j++) {
+      sp[j * 3] = ox; sp[j * 3 + 1] = oy; sp[j * 3 + 2] = oz
+      const a = Math.random() * 6.28, up = Math.random() * 0.9 + 0.2, speed = 6 + Math.random() * 16
+      svel[j * 3] = Math.cos(a) * speed * (1 - up * 0.4)
+      svel[j * 3 + 1] = up * speed * 1.4
+      svel[j * 3 + 2] = Math.sin(a) * speed * (1 - up * 0.4)
+    }
+    sparks.visible = true
+  }
 
   /* mist */
   const mistMat = track(new THREE.ShaderMaterial({
@@ -649,13 +721,26 @@ export function createValley(opts: ValleyOptions): ValleyHandle {
     sun.target.position.set(camera.position.x, 0, camera.position.z - 70)
     sun.position.copy(sun.target.position).addScaledVector(lightDirV, 300)
     const lampK = cur ? cur.n.lamp : 1
+    const now = performance.now() / 1000
     beacons.forEach((b) => {
       const fl = 0.85 + 0.15 * Math.sin(tt * 11 + b.seed) + 0.1 * Math.sin(tt * 23 + b.seed * 3)
+      b.fire.visible = b.lit
+      b.halo.visible = b.lit
       b.fire.scale.set(8 * fl, 11 * fl * (1 + 0.1 * Math.sin(tt * 7 + b.seed)), 1)
       b.halo.material.opacity = Math.min(1, 0.5 + lampK * 0.4)
-      b.light.intensity = (1.4 + lampK * 1.8) * fl * Math.PI
+      b.light.intensity = (b.lit ? 1 : 0) * (1.4 + lampK * 1.8) * fl * Math.PI
       if (b.ring.visible) b.ring.scale.setScalar(0.16 + 0.015 * Math.sin(tt * 4))
       b.mk.position.y = 32 + Math.sin(tt * 2 + b.seed) * 0.7
+      const bt = now - b.burstT
+      const bu = (b.beam.material as THREE.ShaderMaterial).uniforms
+      bu.uT.value = tt
+      bu.uA.value = (b.claimed ? 0.26 : 0) + (bt < 3.2 ? 0.9 * Math.pow(1 - bt / 3.2, 1.5) : 0)
+      const rgm = b.rg.material as THREE.MeshBasicMaterial
+      if (bt < 1.6) {
+        const k = 1 + bt * 42
+        b.rg.scale.set(k, k, 1)
+        rgm.opacity = 1 - bt / 1.6
+      } else rgm.opacity = 0
     })
     lamp.scale.set(1.6 * (0.9 + 0.1 * Math.sin(tt * 13)), 2.2 * (0.9 + 0.12 * Math.sin(tt * 9)), 1)
     lampLight.intensity = (1.0 + lampK * 1.2) * (0.9 + 0.1 * Math.sin(tt * 12)) * Math.PI
@@ -674,6 +759,18 @@ export function createValley(opts: ValleyOptions): ValleyHandle {
         epos.setX(e, epos.getX(e) + Math.sin(tt * 0.6 + e) * dt * 0.8)
       }
       epos.needsUpdate = true
+    }
+    if (sparks.visible) {
+      const st = now - sparkT
+      for (let j = 0; j < SN; j++) {
+        svel[j * 3 + 1] -= 22 * dt
+        sp[j * 3] += svel[j * 3] * dt
+        sp[j * 3 + 1] += svel[j * 3 + 1] * dt
+        sp[j * 3 + 2] += svel[j * 3 + 2] * dt
+      }
+      ;(sg.attributes.position as THREE.BufferAttribute).needsUpdate = true
+      sparkMat.opacity = Math.max(0, 1 - st / 2.2)
+      if (st > 2.4) sparks.visible = false
     }
     if (grade) grade.uniforms.uTime.value = t
     if (composer) composer.render()
@@ -701,6 +798,8 @@ export function createValley(opts: ValleyOptions): ValleyHandle {
     setProgress(p) { prog = Math.min(1, Math.max(0, p)) },
     setPaused(next) { paused = next; last = performance.now() },
     setReducedMotion(next) { reduce = next },
+    setBeacons(views) { views.forEach((v, i) => applyBeacon(i, v)) },
+    burst(index) { doBurst(index) },
     snap() { stepPhase(1); renderFrame(0.016) },
     dispose() {
       disposed = true
