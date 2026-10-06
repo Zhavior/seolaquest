@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { HandbookMark } from './HandbookMark'
+import { Brand } from './Brand'
 
 const READ = [
   { label: 'How the hunt works', href: '/#hunt' },
@@ -16,22 +16,19 @@ const FINE_PRINT = [
   { label: 'API availability', href: '/api-terms' },
 ]
 
-/** Colophon: what this is, where the small print lives, and what it is not. */
+/** What this is, where the small print lives, what it is not, and who drew the icons. */
 export function HandbookFooter() {
   return (
     <footer className="hb-desk">
       <div className="hb-desk-grid">
         <div>
-          <Link href="/" className="hb-mark" aria-label="SEOlaQuest home">
-            <HandbookMark />
-            <span className="hb-mark-word">SEOlaQuest</span>
-          </Link>
+          <Brand />
           <p className="hb-desk-fine" style={{ marginTop: '0.9rem' }}>
             Find buyers on X. Sample data on this site is invented and labelled. X is a trademark of its owner;
             SEOlaQuest is an independent product and is not affiliated with X Corp.
           </p>
         </div>
-        <nav aria-label="Handbook">
+        <nav aria-label="Read">
           <h2>Read</h2>
           <ul>
             {READ.map((item) => (
@@ -57,6 +54,10 @@ export function HandbookFooter() {
       </div>
       <p className="hb-desk-fine" style={{ maxWidth: '74rem', margin: '2rem auto 0' }}>
         © 2026 SEOlaQuest. No public uptime SLA and no open API today; both are stated in the errata.
+      </p>
+      <p className="hb-desk-fine" style={{ maxWidth: '74rem', margin: '0.6rem auto 0' }}>
+        Icon shapes from game-icons.net by Lorc, Delapouite and Skoll, licensed{' '}
+        <a href="https://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>. Recoloured with metal and gem finishes.
       </p>
     </footer>
   )

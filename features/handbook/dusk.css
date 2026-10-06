@@ -137,51 +137,6 @@
   box-shadow: 0 1px 0 #000, 0 8px 24px rgb(0 0 0 / 0.45);
 }
 
-.hb-mark {
-  font-family: var(--font-display);
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  color: var(--gold-hi);
-}
-
-.hb-top-cta {
-  background: linear-gradient(#f3d58a, #d8a93b 55%, #8a6420);
-  border: 1px solid #5a4720;
-  color: #1a1206;
-  box-shadow: 0 2px 0 #3a2a0a, 0 0 18px rgb(216 169 59 / 0.3);
-  font-family: var(--font-sans);
-}
-
-.hb-top-cta:hover {
-  transform: none;
-  filter: brightness(1.08);
-  box-shadow: 0 2px 0 #3a2a0a, 0 0 26px rgb(243 213 138 / 0.45);
-}
-
-.hb-rail {
-  background: linear-gradient(90deg, var(--night), #0e0a1d);
-  border-left: 1px solid var(--gold-edge);
-}
-
-.hb-tab {
-  background: color-mix(in srgb, var(--tab) 38%, var(--night));
-  color: #f6ebd2;
-  border: 1px solid var(--gold-edge);
-  border-left-color: var(--gold-lo);
-  font-family: var(--font-sans);
-}
-
-.hb-tab:hover:not([aria-current]) {
-  background: color-mix(in srgb, var(--tab) 62%, var(--night));
-}
-
-.hb-tab[aria-current] {
-  background: var(--tab);
-  color: var(--tab-ink);
-  border-color: var(--gold);
-  box-shadow: 0 0 22px color-mix(in srgb, var(--tab) 70%, transparent);
-}
-
 /* ── boards: the volume's gem glows behind the panel, a ridge closes it ─ */
 
 .hb-board {

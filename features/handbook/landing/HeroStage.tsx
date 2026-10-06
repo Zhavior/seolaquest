@@ -1,8 +1,8 @@
 'use client'
 
 import { useEffect, useMemo, useState, type ReactNode } from 'react'
-import { Gem, TIER_NAME } from '../components/Gem'
-import { CLAIM_MIN_SCORE, CLAIM_XP, levelTable, tierForScore } from '../rules'
+import { Icon, type IconName } from '../artifact/IconSprite'
+import { CLAIM_MIN_SCORE, CLAIM_XP, levelTable, tierForScore, type Tier } from '../rules'
 import { SAMPLE_LABEL } from '../sample/data'
 import {
   SAMPLE_QUESTS,
@@ -19,15 +19,22 @@ import type { BeaconView } from '../valley/scene'
 import { HERO_POSTS } from './heroPosts'
 import { useHomeStage } from './HomeStage'
 
-const POSTS = HERO_POSTS
 const LEVELS = levelTable(10).map((row) => row.cumulativeXp)
 const FIRST_LEAD = SAMPLE_QUESTS[0]
 
+const TIER: Record<Tier, { name: string; color: string; icon: IconName }> = {
+  ENGAGE: { name: 'Legendary', color: '#FF8A3D', icon: 'gem-leg' },
+  WATCH: { name: 'Rare', color: '#5DB2FF', icon: 'gem-rare' },
+  IGNORE: { name: 'Common', color: '#C9CBD2', icon: 'gem-common' },
+}
+const TEAL = '#5DD6B0'
+const MUTED = '#6E6590'
+
 /**
- * The hero: the live valley with the sample hunt laid over it. Picking a lead
- * lights its beacon, claiming one fires a light pillar, and the XP comes from
- * the same pure rules the full sample hunt and the product use. Nothing here is
- * real: every post, handle and score is invented and says so on the panel.
+ * The hero: copy on the scene, then the sample hunt as a quest log and a lead
+ * card. Picking a lead lights its beacon in the valley, claiming one fires a
+ * light pillar, and the XP comes from the same pure rules the full sample hunt
+ * and the product use. Every post, handle and score here is invented.
  */
 export function HeroStage({ children }: { children: ReactNode }) {
   const [sel, setSel] = useState(0)
@@ -35,18 +42,19 @@ export function HeroStage({ children }: { children: ReactNode }) {
     ...initialState(),
     log: 'Pick a lead. Read the post, then claim it or dismiss it.',
   }))
-  const stage = useHomeStage()
   const [levelNote, setLevelNote] = useState('')
+  const stage = useHomeStage()
 
-  const post = POSTS[sel]
+  const post = HERO_POSTS[sel]
   const tier = tierForScore(post.score)
+  const look = TIER[tier]
   const done = state.claimed.includes(post.id) ? 'claimed' : state.dismissed.includes(post.id) ? 'dismissed' : null
   const level = standing(state.xp, LEVELS)
   const ready = questReady(state, FIRST_LEAD)
 
   const beacons: BeaconView[] = useMemo(
     () =>
-      POSTS.map((p, i) => ({
+      HERO_POSTS.map((p, i) => ({
         state: state.claimed.includes(p.id) ? 'claimed' : state.dismissed.includes(p.id) ? 'dismissed' : 'open',
         selected: i === sel,
       })),
@@ -85,94 +93,139 @@ export function HeroStage({ children }: { children: ReactNode }) {
     noteLevelUp(state, next)
   }
 
+  const tint = done === 'claimed' ? TEAL : done === 'dismissed' ? MUTED : look.color
+
   return (
     <>
-      <div className="hb-hero hb-hero--valley">
-        {children}
-        <section className="hb-ply hb-herohunt" aria-label="Sample hunt">
-          <header className="hb-herohunt-head">
-            <span className="hb-slip">SAMPLE</span>
-            <p className="hb-mono hb-soft">{SAMPLE_LABEL}</p>
-          </header>
+      <div className="hb-hero-top">{children}</div>
+      <div className="hb-deck">
+        <section className="hb-panel hb-log" aria-label="Quest log, sample leads">
+          <div className="hb-ph">
+            <b>QUEST LOG</b>
+            <span>SAMPLE LEADS</span>
+          </div>
 
-          <div className="hb-herohunt-hud">
-            <p className="hb-hud-level">
-              <span className="hb-mono">Level {level.level}</span>
-            </p>
+          <div className="hb-herohud">
+            <span className="hb-lv">
+              <Icon name="star" size={14} /> LV {level.level}
+            </span>
             <div
-              className="hb-bar"
+              className="hb-xpbar"
               role="progressbar"
               aria-label="Sample XP into this level"
               aria-valuemin={0}
               aria-valuemax={level.span}
               aria-valuenow={level.intoLevel}
             >
-              <span style={{ transform: `scaleX(${level.intoLevel / level.span})` }} />
+              <i style={{ width: `${(level.intoLevel / level.span) * 100}%` }} />
             </div>
-            <p className="hb-mono hb-soft">
+            <span className="hb-xptxt">
               {state.xp} XP · {level.toNext} to level {level.level + 1}
-            </p>
+            </span>
           </div>
 
-          <ul className="hb-questlog" aria-label="Leads found">
-            {POSTS.map((p, i) => {
-              const t = tierForScore(p.score)
-              const status = state.claimed.includes(p.id) ? 'Claimed' : state.dismissed.includes(p.id) ? 'Dismissed' : TIER_NAME[t]
+          <ul className="hb-qrows" aria-label="Leads found">
+            {HERO_POSTS.map((p, i) => {
+              const t = TIER[tierForScore(p.score)]
+              const isDone = state.claimed.includes(p.id) ? 'Claimed' : state.dismissed.includes(p.id) ? 'Dismissed' : null
+              const color = isDone === 'Claimed' ? TEAL : isDone === 'Dismissed' ? MUTED : t.color
               return (
                 <li key={p.id}>
                   <button
                     type="button"
-                    className="hb-questrow"
+                    className="hb-qrow"
                     aria-pressed={i === sel}
+                    style={i === sel ? { borderColor: color } : undefined}
                     onClick={() => setSel(i)}
                   >
-                    <Gem tier={t} muted={status === 'Dismissed'} />
-                    <span className="hb-questrow-text">
-                      <strong>{p.name}</strong>
-                      <span className="hb-mono hb-soft">
-                        {p.handle} · {status}
-                      </span>
+                    <span style={{ opacity: isDone ? 0.4 : 1, display: 'inline-flex' }}>
+                      <Icon name={t.icon} size={38} />
                     </span>
-                    <span className="hb-mono hb-questrow-score">{p.score}</span>
+                    <span className="hb-qrow-text">
+                      <b>{p.name}</b>
+                      <small>
+                        {p.handle} · {isDone ?? t.name}
+                      </small>
+                    </span>
+                    <span className="hb-qrow-score" style={{ color: isDone ? '#6E6590' : t.color }}>
+                      {p.score}
+                    </span>
                   </button>
                 </li>
               )
             })}
           </ul>
-
-          <article className="hb-herolead" aria-live="polite">
-            <p className="hb-mono hb-soft">
-              {TIER_NAME[tier]} lead · score {post.score}
-            </p>
-            <blockquote className="hb-quote">{post.text}</blockquote>
-            <p className="hb-mono hb-soft">
-              {claimPays(post)
-                ? `Claiming pays ${CLAIM_XP} XP. Claiming is not contacting.`
-                : `Scores under ${CLAIM_MIN_SCORE} pay no claim XP.`}
-            </p>
-            <div className="hb-row">
-              <button type="button" className="hb-btn hb-btn--small" onClick={onClaim} disabled={Boolean(done)}>
-                {claimPays(post) ? `Claim +${CLAIM_XP} XP` : 'Claim · 0 XP'}
-              </button>
-              <button type="button" className="hb-btn hb-btn--label hb-btn--small" onClick={onDismiss} disabled={Boolean(done)}>
-                Dismiss
-              </button>
-            </div>
-          </article>
-
-          {ready ? (
-            <p className="hb-herohunt-quest">
-              <span className="hb-mono">Quest done: {FIRST_LEAD.title}</span>
-              <button type="button" className="hb-btn hb-btn--small" onClick={onCollect}>
-                Collect +{FIRST_LEAD.rewardXp} XP
-              </button>
-            </p>
-          ) : null}
-
-          <p className="hb-mono hb-soft" role="status">
-            {levelNote || state.log}
-          </p>
         </section>
+
+        <section
+          className="hb-panel hb-tip"
+          aria-label="Selected lead"
+          style={{ borderColor: tint, boxShadow: `0 0 0 3px #0E0A1C, 0 0 0 4px #5A4720, 0 0 46px ${tint}45, 0 28px 60px rgba(0,0,0,.7)` }}
+        >
+          <div className="hb-tbar" style={{ background: tint }} />
+          <div className="hb-tb" key={post.id}>
+            <div className="hb-tt">
+              <span style={{ display: 'inline-flex', filter: `drop-shadow(0 0 12px ${tint})` }}>
+                <Icon name={look.icon} size={62} className="hb-floaty" />
+              </span>
+              <div>
+                <h2 className="hb-tip-name" style={{ color: tint }}>
+                  {post.name}
+                </h2>
+                <small>{look.name} buyer lead · X post</small>
+              </div>
+            </div>
+            <div className="hb-bigscore">
+              <b>{post.score}</b>
+              <span>BUYER INTENT</span>
+            </div>
+            <hr />
+            <blockquote className="hb-quote">“{post.text}”</blockquote>
+            <p className="hb-by">{post.handle} · sample post</p>
+            <div className="hb-facts">
+              <p className="hb-good">
+                <Icon name="star" size={20} />
+                {claimPays(post)
+                  ? `Claiming pays ${CLAIM_XP} XP. Claiming is not contacting.`
+                  : `Scores under ${CLAIM_MIN_SCORE} pay no claim XP.`}
+              </p>
+              <p className="hb-src">
+                <Icon name="scroll" size={20} />
+                Source post attached. Dismissing pays no XP either way.
+              </p>
+            </div>
+            {!done ? (
+              <div className="hb-acts">
+                <button type="button" className="hb-btn hb-btn--small" onClick={onClaim}>
+                  {claimPays(post) ? `Claim +${CLAIM_XP} XP` : 'Claim · 0 XP'}
+                </button>
+                <button type="button" className="hb-btn hb-btn--label hb-btn--small" onClick={onDismiss}>
+                  Dismiss
+                </button>
+              </div>
+            ) : (
+              <p className="hb-done">
+                {done === 'claimed'
+                  ? 'Banked. The beacon burns teal in the valley.'
+                  : 'Dismissed. The beacon has gone dark.'}
+              </p>
+            )}
+            {ready ? (
+              <p className="hb-quest-done">
+                <span className="hb-mono">Quest done: {FIRST_LEAD.title}</span>
+                <button type="button" className="hb-btn hb-btn--small" onClick={onCollect}>
+                  Collect +{FIRST_LEAD.rewardXp} XP
+                </button>
+              </p>
+            ) : null}
+          </div>
+        </section>
+
+        <p className="hb-note" role="status">
+          <span className="hb-slip">SAMPLE</span> {SAMPLE_LABEL}
+          <br />
+          {levelNote || state.log}
+        </p>
       </div>
     </>
   )

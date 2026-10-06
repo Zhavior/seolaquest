@@ -1,9 +1,10 @@
-import Link from 'next/link'
 import type { ReactNode } from 'react'
 import '../handbook.css'
 import '../dusk.css'
+import '../artifact.css'
 import { handbookFontVariables } from '../fonts'
-import { HandbookMark } from '../components/HandbookMark'
+import { Brand } from '../components/Brand'
+import { IconSprite } from '../artifact/IconSprite'
 
 /**
  * Re-skins the tutorial quest without touching its logic. The form is written
@@ -15,11 +16,9 @@ import { HandbookMark } from '../components/HandbookMark'
 export function OnboardingSkin({ children }: { children: ReactNode }) {
   return (
     <div className={`hb hb-skin ${handbookFontVariables}`}>
+      <IconSprite />
       <header className="hb-top hb-frame">
-        <Link href="/" className="hb-mark" aria-label="SEOlaQuest home">
-          <HandbookMark />
-          <span className="hb-mark-word">SEOlaQuest</span>
-        </Link>
+        <Brand />
         <p className="hb-mono" style={{ color: '#D9D0EC' }}>
           Tutorial quest
         </p>

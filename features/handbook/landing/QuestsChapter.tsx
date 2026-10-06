@@ -1,3 +1,4 @@
+import { Icon } from '../artifact/IconSprite'
 import { Board, Leaf, Spread } from '../components/primitives'
 import { questViews } from '../quests'
 import { CLAIM_MIN_SCORE, CLAIM_XP, DAILY_XP_CAP, FEEDBACK_XP, levelTable } from '../rules'
@@ -53,51 +54,36 @@ export function QuestsChapter() {
             </div>
 
             <div className="hb-stack" style={{ '--gap': '1rem' } as React.CSSProperties}>
-              <h3 className="hb-h3">The quest ledger</h3>
-              <table className="hb-ledger hb-ledger--quests">
-                <caption>Claims counted per UTC cycle. Progress counts every claim, whether or not it paid XP.</caption>
-                <thead>
-                  <tr>
-                    <th scope="col">Quest</th>
-                    <th scope="col">Cycle</th>
-                    <th scope="col">Claims</th>
-                    <th scope="col">Reward</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {LIVE.map((quest) => (
-                    <tr key={quest.code}>
-                      <th scope="row">
-                        {quest.title}
-                        <span className="hb-soft hb-quest-desc">{quest.description}</span>
-                      </th>
-                      <td data-label="Cycle" className="hb-mono">{quest.cadence}</td>
-                      <td data-label="Claims" className="hb-mono">{quest.target}</td>
-                      <td data-label="Reward">
-                        <span className="hb-mono">+{quest.rewardXp} XP</span>
-                        <span className="hb-meter" aria-hidden="true">
-                          <span style={{ width: `${Math.round((quest.rewardXp / TOP_REWARD) * 100)}%` }} />
-                        </span>
-                      </td>
-                    </tr>
-                  ))}
-                  {SUSPENDED.map((quest) => (
-                    <tr key={quest.code} data-facedown="">
-                      <th scope="row">
-                        {quest.title}
-                        <span className="hb-soft hb-quest-desc">Face down. Suspended until conversions can be verified.</span>
-                      </th>
-                      <td data-label="Cycle" className="hb-mono">{quest.cadence}</td>
-                      <td data-label="Claims" className="hb-mono">{quest.target}</td>
-                      <td data-label="Reward" className="hb-mono">Pays nothing today</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+              <h3 className="hb-h3">The quest board</h3>
+              <ul className="hb-qboard">
+                {LIVE.map((quest) => (
+                  <li key={quest.code} className="hb-q">
+                    <Icon name="mk-avail" size={44} label="Quest available" />
+                    <div>
+                      <b>{quest.title}</b>
+                      <small>
+                        {quest.description} {quest.cadence} · {quest.target} {quest.target === 1 ? 'claim' : 'claims'} · +
+                        {quest.rewardXp} XP
+                      </small>
+                    </div>
+                  </li>
+                ))}
+                {SUSPENDED.map((quest) => (
+                  <li key={quest.code} className="hb-q hb-q--lock">
+                    <Icon name="mk-lock" size={44} label="Quest locked" />
+                    <div>
+                      <b>{quest.title}</b>
+                      <small>Locked. Suspended until conversions can be verified. Pays nothing today.</small>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+              <p className="hb-mono hb-soft">Claims counted per UTC cycle. Progress counts every claim, whether or not it paid XP.</p>
             </div>
 
             <div className="hb-stack" style={{ '--gap': '1rem' } as React.CSSProperties}>
-              <h3 className="hb-h3">The level curve</h3>
+              <details className="hb-details">
+                <summary className="hb-h3">The level curve</summary>
               <table className="hb-ledger hb-ledger--levels">
                 <caption>Cumulative XP for level L is 100 × (L − 1)<sup>1.5</sup>, rounded. Levels have numbers, not names.</caption>
                 <thead>
@@ -125,6 +111,7 @@ export function QuestsChapter() {
                   ))}
                 </tbody>
               </table>
+              </details>
             </div>
 
             <p className="hb-prose">

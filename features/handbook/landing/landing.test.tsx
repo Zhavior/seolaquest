@@ -2,7 +2,6 @@ import { render, screen, within } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 import type { InventoryFacts } from '../facts'
 import { Hero } from './Hero'
-import { LeadCard } from './LeadCard'
 import { PlanLedger } from './PlanLedger'
 import { CheckoutNote } from './InventoryChapter'
 import { ErrataList, FaqList } from './ErrataChapter'
@@ -33,19 +32,6 @@ describe('Hero', () => {
     expect(screen.getByText(/Real scans need a paid plan/)).toBeInTheDocument()
     expect(screen.getByText(/Invented for this page/)).toBeInTheDocument()
     expect(screen.queryByText(/free scans|50 free/i)).not.toBeInTheDocument()
-  })
-})
-
-describe('LeadCard', () => {
-  it('is display-only: no interactive controls', () => {
-    render(<LeadCard full markers />)
-    expect(screen.queryAllByRole('button')).toHaveLength(0)
-    expect(screen.queryAllByRole('link')).toHaveLength(0)
-  })
-
-  it('states the real XP rule on the card', () => {
-    render(<LeadCard />)
-    expect(screen.getByText(/Pays 25 XP at a score of 60\+/)).toBeInTheDocument()
   })
 })
 

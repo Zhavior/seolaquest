@@ -3,8 +3,7 @@ import { loadFounderSeats, loadInventory, loadNotes } from '@/features/handbook/
 import { Hero } from '@/features/handbook/landing/Hero'
 import { HomeStage } from '@/features/handbook/landing/HomeStage'
 import { HERO_SCORES } from '@/features/handbook/landing/heroPosts'
-import { HuntChapter } from '@/features/handbook/landing/HuntChapter'
-import { TryChapter } from '@/features/handbook/landing/TryChapter'
+import { RouteStage } from '@/features/handbook/landing/RouteStage'
 import { QuestsChapter } from '@/features/handbook/landing/QuestsChapter'
 import { InventoryChapter } from '@/features/handbook/landing/InventoryChapter'
 import { NotesChapter } from '@/features/handbook/landing/NotesChapter'
@@ -40,8 +39,7 @@ export default async function HomePage() {
       <HomeStructuredData inventory={inventory} />
       <HomeStage scores={HERO_SCORES}>
         <Hero />
-        <HuntChapter />
-        <TryChapter />
+        <RouteStage />
         <QuestsChapter />
         <InventoryChapter inventory={inventory} seats={seats} />
         <NotesChapter notes={notes} />

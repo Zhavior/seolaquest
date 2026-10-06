@@ -145,6 +145,7 @@ export function ValleyStage({
 
   return (
     <>
+      <div className="hb-intro" aria-hidden="true" />
       <div ref={hostRef} className="hb-valley" data-live={live ? '' : undefined} aria-hidden="true">
         <canvas ref={canvasRef} className="hb-valley-canvas" />
       </div>

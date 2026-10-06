@@ -1,35 +1,24 @@
-import Link from 'next/link'
 import type { ReactNode } from 'react'
 import '../handbook.css'
 import '../dusk.css'
+import '../artifact.css'
+import { IconSprite } from '../artifact/IconSprite'
 import { handbookFontVariables } from '../fonts'
 import { HandbookFooter } from './HandbookFooter'
-import { HandbookMark } from './HandbookMark'
-import { TabRail } from './TabRail'
+import { SiteHeader } from './SiteHeader'
 
 /**
- * The desk the handbook lies on: a dark frame (top strip and fore-edge rail)
- * around whichever colour board is open. The frame never changes; only the
- * board and the current tab do. Renders the page's single `main` landmark.
+ * The frame every public page shares: the painted dusk sky, the fixed top bar,
+ * the page, and the footer. The home page lays a live 3D valley over the
+ * painted sky; every other page keeps the painted sky. Renders the page's
+ * single `main` landmark.
  */
 export function HandbookFrame({ children }: { children: ReactNode }) {
   return (
     <div className={`hb ${handbookFontVariables}`}>
-      <header className="hb-top hb-frame">
-        <Link href="/" className="hb-mark" aria-label="SEOlaQuest home">
-          <HandbookMark />
-          <span className="hb-mark-word">SEOlaQuest</span>
-        </Link>
-        <nav className="hb-top-actions" aria-label="Account">
-          <Link href="/sign-in" className="hb-top-link">
-            Sign in
-          </Link>
-          <Link href="/sign-up" className="hb-top-cta">
-            Start free
-          </Link>
-        </nav>
-      </header>
-      <TabRail />
+      <IconSprite />
+      <div className="hb-sky" aria-hidden="true" />
+      <SiteHeader />
       <div className="hb-book">
         <main>{children}</main>
         <HandbookFooter />
