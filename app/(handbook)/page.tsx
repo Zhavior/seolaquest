@@ -1,6 +1,8 @@
 import type { Metadata } from 'next'
 import { loadFounderSeats, loadInventory, loadNotes } from '@/features/handbook/facts'
 import { Hero } from '@/features/handbook/landing/Hero'
+import { HomeStage } from '@/features/handbook/landing/HomeStage'
+import { HERO_SCORES } from '@/features/handbook/landing/heroPosts'
 import { HuntChapter } from '@/features/handbook/landing/HuntChapter'
 import { TryChapter } from '@/features/handbook/landing/TryChapter'
 import { QuestsChapter } from '@/features/handbook/landing/QuestsChapter'
@@ -36,14 +38,16 @@ export default async function HomePage() {
   return (
     <>
       <HomeStructuredData inventory={inventory} />
-      <Hero />
-      <HuntChapter />
-      <TryChapter />
-      <QuestsChapter />
-      <InventoryChapter inventory={inventory} seats={seats} />
-      <NotesChapter notes={notes} />
-      <ErrataChapter checkoutOpen={inventory.checkoutOpen} />
-      <RegisterChapter />
+      <HomeStage scores={HERO_SCORES}>
+        <Hero />
+        <HuntChapter />
+        <TryChapter />
+        <QuestsChapter />
+        <InventoryChapter inventory={inventory} seats={seats} />
+        <NotesChapter notes={notes} />
+        <ErrataChapter checkoutOpen={inventory.checkoutOpen} />
+        <RegisterChapter />
+      </HomeStage>
     </>
   )
 }

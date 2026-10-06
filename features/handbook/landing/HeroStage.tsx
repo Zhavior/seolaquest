@@ -1,9 +1,9 @@
 'use client'
 
-import { useMemo, useState, type ReactNode } from 'react'
+import { useEffect, useMemo, useState, type ReactNode } from 'react'
 import { Gem, TIER_NAME } from '../components/Gem'
 import { CLAIM_MIN_SCORE, CLAIM_XP, levelTable, tierForScore } from '../rules'
-import { SAMPLE_LABEL, SAMPLE_SETS } from '../sample/data'
+import { SAMPLE_LABEL } from '../sample/data'
 import {
   SAMPLE_QUESTS,
   claim,
@@ -15,12 +15,11 @@ import {
   standing,
   type SampleState,
 } from '../sample/engine'
-import { ValleyStage } from '../valley/ValleyStage'
 import type { BeaconView } from '../valley/scene'
+import { HERO_POSTS } from './heroPosts'
+import { useHomeStage } from './HomeStage'
 
-// One beacon per invented post, picked so the four tiers of the rules show up.
-const POSTS = [0, 2, 3, 4].map((i) => SAMPLE_SETS[0].posts[i])
-const SCORES = POSTS.map((post) => post.score)
+const POSTS = HERO_POSTS
 const LEVELS = levelTable(10).map((row) => row.cumulativeXp)
 const FIRST_LEAD = SAMPLE_QUESTS[0]
 
@@ -36,7 +35,7 @@ export function HeroStage({ children }: { children: ReactNode }) {
     ...initialState(),
     log: 'Pick a lead. Read the post, then claim it or dismiss it.',
   }))
-  const [burst, setBurst] = useState<{ index: number; n: number } | null>(null)
+  const stage = useHomeStage()
   const [levelNote, setLevelNote] = useState('')
 
   const post = POSTS[sel]
@@ -54,6 +53,10 @@ export function HeroStage({ children }: { children: ReactNode }) {
     [state.claimed, state.dismissed, sel],
   )
 
+  useEffect(() => {
+    stage.setBeacons(beacons)
+  }, [stage, beacons])
+
   function noteLevelUp(from: SampleState, to: SampleState) {
     const after = standing(to.xp, LEVELS).level
     if (after > standing(from.xp, LEVELS).level) {
@@ -67,7 +70,7 @@ export function HeroStage({ children }: { children: ReactNode }) {
     setState(next)
     setLevelNote('')
     noteLevelUp(state, next)
-    setBurst((current) => ({ index: sel, n: (current?.n ?? 0) + 1 }))
+    stage.fire(sel)
   }
 
   function onDismiss() {
@@ -84,7 +87,6 @@ export function HeroStage({ children }: { children: ReactNode }) {
 
   return (
     <>
-      <ValleyStage scores={SCORES} beacons={beacons} burst={burst} />
       <div className="hb-hero hb-hero--valley">
         {children}
         <section className="hb-ply hb-herohunt" aria-label="Sample hunt">

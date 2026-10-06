@@ -757,35 +757,14 @@
 }
 
 /* ── Valley hero ───────────────────────────────────────────────────────
-   The first board is a live 3D valley (features/handbook/valley). The painted
-   gradient below is what shows before the canvas is ready, with WebGL off, and
-   in print. Copy and the sample card sit on opaque plies, so legibility never
-   depends on which time of day the sky is showing.
+   The home page runs on a fixed valley (see dusk.css). The hero is two plies
+   laid over it: the copy on the left, the sample hunt on the right. Running
+   text only ever sits on a panel, so it never depends on the sky.
    ─────────────────────────────────────────────────────────────────────── */
 
 .hb-board--valley {
-  isolation: isolate;
-  overflow: hidden;
-  background: linear-gradient(#1a1546, #6c3a6a 55%, #f58b4c);
-  padding-top: clamp(11rem, 34svh, 22rem);
+  padding-top: clamp(9rem, 30svh, 20rem);
   align-items: flex-end;
-}
-
-.hb-valley {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-}
-
-.hb-valley-canvas {
-  display: block;
-  width: 100%;
-  height: 100%;
-  opacity: 0;
-}
-
-.hb-valley[data-live] .hb-valley-canvas {
-  opacity: 1;
 }
 
 .hb-board--valley > .hb-hero {
@@ -805,72 +784,6 @@
   .hb-hero--valley {
     grid-template-columns: minmax(0, 34rem) minmax(0, 27rem);
     justify-content: space-between;
-  }
-  .hb-hero--valley .hb-hero-ply {
-    margin-right: 0;
-  }
-}
-
-.hb-valley-ctl {
-  position: absolute;
-  z-index: 2;
-  left: clamp(0.6rem, 3vw, 2.25rem);
-  bottom: clamp(0.5rem, 1.5vw, 1rem);
-  right: clamp(0.6rem, 3vw, 2.25rem);
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.35rem 0.8rem;
-  width: fit-content;
-  max-width: calc(100% - 2 * clamp(0.6rem, 3vw, 2.25rem));
-  padding: 0.35rem 0.6rem;
-  background: var(--milk);
-  color: var(--ink);
-  border: 1.5px solid var(--ink);
-  font-size: 0.72rem;
-}
-
-.hb-valley-chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.25rem;
-}
-
-.hb-valley-chip {
-  min-height: 2.75rem;
-  min-width: 2.75rem;
-  padding: 0 0.7rem;
-  border: 1.5px solid var(--ink);
-  background: transparent;
-  color: var(--ink);
-  font: inherit;
-  cursor: pointer;
-}
-
-.hb-valley-chip[aria-pressed='true'] {
-  background: var(--ink);
-  color: var(--milk);
-}
-
-.hb-valley-chip:focus-visible {
-  outline: 3px solid var(--vermilion);
-  outline-offset: 2px;
-}
-
-.hb-valley-note {
-  color: var(--ink-soft);
-}
-
-@media (min-width: 62rem) {
-  .hb-board--valley {
-    padding-bottom: 5.5rem;
-  }
-}
-
-@media print {
-  .hb-valley,
-  .hb-valley-ctl {
-    display: none;
   }
 }
 

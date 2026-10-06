@@ -210,26 +210,9 @@
   z-index: 0;
 }
 
-.hb-board--valley::after {
-  display: none;
-}
-
-.hb-board--valley {
-  padding-bottom: 5.5rem;
-}
-
 .hb-board > * {
   position: relative;
   z-index: 1;
-}
-
-.hb-board > .hb-valley {
-  position: absolute;
-  z-index: 0;
-}
-
-.hb-board > .hb-valley-ctl {
-  position: absolute;
 }
 
 /* ── leaf: the reading panel ───────────────────────────────────────── */
@@ -643,17 +626,95 @@
   background: rgb(93 214 176 / 0.1);
 }
 
-/* ── hero valley controls ──────────────────────────────────────────── */
+/* ── the home valley: a fixed scene behind every chapter ───────────── */
+
+.hb-valley {
+  position: fixed;
+  z-index: 0;
+  top: var(--top-h);
+  bottom: 0;
+  left: 0;
+  right: var(--rail-w);
+  pointer-events: none;
+  background: linear-gradient(#1a1546, #6c3a6a 55%, #f58b4c);
+}
+
+.hb-home {
+  position: relative;
+  z-index: 1;
+}
+
+/* On the home page the boards are windows onto the valley: no field, no ridge. */
+.hb-home .hb-board {
+  background: none;
+}
+
+.hb-home .hb-board::after {
+  display: none;
+}
+
+.hb-home .hb-board:not(.hb-board--first) {
+  padding-block: clamp(2.5rem, 8vw, 6rem);
+}
+
+.hb-board--valley {
+  isolation: auto;
+  overflow: visible;
+  background: none;
+  padding-bottom: clamp(2.5rem, 6vw, 4rem);
+}
 
 .hb-valley-ctl {
-  background: rgb(11 8 24 / 0.86);
+  position: fixed;
+  z-index: 45;
+  left: clamp(0.6rem, 2vw, 1.25rem);
+  bottom: clamp(0.6rem, 2vw, 1.25rem);
+  display: grid;
+  gap: 0.4rem;
+  justify-items: start;
+}
+
+.hb-valley-panel {
+  display: grid;
+  gap: 0.35rem;
+  padding: 0.6rem 0.7rem;
+  max-width: min(26rem, calc(100vw - var(--rail-w) - 1.5rem));
+  background: rgb(11 8 24 / 0.9);
   border: 1px solid var(--gold-edge);
   color: var(--ink);
+  font-size: 0.72rem;
   backdrop-filter: blur(6px);
 }
 
+.hb-valley-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+}
+
+.hb-valley-note {
+  color: var(--ink-soft);
+}
+
+.hb-valley-toggle,
 .hb-valley-chip {
+  min-height: 2.75rem;
+  min-width: 2.75rem;
+  padding: 0 0.8rem;
+  background: rgb(11 8 24 / 0.88);
   border: 1px solid var(--gold-edge);
+  color: var(--gold-hi);
+  font: inherit;
+  font-size: 0.75rem;
+  cursor: pointer;
+  backdrop-filter: blur(6px);
+}
+
+.hb-valley-toggle[aria-expanded='true'] {
+  border-color: var(--gold);
+}
+
+.hb-valley-chip {
   color: var(--ink);
 }
 
@@ -663,12 +724,16 @@
   border-color: var(--gold-lo);
 }
 
+.hb-valley-toggle:focus-visible,
 .hb-valley-chip:focus-visible {
   outline-color: var(--gold-hi);
 }
 
-.hb-board--valley {
-  background: linear-gradient(#1a1546, #6c3a6a 55%, #f58b4c);
+@media print {
+  .hb-valley,
+  .hb-valley-ctl {
+    display: none;
+  }
 }
 
 /* ── auth: Clerk's own markup, painted to match ────────────────────── */

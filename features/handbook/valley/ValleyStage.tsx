@@ -49,6 +49,7 @@ export function ValleyStage({
   const [mode, setMode] = useState<SkyMode>('auto')
   const [calm, setCalm] = useState(false)
   const [live, setLive] = useState(false)
+  const [open, setOpen] = useState(false)
   const [label, setLabel] = useState('')
 
   useEffect(() => {
@@ -66,7 +67,6 @@ export function ValleyStage({
     const host = hostRef.current
     const canvas = canvasRef.current
     if (!host || !canvas || !canRenderWebGL()) return
-    const section = host.parentElement
     let cancelled = false
     let cleanup = () => {}
     const reducedQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
@@ -89,21 +89,15 @@ export function ValleyStage({
       if (beaconsRef.current) valley.setBeacons(beaconsRef.current)
       setLive(true)
 
+      // The camera travels the valley as the whole page scrolls.
       const onScroll = () => {
-        if (!section) return
-        const rect = section.getBoundingClientRect()
-        valley.setProgress(0.55 * Math.min(1, Math.max(0, -rect.top / Math.max(1, rect.height))))
+        const max = Math.max(1, document.documentElement.scrollHeight - window.innerHeight)
+        valley.setProgress(window.scrollY / max)
       }
       window.addEventListener('scroll', onScroll, { passive: true })
       onScroll()
 
-      let visible = true
-      const sync = () => valley.setPaused(!visible || document.hidden)
-      const io = new IntersectionObserver((entries) => {
-        visible = entries[0]?.isIntersecting ?? true
-        sync()
-      })
-      io.observe(host)
+      const sync = () => valley.setPaused(document.hidden)
       document.addEventListener('visibilitychange', sync)
       const onMotion = () => valley.setReducedMotion(reducedQuery.matches || storedCalm())
       reducedQuery.addEventListener('change', onMotion)
@@ -112,7 +106,6 @@ export function ValleyStage({
         window.removeEventListener('scroll', onScroll)
         document.removeEventListener('visibilitychange', sync)
         reducedQuery.removeEventListener('change', onMotion)
-        io.disconnect()
         valley.dispose()
         handle.current = null
       }
@@ -155,25 +148,38 @@ export function ValleyStage({
       <div ref={hostRef} className="hb-valley" data-live={live ? '' : undefined} aria-hidden="true">
         <canvas ref={canvasRef} className="hb-valley-canvas" />
       </div>
-      <div className="hb-valley-ctl hb-mono" role="group" aria-label="Valley sky">
-        <span className="hb-valley-label">{label}</span>
-        <span className="hb-valley-note">Beacon scores are samples.</span>
-        <span className="hb-valley-chips">
-          {SKY_MODES.map((m) => (
-            <button
-              key={m}
-              type="button"
-              className="hb-valley-chip"
-              aria-pressed={mode === m}
-              onClick={() => setMode(m)}
-            >
-              {m === 'auto' ? 'Auto' : PHASE_LABEL[m]}
-            </button>
-          ))}
-          <button type="button" className="hb-valley-chip" aria-pressed={calm} onClick={toggleCalm}>
-            Calm
-          </button>
-        </span>
+      <div className="hb-valley-ctl">
+        {open ? (
+          <div id="hb-valley-panel" className="hb-valley-panel hb-mono" role="group" aria-label="Valley sky">
+            <span className="hb-valley-label">{label}</span>
+            <span className="hb-valley-note">Beacon scores are samples.</span>
+            <span className="hb-valley-chips">
+              {SKY_MODES.map((m) => (
+                <button
+                  key={m}
+                  type="button"
+                  className="hb-valley-chip"
+                  aria-pressed={mode === m}
+                  onClick={() => setMode(m)}
+                >
+                  {m === 'auto' ? 'Auto' : PHASE_LABEL[m]}
+                </button>
+              ))}
+              <button type="button" className="hb-valley-chip" aria-pressed={calm} onClick={toggleCalm}>
+                Calm
+              </button>
+            </span>
+          </div>
+        ) : null}
+        <button
+          type="button"
+          className="hb-valley-toggle hb-mono"
+          aria-expanded={open}
+          aria-controls="hb-valley-panel"
+          onClick={() => setOpen((current) => !current)}
+        >
+          Sky: {mode === 'auto' ? PHASE_LABEL[skyInfo('auto').phase] : PHASE_LABEL[mode]}
+        </button>
       </div>
     </>
   )
