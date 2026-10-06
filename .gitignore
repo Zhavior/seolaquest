@@ -73,3 +73,7 @@ next-env.d.ts
 # Local agent context. Points at ~/Desktop/business-brain, which holds personal
 # material — this must never be committed.
 CLAUDE.local.md
+
+# Licensed 3D models (Fab Standard License): never commit, the repo is public
+assets-src/
+public/models/

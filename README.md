@@ -51,7 +51,7 @@ A full-stack SaaS application, built solo. Not a tutorial project or a CRUD demo
 | Billing | Stripe Checkout, signed webhooks, credit ledger |
 | AI | Google Gemini for the in-app assistant and blog content generation |
 | Infra | Vercel, Upstash Redis for rate limiting, cron-driven job runner |
-| Graphics | PixiJS and react-three-fiber for the world map and battle canvas |
+| Graphics | three.js for the valley scene on the home page, sample radar and dashboard |
 | Testing | Vitest, Testing Library, axe-core accessibility gate |
 
 ### Engineering decisions worth a look
