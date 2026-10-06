@@ -4,7 +4,7 @@ import { ArrowRight } from 'lucide-react'
 import { HandbookPage } from '@/features/handbook/components/primitives'
 import { levelTable } from '@/features/handbook/rules'
 import { SAMPLE_SETS } from '@/features/handbook/sample/data'
-import { SampleHunt } from '@/features/handbook/sample/SampleHunt'
+import { SampleDashboard } from '@/features/handbook/sample/SampleDashboard'
 import { JsonLdScript, breadcrumbSchema } from '@/features/handbook/seo/jsonLd'
 
 const TITLE = 'Try the Sample Hunt | SEOlaQuest'
@@ -34,8 +34,8 @@ export default function SampleHuntPage() {
       />
       <HandbookPage volume="try" title="Try it" note="No account. No X connection. Nothing is sent anywhere.">
         <div className="hb-stack" style={{ '--gap': '2rem' } as React.CSSProperties}>
-          <p className="hb-lede">Run the loop on invented posts. Watch the real XP rules pay, and refuse to pay.</p>
-          <SampleHunt sets={SAMPLE_SETS} levelCumulative={LEVELS} variant="full" />
+          <p className="hb-lede">This is the dashboard you get after sign-up, running on invented posts. Scan a watch list, claim or dismiss leads, and watch the real XP rules pay, and refuse to pay.</p>
+          <SampleDashboard sets={SAMPLE_SETS} levelCumulative={LEVELS} />
           <div className="hb-row">
             <Link href="/sign-up" className="hb-btn">
               Start free <ArrowRight size={18} aria-hidden="true" />

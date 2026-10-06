@@ -51,6 +51,8 @@ type Props = {
   /** Which leads the list below the hero shows. The chips here set it. */
   filter: LeadIntentFilter
   onFilter: (filter: LeadIntentFilter) => void
+  /** Small line above the heading. The public sample hunt says it is a sample here. */
+  eyebrow?: string
 }
 
 const CHIPS: Array<{ value: LeadIntentFilter; label: string; hint: string }> = [
@@ -66,7 +68,7 @@ const CHIPS: Array<{ value: LeadIntentFilter; label: string; hint: string }> = [
  * no lead stay dark. Decorative: the canvas is hidden from assistive tech, and
  * without WebGL the painted dusk gradient stays.
  */
-export function DashboardValleyHero({ name, level, title, leads, filter, onFilter }: Props) {
+export function DashboardValleyHero({ name, level, title, leads, filter, onFilter, eyebrow = 'Your growth journal' }: Props) {
   const hostRef = useRef<HTMLDivElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const handle = useRef<ValleyHandle | null>(null)
@@ -182,7 +184,7 @@ export function DashboardValleyHero({ name, level, title, leads, filter, onFilte
 
       <div className="flex min-h-[max(420px,55vh)] flex-col justify-between gap-6 p-5 sm:p-7">
         <div className="min-w-0 max-w-2xl [text-shadow:0_1px_12px_rgb(8_6_20/0.8)]">
-          <p className="mb-2 text-xs font-medium tracking-wide text-[#f3d58a]">Your growth journal</p>
+          <p className="mb-2 text-xs font-medium tracking-wide text-[#f3d58a]">{eyebrow}</p>
           <h1 className="font-display text-3xl leading-tight tracking-tight sm:text-4xl">
             {name} · Lv {level} · {title}
           </h1>
