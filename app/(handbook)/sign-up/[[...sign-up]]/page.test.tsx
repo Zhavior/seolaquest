@@ -18,7 +18,9 @@ describe('sign-up page', () => {
   it('uses SEOlaQuest branding and sends new accounts to onboarding', () => {
     render(<Page />)
 
-    expect(screen.getByRole('heading', { name: /start one focused customer hunt/i })).toBeVisible()
+    expect(screen.getByRole('heading', { name: /start your first hunt/i })).toBeVisible()
+    expect(screen.getByRole('link', { name: /try the sample hunt/i })).toHaveAttribute('href', '/#hunt')
+    expect(screen.getByRole('list', { name: /six short steps/i }).children).toHaveLength(6)
     expect(mocks.signUp).toHaveBeenCalledWith(expect.objectContaining({
       fallbackRedirectUrl: '/onboarding',
       signInUrl: '/sign-in',

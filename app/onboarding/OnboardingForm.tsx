@@ -467,7 +467,7 @@ export default function OnboardingForm({ initialDraft }: Props) {
             className="mt-2 border border-outline bg-[#FCA5A5] p-2 text-xs font-semibold shrink-0 text-on-accent shadow-brutal-sm rounded-xl"
             role="alert"
           >
-            ⚠️ {error}
+            {error}
           </p>
         ) : null}
 
@@ -949,34 +949,6 @@ function HuntingRealmStation({
   setPreferredSource: (src: PreferredSource) => void
   firstKeyword?: string
 }) {
-  const [logs, setLogs] = useState<string[]>([])
-  const [progress, setProgress] = useState(0)
-
-  useEffect(() => {
-    sfx.playRadarBlip()
-    const logSequence = [
-      `> Connecting to Hunting Grounds (${preferredSource} Live Feed)...`,
-      `> Arming weapon matrix for keyword "${firstKeyword || 'target'}...`,
-      `> Scanning Rival Guilds & signal noise...`,
-      `> Calibrating AI bounty matcher...`,
-      `> WORKSPACE ASSETS SUMMONED & READY.`,
-    ]
-
-    let currentLog = 0
-    const interval = setInterval(() => {
-      if (currentLog < logSequence.length) {
-        setLogs((prev) => [...prev, logSequence[currentLog]])
-        setProgress(Math.round(((currentLog + 1) / logSequence.length) * 100))
-        currentLog++
-        sfx.playRadarBlip()
-      } else {
-        clearInterval(interval)
-      }
-    }, 450)
-
-    return () => clearInterval(interval)
-  }, [preferredSource, firstKeyword])
-
   return (
     <div className="space-y-3">
       <fieldset>
@@ -1002,19 +974,16 @@ function HuntingRealmStation({
         </div>
       </fieldset>
 
-      {/* Ritual of Summoning Terminal (Labor Illusion) */}
-      <div className="border border-outline bg-forest p-3 font-mono text-xs text-ink-muted shadow-brutal rounded-xl">
-        <div className="flex items-center justify-between border-b border-hairline pb-1.5 mb-2 text-[10px] normal-case text-ink-muted font-bold">
-          <span>⚡ Ritual of Summoning Terminal</span>
-          <span className="text-yellow-400">{progress}% READY</span>
-        </div>
-        <div className="space-y-1 min-h-[95px]">
-          {logs.map((log, i) => (
-            <p key={i} className="flex items-center gap-1.5 font-bold">
-              <span className="text-yellow-400">✦</span> {log}
-            </p>
-          ))}
-        </div>
+      <div className="border border-outline bg-canvas p-3 text-xs shadow-brutal-sm rounded-xl">
+        <p className="font-semibold normal-case text-ink">What happens next</p>
+        <ul className="mt-1.5 list-disc space-y-1 pl-4 font-bold text-ink-muted">
+          <li>
+            Your keyword{firstKeyword ? ` “${firstKeyword}”` : ''} is saved to your account.
+          </li>
+          <li>When you run a scan, SEOlaQuest searches {preferredSource === 'X' ? 'X' : 'your chosen source'} for it. A scan costs 1 credit.</li>
+          <li>Scans need a paid plan. Free Scout can save keywords but cannot scan.</li>
+          <li>Nothing is posted or sent for you.</li>
+        </ul>
       </div>
     </div>
   )
@@ -1102,6 +1071,10 @@ function QuestLog({
         <p className="font-semibold normal-case text-ink-muted">{progress}% cleared</p>
       </div>
 
+      <p className="mt-1 flex items-center gap-1 text-xs font-semibold normal-case text-ink-muted">
+        <Check aria-hidden size={14} /> Account created. You are already past the first step.
+      </p>
+
       <div className="mt-1.5 h-3 w-full border border-outline bg-card rounded-xl">
         <div
           className="h-full bg-highlight transition-[width] duration-500"
@@ -1160,16 +1133,12 @@ function QuestCompleteOverlay({ questsAssigned }: { questsAssigned: number }) {
     >
       <div className="w-full max-w-md border border-outline bg-highlight p-6 text-center shadow-brutal-lg text-on-accent relative overflow-hidden rounded-xl">
         <Trophy className="mx-auto h-16 w-16 stroke-[2.5] text-on-accent animate-bounce mb-2" />
-        <span className="inline-block border border-outline bg-forest text-white px-2 py-0.5 text-[10px] font-mono font-semibold normal-case mb-2 rounded-xl">
-          [RANK_1_UNLOCKED]
-        </span>
-        <p className="text-3xl font-semibold normal-case tracking-wider">VICTORY!</p>
         <p className="mt-1 text-xl font-semibold normal-case leading-tight">Quest Complete — Charter Sealed</p>
         <div className="my-3 inline-block border border-outline bg-accent px-4 py-2 font-semibold text-3xl shadow-brutal  rounded-xl">
           {questsAssigned} {questsAssigned === 1 ? 'QUEST IS' : 'QUESTS ARE'} ON YOUR BOARD
         </div>
         <p className="mt-2 font-semibold text-xs normal-case bg-forest text-white p-2 border border-outline rounded-xl">
-          ⚡ Summoning Workspace & Seeding Tutorial Signals…
+          Opening your workspace…
         </p>
       </div>
     </div>

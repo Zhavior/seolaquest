@@ -15,7 +15,7 @@ export default function Page() {
       <AuthShell
         titleId="sign-in-heading"
         title="Resume your customer hunt"
-        lede="Sign in to open your saved workspace or continue onboarding."
+        lede="Sign in to open your saved workspace or pick setup back up where you stopped."
         aside={
           <p className="hb-mono hb-soft">
             New here?{' '}
