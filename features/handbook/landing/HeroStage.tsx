@@ -15,6 +15,7 @@ import {
   standing,
   type SampleState,
 } from '../sample/engine'
+import { valleyAudio } from '../valley/audio'
 import type { BeaconView } from '../valley/scene'
 import { HERO_POSTS } from './heroPosts'
 import { useHomeStage } from './HomeStage'
@@ -69,12 +70,15 @@ export function HeroStage({ children }: { children: ReactNode }) {
     const after = standing(to.xp, LEVELS).level
     if (after > standing(from.xp, LEVELS).level) {
       setLevelNote(`Level ${after} reached. The curve puts it at ${LEVELS[after - 1]} XP.`)
+      // After the claim bell has struck, so the two do not blur together.
+      window.setTimeout(() => valleyAudio.levelUp(), 220)
     }
   }
 
   function onClaim() {
     if (done) return
     const next = claim(state, post)
+    valleyAudio.claim()
     setState(next)
     setLevelNote('')
     noteLevelUp(state, next)
@@ -83,11 +87,13 @@ export function HeroStage({ children }: { children: ReactNode }) {
 
   function onDismiss() {
     if (done) return
+    valleyAudio.dismiss()
     setState((current) => dismiss(current, post))
   }
 
   function onCollect() {
     const next = claimReward(state, FIRST_LEAD)
+    valleyAudio.claim()
     setState(next)
     setLevelNote('')
     noteLevelUp(state, next)
@@ -137,6 +143,7 @@ export function HeroStage({ children }: { children: ReactNode }) {
                     aria-pressed={i === sel}
                     style={i === sel ? { borderColor: color } : undefined}
                     onClick={() => setSel(i)}
+                    onMouseEnter={() => valleyAudio.hover()}
                   >
                     <span style={{ opacity: isDone ? 0.4 : 1, display: 'inline-flex' }}>
                       <Icon name={t.icon} size={38} />

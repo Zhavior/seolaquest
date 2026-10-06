@@ -629,6 +629,16 @@
   justify-items: start;
 }
 
+.hb-valley-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.hb-valley-toggle[aria-pressed='true'] {
+  border-color: var(--gold);
+}
+
 .hb-valley-panel {
   display: grid;
   gap: 0.35rem;

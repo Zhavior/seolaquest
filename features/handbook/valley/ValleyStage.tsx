@@ -1,6 +1,7 @@
 'use client'
 
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react'
+import { valleyAudio } from './audio'
 import { PHASE_LABEL, SKY_MODES, skyInfo, type SkyMode } from './phase'
 import type { BeaconView, ValleyHandle } from './scene'
 
@@ -51,6 +52,7 @@ export function ValleyStage({
   const [live, setLive] = useState(false)
   const [open, setOpen] = useState(false)
   const [label, setLabel] = useState('')
+  const sound = useSyncExternalStore(valleyAudio.subscribe, valleyAudio.getSnapshot, () => false)
 
   useEffect(() => {
     setCalm(storedCalm())
@@ -172,15 +174,25 @@ export function ValleyStage({
             </span>
           </div>
         ) : null}
-        <button
-          type="button"
-          className="hb-valley-toggle hb-mono"
-          aria-expanded={open}
-          aria-controls="hb-valley-panel"
-          onClick={() => setOpen((current) => !current)}
-        >
-          Sky: {mode === 'auto' ? PHASE_LABEL[skyInfo('auto').phase] : PHASE_LABEL[mode]}
-        </button>
+        <span className="hb-valley-row">
+          <button
+            type="button"
+            className="hb-valley-toggle hb-mono"
+            aria-expanded={open}
+            aria-controls="hb-valley-panel"
+            onClick={() => setOpen((current) => !current)}
+          >
+            Sky: {mode === 'auto' ? PHASE_LABEL[skyInfo('auto').phase] : PHASE_LABEL[mode]}
+          </button>
+          <button
+            type="button"
+            className="hb-valley-toggle hb-mono"
+            aria-pressed={sound}
+            onClick={() => valleyAudio.toggle()}
+          >
+            Sound: {sound ? 'On' : 'Off'}
+          </button>
+        </span>
       </div>
     </>
   )

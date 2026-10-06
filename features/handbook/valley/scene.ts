@@ -212,6 +212,8 @@ const GRADE_SHADER = {
 
 /* ── scene ───────────────────────────────────────────────────────────── */
 
+const TILT = (1.5 * Math.PI) / 180
+
 export function createValley(opts: ValleyOptions): ValleyHandle {
   const { canvas, host } = opts
   let mode = opts.mode
@@ -322,6 +324,25 @@ export function createValley(opts: ValleyOptions): ValleyHandle {
   /* trees */
   const treeCount = tier === 'high' ? 3000 : 900
   const coneMat = track(new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.95, flatShading: true }))
+  // Breeze: a low-frequency sway keyed to world X/Z, so neighbouring trees move
+  // together and a gust reads as travelling across the valley. Only the upper
+  // vertices move; the base of each tree stays planted. Shadows stay still.
+  const wind = { uWindT: { value: 0 }, uWindA: { value: reduce ? 0 : 1 } }
+  coneMat.onBeforeCompile = (shader) => {
+    Object.assign(shader.uniforms, wind)
+    shader.vertexShader = 'uniform float uWindT;\nuniform float uWindA;\n' + shader.vertexShader.replace(
+      'mvPosition = modelViewMatrix * mvPosition;',
+      [
+        'float hW = clamp((position.y - 3.0) / 8.5, 0.0, 1.0);',
+        'hW *= hW;',
+        'float gust = 0.6 + 0.4 * sin(uWindT * 0.23 + mvPosition.x * 0.004);',
+        'float swayW = sin(uWindT * 1.15 + mvPosition.x * 0.045 + mvPosition.z * 0.018);',
+        'mvPosition.x += swayW * 0.55 * hW * gust * uWindA;',
+        'mvPosition.z += cos(uWindT * 0.9 + mvPosition.z * 0.04) * 0.22 * hW * gust * uWindA;',
+        'mvPosition = modelViewMatrix * mvPosition;',
+      ].join('\n'),
+    )
+  }
   const cones = [
     track(new THREE.ConeGeometry(2.6, 5.5, 7).translate(0, 4.2, 0)),
     track(new THREE.ConeGeometry(2.0, 4.6, 7).translate(0, 7.0, 0)),
@@ -583,6 +604,34 @@ export function createValley(opts: ValleyOptions): ValleyHandle {
     scene.add(m)
   })
 
+  /* drifting fog banks: soft billboards crossing the trench between the beacons */
+  const BANKS = [
+    { z: -62, lift: 7, w: 230, h: 34, speed: 2.6, phase: 0, alpha: 0.2 },
+    { z: -118, lift: 12, w: 280, h: 44, speed: -1.7, phase: 90, alpha: 0.16 },
+    { z: -176, lift: 9, w: 320, h: 50, speed: 1.2, phase: 170, alpha: 0.14 },
+  ]
+  const BANK_SPAN = 260
+  const fogTex = radialTex([[0, 'rgba(255,255,255,.85)'], [0.45, 'rgba(255,255,255,.32)'], [1, 'rgba(255,255,255,0)']])
+  const banks = BANKS.map((cfg) => {
+    const sprite = new THREE.Sprite(track(new THREE.SpriteMaterial({ map: fogTex, transparent: true, depthWrite: false, opacity: 0 })))
+    sprite.scale.set(cfg.w, cfg.h, 1)
+    sprite.renderOrder = 6
+    const cx = pathX(cfg.z)
+    scene.add(sprite)
+    return { sprite, cfg, cx, y: heightAt(cx, cfg.z) + cfg.lift }
+  })
+  const bankColor = new THREE.Color()
+  let bankAlpha = 1
+  function stepBanks(t: number) {
+    banks.forEach(({ sprite, cfg, cx, y }) => {
+      // Travel across a fixed span and wrap; fade out near the ends so the wrap never pops.
+      const u = (((t * cfg.speed + cfg.phase) % BANK_SPAN) + BANK_SPAN) % BANK_SPAN / BANK_SPAN
+      sprite.position.set(cx + (u - 0.5) * BANK_SPAN, y + Math.sin(t * 0.13 + cfg.phase) * 1.5, cfg.z)
+      sprite.material.opacity = cfg.alpha * bankAlpha * Math.sin(Math.PI * u)
+      sprite.material.color.copy(bankColor)
+    })
+  }
+
   /* post-processing (high tier only) */
   let composer: EffectComposer | null = null
   let bloom: UnrealBloomPass | null = null
@@ -643,7 +692,10 @@ export function createValley(opts: ValleyOptions): ValleyHandle {
     wu.uHor.value.copy(c.hor); wu.uTop.value.copy(c.top); wu.uSunDir.value.copy(sunDirC); wu.uSunCol.value.copy(c.sun)
     wu.uSunI.value = Math.max(n.sunI, n.moonO * 0.4); wu.uFog.value.copy(c.fog); wu.uFogD.value = n.fogD
     mistMat.uniforms.uC.value.copy(c.fog).lerp(c.hor, 0.35)
-    mistMat.uniforms.uA.value = info.phase === 'day' ? 0.18 : 0.5
+    const mistTarget = info.phase === 'day' ? 0.18 : 0.5
+    mistMat.uniforms.uA.value += (mistTarget - mistMat.uniforms.uA.value) * k
+    bankColor.copy(c.fog).lerp(c.hor, 0.5)
+    bankAlpha += ((info.phase === 'day' ? 0.75 : 1) - bankAlpha) * k
     emberMat.opacity = info.phase === 'day' ? 0.35 : 0.85
     emberMat.color.set(info.phase === 'day' ? 0xfff2b0 : 0xffb347)
     if (bloom) bloom.strength = n.bloom
@@ -709,6 +761,9 @@ export function createValley(opts: ValleyOptions): ValleyHandle {
     skyMat.uniforms.uT.value = tt
     waterMat.uniforms.uT.value = tt
     mistMat.uniforms.uT.value = tt
+    wind.uWindT.value = tt
+    wind.uWindA.value = reduce ? 0 : 1
+    stepBanks(tt)
     mouseS.x += (mouse.x - mouseS.x) * 0.04
     mouseS.y += (mouse.y - mouseS.y) * 0.04
     progS += (prog - progS) * (reduce ? 1 : 0.06)
@@ -723,6 +778,9 @@ export function createValley(opts: ValleyOptions): ValleyHandle {
       tmpV.z + Math.sin(tt * 0.07) * 2 * sway,
     )
     camera.lookAt(lookV.x + px * 5, lookV.y, lookV.z)
+    // Pointer tilt: up to 1.5 degrees of yaw and pitch, damped by mouseS above.
+    camera.rotateY(-px * 2 * TILT)
+    camera.rotateX(-py * 2 * TILT)
     sky.position.copy(camera.position)
     const gh = heightAt(camera.position.x, camera.position.z) + 3
     if (camera.position.y < gh) camera.position.y = gh
@@ -732,11 +790,14 @@ export function createValley(opts: ValleyOptions): ValleyHandle {
     const now = performance.now() / 1000
     beacons.forEach((b) => {
       const fl = 0.85 + 0.15 * Math.sin(tt * 11 + b.seed) + 0.1 * Math.sin(tt * 23 + b.seed * 3)
+      // A slow, rhythmic swell under the flicker, like a lamp keeper trimming the wick.
+      const swell = reduce ? 1 : 0.82 + 0.18 * (0.5 + 0.5 * Math.sin(tt * 1.25 + b.seed * 2.1))
       b.fire.visible = b.lit
       b.halo.visible = b.lit
       b.fire.scale.set(8 * fl, 11 * fl * (1 + 0.1 * Math.sin(tt * 7 + b.seed)), 1)
-      b.halo.material.opacity = Math.min(1, 0.5 + lampK * 0.4)
-      b.light.intensity = (b.lit ? 1 : 0) * (1.4 + lampK * 1.8) * fl * Math.PI
+      b.halo.material.opacity = Math.min(1, 0.5 + lampK * 0.4) * swell
+      b.halo.scale.setScalar(52 * (0.9 + 0.1 * swell))
+      b.light.intensity = (b.lit ? 1 : 0) * (1.4 + lampK * 1.8) * fl * swell * Math.PI
       if (b.ring.visible) b.ring.scale.setScalar(0.16 + 0.015 * Math.sin(tt * 4))
       b.mk.position.y = 32 + Math.sin(tt * 2 + b.seed) * 0.7
       const bt = now - b.burstT
