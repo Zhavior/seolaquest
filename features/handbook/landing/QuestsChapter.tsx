@@ -8,7 +8,6 @@ const TOP_XP = LEVELS[LEVELS.length - 1].cumulativeXp
 const QUESTS = questViews()
 const LIVE = QUESTS.filter((quest) => quest.live)
 const SUSPENDED = QUESTS.filter((quest) => !quest.live)
-const TOP_REWARD = Math.max(...LIVE.map((quest) => quest.rewardXp))
 
 export function QuestsChapter() {
   return (
