@@ -19,8 +19,12 @@ export type ValleyOptions = {
   canvas: HTMLCanvasElement
   /** Element whose size the canvas follows. */
   host: HTMLElement
-  /** Sample scores for the beacon markers. Invented, labelled on the page. */
-  scores: number[]
+  /**
+   * Scores for the four beacon markers. The home page passes labelled samples;
+   * the dashboard passes real lead scores. `null` means no measured score and
+   * draws a dash, never a made-up number.
+   */
+  scores: Array<number | null>
   mode: SkyMode
   reducedMotion: boolean
 }
@@ -75,7 +79,8 @@ function blendFor(p: PhaseLook): Blend {
   }
 }
 
-function tierColor(score: number): { fill: string } {
+function tierColor(score: number | null): { fill: string } {
+  if (score === null) return { fill: '#6E6590' }
   if (score >= 80) return { fill: '#FF8A3D' }
   if (score >= 40) return { fill: '#5DB2FF' }
   return { fill: '#C9CBD2' }
@@ -386,7 +391,7 @@ export function createValley(opts: ValleyOptions): ValleyHandle {
   const glowTex = radialTex([[0, 'rgba(255,190,90,.55)'], [0.4, 'rgba(255,140,50,.16)'], [1, 'rgba(255,120,40,0)']])
   const sparkTex = radialTex([[0, 'rgba(255,255,255,1)'], [0.4, 'rgba(180,255,230,.7)'], [1, 'rgba(93,214,176,0)']])
 
-  function markerTex(score: number, fill: string): THREE.CanvasTexture {
+  function markerTex(score: number | null, fill: string): THREE.CanvasTexture {
     const c = document.createElement('canvas')
     c.width = c.height = 128
     const g = c.getContext('2d')!
@@ -397,7 +402,7 @@ export function createValley(opts: ValleyOptions): ValleyHandle {
     g.fillStyle = '#0B0818'
     g.font = '700 46px "Helvetica Neue", Arial, sans-serif'
     g.textAlign = 'center'; g.textBaseline = 'middle'
-    g.fillText(String(score), 0, 4)
+    g.fillText(score === null ? '–' : String(score), 0, 4)
     const t = track(new THREE.CanvasTexture(c))
     t.colorSpace = THREE.SRGBColorSpace
     return t
@@ -411,7 +416,7 @@ export function createValley(opts: ValleyOptions): ValleyHandle {
   const ringGeo = track(new THREE.RingGeometry(0.9, 1.25, 56))
   const bowlGeo = track(new THREE.CylinderGeometry(3.6, 2, 2, 8))
   const scores = opts.scores.slice(0, 4)
-  while (scores.length < 4) scores.push(60)
+  while (scores.length < 4) scores.push(null)
   const beacons = scores.map((score, i) => {
     const { x, z, y } = bpos[i]
     const g = new THREE.Group()
@@ -445,7 +450,7 @@ export function createValley(opts: ValleyOptions): ValleyHandle {
   })
 
   const markerCache = new Map<string, THREE.CanvasTexture>()
-  const markerFor = (score: number, fill: string) => {
+  const markerFor = (score: number | null, fill: string) => {
     const key = `${score}${fill}`
     let tex = markerCache.get(key)
     if (!tex) { tex = markerTex(score, fill); markerCache.set(key, tex) }

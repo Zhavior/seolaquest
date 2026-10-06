@@ -12,6 +12,7 @@ import { DashboardKeywords } from '@/features/dashboard/components/DashboardKeyw
 import DashboardFeed from '@/features/dashboard/components/DashboardFeed'
 import { DashboardRadar } from '@/features/dashboard/components/DashboardRadar'
 import { DashboardLeaderboard } from '@/features/dashboard/components/DashboardLeaderboard'
+import { DashboardValleyHero } from '@/features/dashboard/components/DashboardValleyHero'
 import MissionControlShell from '@/features/dashboard/components/layout/MissionControlShell'
 import { TodaysMissionPanel } from '@/features/dashboard/components/mission/TodaysMissionPanel'
 import { CampaignPulsePanel } from '@/features/dashboard/components/mission/CampaignPulsePanel'
@@ -140,36 +141,15 @@ export default function DashboardClient({
       <div className="relative z-10 mx-auto flex w-full max-w-[1400px] min-w-0 flex-col overflow-x-hidden">
         <MissionControlShell
           chrome={
-            <motion.header
-              variants={reveal}
-              initial="hidden"
-              animate="show"
-              className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between"
-            >
-              <div className="min-w-0">
-                <p className="mb-2 text-xs font-medium tracking-wide text-ink-muted">Your growth journal</p>
-                <h1 className="font-display text-4xl leading-tight tracking-tight text-ink sm:text-5xl">
-                  One useful step at a time.
-                </h1>
-                <p className="mt-3 text-sm text-ink-muted">
-                  {state.user.name} · Lv {state.user.level} · {state.characterTitle}
-                </p>
-              </div>
-
-              <div className="flex flex-wrap items-center gap-2">
-                <div className="rounded-[20px] border border-outline bg-card px-4 py-3 shadow-sm">
-                  <p className="text-[10px] font-medium normal-case text-ink-muted">Scan credits</p>
-                  <p className="text-lg font-semibold normal-case leading-none text-ink">
-                    {`${state.remainingQuests}/${state.maxCredits}`}
-                  </p>
-                </div>
-                <div className="rounded-[20px] border border-outline bg-card px-4 py-3 shadow-sm">
-                  <p className="text-[10px] font-medium normal-case text-ink-muted">Plan</p>
-                  <p className="max-w-[14rem] truncate text-sm font-semibold normal-case leading-none text-ink">
-                    {state.subscriptionTier}
-                  </p>
-                </div>
-              </div>
+            <motion.header variants={reveal} initial="hidden" animate="show">
+              <DashboardValleyHero
+                name={state.user.name}
+                level={state.user.level}
+                title={state.characterTitle}
+                credits={`${state.remainingQuests}/${state.maxCredits}`}
+                plan={state.subscriptionTier}
+                leads={state.leads}
+              />
             </motion.header>
           }
           mission={
