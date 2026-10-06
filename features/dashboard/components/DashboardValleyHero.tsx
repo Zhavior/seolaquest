@@ -38,6 +38,15 @@ function liveScore(lead: DashboardLead): number | null {
   return Math.round(aurora.score)
 }
 
+/** Beacon scores and states from the `liveScore` list, newest lead first. */
+function beaconsFor(scoreKey: string): { scores: Array<number | null>; views: BeaconView[] } {
+  const scores = scoreKey ? scoreKey.split(',').map((part) => (part === '-' ? null : Number(part))) : []
+  const views = [0, 1, 2, 3].map<BeaconView>((i) =>
+    i < scores.length ? { state: 'open', selected: i === 0 } : { state: 'dismissed', selected: false },
+  )
+  return { scores, views }
+}
+
 type Props = {
   name: string
   level: number
@@ -64,10 +73,21 @@ export function DashboardValleyHero({ name, level, title, credits, plan, leads }
   const [calm, setCalm] = useState(() => typeof window !== 'undefined' && storedCalm())
 
   const shown = leads.slice(0, 4)
-  const scoresRef = useRef(shown.map(liveScore))
-  const beaconsRef = useRef<BeaconView[]>(
-    [0, 1, 2, 3].map((i) => (i < shown.length ? { state: 'open', selected: i === 0 } : { state: 'dismissed', selected: false })),
-  )
+  // A string key, so a new leads array with the same four leads changes nothing.
+  const scoreKey = shown.map((lead) => liveScore(lead) ?? '-').join(',')
+  const initial = beaconsFor(scoreKey)
+  const scoresRef = useRef(initial.scores)
+  const beaconsRef = useRef(initial.views)
+
+  // Leads change while the dashboard is open (a scan, a claim). Keep the
+  // beacons in step without rebuilding the scene.
+  useEffect(() => {
+    const { scores, views } = beaconsFor(scoreKey)
+    scoresRef.current = scores
+    beaconsRef.current = views
+    handle.current?.setScores(scores)
+    handle.current?.setBeacons(views)
+  }, [scoreKey])
 
   useEffect(() => {
     const host = hostRef.current

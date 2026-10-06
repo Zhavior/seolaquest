@@ -37,6 +37,8 @@ export type ValleyHandle = {
   setReducedMotion: (reduced: boolean) => void
   /** Sync each beacon to the sample hunt: which are open, claimed or dismissed, and which is selected. */
   setBeacons: (beacons: BeaconView[]) => void
+  /** Replace the beacon scores, e.g. when new leads arrive. `null` draws a dash. */
+  setScores: (scores: Array<number | null>) => void
   /** Light-pillar surge, expanding ring and sparks at one beacon (a claim). */
   burst: (index: number) => void
   /** Jump the sky to its target immediately (used when a still frame is wanted). */
@@ -446,7 +448,7 @@ export function createValley(opts: ValleyOptions): ValleyHandle {
     const rg = new THREE.Mesh(ringGeo, track(new THREE.MeshBasicMaterial({ color: 0x5dd6b0, transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide })))
     rg.rotation.x = -Math.PI / 2; rg.position.y = 0.6; g.add(rg)
     scene.add(g)
-    return { g, fire, halo, light, mk, ring, beam, rg, seed: i * 1.7, lit: true, claimed: false, burstT: -10, lastKey: '' }
+    return { g, fire, halo, light, mk, ring, beam, rg, seed: i * 1.7, lit: true, claimed: false, burstT: -10, lastKey: '', view: null as BeaconView | null }
   })
 
   const markerCache = new Map<string, THREE.CanvasTexture>()
@@ -462,6 +464,7 @@ export function createValley(opts: ValleyOptions): ValleyHandle {
     const base = tierColor(scores[i]).fill
     const fill = view.state === 'claimed' ? '#5DD6B0' : view.state === 'dismissed' ? '#6E6590' : base
     const key = `${fill}${view.selected}${view.state}`
+    b.view = view
     if (key === b.lastKey) return
     b.lastKey = key
     b.mk.material.map = markerFor(scores[i], fill)
@@ -804,6 +807,15 @@ export function createValley(opts: ValleyOptions): ValleyHandle {
     setPaused(next) { paused = next; last = performance.now() },
     setReducedMotion(next) { reduce = next },
     setBeacons(views) { views.forEach((v, i) => applyBeacon(i, v)) },
+    setScores(next) {
+      beacons.forEach((b, i) => {
+        const score = next[i] ?? null
+        if (score === scores[i]) return
+        scores[i] = score
+        b.lastKey = ''
+        applyBeacon(i, b.view ?? { state: 'open', selected: i === 0 })
+      })
+    },
     burst(index) { doBurst(index) },
     snap() { stepPhase(1); renderFrame(0.016) },
     dispose() {
