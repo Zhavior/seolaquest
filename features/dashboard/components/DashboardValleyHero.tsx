@@ -179,7 +179,7 @@ export function DashboardValleyHero({ name, level, title, credits, plan, leads }
         className="pointer-events-none absolute inset-0 -z-10 bg-[linear-gradient(90deg,rgb(8_6_20/0.78),rgb(8_6_20/0.35)_50%,rgb(8_6_20/0)_78%)]"
       />
 
-      <div className="flex min-h-[clamp(20rem,48vh,30rem)] flex-col justify-between gap-6 p-5 sm:p-7">
+      <div className="flex min-h-[clamp(20rem,48vh,30rem)] lg:min-h-[clamp(30rem,64vh,46rem)] flex-col justify-between gap-6 p-5 sm:p-7">
         <div className="min-w-0 max-w-xl [text-shadow:0_1px_12px_rgb(8_6_20/0.8)]">
           <p className="mb-2 text-xs font-medium tracking-wide text-[#f3d58a]">Your growth journal</p>
           <h1 className="font-display text-4xl leading-tight tracking-tight sm:text-5xl">One useful step at a time.</h1>
