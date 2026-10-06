@@ -48,22 +48,21 @@ export function ValleyStage({
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const handle = useRef<ValleyHandle | null>(null)
   const [mode, setMode] = useState<SkyMode>('auto')
-  const [calm, setCalm] = useState(false)
+  // Calm and the sky label only show inside the panel, which opens after a
+  // click, so reading the browser here never changes the server markup.
+  const [calm, setCalm] = useState(() => typeof window !== 'undefined' && storedCalm())
   const [live, setLive] = useState(false)
   const [open, setOpen] = useState(false)
-  const [label, setLabel] = useState('')
+  const [, setTick] = useState(0)
+  const label = open ? skyInfo(mode).label : ''
   const sound = useSyncExternalStore(valleyAudio.subscribe, valleyAudio.getSnapshot, () => false)
 
+  // Keep the clock in "Your sky" current while the panel is open.
   useEffect(() => {
-    setCalm(storedCalm())
-  }, [])
-
-  useEffect(() => {
-    setLabel(skyInfo(mode).label)
-    if (mode !== 'auto') return
-    const timer = window.setInterval(() => setLabel(skyInfo('auto').label), 30000)
+    if (!open || mode !== 'auto') return
+    const timer = window.setInterval(() => setTick((n) => n + 1), 30000)
     return () => window.clearInterval(timer)
-  }, [mode])
+  }, [open, mode])
 
   useEffect(() => {
     const host = hostRef.current
