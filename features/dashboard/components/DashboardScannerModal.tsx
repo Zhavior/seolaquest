@@ -387,7 +387,7 @@ export function DashboardScannerModal({
                   initial={{ opacity: 0, y: 8 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: 6 }}
-                  className="rounded-[20px] border border-outline bg-[#D9FFE3] p-3.5 shadow-sm"
+                  className="rounded-[20px] border border-outline bg-success/15 p-3.5 shadow-sm"
                 >
                   <div className="flex items-start gap-2.5">
                     <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-[#15803D]" />
@@ -407,7 +407,7 @@ export function DashboardScannerModal({
                   initial={{ opacity: 0, y: 8 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: 6 }}
-                  className="rounded-[20px] border border-outline bg-[#FFF1F2] p-3.5 shadow-sm"
+                  className="rounded-[20px] border border-outline bg-danger/15 p-3.5 shadow-sm"
                 >
                   <div className="flex items-start gap-3">
                     <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-[#E11D48]" />

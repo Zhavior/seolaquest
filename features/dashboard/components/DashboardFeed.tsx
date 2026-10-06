@@ -47,21 +47,21 @@ const signalBadgeStyles: Record<
 > = {
   LIVE_SCORED: {
     label: 'LIVE SCORED',
-    wrap: 'bg-[#FFFBEB]',
+    wrap: 'bg-amber-500/10',
     badge: 'bg-highlight-strong text-amber-950 border-amber-500',
     border: 'border-l-8 border-l-amber-500',
     accent: 'bg-amber-500 hover:bg-amber-600 text-on-accent font-semibold',
   },
   UNSCORED: {
     label: 'NOT SCORED',
-    wrap: 'bg-[#F8FAFC]',
-    badge: 'bg-[#E2E8F0] text-ink border-hairline',
+    wrap: 'bg-slate-400/10',
+    badge: 'bg-slate-200 text-slate-900 border-hairline',
     border: 'border-l-8 border-l-slate-400',
     accent: 'bg-slate-700 hover:bg-slate-800 text-white',
   },
   SCORING_UNAVAILABLE: {
     label: 'SCORING UNAVAILABLE',
-    wrap: 'bg-[#F0F9FF]',
+    wrap: 'bg-blue-500/10',
     badge: 'bg-[#BAE6FD] text-blue-900 border-blue-400',
     border: 'border-l-8 border-l-blue-500',
     accent: 'bg-blue-600 hover:bg-blue-700 text-white',
@@ -709,7 +709,7 @@ function DashboardFeedComponent({
                               disabled={isPending}
                               title="Dismiss lead from queue"
                               aria-label={`Dismiss ${lead.author || 'lead'}`}
-                              className="inline-flex min-h-[32px] items-center gap-1 rounded-lg border border-outline bg-inset px-2 py-1 text-[10px] font-semibold normal-case shadow-none hover:bg-rose-100 text-rose-800 disabled:opacity-60"
+                              className="inline-flex min-h-[32px] items-center gap-1 rounded-lg border border-outline bg-inset px-2 py-1 text-[10px] font-semibold normal-case shadow-none hover:bg-danger/15 text-danger-ink disabled:opacity-60"
                             >
                               <X className="h-3 w-3" />
                               Dismiss
@@ -918,7 +918,7 @@ function DashboardFeedComponent({
                         dismissLead(activeDetailLead.id)
                         setActiveDetailLead(null)
                       }}
-                      className="inline-flex min-h-[44px] items-center justify-center rounded-[20px] border border-outline bg-[#F3E5E5] px-4 py-2.5 text-xs font-semibold normal-case shadow-none hover:bg-[#F7C7C7]"
+                      className="inline-flex min-h-[44px] items-center justify-center rounded-[20px] border border-outline bg-danger/15 px-4 py-2.5 text-xs font-semibold normal-case text-danger-ink shadow-none hover:bg-danger/25"
                     >
                       Dismiss
                     </button>
