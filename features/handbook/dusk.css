@@ -28,7 +28,8 @@
   --milk: var(--panel-2);
   --desk: var(--night);
   --desk-ink: #f6ebd2;
-  --vermilion: #e04a36;
+  /* Dark enough for white slip text at 4.9:1 (WCAG AA needs 4.5:1). */
+  --vermilion: #cc3d2a;
 
   --font-display: var(--font-hb-display), Georgia, 'Times New Roman', serif;
   --font-text: var(--font-hb-text), system-ui, -apple-system, 'Segoe UI', sans-serif;
@@ -469,6 +470,13 @@
 
 .hb-desk-fine {
   color: var(--ink-soft);
+}
+
+/* Footer links sit in running text in a near-identical colour, so the
+   underline is what tells them apart (axe link-in-text-block). */
+.hb-desk-fine a {
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
 /* ── errata slip stays vermilion; focus ring is gold on dark ───────── */
