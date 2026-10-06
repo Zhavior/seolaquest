@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import type { ReactNode } from 'react'
 import '../handbook.css'
+import '../dusk.css'
 import { handbookFontVariables } from '../fonts'
 import { HandbookFooter } from './HandbookFooter'
 import { HandbookMark } from './HandbookMark'

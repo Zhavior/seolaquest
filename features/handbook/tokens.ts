@@ -36,16 +36,26 @@ export function tokensFor(volume: VolumeId): BoardTokens {
   return solved
 }
 
-/** Inline custom properties that turn any subtree into that volume's board. */
+/**
+ * Inline custom properties that turn any subtree into that volume's board.
+ *
+ * In the Dusk Hunt look the volume hue is a gem, not a field: `--board` carries
+ * it (buttons, studs, meters and glows are cut from it) while the reading panel
+ * (`--leaf`) and its gold edge (`--edge`) are the same night-violet and old gold
+ * on every page, so contrast never depends on which volume is open.
+ */
 export function boardStyle(volume: VolumeId): CSSProperties {
   const tokens = tokensFor(volume)
   return {
     '--board': tokens.board,
-    '--leaf': tokens.leaf,
-    '--edge': tokens.edge,
+    '--leaf': DUSK_PANEL,
+    '--edge': DUSK_EDGE,
     '--on-board': tokens.onBoard,
   } as CSSProperties
 }
+
+export const DUSK_PANEL = '#120E22'
+export const DUSK_EDGE = '#5A4720'
 
 /** Which volume owns a pathname, for the rail's current tab on non-home routes. */
 export function volumeForPath(pathname: string): VolumeId {

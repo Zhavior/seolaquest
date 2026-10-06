@@ -1,22 +1,23 @@
 /**
  * Clerk appearance shared by sign-in and sign-up.
  *
- * `variables` retheme Clerk to the handbook (ink on milk, square corners, the
- * handbook sans). The visible frame, hard shadow and button treatment come from
+ * `variables` retheme Clerk to the Dusk Hunt panel (parchment on night violet,
+ * old-gold primary, Barlow). The visible frame, hard shadow and button treatment come from
  * the `.hb-clerk` rules in handbook.css, because Clerk's own class hooks are the
  * only way to reach its internal markup. `elements` keeps every control at the
  * 44px touch target the accessibility gate asserts.
  */
 export const clerkAppearance = {
   variables: {
-    colorPrimary: '#14120E',
-    colorBackground: '#FFFDF7',
-    colorForeground: '#14120E',
-    colorMutedForeground: '#4A4538',
-    colorInput: '#FFFDF7',
-    colorInputForeground: '#14120E',
-    borderRadius: '0px',
-    fontFamily: 'var(--font-hb-sans), Helvetica Neue, Arial, sans-serif',
+    colorPrimary: '#D8A93B',
+    colorBackground: '#1B1535',
+    colorForeground: '#F6EBD2',
+    colorMutedForeground: '#D9D0EC',
+    colorInput: '#120E22',
+    colorInputForeground: '#F6EBD2',
+    colorNeutral: '#F6EBD2',
+    borderRadius: '2px',
+    fontFamily: 'var(--font-hb-text), system-ui, sans-serif',
   },
   options: { autoFocus: false },
   elements: {

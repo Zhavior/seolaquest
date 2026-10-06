@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import type { ReactNode } from 'react'
 import '../handbook.css'
+import '../dusk.css'
 import { handbookFontVariables } from '../fonts'
 import { HandbookMark } from '../components/HandbookMark'
 
@@ -19,7 +20,7 @@ export function OnboardingSkin({ children }: { children: ReactNode }) {
           <HandbookMark />
           <span className="hb-mark-word">SEOlaQuest</span>
         </Link>
-        <p className="hb-mono" style={{ color: '#b9b39f' }}>
+        <p className="hb-mono" style={{ color: '#D9D0EC' }}>
           Tutorial quest
         </p>
       </header>
