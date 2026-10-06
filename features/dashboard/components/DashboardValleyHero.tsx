@@ -3,6 +3,12 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import type { BeaconView, ValleyHandle } from '@/features/handbook/valley/scene'
 import type { DashboardLead } from '@/features/dashboard/types'
+import {
+  LEAD_ENGAGE_MIN,
+  liveScore,
+  matchesIntentFilter,
+  type LeadIntentFilter,
+} from '@/features/dashboard/lib/leadScore'
 
 // Shared with the public valley, so one Calm choice covers both.
 const CALM_KEY = 'sq-calm'
@@ -28,16 +34,6 @@ function prefersReducedMotion(): boolean {
   return typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
 }
 
-/**
- * Only a LIVE Aurora verdict is a measurement. A FALLBACK decision still carries
- * a score (a flat 50 when the classifier was unreachable), so it shows as a dash.
- */
-function liveScore(lead: DashboardLead): number | null {
-  const aurora = lead.aurora
-  if (!aurora || aurora.evaluationStatus !== 'LIVE' || !Number.isFinite(aurora.score)) return null
-  return Math.round(aurora.score)
-}
-
 /** Beacon scores and states from the `liveScore` list, newest lead first. */
 function beaconsFor(scoreKey: string): { scores: Array<number | null>; views: BeaconView[] } {
   const scores = scoreKey ? scoreKey.split(',').map((part) => (part === '-' ? null : Number(part))) : []
@@ -51,10 +47,17 @@ type Props = {
   name: string
   level: number
   title: string
-  credits: string
-  plan: string
   leads: DashboardLead[]
+  /** Which leads the list below the hero shows. The chips here set it. */
+  filter: LeadIntentFilter
+  onFilter: (filter: LeadIntentFilter) => void
 }
+
+const CHIPS: Array<{ value: LeadIntentFilter; label: string; hint: string }> = [
+  { value: 'all', label: 'All leads', hint: 'Every lead in your queue' },
+  { value: 'engage', label: `Score ${LEAD_ENGAGE_MIN}+`, hint: `Live Aurora score of ${LEAD_ENGAGE_MIN} or more` },
+  { value: 'unscored', label: 'Unscored', hint: 'No live Aurora score yet' },
+]
 
 /**
  * The signed-in hero: the public site's valley in a fixed frame. The camera
@@ -63,7 +66,7 @@ type Props = {
  * no lead stay dark. Decorative: the canvas is hidden from assistive tech, and
  * without WebGL the painted dusk gradient stays.
  */
-export function DashboardValleyHero({ name, level, title, credits, plan, leads }: Props) {
+export function DashboardValleyHero({ name, level, title, leads, filter, onFilter }: Props) {
   const hostRef = useRef<HTMLDivElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const handle = useRef<ValleyHandle | null>(null)
@@ -156,12 +159,9 @@ export function DashboardValleyHero({ name, level, title, credits, plan, leads }
     })
   }, [])
 
-  const unscored = shown.filter((lead) => liveScore(lead) === null).length
-  const legend =
-    shown.length === 0
-      ? 'Beacons light up as leads arrive.'
-      : `Beacons: your ${shown.length === 1 ? 'newest lead' : `${shown.length} newest leads`}` +
-        (unscored ? ' · – means no live score yet' : ' · number is the live Aurora score')
+  const lit = shown.length
+  const beaconNote =
+    lit === 0 ? 'Beacons light up as leads arrive' : `${lit} of 4 beacons lit · one per newest lead`
 
   return (
     <section
@@ -180,29 +180,38 @@ export function DashboardValleyHero({ name, level, title, credits, plan, leads }
         className="pointer-events-none absolute inset-0 -z-10 bg-[linear-gradient(90deg,rgb(8_6_20/0.78),rgb(8_6_20/0.35)_50%,rgb(8_6_20/0)_78%)]"
       />
 
-      <div className="flex min-h-[clamp(20rem,48vh,30rem)] lg:min-h-[clamp(30rem,64vh,46rem)] flex-col justify-between gap-6 p-5 sm:p-7">
-        <div className="min-w-0 max-w-xl [text-shadow:0_1px_12px_rgb(8_6_20/0.8)]">
+      <div className="flex min-h-[max(420px,55vh)] flex-col justify-between gap-6 p-5 sm:p-7">
+        <div className="min-w-0 max-w-2xl [text-shadow:0_1px_12px_rgb(8_6_20/0.8)]">
           <p className="mb-2 text-xs font-medium tracking-wide text-[#f3d58a]">Your growth journal</p>
-          <h1 className="font-display text-4xl leading-tight tracking-tight sm:text-5xl">One useful step at a time.</h1>
-          <p className="mt-3 text-sm text-[#d9d0ec]">
+          <h1 className="font-display text-3xl leading-tight tracking-tight sm:text-4xl">
             {name} · Lv {level} · {title}
-          </p>
+          </h1>
         </div>
 
         <div className="flex flex-wrap items-end justify-between gap-3">
-          <div className="flex flex-wrap items-center gap-2">
-            <div className="rounded-[14px] border border-[#5a4720] bg-[rgb(11_8_24/0.8)] px-4 py-3 backdrop-blur">
-              <p className="text-[10px] font-medium text-[#a99fc9]">Scan credits</p>
-              <p className="text-lg font-semibold leading-none tabular-nums">{credits}</p>
-            </div>
-            <div className="rounded-[14px] border border-[#5a4720] bg-[rgb(11_8_24/0.8)] px-4 py-3 backdrop-blur">
-              <p className="text-[10px] font-medium text-[#a99fc9]">Plan</p>
-              <p className="max-w-[14rem] truncate text-sm font-semibold leading-none">{plan}</p>
-            </div>
+          <div className="flex flex-wrap items-center gap-2" role="group" aria-label="Filter discovered leads">
+            {CHIPS.map((chip) => {
+              const count = leads.filter((lead) => matchesIntentFilter(lead, chip.value)).length
+              return (
+                <button
+                  key={chip.value}
+                  type="button"
+                  title={chip.hint}
+                  aria-pressed={filter === chip.value}
+                  onClick={() => onFilter(chip.value)}
+                  className="inline-flex min-h-11 items-center gap-2 rounded-[10px] border border-[#5a4720] bg-[rgb(11_8_24/0.82)] px-3 text-xs font-medium text-[#f6ebd2] backdrop-blur transition-colors hover:border-[#8a6420] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#f3d58a] aria-pressed:border-[#d8a93b] aria-pressed:bg-[linear-gradient(#f3d58a,#d8a93b)] aria-pressed:text-[#1a1206]"
+                >
+                  {chip.label}
+                  <span className="tabular-nums opacity-80">{count}</span>
+                </button>
+              )
+            })}
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
-            <p className="rounded-[10px] bg-[rgb(11_8_24/0.72)] px-3 py-2 text-[11px] text-[#d9d0ec] backdrop-blur">{legend}</p>
+            <p className="rounded-[10px] bg-[rgb(11_8_24/0.72)] px-3 py-2 font-mono text-[11px] text-[#d9d0ec] backdrop-blur">
+              {beaconNote}
+            </p>
             {live ? (
               <button
                 type="button"

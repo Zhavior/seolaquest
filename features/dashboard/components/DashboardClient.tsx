@@ -13,6 +13,9 @@ import DashboardFeed from '@/features/dashboard/components/DashboardFeed'
 import { DashboardRadar } from '@/features/dashboard/components/DashboardRadar'
 import { DashboardLeaderboard } from '@/features/dashboard/components/DashboardLeaderboard'
 import { DashboardValleyHero } from '@/features/dashboard/components/DashboardValleyHero'
+import { DashboardQuotaDock } from '@/features/dashboard/components/DashboardQuotaDock'
+import { matchesIntentFilter, type LeadIntentFilter } from '@/features/dashboard/lib/leadScore'
+import Link from 'next/link'
 import MissionControlShell from '@/features/dashboard/components/layout/MissionControlShell'
 import { TodaysMissionPanel } from '@/features/dashboard/components/mission/TodaysMissionPanel'
 import { CampaignPulsePanel } from '@/features/dashboard/components/mission/CampaignPulsePanel'
@@ -62,6 +65,13 @@ export default function DashboardClient({
     state.notice
   )
   const [activeMobileTab, setActiveMobileTab] = useState<'overview' | 'signals' | 'guild'>('overview')
+  const [intentFilter, setIntentFilter] = useState<LeadIntentFilter>('all')
+  const feedLeads = useMemo(
+    () => state.filteredLeads.filter((lead) => matchesIntentFilter(lead, intentFilter)),
+    [state.filteredLeads, intentFilter]
+  )
+  const isScanning = state.isScannerModalOpen || state.asyncStatus === 'scanning'
+  const canScan = Boolean(state.user.entitlements?.canUsePaidScans)
   const shouldReduceMotion = useReducedMotion()
   const reveal = dashboardReveal(shouldReduceMotion)
 
@@ -115,7 +125,7 @@ export default function DashboardClient({
   }
 
   return (
-    <div className="relative min-h-[100dvh] w-full max-w-full overflow-x-hidden bg-canvas px-2 pb-12 pt-3 text-ink sm:px-4 md:px-6 md:pb-12 md:pt-5">
+    <div className="relative min-h-[100dvh] w-full max-w-full overflow-x-clip bg-canvas px-2 pb-12 pt-3 text-ink sm:px-4 md:px-6 md:pb-12 md:pt-5">
       <AnimatePresence mode="wait">
         {state.activeQuickStrikeLead ? (
           <QuickStrikeReplyModal
@@ -138,7 +148,7 @@ export default function DashboardClient({
         ) : null}
       </AnimatePresence>
 
-      <div className="relative z-10 mx-auto flex w-full max-w-[1400px] min-w-0 flex-col overflow-x-hidden">
+      <div className="relative z-10 mx-auto flex w-full max-w-[1400px] min-w-0 flex-col overflow-x-clip">
         <MissionControlShell
           chrome={
             <motion.header variants={reveal} initial="hidden" animate="show">
@@ -146,11 +156,63 @@ export default function DashboardClient({
                 name={state.user.name}
                 level={state.user.level}
                 title={state.characterTitle}
-                credits={`${state.remainingQuests}/${state.maxCredits}`}
-                plan={state.subscriptionTier}
                 leads={state.leads}
+                filter={intentFilter}
+                onFilter={(next) => {
+                  setIntentFilter(next)
+                  requestAnimationFrame(() => scrollToDashboardId('discovered-opportunities', shouldReduceMotion))
+                }}
               />
             </motion.header>
+          }
+          opportunities={
+            <section id="discovered-opportunities" aria-labelledby="discovered-opportunities-title" className="space-y-4">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div className="min-w-0">
+                  <h2 id="discovered-opportunities-title" className="font-mono text-sm font-semibold tracking-wider text-ink">
+                    DISCOVERED OPPORTUNITIES
+                  </h2>
+                  {intentFilter !== 'all' ? (
+                    <p className="text-xs text-ink-muted">
+                      Showing {intentFilter === 'engage' ? 'leads scoring 80 or more' : 'leads without a live score'}.{' '}
+                      <button type="button" className="underline" onClick={() => setIntentFilter('all')}>
+                        Show all
+                      </button>
+                    </p>
+                  ) : null}
+                </div>
+                {canScan ? (
+                  <button
+                    type="button"
+                    onClick={state.runMockScanner}
+                    disabled={isScanning || state.remainingQuests < 1}
+                    className="inline-flex min-h-11 items-center rounded-[10px] border border-outline bg-card px-4 font-mono text-xs font-semibold text-ink transition-colors hover:bg-accent disabled:cursor-not-allowed disabled:opacity-60"
+                  >
+                    {isScanning ? 'Scan running…' : state.remainingQuests < 1 ? 'No scan credits left' : 'Run scan · 1 credit'}
+                  </button>
+                ) : (
+                  <Link
+                    href="/app/billing"
+                    className="inline-flex min-h-11 items-center rounded-[10px] border border-outline bg-card px-4 font-mono text-xs font-semibold text-ink hover:bg-accent"
+                  >
+                    Scans need a paid plan
+                  </Link>
+                )}
+              </div>
+              <DashboardFeed
+                item={reveal}
+                filteredLeads={feedLeads}
+                filter={state.filter}
+                setFilter={state.setFilter}
+                platforms={state.platforms}
+                dismissLead={state.dismissLead}
+                isPending={state.isPending}
+                handleClaimBounty={state.handleClaimBounty}
+                generateAIReply={state.generateAIReply}
+                exportToCRM={state.exportToCRM}
+                handlePresetClick={state.handlePresetClick}
+              />
+            </section>
           }
           mission={
             <TodaysMissionPanel
@@ -293,22 +355,6 @@ export default function DashboardClient({
               </div>
 
               <div className={`${isSignals ? 'block' : 'hidden'} sm:block`}>
-                <DashboardFeed
-                  item={reveal}
-                  filteredLeads={state.filteredLeads}
-                  filter={state.filter}
-                  setFilter={state.setFilter}
-                  platforms={state.platforms}
-                  dismissLead={state.dismissLead}
-                  isPending={state.isPending}
-                  handleClaimBounty={state.handleClaimBounty}
-                  generateAIReply={state.generateAIReply}
-                  exportToCRM={state.exportToCRM}
-                  handlePresetClick={state.handlePresetClick}
-                />
-              </div>
-
-              <div className={`${isSignals ? 'block' : 'hidden'} sm:block`}>
                 <DashboardRadar
                   item={reveal}
                   particles={state.particles}
@@ -351,6 +397,12 @@ export default function DashboardClient({
               />
             </div>
           }
+        />
+        <DashboardQuotaDock
+          remaining={state.remainingQuests}
+          max={state.maxCredits}
+          plan={state.subscriptionTier}
+          canUsePaidScans={canScan}
         />
       </div>
     </div>
