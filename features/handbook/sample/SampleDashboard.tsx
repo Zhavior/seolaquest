@@ -246,7 +246,7 @@ export function SampleDashboard({ sets, levelCumulative }: { sets: SampleSet[]; 
             <div aria-hidden="true" className="h-7 w-px bg-outline" />
             <div className="min-w-0">
               <span className="block font-mono text-[10px] tracking-wider text-ink-muted">SAMPLE XP</span>
-              <span className="block truncate font-mono text-sm tabular-nums">
+              <span className="block font-mono text-sm tabular-nums">
                 {state.xp} XP · Lv {level.level}
                 <span className="hidden sm:inline"> · {level.toNext} to next</span>
               </span>

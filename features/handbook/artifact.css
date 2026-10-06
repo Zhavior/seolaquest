@@ -166,12 +166,48 @@
   text-decoration: none;
 }
 
-@media (max-width: 47.99rem) {
+/* The section links need about 62rem beside the wordmark and account links;
+   below that they fold away so the bar stays one row and never spills onto
+   the page. */
+@media (max-width: 61.99rem) {
   .hb-links {
     display: none;
   }
+  .hb-topbar {
+    flex-wrap: nowrap;
+    gap: 0.5rem;
+  }
+  .hb-brand {
+    gap: 0.5rem;
+    min-width: 0;
+  }
+  .hb-brand > svg {
+    flex-shrink: 0;
+  }
+  .hb-account {
+    flex-shrink: 0;
+    gap: 0.25rem;
+  }
+}
+
+@media (max-width: 47.99rem) {
   .hb-brand-word {
-    font-size: 0.95rem;
+    font-size: 0.8rem;
+    letter-spacing: 0.1em;
+  }
+  .hb-top-link {
+    padding: 0 0.5rem;
+  }
+  .hb-topbar .hb-btn--small {
+    padding-inline: 0.9rem;
+  }
+}
+
+/* Below this width the wordmark and both account links cannot share one row;
+   the crest alone still reads as home and keeps its accessible name. */
+@media (max-width: 23rem) {
+  .hb-brand-word {
+    display: none;
   }
 }
 
@@ -999,6 +1035,20 @@
 @media (max-width: 47.99rem) {
   .hb-hero-top {
     min-height: clamp(22rem, 62svh, 40rem);
+  }
+  /* On a phone the copy covers the busiest part of the valley, beacons
+     included; a soft night wash behind it keeps every line readable. */
+  .hb-hero-top {
+    position: relative;
+    isolation: isolate;
+  }
+  .hb-hero-top::before {
+    content: '';
+    position: absolute;
+    z-index: -1;
+    inset: -1.5rem -1rem;
+    background: linear-gradient(180deg, rgb(11 8 24 / 0.35), rgb(11 8 24 / 0.72) 30%, rgb(11 8 24 / 0.72) 80%, rgb(11 8 24 / 0));
+    pointer-events: none;
   }
   .hb-home .hb-board:not(.hb-hero-stage) {
     min-height: auto;

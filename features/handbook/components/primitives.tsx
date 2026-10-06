@@ -79,7 +79,12 @@ export function Spread({
         <Heading id={headId} className="hb-sidehead">
           {head}
         </Heading>
-        {note ? <p className="hb-sidenote">{note}</p> : null}
+        {/* A note can be block content (Terms passes a <nav>), which a <p> cannot hold. */}
+        {typeof note === 'string' ? (
+          <p className="hb-sidenote">{note}</p>
+        ) : note ? (
+          <div className="hb-sidenote">{note}</div>
+        ) : null}
       </div>
       <div className="hb-main">{children}</div>
     </div>

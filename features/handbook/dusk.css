@@ -805,3 +805,25 @@
     box-shadow: none;
   }
 }
+
+/* Fixed to the bottom-left corner, the controls sat over the quest log and
+   every chapter below it. They ride at the top right of the hero instead, under
+   the bar, and scroll away with it. */
+.hb-valley-ctl {
+  position: absolute;
+  top: calc(var(--top-h) + 0.5rem + env(safe-area-inset-top, 0px));
+  right: clamp(1rem, 4vw, 3rem);
+  left: auto;
+  bottom: auto;
+  justify-items: end;
+}
+
+.hb-valley-row {
+  order: -1;
+}
+
+@media (max-width: 47.99rem) {
+  .hb-home .hb-hero-stage {
+    padding-top: calc(var(--top-h) + 4.5rem);
+  }
+}

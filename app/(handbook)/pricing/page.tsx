@@ -117,7 +117,7 @@ export default async function PricingPage() {
             <h2 className="hb-h3">Currency, tax, and renewal</h2>
             <p className="hb-prose">
               Catalog prices are shown in USD. Stripe shows the final USD total and any tax charged before
-              confirmation. Beta renews monthly until cancellation is confirmed by Stripe and the server billing state.
+              confirmation. Beta Hunter and Founder Pass renew monthly until cancellation is confirmed by Stripe and the server billing state.
             </p>
           </div>
 

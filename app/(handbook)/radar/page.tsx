@@ -34,7 +34,7 @@ export default function SampleHuntPage() {
       />
       <HandbookPage volume="try" title="Try it" note="No account. No X connection. Nothing is sent anywhere.">
         <div className="hb-stack" style={{ '--gap': '2rem' } as React.CSSProperties}>
-          <p className="hb-lede">This is the dashboard you get after sign-up, running on invented posts. Scan a watch list, claim or dismiss leads, and watch the real XP rules pay, and refuse to pay.</p>
+          <p className="hb-lede">This is the dashboard you get after sign-up, running on invented posts. Scan a watch list, claim or dismiss leads, and see exactly when the real XP rules pay out and when they do not.</p>
           <SampleDashboard sets={SAMPLE_SETS} levelCumulative={LEVELS} />
           <div className="hb-row">
             <Link href="/sign-up" className="hb-btn">

@@ -1707,6 +1707,9 @@ html:has(.hb) {
 
 .hb-auth {
   display: grid;
+  /* One shrinkable column on phones: Clerk's card has a fixed width that would
+     otherwise widen the track and clip the copy beside it. */
+  grid-template-columns: minmax(0, 1fr);
   gap: clamp(1.75rem, 4vw, 3rem);
   align-items: start;
 }
@@ -1720,6 +1723,13 @@ html:has(.hb) {
 
 .hb-clerk {
   padding: clamp(0.5rem, 2vw, 1rem);
+  min-width: 0;
+}
+
+.hb-clerk .cl-rootBox,
+.hb-clerk .cl-cardBox {
+  width: 100%;
+  max-width: 100%;
 }
 
 .hb-clerk .cl-card,
