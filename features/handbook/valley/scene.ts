@@ -27,6 +27,11 @@ export type ValleyOptions = {
   scores: Array<number | null>
   mode: SkyMode
   reducedMotion: boolean
+  /**
+   * Scales fog, mist and the drifting fog banks. 1 is the full-page look; a
+   * small framed view reads clearer with less (the dashboard uses 0.45).
+   */
+  atmosphere?: number
 }
 
 export type ValleyHandle = {
@@ -218,6 +223,7 @@ export function createValley(opts: ValleyOptions): ValleyHandle {
   const { canvas, host } = opts
   let mode = opts.mode
   let reduce = opts.reducedMotion
+  const atmosphere = Math.max(0, opts.atmosphere ?? 1)
 
   const small = Math.min(host.clientWidth, window.innerHeight) < 700
   let tier: Tier = small || (navigator.hardwareConcurrency || 8) < 4 ? 'low' : 'high'
@@ -682,7 +688,7 @@ export function createValley(opts: ValleyOptions): ValleyHandle {
     u.uSunI.value = n.sunI; u.uMoonO.value = n.moonO; u.uStars.value = n.stars
     u.uCloudC.value.copy(c.cloudC); u.uCloudS.value.copy(c.cloudS); u.uCover.value = n.cover
     const fog = scene.fog as THREE.FogExp2
-    fog.color.copy(c.fog); fog.density = n.fogD
+    fog.color.copy(c.fog); fog.density = n.fogD * atmosphere
     hemi.color.copy(c.hemiS); hemi.groundColor.copy(c.hemiG); hemi.intensity = n.hemiI * Math.PI
     sun.color.copy(c.dirC); sun.intensity = n.dirI * Math.PI * (info.phase === 'night' ? 0.28 : 1)
     lightDirV.copy(info.phase === 'night' ? new THREE.Vector3(0.4, 0.55, -0.75) : sunDirC)
@@ -692,10 +698,10 @@ export function createValley(opts: ValleyOptions): ValleyHandle {
     wu.uHor.value.copy(c.hor); wu.uTop.value.copy(c.top); wu.uSunDir.value.copy(sunDirC); wu.uSunCol.value.copy(c.sun)
     wu.uSunI.value = Math.max(n.sunI, n.moonO * 0.4); wu.uFog.value.copy(c.fog); wu.uFogD.value = n.fogD
     mistMat.uniforms.uC.value.copy(c.fog).lerp(c.hor, 0.35)
-    const mistTarget = info.phase === 'day' ? 0.18 : 0.5
+    const mistTarget = (info.phase === 'day' ? 0.18 : 0.5) * atmosphere
     mistMat.uniforms.uA.value += (mistTarget - mistMat.uniforms.uA.value) * k
     bankColor.copy(c.fog).lerp(c.hor, 0.5)
-    bankAlpha += ((info.phase === 'day' ? 0.75 : 1) - bankAlpha) * k
+    bankAlpha += ((info.phase === 'day' ? 0.75 : 1) * atmosphere - bankAlpha) * k
     emberMat.opacity = info.phase === 'day' ? 0.35 : 0.85
     emberMat.color.set(info.phase === 'day' ? 0xfff2b0 : 0xffb347)
     if (bloom) bloom.strength = n.bloom

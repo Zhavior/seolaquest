@@ -106,6 +106,7 @@ export function DashboardValleyHero({ name, level, title, credits, plan, leads }
           scores: scoresRef.current,
           mode: 'auto',
           reducedMotion: prefersReducedMotion() || storedCalm(),
+          atmosphere: 0.45,
         })
       } catch {
         return
