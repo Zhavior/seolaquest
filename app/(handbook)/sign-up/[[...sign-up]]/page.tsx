@@ -21,7 +21,7 @@ export default function Page() {
           <>
             <p className="hb-mono hb-soft">
               Want to see a lead first?{' '}
-              <Link href="/#hunt" className="hb-link">
+              <Link href="/radar" className="hb-link">
                 Try the sample hunt
               </Link>{' '}
               (labelled sample data, no account).

@@ -19,7 +19,7 @@ describe('sign-up page', () => {
     render(<Page />)
 
     expect(screen.getByRole('heading', { name: /start your first hunt/i })).toBeVisible()
-    expect(screen.getByRole('link', { name: /try the sample hunt/i })).toHaveAttribute('href', '/#hunt')
+    expect(screen.getByRole('link', { name: /try the sample hunt/i })).toHaveAttribute('href', '/radar')
     expect(screen.getByRole('list', { name: /six short steps/i }).children).toHaveLength(6)
     expect(mocks.signUp).toHaveBeenCalledWith(expect.objectContaining({
       fallbackRedirectUrl: '/onboarding',
