@@ -308,7 +308,7 @@ export function DashboardStats({
             className="flex flex-col rounded-[20px] border border-outline bg-card p-5 shadow-sm sm:p-6"
           >
             <p className="text-xs font-semibold normal-case tracking-wide text-ink-muted">Operations checklist</p>
-            <h3 id="ops-checklist-heading" className="font-display mt-1 text-2xl font-semibold normal-case text-on-accent">
+            <h3 id="ops-checklist-heading" className="font-display mt-1 text-2xl font-semibold normal-case text-ink">
               Measured readiness
             </h3>
             <p className="mt-2 text-xs font-medium text-ink-muted">
@@ -339,7 +339,7 @@ export function DashboardStats({
             <div className="flex items-start justify-between gap-3 pb-4">
               <div>
                 <p className="text-xs font-semibold normal-case tracking-wide text-ink-muted">Entitlements</p>
-                <h3 id="unlock-track-heading" className="font-display mt-1 text-2xl font-semibold normal-case text-on-accent">
+                <h3 id="unlock-track-heading" className="font-display mt-1 text-2xl font-semibold normal-case text-ink">
                   Unlock track
                 </h3>
               </div>

@@ -1,457 +1,138 @@
 'use client'
 
+// Original, lightweight cues: no audio downloads on the navigation path.
+const NOTES = {
+  click: [523.25],
+  confirm: [659.25, 783.99],
+  discovery: [523.25, 1046.5],
+  reward: [523.25, 659.25, 783.99],
+  level: [523.25, 659.25, 783.99, 1046.5],
+  warning: [392, 329.63],
+} as const
+
 class RetroSFX {
   private ctx: AudioContext | null = null
+  private master: GainNode | null = null
   private enabled = true
-  private lastHoverTime = 0
-  private unlockListenerAttached = false
+  private volume = 0.5
+  private listeners = new Set<() => void>()
+  private lastCue = ''
+  private lastCueAt = -Infinity
 
   constructor() {
-    if (typeof window !== 'undefined') {
-      try {
-        const saved = localStorage.getItem('coquest_sfx_enabled')
-        if (saved !== null) {
-          this.enabled = saved === 'true'
-        }
-      } catch {
-        // Ignore storage errors
-      }
-      this.attachUnlockListeners()
-    }
-  }
+    if (typeof window === 'undefined') return
+    try {
+      const enabled = localStorage.getItem('coquest_sfx_enabled')
+      if (enabled !== null) this.enabled = enabled === 'true'
+      const saved = localStorage.getItem('coquest_sfx_volume')
+      const volume = saved === null ? 0.5 : Number(saved)
+      if (Number.isFinite(volume)) this.volume = Math.max(0, Math.min(1, volume))
+    } catch { /* Private browsing can disable storage. */ }
 
-  private attachUnlockListeners() {
-    if (typeof window === 'undefined' || this.unlockListenerAttached) return
-    this.unlockListenerAttached = true
-
+    // Unlock on a gesture so later server-confirmed results can make sound.
     const unlock = () => {
-      this.initCtx()
-      if (this.ctx && this.ctx.state === 'suspended') {
-        void this.ctx.resume()
-      }
+      if (this.enabled && this.volume > 0) this.initCtx()
       window.removeEventListener('pointerdown', unlock)
       window.removeEventListener('keydown', unlock)
-      window.removeEventListener('touchstart', unlock)
     }
-
     window.addEventListener('pointerdown', unlock, { passive: true })
     window.addEventListener('keydown', unlock, { passive: true })
-    window.addEventListener('touchstart', unlock, { passive: true })
   }
 
   private initCtx() {
-    if (typeof window === 'undefined') return false
-    if (!this.ctx || this.ctx.state === 'closed') {
-      const AudioCtx =
-        window.AudioContext ||
-        (window as Window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext
-      if (AudioCtx) this.ctx = new AudioCtx()
-    }
-    if (this.ctx && this.ctx.state === 'suspended') {
-      void this.ctx.resume().catch(() => {})
-    }
-    return !!this.ctx
-  }
-
-  private withCtx(run: (ctx: AudioContext) => void) {
-    if (!this.enabled || !this.initCtx() || !this.ctx) return
     try {
-      run(this.ctx)
-    } catch {
-      // Graceful fallback if Web Audio is restricted
-    }
+      if (!this.ctx || this.ctx.state === 'closed') {
+        const AudioCtx = window.AudioContext ||
+          (window as Window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext
+        if (!AudioCtx) return false
+        this.ctx = new AudioCtx()
+        this.master = this.ctx.createGain()
+        this.master.connect(this.ctx.destination)
+      }
+      this.master!.gain.setValueAtTime(this.enabled ? this.volume : 0, this.ctx.currentTime)
+      if (this.ctx.state === 'suspended') void this.ctx.resume().catch(() => {})
+      return true
+    } catch { return false }
   }
 
-  public isEnabled(): boolean {
+  public subscribe = (listener: () => void) => {
+    this.listeners.add(listener)
+    return () => { this.listeners.delete(listener) }
+  }
+  public isEnabled = () => this.enabled
+  public getVolume = () => this.volume
+
+  private persist() {
+    try {
+      localStorage.setItem('coquest_sfx_enabled', String(this.enabled))
+      localStorage.setItem('coquest_sfx_volume', String(this.volume))
+    } catch { /* Sound controls still work without storage. */ }
+    if (typeof document !== 'undefined') document.documentElement.classList.toggle('sfx-muted', !this.enabled)
+    // Also silence notes that are already playing when the user mutes.
+    this.master?.gain.setValueAtTime(this.enabled ? this.volume : 0, this.ctx!.currentTime)
+    this.listeners.forEach((listener) => listener())
+  }
+
+  public setEnabled(value: boolean) {
+    this.enabled = value
+    this.persist()
+  }
+  public setVolume(value: number) {
+    if (!Number.isFinite(value)) return
+    this.volume = Math.max(0, Math.min(1, value))
+    this.persist()
+  }
+  public toggle() {
+    this.setEnabled(!this.enabled)
+    if (this.enabled) this.playConfirm()
     return this.enabled
   }
 
-  public setEnabled(val: boolean) {
-    this.enabled = val
+  private play(cue: keyof typeof NOTES) {
+    if (!this.enabled || this.volume === 0 || typeof document === 'undefined' || document.hidden) return
+    const nowMs = Date.now()
+    if (cue === this.lastCue && nowMs - this.lastCueAt < 150) return
+    this.lastCue = cue
+    this.lastCueAt = nowMs
+    if (!this.initCtx() || !this.ctx || !this.master) return
     try {
-      localStorage.setItem('coquest_sfx_enabled', String(val))
-    } catch {
-      // Ignore storage errors
-    }
+      const ctx = this.ctx
+      const duration = cue === 'click' ? 0.07 : 0.18
+      NOTES[cue].forEach((frequency, index) => {
+        const start = ctx.currentTime + index * 0.11
+        const osc = ctx.createOscillator()
+        const gain = ctx.createGain()
+        osc.type = 'sine'
+        osc.frequency.setValueAtTime(frequency, start)
+        gain.gain.setValueAtTime(0, start)
+        gain.gain.linearRampToValueAtTime(cue === 'click' ? 0.025 : 0.045, start + 0.008)
+        gain.gain.exponentialRampToValueAtTime(0.001, start + duration)
+        osc.connect(gain)
+        gain.connect(this.master!)
+        osc.onended = () => { osc.disconnect(); gain.disconnect() }
+        osc.start(start)
+        osc.stop(start + duration + 0.01)
+      })
+    } catch { /* Audio must never interrupt an action. */ }
   }
 
-  public toggle(): boolean {
-    const next = !this.enabled
-    this.setEnabled(next)
-    if (next) this.playCoinDrop()
-    return next
-  }
-
-  public playHoverBlip() {
-    const nowMs = Date.now()
-    if (nowMs - this.lastHoverTime < 35) return
-    this.lastHoverTime = nowMs
-
-    this.withCtx((ctx) => {
-      const now = ctx.currentTime
-      const osc = ctx.createOscillator()
-      const gain = ctx.createGain()
-
-      osc.type = 'square'
-      osc.frequency.setValueAtTime(880, now)
-
-      gain.gain.setValueAtTime(0.03, now)
-      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.04)
-
-      osc.connect(gain)
-      gain.connect(ctx.destination)
-
-      osc.onended = () => {
-        try {
-          osc.disconnect()
-          gain.disconnect()
-        } catch {}
-      }
-
-      osc.start(now)
-      osc.stop(now + 0.04)
-    })
-  }
-
-  public playSidebarHover() {
-    const nowMs = Date.now()
-    if (nowMs - this.lastHoverTime < 35) return
-    this.lastHoverTime = nowMs
-
-    this.withCtx((ctx) => {
-      const now = ctx.currentTime
-      const osc = ctx.createOscillator()
-      const gain = ctx.createGain()
-
-      osc.type = 'sine'
-      osc.frequency.setValueAtTime(840, now)
-      osc.frequency.exponentialRampToValueAtTime(980, now + 0.035)
-
-      gain.gain.setValueAtTime(0.02, now)
-      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.035)
-
-      osc.connect(gain)
-      gain.connect(ctx.destination)
-
-      osc.onended = () => {
-        try {
-          osc.disconnect()
-          gain.disconnect()
-        } catch {}
-      }
-
-      osc.start(now)
-      osc.stop(now + 0.035)
-    })
-  }
-
-  public playSidebarExpand() {
-    this.withCtx((ctx) => {
-      const now = ctx.currentTime
-      const osc1 = ctx.createOscillator()
-      const osc2 = ctx.createOscillator()
-      const gain = ctx.createGain()
-
-      osc1.type = 'triangle'
-      osc1.frequency.setValueAtTime(320, now)
-      osc1.frequency.exponentialRampToValueAtTime(760, now + 0.09)
-
-      osc2.type = 'square'
-      osc2.frequency.setValueAtTime(480, now)
-      osc2.frequency.exponentialRampToValueAtTime(1140, now + 0.09)
-
-      gain.gain.setValueAtTime(0.035, now)
-      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.09)
-
-      osc1.connect(gain)
-      osc2.connect(gain)
-      gain.connect(ctx.destination)
-
-      osc1.onended = () => {
-        try {
-          osc1.disconnect()
-          osc2.disconnect()
-          gain.disconnect()
-        } catch {}
-      }
-
-      osc1.start(now)
-      osc2.start(now)
-      osc1.stop(now + 0.09)
-      osc2.stop(now + 0.09)
-    })
-  }
-
-  public playSidebarCollapse() {
-    this.withCtx((ctx) => {
-      const now = ctx.currentTime
-      const osc1 = ctx.createOscillator()
-      const osc2 = ctx.createOscillator()
-      const gain = ctx.createGain()
-
-      osc1.type = 'triangle'
-      osc1.frequency.setValueAtTime(760, now)
-      osc1.frequency.exponentialRampToValueAtTime(320, now + 0.09)
-
-      osc2.type = 'square'
-      osc2.frequency.setValueAtTime(1140, now)
-      osc2.frequency.exponentialRampToValueAtTime(480, now + 0.09)
-
-      gain.gain.setValueAtTime(0.035, now)
-      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.09)
-
-      osc1.connect(gain)
-      osc2.connect(gain)
-      gain.connect(ctx.destination)
-
-      osc1.onended = () => {
-        try {
-          osc1.disconnect()
-          osc2.disconnect()
-          gain.disconnect()
-        } catch {}
-      }
-
-      osc1.start(now)
-      osc2.start(now)
-      osc1.stop(now + 0.09)
-      osc2.stop(now + 0.09)
-    })
-  }
-
-  public playCoinDrop() {
-    this.withCtx((ctx) => {
-      const now = ctx.currentTime
-      const osc = ctx.createOscillator()
-      const gain = ctx.createGain()
-
-      osc.type = 'triangle'
-      osc.frequency.setValueAtTime(1200, now)
-      osc.frequency.exponentialRampToValueAtTime(500, now + 0.12)
-
-      gain.gain.setValueAtTime(0.05, now)
-      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12)
-
-      osc.connect(gain)
-      gain.connect(ctx.destination)
-
-      osc.onended = () => {
-        try {
-          osc.disconnect()
-          gain.disconnect()
-        } catch {}
-      }
-
-      osc.start(now)
-      osc.stop(now + 0.12)
-    })
-  }
-
-  public playLevelUp() {
-    this.withCtx((ctx) => {
-      const now = ctx.currentTime
-      const osc1 = ctx.createOscillator()
-      const osc2 = ctx.createOscillator()
-      const gain = ctx.createGain()
-
-      osc1.type = 'square'
-      osc2.type = 'triangle'
-
-      osc1.frequency.setValueAtTime(440, now)
-      osc1.frequency.exponentialRampToValueAtTime(880, now + 0.18)
-      osc1.frequency.exponentialRampToValueAtTime(1320, now + 0.36)
-
-      osc2.frequency.setValueAtTime(660, now)
-      osc2.frequency.exponentialRampToValueAtTime(990, now + 0.18)
-      osc2.frequency.exponentialRampToValueAtTime(1560, now + 0.36)
-
-      gain.gain.setValueAtTime(0.001, now)
-      gain.gain.exponentialRampToValueAtTime(0.05, now + 0.03)
-      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.45)
-
-      osc1.connect(gain)
-      osc2.connect(gain)
-      gain.connect(ctx.destination)
-
-      osc1.onended = () => {
-        try {
-          osc1.disconnect()
-          osc2.disconnect()
-          gain.disconnect()
-        } catch {}
-      }
-
-      osc1.start(now)
-      osc2.start(now)
-      osc1.stop(now + 0.45)
-      osc2.stop(now + 0.45)
-    })
-  }
-
-  public playCriticalWarning() {
-    this.withCtx((ctx) => {
-      const now = ctx.currentTime
-      const osc = ctx.createOscillator()
-      const gain = ctx.createGain()
-
-      osc.type = 'sawtooth'
-      osc.frequency.setValueAtTime(220, now)
-      osc.frequency.linearRampToValueAtTime(180, now + 0.08)
-      osc.frequency.linearRampToValueAtTime(220, now + 0.16)
-
-      gain.gain.setValueAtTime(0.001, now)
-      gain.gain.exponentialRampToValueAtTime(0.04, now + 0.02)
-      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.22)
-
-      osc.connect(gain)
-      gain.connect(ctx.destination)
-
-      osc.onended = () => {
-        try {
-          osc.disconnect()
-          gain.disconnect()
-        } catch {}
-      }
-
-      osc.start(now)
-      osc.stop(now + 0.22)
-    })
-  }
-
-  public playRadarBlip() {
-    this.withCtx((ctx) => {
-      const now = ctx.currentTime
-      const osc = ctx.createOscillator()
-      const gain = ctx.createGain()
-
-      osc.type = 'sine'
-      osc.frequency.setValueAtTime(1040, now)
-      osc.frequency.exponentialRampToValueAtTime(1480, now + 0.07)
-
-      gain.gain.setValueAtTime(0.001, now)
-      gain.gain.exponentialRampToValueAtTime(0.03, now + 0.01)
-      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08)
-
-      osc.connect(gain)
-      gain.connect(ctx.destination)
-
-      osc.onended = () => {
-        try {
-          osc.disconnect()
-          gain.disconnect()
-        } catch {}
-      }
-
-      osc.start(now)
-      osc.stop(now + 0.08)
-    })
-  }
-
-  public playBountyUnlock() {
-    this.withCtx((ctx) => {
-      const now = ctx.currentTime
-      const osc1 = ctx.createOscillator()
-      const osc2 = ctx.createOscillator()
-      const gain = ctx.createGain()
-
-      osc1.type = 'triangle'
-      osc2.type = 'square'
-
-      osc1.frequency.setValueAtTime(523.25, now)
-      osc1.frequency.exponentialRampToValueAtTime(783.99, now + 0.12)
-      osc1.frequency.exponentialRampToValueAtTime(1046.5, now + 0.24)
-
-      osc2.frequency.setValueAtTime(659.25, now)
-      osc2.frequency.exponentialRampToValueAtTime(987.77, now + 0.24)
-
-      gain.gain.setValueAtTime(0.001, now)
-      gain.gain.exponentialRampToValueAtTime(0.05, now + 0.02)
-      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3)
-
-      osc1.connect(gain)
-      osc2.connect(gain)
-      gain.connect(ctx.destination)
-
-      osc1.onended = () => {
-        try {
-          osc1.disconnect()
-          osc2.disconnect()
-          gain.disconnect()
-        } catch {}
-      }
-
-      osc1.start(now)
-      osc2.start(now)
-      osc1.stop(now + 0.3)
-      osc2.stop(now + 0.3)
-    })
-  }
-
-  public playElixirDrink() {
-    this.withCtx((ctx) => {
-      const now = ctx.currentTime
-      const osc = ctx.createOscillator()
-      const gain = ctx.createGain()
-
-      osc.type = 'sine'
-      osc.frequency.setValueAtTime(740, now)
-      osc.frequency.exponentialRampToValueAtTime(520, now + 0.08)
-      osc.frequency.exponentialRampToValueAtTime(660, now + 0.18)
-
-      gain.gain.setValueAtTime(0.001, now)
-      gain.gain.exponentialRampToValueAtTime(0.04, now + 0.02)
-      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.22)
-
-      osc.connect(gain)
-      gain.connect(ctx.destination)
-
-      osc.onended = () => {
-        try {
-          osc.disconnect()
-          gain.disconnect()
-        } catch {}
-      }
-
-      osc.start(now)
-      osc.stop(now + 0.22)
-    })
-  }
-
-  public playSwordSlash() {
-    this.withCtx((ctx) => {
-      const now = ctx.currentTime
-      const osc = ctx.createOscillator()
-      const filter = ctx.createBiquadFilter()
-      const gain = ctx.createGain()
-
-      osc.type = 'sawtooth'
-      osc.frequency.setValueAtTime(320, now)
-      osc.frequency.exponentialRampToValueAtTime(120, now + 0.12)
-
-      filter.type = 'bandpass'
-      filter.frequency.setValueAtTime(1400, now)
-      filter.Q.setValueAtTime(3, now)
-
-      gain.gain.setValueAtTime(0.001, now)
-      gain.gain.exponentialRampToValueAtTime(0.05, now + 0.01)
-      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.14)
-
-      osc.connect(filter)
-      filter.connect(gain)
-      gain.connect(ctx.destination)
-
-      osc.onended = () => {
-        try {
-          osc.disconnect()
-          filter.disconnect()
-          gain.disconnect()
-        } catch {}
-      }
-
-      osc.start(now)
-      osc.stop(now + 0.14)
-    })
-  }
+  public playConfirm() { this.play('confirm') }
+  public playDiscovery() { this.play('discovery') }
+  public playQuestComplete() { this.play('reward') }
+  public playLevelUp() { this.play('level') }
+  public playCriticalWarning() { this.play('warning') }
+
+  // Existing navigation callers retain quiet feedback, without implying a reward.
+  public playCoinDrop() { this.play('click') }
+  public playSidebarExpand() { this.play('click') }
+  public playSidebarCollapse() { this.play('click') }
+  public playSwordSlash() { this.play('click') }
+  public playRadarBlip() { this.play('click') }
+  public playBountyUnlock() { this.play('reward') }
+  public playElixirDrink() { this.play('confirm') }
+  // Hover and keyboard focus are intentionally silent throughout the app.
+  public playHoverBlip() {}
+  public playSidebarHover() {}
 }
 
 export const sfx = new RetroSFX()

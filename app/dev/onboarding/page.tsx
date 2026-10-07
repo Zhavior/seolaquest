@@ -1,6 +1,7 @@
 import { ClerkProvider } from '@clerk/nextjs'
 import { notFound } from 'next/navigation'
 import OnboardingForm from '@/app/onboarding/OnboardingForm'
+import { OnboardingSkin } from '@/features/handbook/onboarding/OnboardingSkin'
 
 /**
  * Design preview for the tutorial quest, matching the existing `/dev/shell-v2`
@@ -31,6 +32,7 @@ async function PreviewBody({ searchParams }: { searchParams: Promise<{ step?: st
 
   return (
     <ClerkProvider>
+      <OnboardingSkin>
       <OnboardingForm
         initialDraft={{
           displayName: 'Signal Sage',
@@ -42,6 +44,7 @@ async function PreviewBody({ searchParams }: { searchParams: Promise<{ step?: st
           onboardingStep,
         }}
       />
+      </OnboardingSkin>
     </ClerkProvider>
   )
 }

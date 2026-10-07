@@ -1,4 +1,5 @@
 import 'server-only'
+import { GamifyEnrollmentService } from '@/src/modules/gamify/GamifyEnrollmentService'
 
 import { requireCurrentUser } from '@/lib/auth'
 import { GamifyQuestQueryService } from '@/src/modules/gamify/GamifyQuestQueryService'
@@ -22,6 +23,8 @@ export interface QuestBoardEntry {
 }
 
 export interface QuestBoardData {
+  nextHistoryCursor?: string | null
+  historyCursor?: string | null
   progression: HunterProgression
   /** Completed and waiting on the hunter to collect. Rendered first. */
   claimable: QuestBoardEntry[]
@@ -38,24 +41,18 @@ export interface QuestBoardData {
 
 const TERMINAL: GamifyQuestStatus[] = ['CLAIMED', 'EXPIRED']
 
-/**
- * Reads the signed-in hunter's board.
- *
- * Enrollment is not done here. The shell layout already puts every
- * authenticated request on the board, and doing it again on read would mean a
- * page that silently writes — which makes it impossible to tell an empty board
- * from a broken enrollment.
- */
-export async function loadQuestBoard(): Promise<QuestBoardData> {
+/** Ensure current-cycle quests before reading the board; other pages remain read-only. */
+export async function loadQuestBoard(before?: string): Promise<QuestBoardData> {
   const user = await requireCurrentUser()
+  await new GamifyEnrollmentService().ensureEnrolled(user.id)
 
-  const [assignments, progression] = await Promise.all([
-    new GamifyQuestQueryService().getAssignments(user.id),
+  const [page, progression] = await Promise.all([
+    new GamifyQuestQueryService().getBoardPage(user.id, before),
     readHunterProgression(user.id),
   ])
   const now = new Date()
 
-  const entries: QuestBoardEntry[] = assignments.map((assignment) => ({
+  const entries: QuestBoardEntry[] = page.assignments.map((assignment) => ({
     id: assignment.id,
     code: assignment.code,
     title: assignment.title,
@@ -78,9 +75,11 @@ export async function loadQuestBoard(): Promise<QuestBoardData> {
 
   return {
     progression,
+    nextHistoryCursor: page.nextHistoryCursor,
+    historyCursor: page.historyCursor,
     claimable: visibleEntries.filter((entry) => entry.status === 'COMPLETED'),
     active: visibleEntries.filter((entry) => entry.status === 'IN_PROGRESS'),
     finished: visibleEntries.filter((entry) => TERMINAL.includes(entry.status)),
-    catalogEmpty: entries.length === 0,
+    catalogEmpty: entries.length === 0 && !page.historyCursor,
   }
 }

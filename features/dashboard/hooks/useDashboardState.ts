@@ -151,9 +151,9 @@ export function useDashboardState({
         params.set('platform', newFilter)
       }
       const queryString = params.toString()
-      router.replace(queryString ? `${pathname}?${queryString}` : pathname, { scroll: false })
+      window.history.replaceState(null, '', `${pathname}${queryString ? `?${queryString}` : ''}${window.location.hash}`)
     },
-    [searchParams, router, pathname]
+    [searchParams, pathname]
   )
 
   const filteredLeads = useMemo(
@@ -191,34 +191,34 @@ export function useDashboardState({
   function addKeyword() {
     const phrase = newKeyword.trim()
     if (!phrase) return
-    sfx.playCoinDrop()
     startTransition(async () => {
       const result = await addKeywordAction(phrase)
       if (!result.ok) return setNotice(result.message ?? 'Could not add keyword.')
       if (!result.keyword) return setNotice('Keyword saved, but the server did not return its ID. Refresh before deleting it.')
       setKeywords((current) => [result.keyword, ...current.filter((keyword) => keyword.id !== result.keyword.id)])
       setNewKeyword('')
+      sfx.playConfirm()
       setNotice(result.message ?? 'Keyword added.')
     })
   }
 
   function handlePresetClick(phrase: string) {
-    sfx.playCoinDrop()
     startTransition(async () => {
       const result = await addKeywordAction(phrase)
       if (!result.ok) return setNotice(result.message ?? 'Could not add keyword.')
       if (!result.keyword) return setNotice('Keyword saved, but the server did not return its ID. Refresh before deleting it.')
       setKeywords((current) => [result.keyword, ...current.filter((keyword) => keyword.id !== result.keyword.id)])
+      sfx.playConfirm()
       setNotice(result.message ?? 'Keyword added.')
     })
   }
 
   function removeKeyword(id: string) {
-    sfx.playSwordSlash()
     startTransition(async () => {
       const result = await removeKeywordAction(id)
       if (!result.ok) return setNotice(result.message ?? 'Could not remove keyword.')
       setKeywords((current) => current.filter((keyword) => keyword.id !== id))
+      sfx.playConfirm()
       setNotice(result.message ?? 'Keyword removed.')
     })
   }
@@ -291,8 +291,9 @@ export function useDashboardState({
             }
 
             if (scan.status === 'SUCCEEDED') {
-              sfx.playCoinDrop()
               const leadsCreated = scan.counts?.leadsCreated ?? 0
+              if (leadsCreated > 0) sfx.playDiscovery()
+              else sfx.playConfirm()
               const providerStatus = scan.provider?.status ?? 'unknown'
               const completed = `Scan completed: ${leadsCreated} new source match${leadsCreated === 1 ? '' : 'es'}; provider status ${providerStatus}.`
               setScanLogs((current) => [...current, completed])
@@ -301,8 +302,7 @@ export function useDashboardState({
               setScanOutcome('succeeded')
               setScanStep(5)
               setAsyncStatus('idle')
-              // Slice first so the queue updates without waiting on full RSC props.
-              await refreshLeadsSlice()
+              // One server refresh updates the queue, credits, HUD and pipeline together.
               if (signal.aborted) return
               router.refresh()
               return
@@ -369,6 +369,7 @@ export function useDashboardState({
           if (!response.ok) throw new Error('SCAN_STATUS_UNAVAILABLE')
           const payload = await response.json() as { scan?: { status?: ScanStatus } }
           const status = payload.scan?.status ?? 'UNKNOWN'
+          const previousStatus = lastStatus
           if (status !== lastStatus) {
             lastStatus = status
             setScanLogs((current) => [...current, `Server status: ${status}`])
@@ -376,10 +377,9 @@ export function useDashboardState({
           }
           if (status === 'RUNNING') setScanStep(3)
           if (status === 'SUCCEEDED') {
-            sfx.playCoinDrop()
+            if (previousStatus && previousStatus !== 'SUCCEEDED') sfx.playConfirm()
             setScanStep(5)
             setScanOutcome('succeeded')
-            await refreshLeadsSlice()
             if (cancelled) return
             router.refresh()
             return
@@ -429,6 +429,7 @@ export function useDashboardState({
           setRemainingQuests(result.questsRemaining)
         }
 
+        sfx.playConfirm()
         setClaimedCount((current) => current + 1)
         setLeads((current) => current.filter((lead) => lead.id !== leadId))
         setNotice(result.message ?? 'Quest claimed.')
@@ -448,6 +449,7 @@ export function useDashboardState({
       setAsyncStatus('idle')
       if (result.ok) {
         setLeads((current) => current.filter((lead) => lead.id !== id))
+        sfx.playConfirm()
         setNotice(result.message ?? 'Lead dismissed.')
       } else {
         setNotice(result.message ?? 'Failed to dismiss lead.')

@@ -1,0 +1,830 @@
+/* ══ DUSK HUNT ════════════════════════════════════════════════════════════
+   The public site's look: a painted valley at dusk. Night-violet reading
+   panels framed in old gold, set on boards that glow with the volume's gem
+   colour, under a ridge line. Loaded after handbook.css, which still owns
+   layout; this file owns colour, type, frames and motion.
+
+   Colour grammar
+     gold   — the one action colour (primary buttons, the current level)
+     gem    — the volume hue (--board): studs, meters, glows, tabs
+     ember / azure / stone / teal — rarity and state, never decoration
+   Legibility rule: running text only ever sits on the night-violet panel.
+   ═════════════════════════════════════════════════════════════════════════ */
+
+.hb {
+  --night: #0b0818;
+  --panel: #120e22;
+  --panel-2: #1b1535;
+  --gold: #d8a93b;
+  --gold-hi: #f3d58a;
+  --gold-lo: #8a6420;
+  --gold-edge: #5a4720;
+  --ember: #ff8a3d;
+  --azure: #5db2ff;
+  --teal: #5dd6b0;
+
+  --ink: #f6ebd2;
+  --ink-soft: #d9d0ec;
+  --milk: var(--panel-2);
+  --desk: var(--night);
+  --desk-ink: #f6ebd2;
+  /* Dark enough for white slip text at 4.9:1 (WCAG AA needs 4.5:1). */
+  --vermilion: #cc3d2a;
+
+  --font-display: var(--font-hb-display), Georgia, 'Times New Roman', serif;
+  --font-gothic: var(--font-hb-gothic), var(--font-hb-display), Georgia, serif;
+  --font-text: var(--font-hb-text), system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-sans: var(--font-hb-text), system-ui, sans-serif;
+  --font-quote: var(--font-hb-quote), Georgia, serif;
+
+  background: var(--night);
+  font-size: 1.0625rem;
+  line-height: 1.6;
+  color-scheme: dark;
+  scrollbar-color: var(--gold-edge) var(--night);
+}
+
+/* ── type ──────────────────────────────────────────────────────────── */
+
+.hb :where(h1, h2, h3, h4, h5, h6) {
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+.hb-display {
+  font-size: clamp(2.35rem, 6.2vw, 4.4rem);
+  line-height: 1.02;
+  letter-spacing: 0.005em;
+  font-weight: 700;
+  color: var(--gold-hi);
+  text-shadow: 0 2px 0 #3a2a0a, 0 0 28px rgb(216 169 59 / 0.28);
+}
+
+.hb-hero .hb-display {
+  font-size: clamp(2.3rem, 5.2vw, 4.1rem);
+}
+
+.hb-display--post {
+  font-size: clamp(1.9rem, 4.2vw, 3.1rem);
+  line-height: 1.08;
+}
+
+.hb-lede {
+  font-family: var(--font-quote);
+  font-size: clamp(1.4rem, 2.3vw, 1.8rem);
+  line-height: 1.3;
+  font-weight: 500;
+}
+
+.hb-h2,
+.hb-h3 {
+  letter-spacing: 0.01em;
+  color: var(--gold-hi);
+}
+
+.hb-h3 {
+  font-size: 1.15rem;
+}
+
+.hb-side h2,
+.hb-side .hb-sidehead {
+  font-size: clamp(1.3rem, 1.9vw, 1.55rem);
+  line-height: 1.12;
+  color: var(--gold-hi);
+  overflow-wrap: anywhere;
+}
+
+.hb-card-title {
+  font-size: clamp(1.9rem, 4.4vw, 3rem);
+  line-height: 1.05;
+  letter-spacing: 0.01em;
+  color: var(--gold-hi);
+}
+
+.hb-quote,
+.hb-lc-draft,
+.hb-draft p {
+  font-family: var(--font-quote);
+  font-style: italic;
+  font-weight: 500;
+}
+
+.hb-quote {
+  font-size: 1.3rem;
+}
+
+.hb-mono,
+.hb-soft {
+  font-family: var(--font-mono);
+}
+
+.hb-soft {
+  color: var(--ink-soft);
+}
+
+.hb-link {
+  text-decoration-color: var(--gold);
+}
+
+.hb :where(a):hover {
+  color: var(--gold-hi);
+}
+
+/* ── frame: top strip, wordmark, rail ──────────────────────────────── */
+
+.hb-top {
+  background: linear-gradient(#150f2a, var(--night));
+  border-bottom: 1px solid var(--gold-edge);
+  box-shadow: 0 1px 0 #000, 0 8px 24px rgb(0 0 0 / 0.45);
+}
+
+/* ── boards: the volume's gem glows behind the panel, a ridge closes it ─ */
+
+.hb-board {
+  color: var(--ink);
+  background:
+    radial-gradient(60rem 28rem at 50% -8%, color-mix(in srgb, var(--board) 38%, transparent), transparent 70%),
+    radial-gradient(1.2px 1.2px at 12% 18%, rgb(255 255 255 / 0.55), transparent 60%),
+    radial-gradient(1.4px 1.4px at 71% 9%, rgb(255 255 255 / 0.5), transparent 60%),
+    radial-gradient(1px 1px at 38% 32%, rgb(255 255 255 / 0.4), transparent 60%),
+    radial-gradient(1.2px 1.2px at 88% 41%, rgb(255 255 255 / 0.45), transparent 60%),
+    linear-gradient(180deg, color-mix(in srgb, var(--board) 16%, #0b0818) 0%, var(--night) 100%);
+  padding-bottom: clamp(4.5rem, 9vw, 7rem);
+}
+
+.hb-board::after {
+  content: '';
+  position: absolute;
+  inset: auto 0 0 0;
+  height: clamp(3rem, 7vw, 5.5rem);
+  background: #07050f;
+  clip-path: polygon(
+    0 100%, 0 62%, 5% 48%, 11% 60%, 18% 34%, 25% 52%, 31% 40%, 39% 64%, 47% 30%, 54% 50%, 61% 38%,
+    69% 62%, 76% 28%, 83% 52%, 90% 40%, 96% 58%, 100% 44%, 100% 100%
+  );
+  pointer-events: none;
+  z-index: 0;
+}
+
+.hb-board > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* ── leaf: the reading panel ───────────────────────────────────────── */
+
+.hb-leaf {
+  background: linear-gradient(180deg, #1a1433, var(--panel));
+  color: var(--ink);
+  border: 1px solid var(--gold-edge);
+  border-radius: 3px;
+  box-shadow:
+    0 0 0 3px var(--night),
+    0 0 0 4px var(--gold-edge),
+    0 0 44px color-mix(in srgb, var(--board) 28%, transparent),
+    0 26px 56px rgb(0 0 0 / 0.55);
+}
+
+/* Gold corner studs, set with the volume's gem. */
+.hb-leaf::before,
+.hb-leaf::after {
+  background: radial-gradient(circle at 35% 30%, #fff 0 8%, var(--board) 40%, color-mix(in srgb, var(--board) 40%, #000) 100%);
+  border: 1.5px solid var(--gold);
+  box-shadow: 0 0 10px color-mix(in srgb, var(--board) 80%, transparent), 0 0 0 2px var(--night);
+}
+
+.hb-ply,
+.hb-card {
+  background: var(--panel-2);
+  color: var(--ink);
+  border: 1px solid var(--gold-edge);
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.04), 0 14px 32px rgb(0 0 0 / 0.45);
+}
+
+.hb-card {
+  border-style: solid;
+  outline: 1px solid var(--gold-edge);
+  outline-offset: 5px;
+}
+
+.hb-card::before {
+  background: radial-gradient(circle at 35% 30%, #fff 0 8%, var(--board) 40%, color-mix(in srgb, var(--board) 40%, #000) 100%);
+  border: 1.5px solid var(--gold);
+  box-shadow: 0 0 10px color-mix(in srgb, var(--board) 80%, transparent);
+}
+
+/* ── controls: the gold plate ──────────────────────────────────────── */
+
+.hb-btn {
+  background: linear-gradient(#f3d58a, #d8a93b 55%, #8a6420);
+  color: #1a1206;
+  border: 1px solid #5a4720;
+  border-radius: 2px;
+  font-family: var(--font-sans);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.55), 0 3px 0 #3a2a0a, 0 0 22px rgb(216 169 59 / 0.28);
+}
+
+.hb-btn:hover {
+  transform: translateY(1px);
+  filter: brightness(1.08);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.55), 0 2px 0 #3a2a0a, 0 0 30px rgb(243 213 138 / 0.42);
+}
+
+.hb-btn:active {
+  transform: translateY(3px);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.4), 0 0 0 #3a2a0a;
+}
+
+.hb-btn--label {
+  background: transparent;
+  color: var(--gold-hi);
+  border: 1px solid var(--gold);
+  box-shadow: none;
+}
+
+.hb-btn--label:hover {
+  background: rgb(216 169 59 / 0.16);
+  color: var(--gold-hi);
+  box-shadow: 0 0 20px rgb(216 169 59 / 0.25);
+  filter: none;
+}
+
+.hb-btn:disabled,
+.hb-btn[aria-disabled='true'] {
+  background: repeating-linear-gradient(-45deg, transparent 0 6px, rgb(246 235 210 / 0.12) 6px 7px);
+  color: var(--ink-soft);
+  border: 1px dashed var(--gold-edge);
+  filter: none;
+}
+
+.hb-key {
+  background: #241b44;
+  color: var(--ink);
+  border: 1px solid var(--gold-edge);
+  border-bottom: 3px solid var(--gold-lo);
+  border-radius: 2px;
+}
+
+.hb-tag {
+  border: 1px solid var(--gold-lo);
+  color: var(--gold-hi);
+}
+
+.hb-tag--solid,
+.hb-tag[data-tier='ENGAGE'] {
+  background: linear-gradient(#f3d58a, #d8a93b);
+  color: #1a1206;
+  border-color: var(--gold-lo);
+}
+
+.hb-tag[data-tier='IGNORE'] {
+  color: var(--ink-soft);
+  border-color: var(--gold-edge);
+}
+
+/* ── state marks, rules and tables ─────────────────────────────────── */
+
+.hb-punch {
+  border: 1.5px solid var(--gold);
+}
+
+.hb-punch[data-on] {
+  background: radial-gradient(circle at 35% 30%, #fff 0 8%, var(--teal) 45%, #1d7a60 100%);
+  box-shadow: 0 0 8px rgb(93 214 176 / 0.6);
+}
+
+.hb-ledger th {
+  border-top: 1px solid var(--gold-edge);
+  border-bottom: 1px solid var(--gold-edge);
+  color: var(--gold-hi);
+  font-family: var(--font-sans);
+  letter-spacing: 0.06em;
+}
+
+.hb-ledger td,
+.hb-ledger tbody th {
+  border-bottom: 1px solid rgb(246 235 210 / 0.14);
+}
+
+.hb-ledger tbody th {
+  color: var(--ink);
+  font-family: var(--font-sans);
+}
+
+.hb-ledger tr[data-facedown] > *,
+.hb-ledger--posts tr[data-facedown] > * {
+  background: repeating-linear-gradient(-45deg, transparent 0 6px, rgb(246 235 210 / 0.07) 6px 7px);
+}
+
+.hb-ledger--posts tr[data-selected] > * {
+  background: rgb(216 169 59 / 0.1);
+}
+
+@media (max-width: 39.99rem) {
+  .hb-ledger--plans tr,
+  .hb-ledger--quests tr,
+  .hb-ledger--posts tr {
+    border-bottom: 1px solid rgb(246 235 210 / 0.14);
+  }
+}
+
+.hb-notes li,
+.hb-quest,
+.hb-hunt-log,
+.hb-legal + .hb-legal,
+.hb-related,
+.hb-post-body,
+.hb-article-h2,
+.hb-rule {
+  border-color: var(--gold-edge);
+}
+
+.hb-card-fields li {
+  border-bottom: 1px solid rgb(246 235 210 / 0.18);
+}
+
+.hb-lc-zone + .hb-lc-zone {
+  border-top: 1px dashed rgb(246 235 210 / 0.25);
+}
+
+.hb-leadcard-cap {
+  background: #07050f;
+  color: var(--gold-hi);
+  border-bottom: 1px solid var(--gold-edge);
+}
+
+.hb-avatar,
+.hb-marker,
+.hb-stepno {
+  border: 1.5px solid var(--gold);
+  background: radial-gradient(circle at 35% 30%, #fff 0 6%, var(--board) 38%, color-mix(in srgb, var(--board) 45%, #000) 100%);
+  color: var(--on-board);
+  box-shadow: 0 0 10px color-mix(in srgb, var(--board) 60%, transparent);
+}
+
+.hb-aurora-score {
+  background: linear-gradient(color-mix(in srgb, var(--board) 85%, #fff), var(--board));
+  color: var(--on-board);
+  border: 1px solid var(--gold);
+  box-shadow: 0 0 18px color-mix(in srgb, var(--board) 55%, transparent);
+  font-family: var(--font-sans);
+}
+
+.hb-meter,
+.hb-bar {
+  border: 1px solid var(--gold-edge);
+  background: #07050f;
+}
+
+.hb-meter > span,
+.hb-bar > span {
+  background: linear-gradient(90deg, var(--gold-lo), var(--gold-hi));
+  box-shadow: 0 0 12px rgb(216 169 59 / 0.45);
+}
+
+.hb-hud,
+.hb-evidence,
+.hb-callout,
+.hb-tocbox,
+.hb-search-field,
+.hb-chip--fixed,
+.hb-chip:has(input:checked) {
+  background: var(--panel-2);
+  border: 1px solid var(--gold-edge);
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.04);
+}
+
+.hb-chip {
+  border: 1px solid var(--gold-edge);
+}
+
+.hb-chip:has(input:checked) {
+  border-color: var(--gold);
+  box-shadow: 0 0 20px rgb(216 169 59 / 0.28);
+}
+
+.hb-empty,
+.hb-draft {
+  border: 1px dashed var(--gold-lo);
+}
+
+.hb-hud-level,
+.hb-evidence .hb-h3 {
+  font-family: var(--font-display);
+  color: var(--gold-hi);
+}
+
+.hb-inline-code {
+  background: #07050f;
+  border: 1px solid var(--gold-edge);
+  color: var(--gold-hi);
+}
+
+.hb-article-list:not(.hb-article-list--ordered) li::before {
+  border: 1.5px solid var(--gold);
+  background: radial-gradient(circle at 35% 30%, #fff 0 8%, var(--board) 45%, color-mix(in srgb, var(--board) 40%, #000) 100%);
+}
+
+.hb-article-figure img {
+  border: 1px solid var(--gold-edge);
+}
+
+.hb-codeblock {
+  background: #07050f;
+  color: var(--ink);
+  border: 1px solid var(--gold-edge);
+  box-shadow: none;
+}
+
+.hb-codeblock-bar {
+  border-bottom: 1px solid var(--gold-edge);
+  color: var(--ink-soft);
+}
+
+.hb-codeblock-copy {
+  color: var(--gold-hi);
+  border: 1px solid var(--gold-lo);
+}
+
+.hb-codeblock-copy:hover {
+  background: rgb(216 169 59 / 0.18);
+  color: var(--gold-hi);
+}
+
+.hb-codeblock :focus-visible {
+  outline-color: var(--gold-hi);
+}
+
+/* ── footer ────────────────────────────────────────────────────────── */
+
+.hb-desk {
+  background: linear-gradient(#07050f, var(--night));
+  border-top: 1px solid var(--gold-edge);
+}
+
+.hb-desk h2 {
+  color: var(--gold);
+}
+
+.hb-desk-fine {
+  color: var(--ink-soft);
+}
+
+/* Footer links sit in running text in a near-identical colour, so the
+   underline is what tells them apart (axe link-in-text-block). */
+.hb-desk-fine a {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* ── errata slip stays vermilion; focus ring is gold on dark ───────── */
+
+.hb :focus-visible {
+  outline: 3px solid var(--gold-hi);
+  box-shadow: 0 0 0 6px var(--night);
+}
+
+/* ── hero sample hunt: quest log over the valley ───────────────────── */
+
+.hb-herohunt {
+  display: grid;
+  gap: 0.9rem;
+  padding: 1rem 1.1rem 1.1rem;
+  font-family: var(--font-sans);
+}
+
+.hb-herohunt-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 0.4rem 0.7rem;
+}
+
+.hb-herohunt-head .hb-mono {
+  flex: 1 1 14rem;
+  font-size: 0.72rem;
+  line-height: 1.4;
+}
+
+.hb-herohunt-hud .hb-hud-level {
+  margin: 0 0 0.35rem;
+  font-size: 1.15rem;
+}
+
+.hb-questlog {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.4rem;
+}
+
+.hb-questrow {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.7rem;
+  width: 100%;
+  min-height: 3rem;
+  padding: 0.35rem 0.7rem;
+  background: var(--panel);
+  border: 1px solid var(--gold-edge);
+  color: var(--ink);
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
+}
+
+.hb-questrow[aria-pressed='true'] {
+  background: #1d1740;
+  border-color: var(--gold);
+  box-shadow: 0 0 18px rgb(216 169 59 / 0.25);
+}
+
+.hb-questrow-text {
+  display: grid;
+  min-width: 0;
+}
+
+.hb-questrow-text .hb-mono {
+  font-size: 0.72rem;
+  overflow-wrap: anywhere;
+}
+
+.hb-questrow-score {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--gold-hi);
+}
+
+.hb-herolead {
+  display: grid;
+  gap: 0.6rem;
+  padding: 0.85rem 0.9rem;
+  background: var(--panel);
+  border: 1px solid var(--gold-edge);
+}
+
+.hb-herolead .hb-quote {
+  margin: 0;
+  font-size: 1.12rem;
+  line-height: 1.35;
+}
+
+.hb-herolead .hb-mono {
+  font-size: 0.74rem;
+}
+
+.hb-herohunt-quest {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  margin: 0;
+  padding: 0.6rem 0.8rem;
+  border: 1px solid var(--teal);
+  background: rgb(93 214 176 / 0.1);
+}
+
+/* ── the home valley: a fixed scene behind every chapter ───────────── */
+
+.hb-valley {
+  position: fixed;
+  z-index: 0;
+  top: var(--top-h);
+  bottom: 0;
+  left: 0;
+  right: var(--rail-w);
+  pointer-events: none;
+  background: linear-gradient(#1a1546, #6c3a6a 55%, #f58b4c);
+}
+
+.hb-home {
+  position: relative;
+  z-index: 1;
+}
+
+/* On the home page the boards are windows onto the valley: no field, no ridge. */
+.hb-home .hb-board {
+  background: none;
+}
+
+.hb-home .hb-board::after {
+  display: none;
+}
+
+.hb-home .hb-board:not(.hb-board--first) {
+  padding-block: clamp(2.5rem, 8vw, 6rem);
+}
+
+.hb-board--valley {
+  isolation: auto;
+  overflow: visible;
+  background: none;
+  padding-bottom: clamp(2.5rem, 6vw, 4rem);
+}
+
+.hb-valley-ctl {
+  position: fixed;
+  z-index: 45;
+  left: clamp(0.6rem, 2vw, 1.25rem);
+  bottom: clamp(0.6rem, 2vw, 1.25rem);
+  display: grid;
+  gap: 0.4rem;
+  justify-items: start;
+}
+
+.hb-valley-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.hb-valley-toggle[aria-pressed='true'] {
+  border-color: var(--gold);
+}
+
+.hb-valley-panel {
+  display: grid;
+  gap: 0.35rem;
+  padding: 0.6rem 0.7rem;
+  max-width: min(26rem, calc(100vw - var(--rail-w) - 1.5rem));
+  background: rgb(11 8 24 / 0.9);
+  border: 1px solid var(--gold-edge);
+  color: var(--ink);
+  font-size: 0.72rem;
+  backdrop-filter: blur(6px);
+}
+
+.hb-valley-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+}
+
+.hb-valley-note {
+  color: var(--ink-soft);
+}
+
+.hb-valley-toggle,
+.hb-valley-chip {
+  min-height: 2.75rem;
+  min-width: 2.75rem;
+  padding: 0 0.8rem;
+  background: rgb(11 8 24 / 0.88);
+  border: 1px solid var(--gold-edge);
+  color: var(--gold-hi);
+  font: inherit;
+  font-size: 0.75rem;
+  cursor: pointer;
+  backdrop-filter: blur(6px);
+}
+
+.hb-valley-toggle[aria-expanded='true'] {
+  border-color: var(--gold);
+}
+
+.hb-valley-chip {
+  color: var(--ink);
+}
+
+.hb-valley-chip[aria-pressed='true'] {
+  background: linear-gradient(#f3d58a, #d8a93b);
+  color: #1a1206;
+  border-color: var(--gold-lo);
+}
+
+.hb-valley-toggle:focus-visible,
+.hb-valley-chip:focus-visible {
+  outline-color: var(--gold-hi);
+}
+
+@media print {
+  .hb-valley,
+  .hb-valley-ctl {
+    display: none;
+  }
+}
+
+/* ── auth: Clerk's own markup, painted to match ────────────────────── */
+
+.hb-clerk .cl-formButtonPrimary {
+  border: 1px solid #5a4720;
+  border-radius: 2px;
+  background: linear-gradient(#f3d58a, #d8a93b 55%, #8a6420);
+  color: #1a1206;
+  font-family: var(--font-sans);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.55), 0 3px 0 #3a2a0a;
+}
+
+.hb-clerk .cl-formButtonPrimary:hover {
+  background: linear-gradient(#f3d58a, #d8a93b 55%, #8a6420);
+  filter: brightness(1.08);
+  transform: translateY(1px);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.55), 0 2px 0 #3a2a0a;
+}
+
+.hb-clerk .cl-socialButtonsBlockButton,
+.hb-clerk .cl-formFieldInput {
+  border: 1px solid var(--gold-edge);
+  border-radius: 2px;
+  background: var(--panel);
+  color: var(--ink);
+}
+
+.hb-clerk .cl-footerActionLink {
+  color: var(--gold-hi);
+}
+
+/* ── onboarding: the tutorial quest, re-inked ──────────────────────── */
+
+.hb-skin {
+  --bg-base: #0b0818;
+  --bg-surface: #120e22;
+  --bg-card: #1b1535;
+  --bg-inset: #120e22;
+  --bg-highlight: #d8a93b;
+  --bg-highlight-strong: #f3d58a;
+  --border-main: #5a4720;
+  --border-strong: #8a6420;
+  --shadow-color: rgb(0 0 0 / 0.5);
+  --shadow-accent: rgb(216 169 59 / 0.3);
+  --ink-primary-base: #f6ebd2;
+  --ink-muted-base: #d9d0ec;
+  --text-primary: #f6ebd2;
+  --text-muted: #d9d0ec;
+  --text-inverse: #0b0818;
+  --text-on-accent: #1a1206;
+  --forest-surface: #07050f;
+  --forest-ink: #f6ebd2;
+  --forest-muted: #d9d0ec;
+  --accent-primary: #d8a93b;
+  --accent-secondary: #5dd6b0;
+  --link-color: #f3d58a;
+  --focus-ring: #f3d58a;
+  --focus-halo: #0b0818;
+  --font-display: var(--font-hb-display), Georgia, serif;
+  --font-sans: var(--font-hb-text), system-ui, sans-serif;
+  --radius-md: 2px;
+  --radius-lg: 2px;
+  --radius-xl: 3px;
+  --radius-2xl: 3px;
+  --radius-3xl: 3px;
+  background:
+    radial-gradient(50rem 24rem at 50% -6%, rgb(108 58 106 / 0.5), transparent 70%),
+    linear-gradient(180deg, #1a1546, var(--night) 40%);
+}
+
+.hb-skin-body {
+  background: transparent;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hb-btn:hover,
+  .hb-btn:active,
+  .hb-top-cta:hover,
+  .hb-clerk .cl-formButtonPrimary:hover {
+    transform: none;
+  }
+}
+
+@media print {
+  .hb {
+    background: #fff;
+    color: #000;
+  }
+  .hb-board,
+  .hb-leaf,
+  .hb-ply,
+  .hb-card {
+    background: #fff;
+    color: #000;
+    box-shadow: none;
+  }
+}
+
+/* Fixed to the bottom-left corner, the controls sat over the quest log and
+   every chapter below it. They ride at the top right of the hero instead, under
+   the bar, and scroll away with it. */
+.hb-valley-ctl {
+  position: absolute;
+  top: calc(var(--top-h) + 0.5rem + env(safe-area-inset-top, 0px));
+  right: clamp(1rem, 4vw, 3rem);
+  left: auto;
+  bottom: auto;
+  justify-items: end;
+}
+
+.hb-valley-row {
+  order: -1;
+}
+
+@media (max-width: 47.99rem) {
+  .hb-home .hb-hero-stage {
+    padding-top: calc(var(--top-h) + 4.5rem);
+  }
+}

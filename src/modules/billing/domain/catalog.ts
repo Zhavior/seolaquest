@@ -106,7 +106,7 @@ export const FOUNDER_SEAT_LIMIT = 50
 export const FOUNDER_LOCK_TERMS = [
   'Your rate stays at the founder price for as long as the subscription stays active, even after public pricing rises.',
   'Cancelling releases the seat and the locked rate. Resubscribing later uses whatever the public price is then.',
-  'The lock covers the software subscription, not usage: it includes a fixed monthly mana allowance, with top-up packs sold separately.',
+  'The lock covers the software subscription, not usage: it includes a fixed monthly mana allowance. Top-up packs are not on sale yet and will be priced separately when they are.',
 ] as const
 
 export function isPlanCode(value: string): value is PlanCode {

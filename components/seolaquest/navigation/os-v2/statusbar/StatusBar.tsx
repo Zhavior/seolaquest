@@ -6,12 +6,11 @@ import {
   Menu,
   Sword,
   Zap,
-  Volume2,
-  VolumeX,
   PanelLeftClose,
   PanelLeftOpen,
 } from 'lucide-react'
 import { sfx } from '@/lib/sfx'
+import { SoundControls } from './SoundControls'
 
 
 interface StatusBarProps {
@@ -35,26 +34,6 @@ export default function StatusBar({
   onOpenNavigation,
   onToggleCollapsed,
 }: StatusBarProps) {
-  /**
-   * The sound toggle keeps its state on the DOM rather than in React.
-   *
-   * The server cannot read localStorage, so any React state seeded from it
-   * disagrees with the server-rendered HTML on the very first client render.
-   * Instead the blocking script in the root layout applies the saved
-   * preference as a class on `<html>` before first paint, and CSS picks the
-   * matching icon — correct immediately, with nothing to reconcile.
-   *
-   * Colour mode is handled the same way one level up, by ThemeScript +
-   * ThemeProvider; this bar just renders the shared <ThemeToggle />.
-   */
-  const toggleSfx = () => {
-    // `sfx.toggle()` is what actually mutes the engine and persists the choice.
-    // This used to flip a local boolean only, so the button swapped its own icon
-    // and the sound kept playing.
-    const enabled = sfx.toggle()
-    document.documentElement.classList.toggle('sfx-muted', !enabled)
-  }
-
   return (
     <header
       aria-label="SEOlaQuest navigation"
@@ -113,17 +92,7 @@ export default function StatusBar({
           {/* Thin divider */}
           <div className="hidden sm:block w-px h-6 bg-outline mx-0.5" />
 
-          {/* SFX Sound Toggle */}
-          <button
-            type="button"
-            onClick={toggleSfx}
-            aria-label="Toggle sound effects"
-            title="Toggle sound effects"
-            className="grid size-9 shrink-0 place-items-center rounded-lg border border-outline bg-card shadow-none transition-transform duration-150 hover:-translate-y-0.5 hover:shadow-sm active:translate-y-0 active:shadow-none"
-          >
-            <Volume2 aria-hidden="true" className="sfx-icon-on size-4 text-ink" strokeWidth={1.75} />
-            <VolumeX aria-hidden="true" className="sfx-icon-off size-4 text-ink" strokeWidth={1.75} />
-          </button>
+          <SoundControls />
 
           {/* Recharge CTA */}
           <Link

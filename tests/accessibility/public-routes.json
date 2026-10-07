@@ -3,7 +3,7 @@
   "routes": [
     {
       "path": "/",
-      "title": "SEOlaQuest | Customer Research on X",
+      "title": "SEOlaQuest | Find Buyers on X",
       "requiredLandmarks": [
         "main"
       ]

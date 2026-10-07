@@ -1,0 +1,1073 @@
+/* ══ THE ARTIFACT UI ══════════════════════════════════════════════════════
+   Loaded last. The public site's interface, taken from the approved valley
+   design: a fixed bar floating over the scene, bare text on the sky behind a
+   left scrim, gold bevelled buttons, engraved panels with diamond corners, and
+   dark glass for everything that has to be read. There is no rail, no colour
+   board and no punched leaf any more; the scene is the page.
+
+   Legibility rule, unchanged: running text only ever sits on glass or a panel.
+   Only the hero's large headline and lede sit on the bare scene, behind the
+   scrim, with a dark halo.
+   ═════════════════════════════════════════════════════════════════════════ */
+
+.hb {
+  --rail-w: 0px;
+  --top-h: 4.5rem;
+  --gold: #d8a93b;
+  --gold-hi: #f3d58a;
+  --gold-lo: #8a6420;
+  --glass: rgb(11 8 24 / 0.8);
+  --muted: #a99fc9;
+  scroll-behavior: smooth;
+}
+
+.hb-book {
+  margin-right: 0;
+}
+
+.hb main {
+  position: relative;
+  z-index: 10;
+}
+
+/* ── painted sky: every page; the home page lays the live valley over it ─ */
+
+.hb-sky {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background: linear-gradient(180deg, #15122e, #5e3258 55%, #d9704a);
+}
+
+.hb-sky::before,
+.hb-valley::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, rgb(8 6 20 / 0.7), rgb(8 6 20 / 0.28) 46%, rgb(8 6 20 / 0) 72%);
+  pointer-events: none;
+}
+
+.hb-sky::after {
+  content: '';
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 22vh;
+  background: #07050f;
+  opacity: 0.8;
+  clip-path: polygon(
+    0 100%, 0 60%, 6% 44%, 12% 58%, 19% 30%, 26% 52%, 33% 38%, 41% 62%, 49% 28%, 56% 50%, 63% 36%,
+    71% 60%, 78% 26%, 85% 50%, 92% 38%, 97% 56%, 100% 42%, 100% 100%
+  );
+}
+
+.hb-valley {
+  top: 0;
+  right: 0;
+}
+
+.hb-intro {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background: #05040c;
+  pointer-events: none;
+  animation: hb-introfade 2.2s ease-out 0.2s both;
+}
+
+@keyframes hb-introfade {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
+/* ── the bar ───────────────────────────────────────────────────────── */
+
+.hb-topbar {
+  position: fixed;
+  z-index: 40;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem 1.25rem;
+  padding: calc(0.7rem + env(safe-area-inset-top, 0px)) clamp(1rem, 4vw, 3rem) 0.7rem;
+  background: transparent;
+  transition: background 0.3s;
+}
+
+.hb-topbar[data-scrolled] {
+  background: rgb(11 8 24 / 0.82);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid #2d2350;
+}
+
+.hb-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7rem;
+  min-height: 44px;
+  color: var(--ink);
+  text-decoration: none;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.45rem;
+  letter-spacing: 0.01em;
+}
+
+.hb-brand:hover {
+  color: var(--gold-hi);
+}
+
+.hb-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1.6rem;
+  /* Capitalised labels use the text face: blackletter capitals run together. */
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 0.82rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.hb-links a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.hb-links a:hover {
+  color: var(--gold-hi);
+}
+
+.hb-account {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.hb-top-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 0.7rem;
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+/* The section links need about 62rem beside the wordmark and account links;
+   below that they fold away so the bar stays one row and never spills onto
+   the page. */
+@media (max-width: 61.99rem) {
+  .hb-links {
+    display: none;
+  }
+  .hb-topbar {
+    flex-wrap: nowrap;
+    gap: 0.5rem;
+  }
+  .hb-brand {
+    gap: 0.5rem;
+    min-width: 0;
+  }
+  .hb-brand > svg {
+    flex-shrink: 0;
+  }
+  .hb-account {
+    flex-shrink: 0;
+    gap: 0.25rem;
+  }
+}
+
+@media (max-width: 47.99rem) {
+  .hb-brand-word {
+    font-size: 1.15rem;
+  }
+  .hb-top-link {
+    padding: 0 0.5rem;
+  }
+  .hb-topbar .hb-btn--small {
+    padding-inline: 0.9rem;
+  }
+}
+
+/* Below this width the wordmark and both account links cannot share one row;
+   the crest alone still reads as home and keeps its accessible name. */
+@media (max-width: 21.5rem) {
+  .hb-brand-word {
+    display: none;
+  }
+}
+
+/* ── buttons: the bevelled gold plate ──────────────────────────────── */
+
+.hb-btn {
+  position: relative;
+  overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  min-height: 48px;
+  padding: 0.9rem 1.8rem;
+  border: 0;
+  border-radius: 0;
+  background: var(--gold);
+  color: #1a1206;
+  font-family: var(--font-sans);
+  font-weight: 800;
+  font-size: 0.92rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  text-decoration: none;
+  box-shadow: inset 0 2px 0 var(--gold-hi), inset 0 -3px 0 var(--gold-lo);
+  clip-path: polygon(10px 0, calc(100% - 10px) 0, 100% 10px, 100% calc(100% - 10px), calc(100% - 10px) 100%, 10px 100%, 0 calc(100% - 10px), 0 10px);
+  filter: none;
+  transition: transform 0.15s, filter 0.15s;
+}
+
+.hb-btn::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 30%;
+  width: 45%;
+  background: linear-gradient(100deg, #fff0, #fffa, #fff0);
+  transform: translateX(-130%);
+  pointer-events: none;
+}
+
+.hb-btn:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.08);
+  box-shadow: inset 0 2px 0 var(--gold-hi), inset 0 -3px 0 var(--gold-lo);
+}
+
+.hb-btn:hover::after {
+  animation: hb-sheen 0.7s ease-out;
+}
+
+@keyframes hb-sheen {
+  0% {
+    transform: translateX(-130%);
+  }
+  100% {
+    transform: translateX(130%);
+  }
+}
+
+.hb-btn:active {
+  transform: translateY(0);
+}
+
+.hb-btn--small {
+  min-height: 44px;
+  padding: 0.7rem 1.3rem;
+  font-size: 0.78rem;
+  letter-spacing: 0.12em;
+}
+
+.hb-btn--label {
+  background: rgb(11 8 24 / 0.82);
+  color: var(--ink);
+  border: 1px solid var(--gold);
+  box-shadow: none;
+  clip-path: none;
+  font-weight: 600;
+}
+
+.hb-btn--label:hover {
+  background: #1b1432;
+  border-color: var(--gold-hi);
+  color: var(--ink);
+  box-shadow: none;
+}
+
+.hb-btn--label::after {
+  display: none;
+}
+
+.hb-btn:disabled,
+.hb-btn[aria-disabled='true'] {
+  background: repeating-linear-gradient(-45deg, #1a1433 0 6px, #231b42 6px 7px);
+  color: var(--ink-soft);
+  border: 1px dashed var(--gold-lo);
+  box-shadow: none;
+  clip-path: none;
+  transform: none;
+  filter: none;
+}
+
+/* ── stages: bare scene between glass panels ───────────────────────── */
+
+.hb-board {
+  background: none;
+  padding: clamp(2rem, 7vw, 5rem) clamp(1rem, 4vw, 3rem);
+}
+
+.hb-board::after {
+  display: none;
+}
+
+.hb-board--first {
+  padding-top: calc(var(--top-h) + clamp(1.5rem, 5vw, 3rem));
+  min-height: auto;
+  display: block;
+}
+
+.hb-home .hb-board:not(.hb-hero-stage) {
+  min-height: 72svh;
+  display: flex;
+  align-items: center;
+}
+
+.hb-home .hb-board:not(.hb-hero-stage) > .hb-leaf {
+  width: 100%;
+  max-width: min(100%, 60rem);
+  margin-inline: 0 auto;
+}
+
+.hb-home .hb-board:nth-of-type(even):not(.hb-hero-stage) > .hb-leaf {
+  margin-inline: auto 0;
+}
+
+.hb-home .hb-board {
+  max-width: 85rem;
+  margin-inline: auto;
+}
+
+/* ── glass and engraved panels ─────────────────────────────────────── */
+
+.hb-leaf {
+  background: var(--glass);
+  border: 1px solid #3b2f14;
+  border-radius: 0;
+  box-shadow: 0 24px 56px rgb(0 0 0 / 0.5);
+  backdrop-filter: blur(12px);
+  max-width: 64rem;
+  padding: clamp(1.25rem, 3.4vw, 2.5rem);
+}
+
+.hb-leaf::before,
+.hb-leaf::after,
+.hb-panel::before,
+.hb-panel::after {
+  content: '';
+  position: absolute;
+  left: auto;
+  top: auto;
+  right: auto;
+  bottom: auto;
+  width: 11px;
+  height: 11px;
+  border: 0;
+  border-radius: 0;
+  background: linear-gradient(135deg, #fbe9b0, #b88a2e);
+  transform: rotate(45deg);
+  box-shadow: 0 0 0 1px #3a2a0a;
+}
+
+.hb-leaf::before,
+.hb-panel::before {
+  top: -7px;
+  left: -7px;
+}
+
+.hb-leaf::after,
+.hb-panel::after {
+  bottom: -7px;
+  right: -7px;
+}
+
+.hb-panel,
+.hb-ply {
+  position: relative;
+  background: linear-gradient(180deg, rgb(26 20 51 / 0.9), rgb(12 9 25 / 0.92));
+  border: 1px solid #a8832f;
+  box-shadow: 0 0 0 3px #0e0a1c, 0 0 0 4px var(--gold-edge), inset 0 1px 0 rgb(255 255 255 / 0.12), 0 28px 60px rgb(0 0 0 / 0.7);
+  padding: 1.1rem;
+  backdrop-filter: blur(10px);
+}
+
+/* A chapter's heading sits above its body, not in a margin column. */
+.hb-spread {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1.1rem;
+}
+
+.hb-side {
+  position: static;
+}
+
+.hb-side h2,
+.hb-side .hb-sidehead {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(1.7rem, 3.6vw, 2.9rem);
+  line-height: 1.1;
+  text-wrap: balance;
+  color: var(--ink);
+}
+
+.hb-side .hb-sidenote {
+  margin-top: 0.7rem;
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #ffd6a0;
+}
+
+.hb-main {
+  grid-column: auto;
+}
+
+@media (min-width: 62rem) {
+  .hb-spread {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .hb-main {
+    grid-column: auto;
+  }
+  .hb-side {
+    grid-column: auto;
+    position: static;
+  }
+}
+
+/* ── hero: bare text on the scene ──────────────────────────────────── */
+
+.hb-hero-stage {
+  min-height: auto;
+  padding-bottom: clamp(3rem, 8vw, 6rem);
+}
+
+.hb-hero-top {
+  min-height: clamp(26rem, 78svh, 52rem);
+  padding-bottom: clamp(2rem, 6vw, 4rem);
+  max-width: 44rem;
+}
+
+.hb-eyebrow {
+  margin: 0 0 1rem;
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-size: 0.76rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #ffd6a0;
+  text-shadow: 0 1px 0 rgb(11 8 24 / 0.8), 0 0 16px rgb(11 8 24 / 0.9);
+  animation: hb-rise 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) 0.3s both;
+}
+
+.hb-hero-stage .hb-display {
+  margin: 0;
+  font-size: clamp(2.9rem, 7.4vw, 6rem);
+  line-height: 1;
+  text-wrap: balance;
+  background: linear-gradient(180deg, #fff8e0 0%, #f4d88c 46%, #b88a2e 54%, #f0cf7a 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  text-shadow: none;
+  filter: drop-shadow(0 4px 0 rgb(11 8 24 / 0.7)) drop-shadow(0 0 24px rgb(255 179 71 / 0.2));
+  animation: hb-rise 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) 0.5s both;
+}
+
+.hb-hero-lead {
+  margin: 1.25rem 0 0;
+  max-width: 34em;
+  font-family: var(--font-text);
+  font-size: clamp(1.05rem, 1.6vw, 1.25rem);
+  line-height: 1.55;
+  color: #eadfc8;
+  text-shadow: 0 1px 0 rgb(11 8 24 / 0.6), 0 0 18px rgb(11 8 24 / 0.7);
+  animation: hb-rise 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) 0.75s both;
+}
+
+.hb-ctas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-top: 1.75rem;
+  animation: hb-rise 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) 0.95s both;
+}
+
+.hb-ctas--center {
+  justify-content: center;
+}
+
+.hb-hero-fine {
+  margin-top: 1.1rem;
+  max-width: 46ch;
+  color: #eadfc8;
+  text-shadow: 0 0 14px rgb(11 8 24 / 0.9);
+}
+
+@keyframes hb-rise {
+  0% {
+    opacity: 0;
+    transform: translateY(26px);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ── the deck: quest log, lead card, note ──────────────────────────── */
+
+.hb-deck {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 1.25rem;
+  max-width: 85rem;
+  margin-inline: auto;
+}
+
+.hb-log {
+  flex: 0 1 26rem;
+  min-width: min(18.75rem, 100%);
+}
+
+.hb-tip {
+  flex: 0 1 27rem;
+  min-width: min(18.75rem, 100%);
+  padding: 0;
+  transition: box-shadow 0.4s, border-color 0.4s;
+}
+
+.hb-note {
+  flex: 1 1 14rem;
+  min-width: min(12.5rem, 100%);
+  margin: 0;
+  padding: 0.8rem 0.9rem;
+  font-size: 0.82rem;
+  line-height: 1.5;
+  color: var(--ink-soft);
+  background: rgb(11 8 24 / 0.82);
+  border: 1px solid #2d2350;
+}
+
+.hb-ph {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.5rem;
+  padding-bottom: 0.65rem;
+  margin-bottom: 0.8rem;
+  border-bottom: 1px solid #3b2f14;
+}
+
+.hb-ph b {
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  color: #e9c766;
+}
+
+.hb-ph span {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+}
+
+.hb-herohud {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.75rem;
+  margin-bottom: 0.9rem;
+}
+
+.hb-lv {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.2rem 0.55rem;
+  background: var(--gold);
+  color: #1a1206;
+  font-family: var(--font-mono);
+  font-weight: 600;
+  font-size: 0.74rem;
+  letter-spacing: 0.1em;
+}
+
+.hb-xpbar {
+  position: relative;
+  flex: 1 1 6rem;
+  height: 10px;
+  min-width: 5rem;
+  background: #251c45;
+  overflow: hidden;
+  border: 0;
+  margin: 0;
+}
+
+.hb-xpbar i {
+  position: absolute;
+  inset: 0 auto 0 0;
+  background: var(--teal);
+  transition: width 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.hb-xptxt {
+  flex: 1 0 100%;
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 0.8rem;
+  letter-spacing: 0.06em;
+  color: var(--ink-soft);
+  font-variant-numeric: tabular-nums;
+}
+
+.hb-qrows {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.hb-qrows li + li {
+  margin-top: 0.5rem;
+}
+
+.hb-qrow {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: 0.75rem;
+  min-height: 3.4rem;
+  padding: 0.5rem 0.75rem;
+  background: #120e24;
+  border: 1px solid #2d2350;
+  color: var(--ink);
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
+  transition: transform 0.15s, background 0.15s;
+}
+
+.hb-qrow:hover {
+  transform: translateX(5px);
+  background: #1f1740;
+}
+
+.hb-qrow[aria-pressed='true'] {
+  background: #1b1432;
+}
+
+.hb-qrow-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.hb-qrow-text b {
+  display: block;
+  font-weight: 500;
+  font-size: 0.95rem;
+  line-height: 1.3;
+}
+
+.hb-qrow-text small {
+  display: block;
+  margin-top: 2px;
+  font-size: 0.8rem;
+  color: var(--muted);
+  overflow-wrap: anywhere;
+}
+
+.hb-qrow-score {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 1.6rem;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.hb-tbar {
+  height: 4px;
+}
+
+.hb-tb {
+  padding: 1.1rem 1.3rem 1.25rem;
+  animation: hb-tipin 0.45s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+@keyframes hb-tipin {
+  0% {
+    opacity: 0;
+    transform: translateY(14px) scale(0.97);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.hb-tt {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+}
+
+.hb-floaty {
+  animation: hb-floaty 4s ease-in-out infinite;
+}
+
+@keyframes hb-floaty {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+.hb-tip-name {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.35rem;
+  line-height: 1.2;
+}
+
+.hb-tt small {
+  display: block;
+  margin-top: 4px;
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 0.75rem;
+  letter-spacing: 0.14em;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+
+.hb-bigscore {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  margin: 0.9rem 0 0.2rem;
+}
+
+.hb-bigscore b {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 3.2rem;
+  line-height: 1;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.hb-bigscore span {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 0.9rem;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+}
+
+.hb-tb hr {
+  border: 0;
+  height: 1px;
+  background: #4a3c18;
+  margin: 0.75rem 0;
+}
+
+.hb-tb .hb-quote {
+  margin: 0;
+  font-size: 1.3rem;
+  line-height: 1.35;
+  color: #e8dfc8;
+}
+
+.hb-by {
+  margin-top: 0.5rem;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.hb-facts {
+  display: grid;
+  gap: 0.25rem;
+  margin-top: 0.9rem;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.hb-facts p {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+}
+
+.hb-facts svg {
+  flex: none;
+}
+
+.hb-good {
+  color: #7fe0c0;
+}
+
+.hb-src {
+  color: #c9d6ff;
+}
+
+.hb-acts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1.1rem;
+}
+
+.hb-done {
+  margin-top: 1.1rem;
+  padding: 0.75rem 0.9rem;
+  border: 1px solid #3b2f14;
+  color: var(--ink-soft);
+  font-size: 0.92rem;
+}
+
+.hb-quest-done {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  margin: 0.9rem 0 0;
+  padding: 0.6rem 0.8rem;
+  border: 1px solid var(--teal);
+  background: rgb(93 214 176 / 0.1);
+}
+
+/* ── route stops, quest board, end stage ───────────────────────────── */
+
+.hb-stops {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+@media (max-width: 40rem) {
+  .hb-stops {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.hb-stop {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 1.1rem;
+  background: rgb(18 14 34 / 0.9);
+  border: 1px solid #3b2f14;
+  transition: transform 0.25s, border-color 0.25s;
+}
+
+.hb-stop:hover {
+  transform: translateY(-6px);
+  border-color: var(--gold);
+}
+
+.hb-stop--hot {
+  border-color: var(--gold);
+}
+
+.hb-stop h3 {
+  margin: 0.3rem 0 0;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.3rem;
+  letter-spacing: 0.01em;
+  color: var(--ink);
+}
+
+.hb-stop--hot h3 {
+  color: #e9c766;
+}
+
+.hb-stop p {
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: #c9c0de;
+}
+
+.hb-qboard {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.hb-q {
+  display: flex;
+  gap: 1.1rem;
+  align-items: center;
+  padding: 0.9rem 0;
+  border-bottom: 1px solid #2d2350;
+}
+
+.hb-q:last-child {
+  border-bottom: 0;
+}
+
+.hb-q svg {
+  flex: none;
+}
+
+.hb-q b {
+  display: block;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1.1rem;
+  letter-spacing: 0.04em;
+}
+
+.hb-q small {
+  display: block;
+  margin-top: 3px;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.hb-q--lock b {
+  color: var(--muted);
+}
+
+.hb-details > summary {
+  cursor: pointer;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+}
+
+.hb-end {
+  max-width: 48rem;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  text-align: center;
+  padding: clamp(1.5rem, 4vw, 2.5rem);
+  background: var(--glass);
+  border: 1px solid #3b2f14;
+  backdrop-filter: blur(12px);
+}
+
+.hb-end-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(2rem, 5vw, 3.4rem);
+  line-height: 1.1;
+  color: var(--ink);
+}
+
+.hb-end-lede {
+  max-width: 40em;
+  color: #eadfc8;
+}
+
+.hb-end-steps {
+  width: 100%;
+  max-width: 28rem;
+  text-align: left;
+}
+
+/* ── footer ────────────────────────────────────────────────────────── */
+
+.hb-desk {
+  position: relative;
+  z-index: 10;
+  background: #07050f;
+  border-top: 1px solid var(--gold-edge);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hb-intro {
+    display: none;
+  }
+  .hb {
+    scroll-behavior: auto;
+  }
+  .hb-eyebrow,
+  .hb-hero-stage .hb-display,
+  .hb-hero-lead,
+  .hb-ctas {
+    animation: none;
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .hb-leaf,
+  .hb-end,
+  .hb-panel,
+  .hb-note,
+  .hb-topbar[data-scrolled] {
+    background: #120e22;
+    backdrop-filter: none;
+  }
+}
+
+@media (max-width: 47.99rem) {
+  .hb-hero-top {
+    min-height: clamp(22rem, 62svh, 40rem);
+  }
+  /* On a phone the copy covers the busiest part of the valley, beacons
+     included; a soft night wash behind it keeps every line readable. */
+  .hb-hero-top {
+    position: relative;
+    isolation: isolate;
+  }
+  .hb-hero-top::before {
+    content: '';
+    position: absolute;
+    z-index: -1;
+    inset: -1.5rem -1rem;
+    background: linear-gradient(180deg, rgb(11 8 24 / 0.35), rgb(11 8 24 / 0.72) 30%, rgb(11 8 24 / 0.72) 80%, rgb(11 8 24 / 0));
+    pointer-events: none;
+  }
+  .hb-home .hb-board:not(.hb-hero-stage) {
+    min-height: auto;
+  }
+}
+
+/* The blackletter cut, kept to headings whose words it can carry: the wordmark,
+   the home headline, page titles and chapter heads. `.hb-plain` drops back to
+   the roman cut for capitals the gothic one cannot render legibly. Last in the
+   cascade so it wins over the heading rules above. */
+.hb-brand,
+.hb-hero-stage .hb-display,
+.hb-auth .hb-display--post,
+.hb-side h2,
+.hb-side .hb-sidehead {
+  font-family: var(--font-gothic);
+}
+
+.hb-plain {
+  font-family: var(--font-display);
+}

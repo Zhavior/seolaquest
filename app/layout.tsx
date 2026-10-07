@@ -1,29 +1,16 @@
 import './globals.css'
 import type { Metadata, Viewport } from 'next'
-import { DM_Sans, Fraunces } from 'next/font/google'
 import { SkipLink } from '@/components/SkipLink'
 import { ThemeProvider } from '@/components/theme/ThemeProvider'
 import { ThemeScript } from '@/components/theme/ThemeScript'
 import { siteUrl } from '@/lib/siteUrl'
+import { handbookFontVariables } from '@/features/handbook/fonts'
 import { Analytics } from '@vercel/analytics/next'
 import { SpeedInsights } from '@vercel/speed-insights/next'
 
-const bodyFont = DM_Sans({
-  subsets: ['latin'],
-  display: 'swap',
-  adjustFontFallback: true,
-  variable: '--font-dm-sans',
-})
-
-const displayFont = Fraunces({
-  subsets: ['latin'],
-  display: 'swap',
-  variable: '--font-fraunces',
-})
-
-const TITLE = 'SEOlaQuest | AI Social Listening & Lead Monitoring'
+const TITLE = 'SEOlaQuest | Find Buyers on X'
 const DESCRIPTION =
-  'SEOlaQuest monitors X (Twitter) for your target keywords in real time. AI scouts flag posts from potential customers and deliver matched leads to your dashboard automatically. Reddit support is in development.'
+  'Scan X for the problems you solve. Every match is scored for buyer intent and arrives with its source post. Play it as a daily quest: claim leads, earn XP, level up.'
 
 export const metadata: Metadata = {
   // Without `metadataBase` every relative URL below resolves against the
@@ -70,7 +57,7 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" className={`${bodyFont.variable} ${displayFont.variable}`} suppressHydrationWarning>
+    <html lang="en" className={handbookFontVariables} suppressHydrationWarning>
       <head>
         {/*
           Both scripts run synchronously while the browser parses the document,

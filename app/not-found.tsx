@@ -1,4 +1,6 @@
 import Link from 'next/link'
+import { HandbookFrame } from '@/features/handbook/components/HandbookFrame'
+import { HandbookPage } from '@/features/handbook/components/primitives'
 
 export const metadata = {
   title: 'Page Not Found | SEOlaQuest',
@@ -7,37 +9,36 @@ export const metadata = {
 
 // Without this route, every 404 on the public site falls back to the built-in
 // Next.js page, which renders no `main` landmark and no way back into the site.
-// The accessibility gate treats a missing main landmark as a hard failure.
+// The accessibility gate treats a missing main landmark as a hard failure; the
+// handbook frame supplies that landmark.
 export default function NotFound() {
   return (
-    <main className="flex min-h-screen items-center justify-center bg-canvas p-6">
-      <section className="max-w-xl rounded-[20px] border border-outline bg-card p-8">
-        <p className="text-xs font-semibold text-ink-muted">SEOlaQuest could not find this page</p>
-        <h1 className="font-display mt-3 text-3xl font-medium">Nothing here.</h1>
-        <p className="mt-4 font-medium text-ink-muted">
-          The address may be mistyped, or the page may have been retired. The links below still work.
-        </p>
-        <nav aria-label="Recovery links" className="mt-6 flex flex-wrap gap-3">
-          <Link
-            href="/"
-            className="rounded-xl border border-outline bg-accent px-5 py-3 font-semibold text-on-accent"
-          >
-            Home
-          </Link>
-          <Link
-            href="/blog"
-            className="rounded-xl border border-outline bg-card px-5 py-3 font-semibold"
-          >
-            Blog
-          </Link>
-          <Link
-            href="/pricing"
-            className="rounded-xl border border-outline bg-card px-5 py-3 font-semibold"
-          >
-            Pricing
-          </Link>
-        </nav>
-      </section>
-    </main>
+    <HandbookFrame>
+      <HandbookPage volume="errata" title="404" note="SEOlaQuest could not find this page.">
+        <div className="hb-stack" style={{ '--gap': '1.6rem' } as React.CSSProperties}>
+          <p>
+            <span className="hb-slip">PAGE NOT IN THIS EDITION</span>
+          </p>
+          <p className="hb-lede">Nothing here.</p>
+          <p className="hb-prose">
+            The address may be mistyped, or the page may have been retired. The links below still work.
+          </p>
+          <nav aria-label="Recovery links" className="hb-row">
+            <Link href="/" className="hb-btn">
+              Home
+            </Link>
+            <Link href="/radar" className="hb-btn hb-btn--label">
+              Try the sample hunt
+            </Link>
+            <Link href="/pricing" className="hb-btn hb-btn--label">
+              Pricing
+            </Link>
+            <Link href="/blog" className="hb-btn hb-btn--label">
+              Field notes
+            </Link>
+          </nav>
+        </div>
+      </HandbookPage>
+    </HandbookFrame>
   )
 }

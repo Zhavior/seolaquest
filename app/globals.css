@@ -1,8 +1,9 @@
 @import "tailwindcss";
 
 @theme {
-  --font-display: var(--font-fraunces), Georgia, serif;
-  --font-sans: var(--font-dm-sans), ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --font-display: var(--font-hb-display), Georgia, serif;
+  --font-sans: var(--font-hb-text), ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --font-mono: var(--font-hb-mono), ui-monospace, "SF Mono", Menlo, monospace;
 }
 
 /* ══ THEME PALETTES ═══════════════════════════════════════════════════════
@@ -177,6 +178,64 @@
   --canvas-texture: none;
 }
 
+/* Dusk: the public site's night-violet and old-gold palette, used by the
+   signed-in dashboard so it reads as the same world as the valley header.
+   Applied with data-theme="dusk" on the dashboard root, so it overrides the
+   app-wide theme for that subtree only. Bright fills keep dark ink
+   (--text-on-accent), as in every other theme. */
+[data-theme="dusk"] {
+  color-scheme: dark;
+
+  --bg-base: #0b0818;
+  --bg-surface: #120e22;
+  --bg-card: #1b1535;
+  --bg-inset: #120e22;
+
+  --border-main: #3a3056;
+  --border-strong: #5a4720;
+
+  --shadow-color: transparent;
+  --shadow-accent: rgb(216 169 59 / 0.22);
+
+  --ink-primary-base: #f6ebd2;
+  --ink-muted-base: #c9c0e0;
+  --text-primary: var(--ink-primary-base);
+  --text-muted: var(--ink-muted-base);
+  --text-inverse: #0b0818;
+  --text-on-accent: #1a1206;
+
+  --forest-surface: #07050f;
+  --forest-ink: #f6ebd2;
+  --forest-muted: #d9d0ec;
+
+  --accent-primary: #d8a93b;
+  --accent-secondary: #5dd6b0;
+
+  /* Panels here are night glass, not sticky notes: the big highlight surface is
+     a lifted violet that keeps the theme's light ink (see the rule below).
+     The strong variant stays gold for small badges that carry dark text. */
+  --bg-highlight: #231b42;
+  --bg-highlight-strong: #f3d58a;
+
+  --status-success: #5dd6b0;
+  --status-warning: #f3b34a;
+  --status-danger: #f87171;
+  --status-danger-ink: #f87171;
+  --status-info: #5db2ff;
+
+  --focus-ring: #f3d58a;
+  --focus-halo: #0b0818;
+
+  --link-color: #f3d58a;
+  --canvas-texture: none;
+
+  --font-display: var(--font-hb-display), Georgia, serif;
+
+  background-image:
+    radial-gradient(60rem 28rem at 50% -8rem, rgb(108 58 106 / 0.45), transparent 70%),
+    linear-gradient(180deg, #1a1546, #0b0818 32rem);
+}
+
 /* Ink for fills that are always dark (bg-black and friends) — identical in
    every theme, because the fill itself is. */
 :root {
@@ -250,6 +309,14 @@
   .bg-info {
     --text-primary: var(--text-on-accent);
     --text-muted: color-mix(in srgb, var(--text-on-accent) 70%, transparent);
+    color: var(--text-primary);
+  }
+
+  /* In Dusk the highlight surface is dark, so it keeps light ink instead of
+     switching to the dark on-accent ink every other theme uses there. */
+  [data-theme="dusk"] .bg-highlight {
+    --text-primary: var(--ink-primary-base);
+    --text-muted: var(--ink-muted-base);
     color: var(--text-primary);
   }
 
@@ -431,13 +498,17 @@
   /* Canvas colours live here rather than as an inline style on <body>, which
      no stylesheet (and therefore no theme) could ever override. */
   h1, h2 {
-    font-family: var(--font-fraunces), Georgia, serif;
-    font-weight: 500;
-    letter-spacing: -0.025em;
+    font-family: var(--font-display);
+    font-weight: 600;
+    letter-spacing: 0;
     overflow-wrap: break-word;
   }
 
   body {
+    /* Martian Mono is wide at its default width; narrow it everywhere. The
+       other faces have no width axis and ignore this. Set here rather than via
+       font-stretch, which every font shorthand would reset. */
+    font-variation-settings: 'wdth' 87.5;
     background-color: var(--bg-base);
     background-image: var(--canvas-texture);
     background-size: auto, 40px 40px, 40px 40px;
@@ -767,4 +838,12 @@ html.sfx-muted .sfx-icon-on {
 @keyframes radar-fade {
   from { opacity: 0; }
   to   { opacity: 1; }
+}
+
+/* Outside any layer on purpose: a text-on-accent utility on a Dusk highlight
+   panel (or on its direct text and icon children, but not on a filled button
+   inside it) would otherwise win and paint dark ink on the dark panel. */
+[data-theme="dusk"] .bg-highlight.text-on-accent,
+[data-theme="dusk"] .bg-highlight > .text-on-accent:not([class*="bg-"]) {
+  color: var(--ink-primary-base);
 }

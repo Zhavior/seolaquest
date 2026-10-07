@@ -99,6 +99,7 @@ export class GamifyQuestService {
 
       const results: GamifyQuestContributionResult[] = []
       for (const candidate of candidates) {
+        if (candidate.cycleKey !== assignmentCycle(candidate.quest.type, occurredAt).key) continue
         await this.lockAssignment(candidate.id, tx)
         const assignment = await tx.gamifyQuestAssignment.findUnique({
           where: { id: candidate.id },

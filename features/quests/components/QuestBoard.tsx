@@ -1,6 +1,9 @@
 'use client'
 
-import { useState, useTransition } from 'react'
+import { useRef, useState, useTransition } from 'react'
+import Link from 'next/link'
+import { motion, useReducedMotion } from 'framer-motion'
+import { sfx } from '@/lib/sfx'
 import { CheckCircle2, Clock, Lock, Trophy } from 'lucide-react'
 import { QuestPanel, QuestSectionHeading, questBadge, questButton } from '@/components/quest'
 import { claimQuestRewardAction } from '@/features/quests/actions'
@@ -26,7 +29,7 @@ function ProgressBar({ percent, target, progress }: { percent: number; target: n
         assistive tech rather than announced twice.
       */}
       <div aria-hidden="true" className="h-3 w-full border border-outline bg-inset rounded-xl">
-        <div className="h-full bg-emerald-400" style={{ width: `${percent}%` }} />
+        <div className="h-full rounded-xl bg-emerald-400 motion-safe:transition-[width] motion-safe:duration-300" style={{ width: `${percent}%` }} />
       </div>
       <p className="mt-1 text-xs font-semibold normal-case tracking-wider text-ink-muted">
         {progress} / {target} complete
@@ -39,10 +42,12 @@ function QuestCard({
   entry,
   onClaim,
   claiming,
+  busy = false,
 }: {
   entry: QuestBoardEntry
   onClaim?: (id: string) => void
   claiming: boolean
+  busy?: boolean
 }) {
   const isClaimable = entry.status === 'COMPLETED'
   const isExpired = entry.status === 'EXPIRED'
@@ -68,7 +73,7 @@ function QuestCard({
         {isClaimable && onClaim ? (
           <button
             type="button"
-            disabled={claiming}
+            disabled={claiming || busy}
             onClick={() => onClaim(entry.id)}
             className={questButton({ tone: 'gold' })}
           >
@@ -102,15 +107,35 @@ function QuestCard({
 
 export default function QuestBoard({ board }: { board: QuestBoardData }) {
   const [notice, setNotice] = useState('')
+  const [receipt, setReceipt] = useState<{ level: number; lifetimeXp: number } | null>(null)
   const [claimingId, setClaimingId] = useState<string | null>(null)
   const [, startTransition] = useTransition()
+  const claimInFlight = useRef(false)
+  const levelRef = useRef(board.progression.level)
+  const reduceMotion = useReducedMotion()
 
   function claim(assignmentId: string) {
+    if (claimInFlight.current) return
+    claimInFlight.current = true
     setClaimingId(assignmentId)
+    setNotice('')
+    setReceipt(null)
     startTransition(async () => {
-      const result = await claimQuestRewardAction(assignmentId)
-      setClaimingId(null)
-      setNotice(result.message ?? (result.ok ? 'Reward claimed.' : 'Could not claim this reward.'))
+      try {
+        const result = await claimQuestRewardAction(assignmentId)
+        setNotice(result.message ?? (result.ok ? 'Reward claimed.' : 'Could not claim this reward.'))
+        if (result.ok && result.claimed && typeof result.level === 'number' && typeof result.lifetimeXp === 'number') {
+          setReceipt({ level: result.level, lifetimeXp: result.lifetimeXp })
+          if (result.level > Math.max(levelRef.current, board.progression.level)) sfx.playLevelUp()
+          else sfx.playQuestComplete()
+          levelRef.current = result.level
+        }
+      } catch {
+        setNotice('Could not confirm this reward. Please try again; rewards can only be collected once.')
+      } finally {
+        claimInFlight.current = false
+        setClaimingId(null)
+      }
     })
   }
 
@@ -129,9 +154,26 @@ export default function QuestBoard({ board }: { board: QuestBoardData }) {
   return (
     <div className="mt-6 space-y-8">
       {notice ? (
-        <p role="status" aria-live="polite" className={questBadge({ tone: 'mint', className: 'w-full' })}>
-          {notice}
-        </p>
+        <motion.div
+          role="status"
+          aria-live="polite"
+          initial={reduceMotion || !receipt ? false : { opacity: 0, y: 6 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.2 }}
+          className="rounded-2xl border border-outline bg-card p-5"
+        >
+          <p className="flex items-center gap-2 font-semibold text-ink">
+            {receipt ? <CheckCircle2 aria-hidden="true" className="size-5 text-emerald-600" /> : null}
+            {notice}
+          </p>
+          {receipt ? (
+            <>
+              <p className="mt-2 text-sm text-ink-muted">Level {receipt.level} · {receipt.lifetimeXp.toLocaleString()} lifetime XP</p>
+              <p className="mt-1 text-sm text-ink-muted">Your progress is saved. Choose your next useful conversation.</p>
+              <Link href="/app/leads" className="mt-3 inline-flex min-h-11 items-center font-semibold text-ink underline">Continue reviewing leads →</Link>
+            </>
+          ) : null}
+        </motion.div>
       ) : null}
 
       {board.claimable.length > 0 ? (
@@ -144,6 +186,7 @@ export default function QuestBoard({ board }: { board: QuestBoardData }) {
                 entry={entry}
                 onClaim={claim}
                 claiming={claimingId === entry.id}
+                busy={claimingId !== null}
               />
             ))}
           </ul>
@@ -164,6 +207,13 @@ export default function QuestBoard({ board }: { board: QuestBoardData }) {
           </ul>
         )}
       </section>
+
+      {board.historyCursor || board.nextHistoryCursor ? (
+        <nav aria-label="Quest history pages" className="flex flex-wrap gap-4">
+          {board.historyCursor ? <Link href="/app/quests" className="inline-flex min-h-11 items-center underline">Latest history</Link> : null}
+          {board.nextHistoryCursor ? <Link href={`/app/quests?before=${encodeURIComponent(board.nextHistoryCursor)}`} className="inline-flex min-h-11 items-center underline">Older history →</Link> : null}
+        </nav>
+      ) : null}
 
       {board.finished.length > 0 ? (
         <section>

@@ -38,7 +38,7 @@ export function IntelLogPanel({
       initial="hidden"
       animate="show"
       aria-labelledby="intel-log-heading"
-      className="w-full min-w-0 rounded-[20px] border border-outline bg-card shadow-sm"
+      className="w-full min-w-0 overflow-hidden rounded-[20px] border border-outline bg-card shadow-sm"
     >
       <div className="flex flex-wrap items-center justify-between gap-2 border-b border-outline bg-highlight px-4 py-3">
         <div className="flex items-center gap-2">

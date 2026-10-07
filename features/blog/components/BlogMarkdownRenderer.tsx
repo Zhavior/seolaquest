@@ -1,7 +1,7 @@
 import React from 'react'
 import Link from 'next/link'
-import { sfx } from '@/lib/sfx'
 import { BlogCodeBlock } from '@/features/blog/components/BlogCodeBlock'
+import { stripEmoji } from '@/features/handbook/text'
 
 /**
  * Helper to parse inline markdown with sound triggers:
@@ -25,36 +25,23 @@ function renderInlineText(text: string): React.ReactNode {
 
     if (linkLabel !== undefined) {
       parts.push(
-        <Link
-          key={match.index}
-          href={href}
-          onMouseEnter={() => sfx.playHoverBlip()}
-          onClick={() => sfx.playCoinDrop()}
-          className="font-semibold text-link underline decoration-2 underline-offset-2 hover:bg-accent hover:text-on-accent px-1 py-0.5 border border-outline  transition-colors"
-        >
+        <Link key={match.index} href={href}>
           {linkLabel}
         </Link>
       )
     } else if (boldText !== undefined) {
       parts.push(
-        <strong key={match.index} className="font-semibold text-ink">
-          {boldText}
-        </strong>
+        <strong key={match.index}>{boldText}</strong>
       )
     } else if (codeText !== undefined) {
       parts.push(
-        <code
-          key={match.index}
-          className="rounded-xl border border-outline bg-accent/25 px-1 py-0.5 font-mono text-[0.85em] font-medium text-ink"
-        >
+        <code key={match.index} className="hb-inline-code">
           {codeText}
         </code>
       )
     } else {
       parts.push(
-        <em key={match.index} className="italic">
-          {italicText}
-        </em>
+        <em key={match.index}>{italicText}</em>
       )
     }
 
@@ -86,7 +73,7 @@ function renderMarkdownContent(content: string) {
     // Process non-code content line by line or paragraph by paragraph
     const paragraphs = part.split(/\n\n+/)
     return (
-      <div key={index} className="space-y-4">
+      <div key={index} className="hb-article-flow">
         {paragraphs.map((para, pIdx) => {
           const trimmed = para.trim()
           if (!trimmed) return null
@@ -94,7 +81,7 @@ function renderMarkdownContent(content: string) {
           // Horizontal rule (--- or ***)
           if (/^[-*_]{3,}$/.test(trimmed)) {
             return (
-              <hr key={pIdx} className="my-8 border-t border-outline" />
+              <hr key={pIdx} className="hb-rule" />
             )
           }
 
@@ -124,14 +111,14 @@ function renderMarkdownContent(content: string) {
             const bodyRows = tableLines.slice(2).map(parseRow)
 
             return (
-              <div key={pIdx} className="my-6 overflow-x-auto">
-                <table className="w-full border border-outline text-sm">
+              <div key={pIdx} className="hb-table-wrap" tabIndex={0} role="region" aria-label="Table, scrolls sideways">
+                <table className="hb-ledger">
                   <thead>
-                    <tr className="bg-forest text-accent">
+                    <tr>
                       {headerCells.map((cell, cIdx) => (
                         <th
                           key={cIdx}
-                          className="border border-outline px-4 py-2.5 font-semibold text-xs text-left"
+                          scope="col"
                           style={{ textAlign: alignments[cIdx] || 'left' }}
                         >
                           {renderInlineText(cell)}
@@ -141,14 +128,10 @@ function renderMarkdownContent(content: string) {
                   </thead>
                   <tbody>
                     {bodyRows.map((row, rIdx) => (
-                      <tr
-                        key={rIdx}
-                        className={rIdx % 2 === 0 ? 'bg-card' : 'bg-canvas'}
-                      >
+                      <tr key={rIdx}>
                         {row.map((cell, cIdx) => (
                           <td
                             key={cIdx}
-                            className="border border-outline px-4 py-2 font-medium text-ink"
                             style={{ textAlign: alignments[cIdx] || 'left' }}
                           >
                             {renderInlineText(cell)}
@@ -167,9 +150,10 @@ function renderMarkdownContent(content: string) {
             const text = trimmed.slice(2).trim()
             const id = text.toLowerCase().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-')
             return (
-              <h1 id={id} key={pIdx} className="font-display text-2xl sm:text-3xl md:text-4xl font-medium text-ink pt-6 pb-2 border-b border-outline">
-                {renderInlineText(text)}
-              </h1>
+              // The page header owns the H1; a body-level `#` is a section head.
+              <h2 id={id} key={pIdx} className="hb-h2 hb-article-h2">
+                {renderInlineText(stripEmoji(text))}
+              </h2>
             )
           }
 
@@ -178,9 +162,8 @@ function renderMarkdownContent(content: string) {
             const text = trimmed.slice(3).trim()
             const id = text.toLowerCase().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-')
             return (
-              <h2 id={id} key={pIdx} className="font-display text-xl sm:text-2xl font-medium text-ink pt-5 pb-1 border-b border-outline flex items-center gap-2">
-                <span className="h-3 w-3 bg-accent border border-outline inline-block"></span>
-                {renderInlineText(text)}
+              <h2 id={id} key={pIdx} className="hb-h2 hb-article-h2">
+                {renderInlineText(stripEmoji(text))}
               </h2>
             )
           }
@@ -190,8 +173,8 @@ function renderMarkdownContent(content: string) {
             const text = trimmed.slice(4).trim()
             const id = text.toLowerCase().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-')
             return (
-              <h3 id={id} key={pIdx} className="font-display text-lg font-medium text-ink pt-3">
-                {renderInlineText(text)}
+              <h3 id={id} key={pIdx} className="hb-h3 hb-article-h3">
+                {renderInlineText(stripEmoji(text))}
               </h3>
             )
           }
@@ -203,7 +186,7 @@ function renderMarkdownContent(content: string) {
           if (figure) {
             const [, alt, src, caption] = figure
             return (
-              <figure key={pIdx} className="my-6 space-y-2">
+              <figure key={pIdx} className="hb-article-figure">
                 {/* eslint-disable-next-line @next/next/no-img-element -- post
                     images are local, pre-sized screenshots; next/image adds a
                     layout wrapper that fights the offset-slab border here. */}
@@ -212,13 +195,8 @@ function renderMarkdownContent(content: string) {
                   alt={alt}
                   loading="lazy"
                   decoding="async"
-                  className="w-full border border-outline"
                 />
-                {caption && (
-                  <figcaption className="text-xs font-medium tracking-wide text-ink-muted">
-                    {caption}
-                  </figcaption>
-                )}
+                {caption && <figcaption className="hb-mono hb-soft">{caption}</figcaption>}
               </figure>
             )
           }
@@ -228,10 +206,7 @@ function renderMarkdownContent(content: string) {
             const quoteLines = trimmed.split('\n').map(l => l.replace(/^>\s?/, '').trim())
             const quoteText = quoteLines.join(' ')
             return (
-              // `bg-accent/20` is a different class from `bg-accent`, so the
-              // ink-inversion rule in globals.css does not apply to it and the
-              // theme's own ink is the correct colour here.
-              <blockquote key={pIdx} className="my-5 border-l border-link bg-accent/20 border border-outline p-4 font-medium text-ink">
+              <blockquote key={pIdx} className="hb-callout">
                 {renderInlineText(quoteText)}
               </blockquote>
             )
@@ -241,12 +216,9 @@ function renderMarkdownContent(content: string) {
           if (trimmed.startsWith('- ') || trimmed.startsWith('* ')) {
             const items = trimmed.split(/\n/).map((line) => line.replace(/^[-*]\s*/, '').trim())
             return (
-              <ul key={pIdx} className="my-3 space-y-2 pl-4">
+              <ul key={pIdx} className="hb-article-list">
                 {items.map((item, iIdx) => (
-                  <li key={iIdx} className="flex items-start gap-2 font-medium text-ink text-sm md:text-base">
-                    <span className="mt-1 flex h-2 w-2 shrink-0 bg-forest rotate-45" />
-                    <span>{renderInlineText(item)}</span>
-                  </li>
+                  <li key={iIdx}>{renderInlineText(item)}</li>
                 ))}
               </ul>
             )
@@ -256,11 +228,9 @@ function renderMarkdownContent(content: string) {
           if (/^\d+\.\s/.test(trimmed)) {
             const items = trimmed.split(/\n/).map((line) => line.replace(/^\d+\.\s*/, '').trim())
             return (
-              <ol key={pIdx} className="my-3 space-y-2 pl-4 list-decimal font-medium text-ink text-sm md:text-base">
+              <ol key={pIdx} className="hb-article-list hb-article-list--ordered">
                 {items.map((item, iIdx) => (
-                  <li key={iIdx} className="pl-1">
-                    {renderInlineText(item)}
-                  </li>
+                  <li key={iIdx}>{renderInlineText(item)}</li>
                 ))}
               </ol>
             )
@@ -268,9 +238,7 @@ function renderMarkdownContent(content: string) {
 
           // Standard Paragraph text with inline formatting
           return (
-            <p key={pIdx} className="text-sm md:text-base font-medium text-ink leading-relaxed">
-              {renderInlineText(trimmed)}
-            </p>
+            <p key={pIdx}>{renderInlineText(trimmed)}</p>
           )
         })}
       </div>

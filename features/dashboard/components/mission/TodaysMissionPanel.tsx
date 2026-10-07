@@ -28,7 +28,6 @@ export function TodaysMissionPanel({
   onViewScan,
 }: TodaysMissionPanelProps) {
   const handlePrimary = () => {
-    sfx.playCoinDrop()
     switch (mission.action.kind) {
       case 'scan':
         onScan()
@@ -111,7 +110,6 @@ export function TodaysMissionPanel({
             <Link
               href={href}
               onMouseEnter={() => sfx.playSidebarHover()}
-              onClick={() => sfx.playCoinDrop()}
               className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-[20px] border border-outline bg-accent px-4 py-3 text-sm font-semibold normal-case tracking-normal text-on-accent shadow-sm transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-sm active:translate-x-0 active:translate-y-0"
             >
               <ActionIcon className="size-4 shrink-0" strokeWidth={1.75} aria-hidden />

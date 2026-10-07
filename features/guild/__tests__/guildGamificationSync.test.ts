@@ -8,12 +8,14 @@ const mocks = vi.hoisted(() => ({
   leadCount: vi.fn(),
   leadFindMany: vi.fn(),
   leadGroupBy: vi.fn(),
+  queryRaw: vi.fn(),
 }))
 
 vi.mock('server-only', () => ({}))
 vi.mock('@/lib/auth', () => ({ requireCurrentUser: mocks.requireCurrentUser }))
 vi.mock('@/lib/prisma', () => ({
   default: {
+    $queryRaw: mocks.queryRaw,
     user: { findUnique: mocks.userFindUnique },
     gamifyProfile: { findUnique: mocks.gamifyProfileFindUnique },
     trackedKeyword: { count: mocks.trackedKeywordCount },
@@ -39,6 +41,7 @@ describe('Guild & Gamification Synchronization', () => {
     mocks.trackedKeywordCount.mockResolvedValue(4)
     mocks.leadCount.mockResolvedValue(18)
     mocks.leadFindMany.mockResolvedValue([])
+    mocks.queryRaw.mockResolvedValue([])
     mocks.leadGroupBy.mockResolvedValue([
       { platform: 'TWITTER', _count: { id: 10 } },
       { platform: 'REDDIT', _count: { id: 8 } },

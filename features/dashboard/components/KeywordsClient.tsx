@@ -3,6 +3,7 @@
 import React, { useState, useMemo } from 'react'
 import { motion, useReducedMotion, type Variants } from 'framer-motion'
 import { Search, Plus, Radio, Swords, Sparkles, X, ShieldAlert } from 'lucide-react'
+import { sfx } from '@/lib/sfx'
 import { addKeywordAction } from '@/features/dashboard/actions'
 import {
   QuestBadge,
@@ -47,6 +48,7 @@ export function KeywordsClient({ initialKeywords }: KeywordsClientProps) {
   const [newPhrase, setNewPhrase] = useState('')
   const [searchQuery, setSearchQuery] = useState('')
   const [isAdding, setIsAdding] = useState(false)
+  const [notice, setNotice] = useState('')
   const shouldReduceMotion = useReducedMotion()
 
   const handleAddKeyword = async (e: React.FormEvent) => {
@@ -55,14 +57,22 @@ export function KeywordsClient({ initialKeywords }: KeywordsClientProps) {
     if (!phrase) return
 
     setIsAdding(true)
-    const result = await addKeywordAction(phrase)
-    if (result.ok && result.keyword) {
-      setKeywords((prev) => [result.keyword!, ...prev.filter((kw) => kw.id !== result.keyword!.id)])
-      setNewPhrase('')
-    } else {
-      console.error(result.message)
+    setNotice('')
+    try {
+      const result = await addKeywordAction(phrase)
+      if (result.ok && result.keyword) {
+        setKeywords((prev) => [result.keyword!, ...prev.filter((kw) => kw.id !== result.keyword!.id)])
+        setNewPhrase('')
+        setNotice('Keyword saved. Your next scan can use it.')
+        sfx.playConfirm()
+      } else {
+        setNotice(result.message ?? 'Could not save this keyword. Please try again.')
+      }
+    } catch {
+      setNotice('Could not confirm this keyword. Please try again.')
+    } finally {
+      setIsAdding(false)
     }
-    setIsAdding(false)
   }
 
   const filteredKeywords = useMemo(() => {
@@ -101,6 +111,8 @@ export function KeywordsClient({ initialKeywords }: KeywordsClientProps) {
             status={<QuestStatusPill label="Signal streams" value={`${keywords.length} Active`} />}
           />
         </motion.div>
+
+        {notice ? <p role="status" className="rounded-xl border border-outline bg-card p-4 text-sm text-ink">{notice}</p> : null}
 
         {/* ARM NEW KEYWORD STREAM */}
         <motion.form
