@@ -14,7 +14,7 @@ const ROWS: Array<{ item: string; state: string; detail: string }> = [
   {
     item: 'GEO scans',
     state: 'Not switched on',
-    detail: 'The scan, the source sorting and the cost log are built and tested in code. No real scan has run yet.',
+    detail: 'The scan, the source sorting and the cost log are built and tested in code.',
   },
   {
     item: 'Engines',
@@ -26,15 +26,21 @@ const ROWS: Array<{ item: string; state: string; detail: string }> = [
     state: 'Not set',
     detail: 'Every scan records what the engine charged. Pricing waits for those numbers.',
   },
-  {
-    item: 'X lead finder',
-    state: 'In the app',
-    detail: 'The earlier SEOlaQuest product still runs inside the app for signed-in accounts.',
-  },
 ]
 
-/** The early-access ledger, shared by the home chapter and the pricing page. */
-export function AccessLedger() {
+const LEGACY_ROW = {
+  item: 'X lead finder',
+  state: 'In the app',
+  detail: 'The earlier SEOlaQuest product still runs inside the app for signed-in accounts.',
+}
+
+/**
+ * The early-access ledger, shared by the home chapter and the pricing page.
+ * Only the pricing page, where existing X plans are explained, lists the
+ * earlier X lead finder.
+ */
+export function AccessLedger({ legacy = false }: { legacy?: boolean }) {
+  const rows = legacy ? [...ROWS, LEGACY_ROW] : ROWS
   return (
     <table className="hb-ledger">
       <caption>Early access, as of this edition.</caption>
@@ -46,7 +52,7 @@ export function AccessLedger() {
         </tr>
       </thead>
       <tbody>
-        {ROWS.map((row) => (
+        {rows.map((row) => (
           <tr key={row.item}>
             <th scope="row">{row.item}</th>
             <td>{row.state}</td>

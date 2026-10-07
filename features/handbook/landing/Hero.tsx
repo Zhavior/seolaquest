@@ -3,9 +3,9 @@ import { Board } from '../components/primitives'
 import { GeoHeroStage } from './GeoHeroStage'
 
 /**
- * The hero is bare text on the scene, readable through a left-hand scrim, with
- * one sample AI-citation scan waiting below it. The tall stage leaves the
- * beacons visible between the headline and the panels.
+ * The hero copy sits on a solid panel at the left, so no landmark or glow ever
+ * runs behind a line of text. The valley to its right turns into the sample
+ * scan, and the same scan waits below as panels.
  */
 export function Hero() {
   return (
@@ -29,7 +29,7 @@ export function Hero() {
           </Link>
         </div>
         <p className="hb-hero-fine hb-mono">
-          Early access. Scans are not switched on yet, and the sample below is invented.
+          Early access. Scans are not switched on yet, and the sample scan on this page is invented.
         </p>
       </GeoHeroStage>
     </Board>

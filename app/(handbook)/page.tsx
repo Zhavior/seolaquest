@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import { loadInventory, loadNotes } from '@/features/handbook/facts'
 import { Hero } from '@/features/handbook/landing/Hero'
 import { HomeStage } from '@/features/handbook/landing/HomeStage'
-import { SAMPLE_GEO_MARKS } from '@/features/handbook/geo/sample'
+import { SAMPLE_GEO_MARKS, SAMPLE_GEO_PINS } from '@/features/handbook/geo/sample'
 import { RouteStage } from '@/features/handbook/landing/RouteStage'
 import { AccessChapter } from '@/features/handbook/landing/AccessChapter'
 import { NotesChapter } from '@/features/handbook/landing/NotesChapter'
@@ -33,7 +33,7 @@ export default function HomePage() {
   return (
     <>
       <HomeStructuredData />
-      <HomeStage scores={[]} marks={SAMPLE_GEO_MARKS}>
+      <HomeStage scores={[]} marks={SAMPLE_GEO_MARKS} scan={SAMPLE_GEO_PINS}>
         <Hero />
         <RouteStage />
         <AccessChapter />
