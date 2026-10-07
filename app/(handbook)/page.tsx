@@ -1,11 +1,10 @@
 import type { Metadata } from 'next'
-import { loadFounderSeats, loadInventory, loadNotes } from '@/features/handbook/facts'
+import { loadInventory, loadNotes } from '@/features/handbook/facts'
 import { Hero } from '@/features/handbook/landing/Hero'
 import { HomeStage } from '@/features/handbook/landing/HomeStage'
-import { HERO_SCORES } from '@/features/handbook/landing/heroPosts'
+import { SAMPLE_GEO_MARKS } from '@/features/handbook/geo/sample'
 import { RouteStage } from '@/features/handbook/landing/RouteStage'
-import { QuestsChapter } from '@/features/handbook/landing/QuestsChapter'
-import { InventoryChapter } from '@/features/handbook/landing/InventoryChapter'
+import { AccessChapter } from '@/features/handbook/landing/AccessChapter'
 import { NotesChapter } from '@/features/handbook/landing/NotesChapter'
 import { ErrataChapter } from '@/features/handbook/landing/ErrataChapter'
 import { RegisterChapter } from '@/features/handbook/landing/RegisterChapter'
@@ -15,33 +14,29 @@ import { HomeStructuredData } from '@/features/handbook/seo/HomeStructuredData'
 // the URL-bearing fields are declared here, because a canonical set in the
 // layout would be inherited by every other page.
 export const metadata: Metadata = {
-  title: 'SEOlaQuest | Find Buyers on X',
+  title: 'SEOlaQuest | See Who AI Answers Cite',
   description:
-    'Scan X for the problems you solve. Every match is scored for buyer intent and arrives with its source post. Play it as a daily quest: claim leads, earn XP, level up.',
+    'Ask the question your buyers ask an AI search engine. SEOlaQuest lists every source the answer cited, sorts them into forums, review sites, articles and vendor pages, and shows whether your site made it in. Early access.',
   alternates: { canonical: '/' },
   openGraph: { url: '/' },
 }
 
-// Marketing content with one live input (the founder seat count), so it is
-// cached briefly rather than rendered per request. This must live on the page
-// itself: a re-export forwards the component and silently drops route config.
-export const revalidate = 60
+// Marketing content with no per-visitor input, so it is cached rather than
+// rendered per request. This must live on the page itself: a re-export
+// forwards the component and silently drops route config.
+export const revalidate = 3600
 
-export default async function HomePage() {
-  const [seats, inventory, notes] = await Promise.all([
-    loadFounderSeats(),
-    Promise.resolve(loadInventory()),
-    Promise.resolve(loadNotes(3)),
-  ])
+export default function HomePage() {
+  const notes = loadNotes(3)
+  const inventory = loadInventory()
 
   return (
     <>
-      <HomeStructuredData inventory={inventory} />
-      <HomeStage scores={HERO_SCORES}>
+      <HomeStructuredData />
+      <HomeStage scores={[]} marks={SAMPLE_GEO_MARKS}>
         <Hero />
         <RouteStage />
-        <QuestsChapter />
-        <InventoryChapter inventory={inventory} seats={seats} />
+        <AccessChapter />
         <NotesChapter notes={notes} />
         <ErrataChapter checkoutOpen={inventory.checkoutOpen} />
         <RegisterChapter />

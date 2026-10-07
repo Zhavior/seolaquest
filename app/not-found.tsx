@@ -28,7 +28,7 @@ export default function NotFound() {
               Home
             </Link>
             <Link href="/radar" className="hb-btn hb-btn--label">
-              Try the sample hunt
+              See a sample scan
             </Link>
             <Link href="/pricing" className="hb-btn hb-btn--label">
               Pricing

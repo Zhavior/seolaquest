@@ -2,12 +2,12 @@
 
 import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from 'react'
 import { ValleyStage } from '../valley/ValleyStage'
-import type { BeaconView } from '../valley/scene'
+import type { BeaconMark, BeaconView } from '../valley/scene'
 
 /**
  * The home page's fixed valley. It sits behind every chapter and the camera
  * travels it as the whole page scrolls, so the journey down the page is a
- * journey through the valley. The hero's sample hunt publishes the beacon
+ * journey through the valley. The hero's sample scan publishes the beacon
  * states here; the chapters are plain content floating over the scene.
  */
 
@@ -26,7 +26,15 @@ export function useHomeStage(): HomeStageApi {
   return useContext(HomeStageContext)
 }
 
-export function HomeStage({ scores, children }: { scores: number[]; children: ReactNode }) {
+export function HomeStage({
+  scores,
+  marks,
+  children,
+}: {
+  scores: number[]
+  marks?: BeaconMark[]
+  children: ReactNode
+}) {
   const [beacons, setBeacons] = useState<BeaconView[] | undefined>(undefined)
   const [burst, setBurst] = useState<Burst | null>(null)
 
@@ -38,7 +46,7 @@ export function HomeStage({ scores, children }: { scores: number[]; children: Re
 
   return (
     <HomeStageContext.Provider value={api}>
-      <ValleyStage scores={scores} beacons={beacons} burst={burst} />
+      <ValleyStage scores={scores} marks={marks} beacons={beacons} burst={burst} />
       <div className="hb-home">{children}</div>
     </HomeStageContext.Provider>
   )

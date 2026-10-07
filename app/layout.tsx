@@ -8,9 +8,9 @@ import { handbookFontVariables } from '@/features/handbook/fonts'
 import { Analytics } from '@vercel/analytics/next'
 import { SpeedInsights } from '@vercel/speed-insights/next'
 
-const TITLE = 'SEOlaQuest | Find Buyers on X'
+const TITLE = 'SEOlaQuest | See Who AI Answers Cite'
 const DESCRIPTION =
-  'Scan X for the problems you solve. Every match is scored for buyer intent and arrives with its source post. Play it as a daily quest: claim leads, earn XP, level up.'
+  'Ask the question your buyers ask an AI search engine. See which sources the answer cited, what kind of page each one is, and whether your site made it in. Early access.'
 
 export const metadata: Metadata = {
   // Without `metadataBase` every relative URL below resolves against the

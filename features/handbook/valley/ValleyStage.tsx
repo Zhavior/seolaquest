@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react'
 import { valleyAudio } from './audio'
 import { PHASE_LABEL, SKY_MODES, skyInfo, type SkyMode } from './phase'
-import type { BeaconView, ValleyHandle } from './scene'
+import type { BeaconMark, BeaconView, ValleyHandle } from './scene'
 
 const CALM_KEY = 'sq-calm'
 
@@ -34,15 +34,19 @@ function canRenderWebGL(): boolean {
  */
 export function ValleyStage({
   scores,
+  marks,
   beacons,
   burst,
 }: {
   scores: number[]
+  /** Label and colour per beacon in place of a score; see `ValleyOptions.marks`. */
+  marks?: BeaconMark[]
   beacons?: BeaconView[]
   /** Bump `n` to fire a claim surge at beacon `index`. */
   burst?: { index: number; n: number } | null
 }) {
   const scoresRef = useRef(scores)
+  const marksRef = useRef(marks)
   const beaconsRef = useRef(beacons)
   const hostRef = useRef<HTMLDivElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -80,6 +84,7 @@ export function ValleyStage({
           canvas,
           host,
           scores: scoresRef.current,
+          marks: marksRef.current,
           mode: 'auto',
           reducedMotion: reducedQuery.matches || storedCalm(),
         })
@@ -154,7 +159,7 @@ export function ValleyStage({
         {open ? (
           <div id="hb-valley-panel" className="hb-valley-panel hb-mono" role="group" aria-label="Valley sky">
             <span className="hb-valley-label">{label}</span>
-            <span className="hb-valley-note">Beacon scores are samples.</span>
+            <span className="hb-valley-note">{marks ? 'Beacon ranks are samples.' : 'Beacon scores are samples.'}</span>
             <span className="hb-valley-chips">
               {SKY_MODES.map((m) => (
                 <button

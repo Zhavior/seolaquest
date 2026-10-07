@@ -77,3 +77,6 @@ CLAUDE.local.md
 # Licensed 3D models (Fab Standard License): never commit, the repo is public
 assets-src/
 public/models/
+
+# Raw Perplexity response from scripts/geo-probe.ts
+.geo-probe-last.json

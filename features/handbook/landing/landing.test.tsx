@@ -1,91 +1,66 @@
-import { render, screen, within } from '@testing-library/react'
+import { fireEvent, render, screen, within } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
-import type { InventoryFacts } from '../facts'
 import { Hero } from './Hero'
-import { PlanLedger } from './PlanLedger'
-import { CheckoutNote } from './InventoryChapter'
+import { AccessLedger } from './AccessChapter'
 import { ErrataList, FaqList } from './ErrataChapter'
 import { FAQ, errataItems } from './errata'
-
-const inventory = (checkoutOpen: boolean): InventoryFacts => ({
-  plans: [],
-  free: { code: 'FREE', name: 'Free Scout', priceLabel: '$0', scanLimit: 0, enabled: true, availabilityLabel: '', benefits: [] },
-  beta: { code: 'BETA', name: 'Beta Hunter', priceLabel: '$14.99/mo', scanLimit: 1500, enabled: true, availabilityLabel: '', benefits: [] },
-  founder: { code: 'FOUNDER', name: 'Founder Pass', priceLabel: '$29.99/mo', scanLimit: 3000, enabled: true, availabilityLabel: '', benefits: [] },
-  comingSoon: [],
-  checkoutOpen,
-  founderSeatLimit: 50,
-  founderLockTerms: [],
-  potions: [],
-})
+import { SAMPLE_GEO_CITED, SAMPLE_GEO_PRESENCE, SAMPLE_GEO_SOURCES } from '../geo/sample'
 
 describe('Hero', () => {
-  it('leads with the promise and two honest actions', () => {
+  it('leads with the GEO promise and two honest actions', () => {
     render(<Hero />)
-    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Find buyers on X.')
-    expect(screen.getByRole('link', { name: /Start free/ })).toHaveAttribute('href', '/sign-up')
-    expect(screen.getByRole('link', { name: 'Try the sample hunt' })).toHaveAttribute('href', '/radar')
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Be the source the answer cites.')
+    expect(screen.getByRole('link', { name: 'Join early access' })).toHaveAttribute('href', '/sign-up')
+    expect(screen.getByRole('link', { name: 'See a sample scan' })).toHaveAttribute('href', '/radar')
   })
 
-  it('does not promise free real scans and labels its example as invented', () => {
+  it('says scans are not switched on and labels its example as invented', () => {
     render(<Hero />)
-    expect(screen.getByText(/Real scans need a paid plan/)).toBeInTheDocument()
+    expect(screen.getByText(/Scans are not switched on yet/)).toBeInTheDocument()
     expect(screen.getByText(/Invented for this page/)).toBeInTheDocument()
-    expect(screen.queryByText(/free scans|50 free/i)).not.toBeInTheDocument()
+    expect(screen.queryByText(/guarantee|free scans/i)).not.toBeInTheDocument()
+  })
+
+  it('lists the cited sources and adds one to the plan', () => {
+    render(<Hero />)
+    const list = screen.getByRole('list', { name: 'Sources the answer cited' })
+    expect(within(list).getAllByRole('button')).toHaveLength(SAMPLE_GEO_CITED.length)
+    fireEvent.click(screen.getByRole('button', { name: 'Add to plan' }))
+    expect(screen.getByText(/In your plan\. The beacon burns teal/)).toBeInTheDocument()
+    expect(screen.getByRole('status')).toHaveTextContent(`1 of ${SAMPLE_GEO_CITED.length} cited sources in your plan.`)
   })
 })
 
-describe('PlanLedger', () => {
-  it('never offers a paid purchase while checkout is paused', () => {
-    render(<PlanLedger inventory={inventory(false)} actions />)
-    const start = screen.getByRole('row', { name: /Start/ })
-    expect(within(start).getAllByRole('button', { name: 'Checkout paused' })).toHaveLength(2)
-    for (const button of within(start).getAllByRole('button')) expect(button).toBeDisabled()
-    expect(within(start).getAllByRole('link')).toHaveLength(1)
+describe('GEO sample', () => {
+  it('uses only reserved example domains, so no real site is shown as cited', () => {
+    for (const source of SAMPLE_GEO_SOURCES) expect(source.domain).toMatch(/\.example$/)
   })
 
-  it('links the paid plans to sign-up when checkout is on', () => {
-    render(<PlanLedger inventory={inventory(true)} actions />)
-    const start = screen.getByRole('row', { name: /Start/ })
-    expect(within(start).getAllByRole('link')).toHaveLength(3)
-  })
-
-  it('shows sold out instead of a claim button', () => {
-    render(<PlanLedger inventory={inventory(true)} actions soldOut />)
-    expect(screen.getByRole('button', { name: 'Seats sold out' })).toBeDisabled()
-  })
-
-  it('takes plan numbers from the catalog, not from copy', () => {
-    render(<PlanLedger inventory={inventory(false)} />)
-    expect(screen.getByText('1,500 per paid invoice')).toBeInTheDocument()
-    expect(screen.getByText('3,000 per paid invoice')).toBeInTheDocument()
+  it('shows the brand found but not cited, through the product rule', () => {
+    expect(SAMPLE_GEO_PRESENCE).toEqual({ brandCited: false, brandCitedRank: null, brandRetrieved: true })
   })
 })
 
-describe('CheckoutNote', () => {
-  it('names a paused checkout as an errata slip', () => {
-    render(<CheckoutNote open={false} />)
-    expect(screen.getByText('CHECKOUT PAUSED')).toBeInTheDocument()
-    expect(screen.getByText(/Nothing on this page can be bought yet/)).toBeInTheDocument()
-  })
-
-  it('does not claim more than the configuration says when checkout is on', () => {
-    render(<CheckoutNote open />)
-    expect(screen.getByText(/final payment check still runs/)).toBeInTheDocument()
+describe('AccessLedger', () => {
+  it('puts no price on GEO scans', () => {
+    render(<AccessLedger />)
+    expect(within(screen.getByRole('row', { name: /Price per scan/ })).getByText('Not set')).toBeInTheDocument()
+    expect(within(screen.getByRole('row', { name: /GEO scans/ })).getByText('Not switched on')).toBeInTheDocument()
+    expect(screen.queryByText(/\$\d/)).not.toBeInTheDocument()
   })
 })
 
 describe('Errata and FAQ', () => {
-  it('names what is not built, including Reddit and the missing leaderboards', () => {
+  it('names that scans have not run and only one engine exists', () => {
     render(<ErrataList checkoutOpen={false} />)
-    expect(screen.getByText(/Reddit support is built but switched off/)).toBeInTheDocument()
-    expect(screen.getByText(/no leaderboards, rankings, or other hunters/)).toBeInTheDocument()
-    expect(screen.getByText(/Paid checkout is paused/)).toBeInTheDocument()
+    expect(screen.getByText(/no real scan has run/)).toBeInTheDocument()
+    expect(screen.getByText(/One engine: Perplexity/)).toBeInTheDocument()
+    expect(screen.getByText(/Nothing on this site can be bought/)).toBeInTheDocument()
   })
 
   it('changes the checkout line when checkout is on', () => {
-    const paused = errataItems(false).find((item) => item.id === 'checkout')!.text
-    const open = errataItems(true).find((item) => item.id === 'checkout')!.text
+    const paused = errataItems(false).find((item) => item.id === 'x-checkout')!.text
+    const open = errataItems(true).find((item) => item.id === 'x-checkout')!.text
     expect(paused).not.toEqual(open)
   })
 
@@ -94,8 +69,8 @@ describe('Errata and FAQ', () => {
     for (const item of FAQ) expect(screen.getByText(item.q)).toBeInTheDocument()
   })
 
-  it('does not say SEOlaQuest posts to X for you', () => {
-    const answer = FAQ.find((item) => /post to X/.test(item.q))!.a
+  it('does not promise a citation', () => {
+    const answer = FAQ.find((item) => /get my site cited/.test(item.q))!.a
     expect(answer).toMatch(/^No\./)
   })
 })

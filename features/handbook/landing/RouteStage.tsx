@@ -1,37 +1,36 @@
 import Link from 'next/link'
 import { PlateIcon, type IconName } from '../artifact/IconSprite'
 import { Board, Leaf, Spread } from '../components/primitives'
-import { AURORA_ENGAGE_MIN, AURORA_IGNORE_BELOW, CLAIM_MIN_SCORE, CLAIM_XP } from '../rules'
 
 const STOPS: Array<{ numeral: string; key: string; icon: IconName; label: string; hot?: boolean; body: string }> = [
   {
     numeral: 'I',
-    key: 'Scan',
+    key: 'Ask',
     icon: 'spyglass',
-    label: 'Scan: spyglass',
-    body: 'Search X for the keywords you track. One scan costs 1 mana. Scanning needs a paid plan, and it pays no XP.',
+    label: 'Ask: spyglass',
+    body: 'Type a question your buyers ask, and the site you want named in the answer. SEOlaQuest puts the question to Perplexity, one engine for now.',
   },
   {
     numeral: 'II',
-    key: 'Review',
+    key: 'Read',
     icon: 'eye',
-    label: 'Review: all-seeing eye',
-    body: `Open the source post. Aurora scores it 0 to 100 for buyer intent: Engage ${AURORA_ENGAGE_MIN}+, Watch ${AURORA_IGNORE_BELOW} to ${AURORA_ENGAGE_MIN - 1}, Ignore under ${AURORA_IGNORE_BELOW}. A policy line, not a chance of a sale.`,
+    label: 'Read: all-seeing eye',
+    body: 'See every page the search found and every page the answer cited, in order. Found but not cited is its own result, and often the useful one.',
   },
   {
     numeral: 'III',
-    key: 'Claim',
-    icon: 'chest',
-    label: 'Claim: treasure chest',
+    key: 'Sort',
+    icon: 'map',
+    label: 'Sort: map',
     hot: true,
-    body: `Save the lead for follow-up. It pays ${CLAIM_XP} XP when the score is ${CLAIM_MIN_SCORE} or more. Claiming does not mean you contacted anyone.`,
+    body: 'Each source is sorted as a forum, a review site, an article or a vendor page. Sites the rules do not recognise are marked as a guess, not passed off as known.',
   },
   {
     numeral: 'IV',
-    key: 'Follow up',
+    key: 'Act',
     icon: 'sword',
-    label: 'Follow up: crossed swords',
-    body: 'On paid plans: draft a reply with AI, export the lead to your CRM by webhook, and log what happened. SEOlaQuest does not post to X for you, and logged replies or sales earn no XP.',
+    label: 'Act: crossed swords',
+    body: 'Each type points to a different move: answer the thread, get listed, pitch the writer, or fix your own page. SEOlaQuest shows the map; you do the work.',
   },
 ]
 
@@ -40,27 +39,27 @@ export function RouteStage() {
   return (
     <Board volume="hunt" id="route" labelledBy="route-title">
       <Leaf>
-        <Spread head="Four verbs. One lead." headId="route-title" note="Costs and payouts here are the product's real ones.">
+        <Spread head="Four verbs. One answer." headId="route-title" note="How a scan works, from question to plan.">
           <div className="hb-stack" style={{ '--gap': '1.5rem' } as React.CSSProperties}>
             <ol className="hb-stops">
               {STOPS.map((stop) => (
                 <li key={stop.key} className={stop.hot ? 'hb-stop hb-stop--hot' : 'hb-stop'}>
                   <PlateIcon name={stop.icon} label={stop.label} />
                   <h3>
-                    {stop.numeral} · {stop.key}
+                    <span className="hb-plain">{stop.numeral}</span> · {stop.key}
                   </h3>
                   <p>{stop.body}</p>
                 </li>
               ))}
             </ol>
             <p className="hb-prose">
-              A match is a post, not a customer. The score says how closely the post fits your keywords and buying
-              language; it is not a promise that anyone will buy. When scoring is unavailable, the lead shows as not
-              scored, never as a guessed number.
+              A citation is a snapshot, not a ranking you own. The same question can cite different sources tomorrow,
+              and SEOlaQuest does not promise your site will be cited after you act. It shows you where the answer comes
+              from today.
             </p>
             <p>
               <Link href="/radar" className="hb-link">
-                Open the full sample hunt with three watch lists
+                Open the full sample scan
               </Link>
             </p>
           </div>

@@ -1071,3 +1071,173 @@
 .hb-plain {
   font-family: var(--font-display);
 }
+
+/* ── GEO sample scan in the hero ───────────────────────────────────── */
+
+.hb-geo-query {
+  display: grid;
+  gap: 0.3rem;
+  margin: 0 0 0.9rem;
+  font-family: var(--font-quote);
+  font-style: italic;
+  font-size: 1.1rem;
+  line-height: 1.35;
+  color: var(--ink);
+}
+
+.hb-geo-query .hb-mono {
+  font-style: normal;
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-soft, #b9b0cf);
+}
+
+.hb-geo-brand {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.4rem 0.7rem;
+  margin-top: 0.9rem;
+  padding-top: 0.9rem;
+  border-top: 1px solid #2d2350;
+}
+
+.hb-geo-brand p {
+  margin: 0;
+  min-width: 0;
+  font-size: 0.95rem;
+  line-height: 1.45;
+  color: var(--ink);
+}
+
+.hb-geo-brand b {
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-size: 0.85rem;
+  overflow-wrap: anywhere;
+}
+
+/* ── GEO sample scan page ──────────────────────────────────────────── */
+
+.hb-geo-scan {
+  display: grid;
+  gap: 2.25rem;
+  min-width: 0;
+}
+
+.hb-geo-block {
+  display: grid;
+  gap: 0.8rem;
+  min-width: 0;
+}
+
+.hb-geo-asked {
+  margin: 0;
+  font-family: var(--font-quote);
+  font-style: italic;
+  font-size: clamp(1.3rem, 2.6vw, 1.75rem);
+  line-height: 1.3;
+  color: var(--ink);
+}
+
+.hb-geo-answer {
+  margin: 0;
+  max-width: 62ch;
+  padding: 1rem 1.2rem;
+  border-left: 3px solid var(--gold);
+  background: rgb(11 8 24 / 0.55);
+  font-size: 1.05rem;
+  line-height: 1.65;
+  color: var(--ink);
+}
+
+.hb-geo-cite {
+  margin-left: 0.15em;
+  font-family: var(--font-mono);
+  font-size: 0.7em;
+  color: var(--gold-hi);
+}
+
+.hb-geo-verdict {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.5rem 0.8rem;
+  margin: 0;
+  font-size: 1.05rem;
+  line-height: 1.5;
+  color: var(--ink);
+}
+
+.hb-geo-verdict > span:last-child {
+  flex: 1 1 18rem;
+  min-width: 0;
+}
+
+.hb-geo-tbl {
+  overflow-x: auto;
+  min-width: 0;
+}
+
+.hb-geo-tbl table {
+  min-width: 34rem;
+}
+
+.hb-geo-domain {
+  display: block;
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-size: 0.82rem;
+  overflow-wrap: anywhere;
+}
+
+.hb-geo-title {
+  display: block;
+  font-weight: 400;
+  font-size: 0.92rem;
+  color: var(--ink-soft);
+}
+
+.hb-geo-mine th,
+.hb-geo-mine td {
+  background: rgb(216 169 59 / 0.1);
+}
+
+.hb-geo-type {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.hb-geo-moves {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 12.5rem), 1fr));
+}
+
+.hb-geo-moves li {
+  display: grid;
+  gap: 0.4rem;
+  align-content: start;
+  padding: 1rem 1.1rem;
+  border: 1px solid;
+  border-top-width: 3px;
+  background: rgb(11 8 24 / 0.55);
+}
+
+.hb-geo-moves p {
+  margin: 0;
+  font-size: 0.98rem;
+  line-height: 1.5;
+  color: var(--ink-soft);
+}
+
+.hb-geo-moves b {
+  color: var(--ink);
+}

@@ -3,7 +3,7 @@
   "routes": [
     {
       "path": "/",
-      "title": "SEOlaQuest | Find Buyers on X",
+      "title": "SEOlaQuest | See Who AI Answers Cite",
       "requiredLandmarks": [
         "main"
       ]
@@ -67,7 +67,7 @@
     },
     {
       "path": "/sign-up",
-      "title": "Create Account | SEOlaQuest",
+      "title": "Join Early Access | SEOlaQuest",
       "requiredLandmarks": [
         "main"
       ]

@@ -2,14 +2,12 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
 import { HandbookPage } from '@/features/handbook/components/primitives'
-import { levelTable } from '@/features/handbook/rules'
-import { SAMPLE_SETS } from '@/features/handbook/sample/data'
-import { SampleDashboard } from '@/features/handbook/sample/SampleDashboard'
+import { GeoSampleScan } from '@/features/handbook/geo/GeoSampleScan'
 import { JsonLdScript, breadcrumbSchema } from '@/features/handbook/seo/jsonLd'
 
-const TITLE = 'Try the Sample Hunt | SEOlaQuest'
+const TITLE = 'Sample GEO Scan | SEOlaQuest'
 const DESCRIPTION =
-  'Run the SEOlaQuest loop on invented X posts: scan, read the source, claim a lead, and watch the real XP rules pay or refuse to pay. No account, no live sources.'
+  'What a SEOlaQuest scan shows, on an invented example: the question, the AI answer and its citations, every source found, whether your site made it in, and what each source type suggests you do.'
 
 export const metadata: Metadata = {
   title: TITLE,
@@ -21,27 +19,28 @@ export const metadata: Metadata = {
 /** Static content and no per-visitor state, so it is cached rather than rendered per request. */
 export const revalidate = 3600
 
-const LEVELS = levelTable(10).map((row) => row.cumulativeXp)
-
-export default function SampleHuntPage() {
+export default function SampleScanPage() {
   return (
     <>
       <JsonLdScript
         data={breadcrumbSchema([
           { name: 'SEOlaQuest', path: '/' },
-          { name: 'Sample hunt', path: '/radar' },
+          { name: 'Sample scan', path: '/radar' },
         ])}
       />
-      <HandbookPage volume="try" title="Try it" note="No account. No X connection. Nothing is sent anywhere.">
+      <HandbookPage volume="try" title="Try it" note="No account. No engine was asked. Every site here is invented.">
         <div className="hb-stack" style={{ '--gap': '2rem' } as React.CSSProperties}>
-          <p className="hb-lede">This is the dashboard you get after sign-up, running on invented posts. Scan a watch list, claim or dismiss leads, and see exactly when the real XP rules pay out and when they do not.</p>
-          <SampleDashboard sets={SAMPLE_SETS} levelCumulative={LEVELS} />
+          <p className="hb-lede">
+            This is what one scan shows, on an invented question about CRMs. A real scan asks Perplexity your question
+            and checks your site.
+          </p>
+          <GeoSampleScan />
           <div className="hb-row">
             <Link href="/sign-up" className="hb-btn">
-              Start free <ArrowRight size={18} aria-hidden="true" />
+              Join early access <ArrowRight size={18} aria-hidden="true" />
             </Link>
             <Link href="/pricing" className="hb-btn hb-btn--label">
-              See what real scans cost
+              What early access includes
             </Link>
           </div>
         </div>

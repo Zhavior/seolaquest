@@ -49,7 +49,7 @@ export function softwareSchema(offers: OfferInput[]): JsonLd {
     applicationCategory: 'BusinessApplication',
     operatingSystem: 'Web',
     description:
-      'Scans X for the keywords you track, scores each public post for buyer intent, and delivers it to a lead inbox with the source post attached.',
+      'Asks an AI search engine the question your buyers ask, lists the sources its answer cited, sorts them into forums, review sites, articles and vendor pages, and shows whether your site was cited. Early access; scans are not switched on yet.',
     offers: offers.map((offer) => ({
       '@type': 'Offer',
       name: offer.name,

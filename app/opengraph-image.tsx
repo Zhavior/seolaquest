@@ -1,6 +1,6 @@
 import { ImageResponse } from 'next/og'
 
-export const alt = 'SEOlaQuest: find buyers on X'
+export const alt = 'SEOlaQuest: be the source the answer cites'
 export const size = { width: 1200, height: 630 }
 export const contentType = 'image/png'
 
@@ -92,7 +92,7 @@ export default function OpengraphImage() {
                   letterSpacing: -5,
                 }}
               >
-                Find buyers
+                Be the source
               </div>
               <div
                 style={{
@@ -104,11 +104,11 @@ export default function OpengraphImage() {
                   letterSpacing: -5,
                 }}
               >
-                on X.
+                it cites.
               </div>
             </div>
             <div style={{ display: 'flex', color: '#4A4538', fontSize: 30 }}>
-              Scan. Read the source post. Claim the lead. Level up.
+              Ask. Read the sources. Sort them. Make your move.
             </div>
           </div>
         </div>
