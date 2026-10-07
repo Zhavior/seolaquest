@@ -1,8 +1,8 @@
 /**
  * What this edition does not do yet, and the plain answers to the questions a
- * founder asks before signing up. Both lists render on the page and feed the
- * FAQ structured data, so what a crawler reads is exactly what a visitor sees.
- * Each line was checked against the product code on 2026-09-29 (see PRODUCT.md).
+ * founder asks before joining. Both lists render on the page and feed the FAQ
+ * structured data, so what a crawler reads is exactly what a visitor sees.
+ * Each GEO line was checked against src/modules/geo on 2026-10-07.
  */
 
 export type ErrataItem = { id: string; text: string; kind: 'open' | 'by-design' }
@@ -10,46 +10,41 @@ export type ErrataItem = { id: string; text: string; kind: 'open' | 'by-design' 
 export function errataItems(checkoutOpen: boolean): ErrataItem[] {
   return [
     {
-      id: 'x-only',
+      id: 'not-running',
       kind: 'open',
-      text: 'X only. Reddit support is built but switched off, so no Reddit posts are scanned.',
+      text: 'GEO scans are not switched on. The code is built and tested, but no real scan has run, so no result on this site comes from an engine.',
     },
     {
-      id: 'manual-scans',
+      id: 'one-engine',
       kind: 'open',
-      text: 'Scans run when you start them. Scheduled scanning exists in the code but is not a promised feature, so do not count on automatic monitoring.',
+      text: 'One engine: Perplexity. Other AI search engines are not built, and a citation in one engine says nothing about another.',
     },
     {
-      id: 'checkout',
+      id: 'cost',
+      kind: 'open',
+      text: 'The cost of a scan is not known yet. Each scan records what the engine charged; there is no price until those numbers exist.',
+    },
+    {
+      id: 'classification',
+      kind: 'by-design',
+      text: 'Source types come from a short, hand-picked list of sites and URL patterns. Anything else is marked as a guess rather than shown as known.',
+    },
+    {
+      id: 'snapshot',
+      kind: 'by-design',
+      text: 'A scan is one answer at one moment. The same question can cite different sources later, and SEOlaQuest does not promise a citation after you act.',
+    },
+    {
+      id: 'manual',
+      kind: 'open',
+      text: 'Scans will run when you start them. There is no scheduled monitoring.',
+    },
+    {
+      id: 'x-checkout',
       kind: 'open',
       text: checkoutOpen
-        ? 'Paid checkout is switched on but runs a final check before any charge; it can be paused again.'
-        : 'Paid checkout is paused. If you try to buy, you will see that no charge was made.',
-    },
-    {
-      id: 'scoring',
-      kind: 'open',
-      text: 'Scoring can be unavailable. When it is, the lead shows as not scored. It never shows a guessed number.',
-    },
-    {
-      id: 'guild',
-      kind: 'by-design',
-      text: 'The Guild Hall is a private journal. There are no leaderboards, rankings, or other hunters to compete with.',
-    },
-    {
-      id: 'conversions',
-      kind: 'open',
-      text: 'Conversion quests (First Blood, Weekly Closer, Rainmaker) are face down and pay nothing until conversions can be verified.',
-    },
-    {
-      id: 'keywords',
-      kind: 'by-design',
-      text: 'Each account can keep up to 10 active keywords.',
-    },
-    {
-      id: 'sla',
-      kind: 'open',
-      text: 'No uptime guarantee and no public API. The status page lists what is verified and what is still pending.',
+        ? 'The earlier X lead finder still sells paid plans, behind a final payment check that can pause checkout again.'
+        : 'Paid checkout for the earlier X lead finder is paused. Nothing on this site can be bought.',
     },
   ]
 }
@@ -58,27 +53,27 @@ export type FaqItem = { q: string; a: string }
 
 export const FAQ: FaqItem[] = [
   {
-    q: 'Does a match mean someone will buy?',
-    a: 'No. A match is a public post that fits your keywords. The score is a policy threshold, not a chance of a sale. Read the source post before you act.',
+    q: 'What does a scan tell me?',
+    a: 'For one question you choose: which pages the AI search found, which ones its answer cited and in what order, what kind of page each one is, and whether your own site was cited, found but left out, or missing.',
   },
   {
-    q: 'What can I do for free?',
-    a: 'Create an account, take the six-step tutorial quest, and save up to 10 keywords. Free Scout includes no scan credits, so real scans need a paid plan.',
+    q: 'Can SEOlaQuest get my site cited?',
+    a: 'No. It shows where the answer comes from and what kind of move each source suggests. Nothing guarantees a citation, and the answer can change.',
   },
   {
-    q: 'Which platforms does it scan?',
-    a: 'X only today. Reddit is built but switched off.',
+    q: 'Which AI engines does it check?',
+    a: 'Perplexity only, once scans are switched on. ChatGPT, Gemini and Google AI answers are not covered.',
   },
   {
-    q: 'Does SEOlaQuest post to X for me?',
-    a: 'No. It drafts replies and you send them yourself. It does not post on your behalf.',
+    q: 'What does early access cost?',
+    a: 'Nothing. Joining is free and asks for no card. GEO scans have no price yet, because no real scan has reported what it costs.',
   },
   {
-    q: 'Why not just search X myself?',
-    a: 'You can. SEOlaQuest keeps every match with its source in one inbox, drops noise such as cashtag chatter, job posts, and invite spam before you see it, scores the rest, and tracks what you did about each one.',
+    q: 'What happened to the X lead finder?',
+    a: 'It still runs inside the app for signed-in accounts. The public site now describes GEO, which is where SEOlaQuest is heading.',
   },
   {
     q: 'What data do you keep?',
-    a: 'Your email and display name, your keywords and scan results, lead workflow state, and Stripe identifiers and subscription state. Card numbers stay with Stripe. The privacy page has the full list.',
+    a: 'Your email and display name, and for each scan the question, the site you checked, the answer text, the sources returned and what the engine charged. Card numbers stay with Stripe. The privacy page has the full list.',
   },
 ]

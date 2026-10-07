@@ -6,8 +6,8 @@ import { AuthShell } from '@/features/handbook/auth/AuthShell'
 import { QUEST_OBJECTIVES } from '@/features/auth/questSteps'
 
 export const metadata: Metadata = {
-  title: 'Create Account | SEOlaQuest',
-  description: 'Create an account before saving your first customer-research keyword.',
+  title: 'Join Early Access | SEOlaQuest',
+  description: 'Create a free SEOlaQuest account for GEO early access. No card.',
 }
 
 export default function Page() {
@@ -15,18 +15,22 @@ export default function Page() {
     <ClerkProvider>
       <AuthShell
         titleId="sign-up-heading"
-        title="Start your first hunt"
-        lede="Make a free account, then pick your first keyword. Free Scout costs $0 and asks for no card."
+        title="Join the early access"
+        lede="Free, and no card. GEO scans are planned to switch on in this account once they have run for real."
         aside={
           <>
             <p className="hb-mono hb-soft">
-              Want to see a lead first?{' '}
+              Want to see what a scan shows first?{' '}
               <Link href="/radar" className="hb-link">
-                Try the sample hunt
+                See the sample scan
               </Link>{' '}
-              (labelled sample data, no account).
+              (invented data, no account).
             </p>
-            <ol className="hb-card-fields" aria-label="Setup, six short steps">
+            <p className="hb-prose">
+              Until GEO switches on, your account opens today&apos;s app: the X lead finder. Its setup takes six short
+              steps:
+            </p>
+            <ol className="hb-card-fields" aria-label="Today's setup, six short steps">
               {QUEST_OBJECTIVES.map((objective) => (
                 <li key={objective.step}>
                   <strong>{objective.title}</strong>
@@ -35,12 +39,11 @@ export default function Page() {
               ))}
             </ol>
             <p className="hb-mono hb-soft">
-              Setup saves as you go, so you can leave and pick it up later. It never posts or messages anyone for you.
-              Free Scout saves keywords; running scans needs a paid plan, and{' '}
+              Setup saves as you go. Nothing posts or messages anyone for you, and{' '}
               <Link href="/pricing" className="hb-link">
                 pricing
               </Link>{' '}
-              shows what is open today.
+              shows what early access includes.
             </p>
             <p className="hb-mono hb-soft">
               Already registered?{' '}

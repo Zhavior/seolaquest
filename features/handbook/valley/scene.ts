@@ -29,6 +29,12 @@ export type ValleyOptions = {
    * draws a dash, never a made-up number.
    */
   scores: Array<number | null>
+  /**
+   * Optional label and colour per beacon, used instead of the score and its
+   * tier colour. The GEO sample uses it to show a source's citation rank in
+   * the colour of its source type.
+   */
+  marks?: Array<BeaconMark | null>
   mode: SkyMode
   reducedMotion: boolean
   /**
@@ -55,6 +61,7 @@ export type ValleyHandle = {
   dispose: () => void
 }
 
+export type BeaconMark = { text: string; fill: string }
 export type BeaconState = 'open' | 'claimed' | 'dismissed'
 export type BeaconView = { state: BeaconState; selected: boolean }
 
@@ -529,7 +536,7 @@ export function createValley(opts: ValleyOptions): ValleyHandle {
     return m
   }
 
-  function markerTex(score: number | null, fill: string): THREE.CanvasTexture {
+  function markerTex(text: string, fill: string): THREE.CanvasTexture {
     const c = document.createElement('canvas')
     c.width = c.height = 128
     const g = c.getContext('2d')!
@@ -540,7 +547,7 @@ export function createValley(opts: ValleyOptions): ValleyHandle {
     g.fillStyle = '#0B0818'
     g.font = '700 46px "Helvetica Neue", Arial, sans-serif'
     g.textAlign = 'center'; g.textBaseline = 'middle'
-    g.fillText(score === null ? '–' : String(score), 0, 4)
+    g.fillText(text, 0, 4)
     const t = track(new THREE.CanvasTexture(c))
     t.colorSpace = THREE.SRGBColorSpace
     return t
@@ -555,7 +562,13 @@ export function createValley(opts: ValleyOptions): ValleyHandle {
   const bowlGeo = track(new THREE.CylinderGeometry(3.6, 2, 2, 8))
   const scores = opts.scores.slice(0, 4)
   while (scores.length < 4) scores.push(null)
-  const beacons = scores.map((score, i) => {
+  const markOf = (i: number): BeaconMark => {
+    const mark = opts.marks?.[i]
+    if (mark) return mark
+    const score = scores[i]
+    return { text: score === null ? '–' : String(score), fill: tierColor(score).fill }
+  }
+  const beacons = scores.map((_score, i) => {
     const { x, z, y } = bpos[i]
     const g = new THREE.Group()
     g.position.set(x, y, z)
@@ -570,8 +583,8 @@ export function createValley(opts: ValleyOptions): ValleyHandle {
     halo.position.y = 19.5; halo.scale.set(52, 52, 1); g.add(halo)
     const light = new THREE.PointLight(0xffa040, 2, 60, 1.6)
     light.position.y = 19; g.add(light)
-    const fill = tierColor(score).fill
-    const mk = new THREE.Sprite(track(new THREE.SpriteMaterial({ map: markerTex(score, fill), depthTest: false, transparent: true, sizeAttenuation: false, fog: false })))
+    const { text, fill } = markOf(i)
+    const mk = new THREE.Sprite(track(new THREE.SpriteMaterial({ map: markerTex(text, fill), depthTest: false, transparent: true, sizeAttenuation: false, fog: false })))
     mk.position.y = 32; mk.scale.set(i === 0 ? 0.095 : 0.07, i === 0 ? 0.095 : 0.07, 1); mk.renderOrder = 20; g.add(mk)
     const ring = new THREE.Sprite(track(new THREE.SpriteMaterial({ map: glowTex, color: new THREE.Color(fill), blending: THREE.AdditiveBlending, depthWrite: false, transparent: true, sizeAttenuation: false, depthTest: false, fog: false })))
     ring.position.y = 32; ring.scale.set(0.16, 0.16, 1); ring.renderOrder = 19; ring.visible = i === 0; g.add(ring)
@@ -589,22 +602,23 @@ export function createValley(opts: ValleyOptions): ValleyHandle {
   })
 
   const markerCache = new Map<string, THREE.CanvasTexture>()
-  const markerFor = (score: number | null, fill: string) => {
-    const key = `${score}${fill}`
+  const markerFor = (text: string, fill: string) => {
+    const key = `${text}${fill}`
     let tex = markerCache.get(key)
-    if (!tex) { tex = markerTex(score, fill); markerCache.set(key, tex) }
+    if (!tex) { tex = markerTex(text, fill); markerCache.set(key, tex) }
     return tex
   }
   function applyBeacon(i: number, view: BeaconView) {
     const b = beacons[i]
     if (!b) return
-    const base = tierColor(scores[i]).fill
+    const mark = markOf(i)
+    const base = mark.fill
     const fill = view.state === 'claimed' ? '#5DD6B0' : view.state === 'dismissed' ? '#6E6590' : base
     const key = `${fill}${view.selected}${view.state}`
     b.view = view
     if (key === b.lastKey) return
     b.lastKey = key
-    b.mk.material.map = markerFor(scores[i], fill)
+    b.mk.material.map = markerFor(mark.text, fill)
     b.mk.material.needsUpdate = true
     const size = view.selected ? 0.095 : 0.07
     b.mk.scale.set(size, size, 1)

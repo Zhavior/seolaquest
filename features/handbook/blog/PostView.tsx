@@ -67,14 +67,14 @@ export function PostView({ post, related }: { post: Post; related: Post[] }) {
               </div>
 
               <aside className="hb-post-cta hb-ply" aria-label="Try SEOlaQuest">
-                <h2 className="hb-h3">See the loop with invented posts</h2>
+                <h2 className="hb-h3">See which sources an AI answer cites</h2>
                 <p className="hb-prose">
-                  Scan, read the source post, claim a lead, and watch the real XP rules pay or refuse to pay. No account
-                  needed.
+                  One invented scan, laid out the way a real one reads: the question, the answer, every source, and
+                  whether your site made it in. No account needed.
                 </p>
                 <div className="hb-row">
                   <Link href="/radar" className="hb-btn">
-                    Try the sample hunt <ArrowRight size={18} aria-hidden="true" />
+                    See a sample scan <ArrowRight size={18} aria-hidden="true" />
                   </Link>
                   <Link href="/pricing" className="hb-btn hb-btn--label">
                     Pricing

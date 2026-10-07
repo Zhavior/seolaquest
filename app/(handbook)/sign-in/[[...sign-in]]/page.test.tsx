@@ -18,7 +18,7 @@ describe('sign-in page', () => {
   it('uses SEOlaQuest branding and a safe onboarding fallback', () => {
     render(<Page />)
 
-    expect(screen.getByRole('heading', { name: /resume your customer hunt/i })).toBeVisible()
+    expect(screen.getByRole('heading', { name: /welcome back/i })).toBeVisible()
     expect(mocks.signIn).toHaveBeenCalledWith(expect.objectContaining({
       fallbackRedirectUrl: '/onboarding',
       signUpUrl: '/sign-up',

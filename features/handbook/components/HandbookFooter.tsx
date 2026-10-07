@@ -2,9 +2,9 @@ import Link from 'next/link'
 import { Brand } from './Brand'
 
 const READ = [
-  { label: 'How the hunt works', href: '/#hunt' },
-  { label: 'Try the sample hunt', href: '/radar' },
-  { label: 'Quests and XP', href: '/#quests' },
+  { label: 'How a scan works', href: '/#route' },
+  { label: 'See a sample scan', href: '/radar' },
+  { label: 'Early access', href: '/#inventory' },
   { label: 'Pricing', href: '/pricing' },
   { label: 'Field notes', href: '/blog' },
 ]
@@ -24,8 +24,8 @@ export function HandbookFooter() {
         <div>
           <Brand />
           <p className="hb-desk-fine" style={{ marginTop: '0.9rem' }}>
-            Find buyers on X. Sample data on this site is invented and labelled. X is a trademark of its owner;
-            SEOlaQuest is an independent product and is not affiliated with X Corp.
+            See who AI answers cite. Sample data on this site is invented and labelled. Perplexity and X are
+            trademarks of their owners; SEOlaQuest is an independent product and is not affiliated with either.
           </p>
         </div>
         <nav aria-label="Read">

@@ -14,7 +14,7 @@ export default function Page() {
     <ClerkProvider>
       <AuthShell
         titleId="sign-in-heading"
-        title="Resume your customer hunt"
+        title="Welcome back"
         lede="Sign in to open your saved workspace or pick setup back up where you stopped."
         aside={
           <p className="hb-mono hb-soft">
@@ -22,7 +22,7 @@ export default function Page() {
             <Link href="/sign-up" className="hb-link">
               Create a free account
             </Link>
-            . Free Scout is $0.
+            . Early access is free.
           </p>
         }
       >

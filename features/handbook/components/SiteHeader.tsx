@@ -5,8 +5,8 @@ import { useEffect, useState } from 'react'
 import { Brand } from './Brand'
 
 const LINKS = [
-  { label: 'The Hunt', href: '/#hunt' },
-  { label: 'Quests', href: '/#quests' },
+  { label: 'The Scan', href: '/#hunt' },
+  { label: 'How it works', href: '/#route' },
   { label: 'Pricing', href: '/pricing' },
   { label: 'Field Notes', href: '/blog' },
 ]
@@ -40,7 +40,7 @@ export function SiteHeader() {
           Sign in
         </Link>
         <Link href="/sign-up" className="hb-btn hb-btn--small">
-          Start free
+          Join free
         </Link>
       </nav>
     </header>
