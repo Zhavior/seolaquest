@@ -42,6 +42,19 @@ export type ValleyOptions = {
    * small framed view reads clearer with less (the dashboard uses 0.45).
    */
   atmosphere?: number
+  /**
+   * The home page's scan view: the visitor's own site as a fifth, unlit tower,
+   * a citation thread from each beacon up to the answer, and a survey grid
+   * swept over the land. Hidden until `setScan(true)`. The dashboard leaves
+   * it out.
+   */
+  scan?: boolean
+  /**
+   * Moves the opening shot right by this fraction of the view width on wide
+   * screens, and widens it a little, so every landmark fits beside a copy
+   * column on the left. Fades out as the camera travels down the page.
+   */
+  shiftRight?: number
 }
 
 export type ValleyHandle = {
@@ -50,12 +63,23 @@ export type ValleyHandle = {
   setProgress: (progress: number) => void
   setPaused: (paused: boolean) => void
   setReducedMotion: (reduced: boolean) => void
-  /** Sync each beacon to the sample hunt: which are open, claimed or dismissed, and which is selected. */
+  /**
+   * Sync each beacon to the sample: which are open, claimed or dismissed, and
+   * which is selected. A fifth entry selects the visitor's own site.
+   */
   setBeacons: (beacons: BeaconView[]) => void
   /** Replace the beacon scores, e.g. when new leads arrive. `null` draws a dash. */
   setScores: (scores: Array<number | null>) => void
   /** Light-pillar surge, expanding ring and sparks at one beacon (a claim). */
   burst: (index: number) => void
+  /** Show or hide the scan view. Does nothing unless `scan` was set at creation. */
+  setScan: (on: boolean) => void
+  /**
+   * Where a marker sits on screen, in client pixels: 0-3 the beacons, 4 the
+   * visitor's own site, 5 the answer. `null` when it is behind the camera or
+   * was never built.
+   */
+  screenOf: (index: number) => { x: number; y: number } | null
   /** Jump the sky to its target immediately (used when a still frame is wanted). */
   snap: () => void
   dispose: () => void
@@ -427,6 +451,14 @@ export function createValley(opts: ValleyOptions): ValleyHandle {
     const x = pathX(z) + side * off
     return { x, z, y: heightAt(x, z) }
   })
+  // The visitor's own site stands between the first and third beacons, on the
+  // near side of the path, so the scan view can show it left out.
+  const brandPos = (() => {
+    const z = -62
+    const x = pathX(z) + 26
+    return { x, z, y: heightAt(x, z) }
+  })()
+  const landmarks = opts.scan ? [...bpos, brandPos] : bpos
 
   /* trees */
   const treeCount = tier === 'high' ? 3000 : 900
@@ -467,7 +499,7 @@ export function createValley(opts: ValleyOptions): ValleyHandle {
       if (fbm(tx * 0.018 + 9, tz * 0.018 + 4, 3) < 0.46) continue
       if (Math.abs(tx - pathX(tz)) < 16) continue
       if (tz > 40 && Math.abs(tx) < 60) continue
-      if (bpos.some((b) => Math.hypot(tx - b.x, tz - b.z) < 20)) continue
+      if (landmarks.some((b) => Math.hypot(tx - b.x, tz - b.z) < 20)) continue
       if (Math.hypot(tx - LAKE.x, tz - LAKE.z) < 33) continue
       const s = 0.55 + rnd() * 0.65
       pos.set(tx, ty - 0.2, tz)
@@ -651,6 +683,141 @@ export function createValley(opts: ValleyOptions): ValleyHandle {
     scene.add(grp)
   }
 
+  /* scan view: the visitor's own site, the answer, the citation threads and a
+     survey grid. Built only when the page asks for it; hidden until setScan. */
+  const UV_VERT = 'varying vec2 vU; void main(){ vU=uv; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.); }'
+  const THREAD_FRAG = [
+    'varying vec2 vU; uniform float uA,uT,uGrow,uDash; uniform vec3 uC;',
+    'void main(){',
+    ' if(vU.x>uGrow) discard;',
+    ' float flow=.5+.5*sin(vU.x*46.-uT*5.);',
+    ' float head=uGrow<1.?smoothstep(uGrow-.06,uGrow,vU.x):0.;',
+    ' float dash=uDash>0.?step(.45,fract(vU.x*30.)):1.;',
+    ' gl_FragColor=vec4(uC*1.4,uA*dash*(.45+.4*flow+1.2*head));',
+    '}',
+  ].join('\n')
+  const GRID_FRAG = [
+    'varying vec3 vW; uniform float uA,uFront; uniform vec3 uC,uCam;',
+    'void main(){',
+    ' vec2 q=vW.xz/10.; vec2 g=abs(fract(q-.5)-.5)/fwidth(q); float line=1.-min(min(g.x,g.y),1.);',
+    ' float fade=exp(-distance(vW,uCam)*.004);',
+    ' float shown=step(uFront,vW.z); float band=exp(-abs(vW.z-uFront)*.07);',
+    ' gl_FragColor=vec4(uC*1.3,uA*fade*(line*(.3*shown+.9*band)+band*.08));',
+    '}',
+  ].join('\n')
+  const MUTED_C = new THREE.Color(0x8e86a8)
+  const CLAIM_C = new THREE.Color(0x5dd6b0)
+  const scanState = { target: 0, k: 0, start: -10 }
+  type Thread = { mat: THREE.ShaderMaterial; base: THREE.Color }
+  const threads: Thread[] = []
+  let brandThread: THREE.ShaderMaterial | null = null
+  let brand: { g: THREE.Group; mk: THREE.Sprite; ring: THREE.Sprite; lastKey: string } | null = null
+  let answer: THREE.Group | null = null
+  let gridMat: THREE.ShaderMaterial | null = null
+  const answerPos = new THREE.Vector3(-46, 78, -190)
+  const threadMat = (color: THREE.Color, dash: boolean) =>
+    track(new THREE.ShaderMaterial({
+      transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
+      uniforms: { uA: { value: 0 }, uT: { value: 0 }, uGrow: { value: 0 }, uDash: { value: dash ? 1 : 0 }, uC: { value: color.clone() } },
+      vertexShader: UV_VERT,
+      fragmentShader: THREAD_FRAG,
+    }))
+  const arc = (from: THREE.Vector3, to: THREE.Vector3, radius: number, mat: THREE.ShaderMaterial) => {
+    const mid = from.clone().lerp(to, 0.5)
+    mid.y += 24 + from.distanceTo(to) * 0.1
+    const tube = new THREE.Mesh(track(new THREE.TubeGeometry(new THREE.QuadraticBezierCurve3(from, mid, to), 72, radius, 6)), mat)
+    tube.renderOrder = 8
+    tube.frustumCulled = false
+    scene.add(tube)
+  }
+  if (opts.scan) {
+    // The visitor's own site: a tower with an empty bowl and no rank.
+    const g = new THREE.Group()
+    g.position.set(brandPos.x, brandPos.y, brandPos.z)
+    const stone = new THREE.Mesh(stoneGeo, stoneMat)
+    stone.position.y = 7; g.add(stone)
+    g.add(blob(13))
+    const bowl = new THREE.Mesh(bowlGeo, bowlMat)
+    bowl.position.y = 15.8; g.add(bowl)
+    const mk = new THREE.Sprite(track(new THREE.SpriteMaterial({ map: markerFor('–', '#8E86A8'), depthTest: false, transparent: true, sizeAttenuation: false, fog: false })))
+    mk.position.y = 26; mk.scale.set(0.07, 0.07, 1); mk.renderOrder = 20; g.add(mk)
+    const ring = new THREE.Sprite(track(new THREE.SpriteMaterial({ map: glowTex, color: MUTED_C, blending: THREE.AdditiveBlending, depthWrite: false, transparent: true, sizeAttenuation: false, depthTest: false, fog: false })))
+    ring.position.y = 26; ring.scale.set(0.16, 0.16, 1); ring.renderOrder = 19; ring.visible = false; g.add(ring)
+    scene.add(g)
+    brand = { g, mk, ring, lastKey: '' }
+
+    // The answer: a floating crystal the cited sources feed.
+    const a = new THREE.Group()
+    a.position.copy(answerPos)
+    const gem = new THREE.Mesh(track(new THREE.OctahedronGeometry(4.2, 0)), track(new THREE.MeshBasicMaterial({ color: 0xf3d58a, fog: false })))
+    gem.scale.set(1, 1.5, 1)
+    a.add(gem)
+    const glow = new THREE.Sprite(track(new THREE.SpriteMaterial({ map: glowTex, color: CLAIM_C, blending: THREE.AdditiveBlending, depthWrite: false, transparent: true, fog: false })))
+    glow.scale.set(46, 46, 1)
+    a.add(glow)
+    a.visible = false
+    scene.add(a)
+    answer = a
+
+    beacons.forEach((b, i) => {
+      const base = new THREE.Color(markOf(i).fill)
+      const mat = threadMat(base, false)
+      arc(b.g.position.clone().setY(b.g.position.y + 19), answerPos, 0.55, mat)
+      threads.push({ mat, base })
+    })
+    brandThread = threadMat(MUTED_C, true)
+    arc(answerPos, new THREE.Vector3(brandPos.x, brandPos.y + 17, brandPos.z), 0.35, brandThread)
+
+    gridMat = track(new THREE.ShaderMaterial({
+      transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
+      polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2,
+      uniforms: { uA: { value: 0 }, uFront: { value: 200 }, uC: { value: CLAIM_C.clone() }, uCam: { value: new THREE.Vector3() } },
+      vertexShader: WORLD_VERT,
+      fragmentShader: GRID_FRAG,
+    }))
+    const gridMesh = new THREE.Mesh(tg, gridMat)
+    gridMesh.renderOrder = 2
+    scene.add(gridMesh)
+  }
+  function applyBrand(view: BeaconView) {
+    if (!brand) return
+    const key = `${view.selected}`
+    if (key === brand.lastKey) return
+    brand.lastKey = key
+    const size = view.selected ? 0.095 : 0.07
+    brand.mk.scale.set(size, size, 1)
+    brand.ring.visible = view.selected
+  }
+  function stepScan(tt: number, now: number) {
+    if (!gridMat || !answer || !brandThread) return
+    scanState.k += (scanState.target - scanState.k) * (reduce ? 1 : 0.06)
+    const k = scanState.k
+    const since = now - scanState.start
+    const sweep = reduce ? 1 : Math.min(1, since / 2.4)
+    const ease = 1 - Math.pow(1 - sweep, 3)
+    gridMat.uniforms.uA.value = k
+    gridMat.uniforms.uFront.value = sweep >= 1 ? -2000 : 150 - 630 * ease
+    gridMat.uniforms.uCam.value.copy(camera.position)
+    answer.visible = k > 0.01
+    const s = Math.max(0.001, k)
+    answer.scale.setScalar(s)
+    answer.position.y = answerPos.y + (reduce ? 0 : Math.sin(tt * 0.9) * 1.2)
+    answer.children[0].rotation.y = reduce ? 0.6 : tt * 0.5
+    threads.forEach((th, i) => {
+      const view = beacons[i]?.view
+      const u = th.mat.uniforms
+      u.uT.value = tt
+      u.uGrow.value = reduce ? 1 : Math.min(1, Math.max(0, (since - 0.9 - i * 0.22) / 1.1))
+      const state = view?.state ?? 'open'
+      u.uC.value.copy(state === 'claimed' ? CLAIM_C : state === 'dismissed' ? MUTED_C : th.base)
+      u.uA.value = k * (view?.selected ? 0.95 : 0.5) * (state === 'dismissed' ? 0.35 : 1)
+    })
+    const bu = brandThread.uniforms
+    bu.uT.value = tt
+    bu.uGrow.value = reduce ? 1 : Math.min(1, Math.max(0, (since - 1.9) / 1.1))
+    bu.uA.value = k * 0.55
+  }
+
   /* hero figure */
   const fx = 8, fz = 40
   const fig = new THREE.Group()
@@ -769,6 +936,7 @@ export function createValley(opts: ValleyOptions): ValleyHandle {
   let bloom: UnrealBloomPass | null = null
   let grade: ShaderPass | null = null
   let width = 1, height = 1
+  let rect = canvas.getBoundingClientRect()
   function buildComposer() {
     composer = new EffectComposer(renderer)
     composer.setPixelRatio(Math.min(window.devicePixelRatio || 1, dprCap))
@@ -787,6 +955,7 @@ export function createValley(opts: ValleyOptions): ValleyHandle {
     camera.aspect = width / height
     camera.updateProjectionMatrix()
     if (composer) composer.setSize(width, height)
+    rect = canvas.getBoundingClientRect()
   }
   resize()
   if (tier === 'high') buildComposer()
@@ -864,7 +1033,7 @@ export function createValley(opts: ValleyOptions): ValleyHandle {
   let disposed = false
   let last = performance.now()
   let elapsed = 0, frames = 0, acc = 0, downgraded = false
-  const tmpV = new THREE.Vector3(), lookV = new THREE.Vector3()
+  const tmpV = new THREE.Vector3(), lookV = new THREE.Vector3(), projV = new THREE.Vector3()
 
   function downgrade() {
     downgraded = true
@@ -908,6 +1077,15 @@ export function createValley(opts: ValleyOptions): ValleyHandle {
     // Pointer tilt: up to 1.5 degrees of yaw and pitch, damped by mouseS above.
     camera.rotateY(-px * 2 * TILT)
     camera.rotateX(-py * 2 * TILT)
+    const heroK = opts.shiftRight && width >= 900 ? 1 - sstep(0.03, 0.2, progS) : 0
+    // Narrower screens see less of the valley side to side, so they widen more.
+    const zoom = 1 - heroK * (0.16 + Math.min(0.24, Math.max(0, (1.6 - camera.aspect) * 0.9)))
+    const skew = -(opts.shiftRight ?? 0) * heroK * camera.getFilmWidth() * 2 * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) * camera.aspect
+    if (Math.abs(skew - camera.filmOffset) > 1e-4 || Math.abs(zoom - camera.zoom) > 1e-4) {
+      camera.filmOffset = skew
+      camera.zoom = zoom
+      camera.updateProjectionMatrix()
+    }
     sky.position.copy(camera.position)
     const gh = heightAt(camera.position.x, camera.position.z) + 3
     if (camera.position.y < gh) camera.position.y = gh
@@ -938,6 +1116,7 @@ export function createValley(opts: ValleyOptions): ValleyHandle {
         rgm.opacity = 1 - bt / 1.6
       } else rgm.opacity = 0
     })
+    stepScan(tt, now)
     lamp.scale.set(1.6 * (0.9 + 0.1 * Math.sin(tt * 13)), 2.2 * (0.9 + 0.12 * Math.sin(tt * 9)), 1)
     lampLight.intensity = (1.0 + lampK * 1.2) * (0.9 + 0.1 * Math.sin(tt * 12)) * Math.PI
     if (!reduce) {
@@ -994,7 +1173,32 @@ export function createValley(opts: ValleyOptions): ValleyHandle {
     setProgress(p) { prog = Math.min(1, Math.max(0, p)) },
     setPaused(next) { paused = next; last = performance.now() },
     setReducedMotion(next) { reduce = next },
-    setBeacons(views) { views.forEach((v, i) => applyBeacon(i, v)) },
+    setBeacons(views) { views.forEach((v, i) => (i === 4 ? applyBrand(v) : applyBeacon(i, v))) },
+    setScan(on) {
+      if (!gridMat) return
+      const next = on ? 1 : 0
+      if (next === scanState.target) return
+      scanState.target = next
+      if (on) scanState.start = performance.now() / 1000
+    },
+    screenOf(index) {
+      if (index < 4) {
+        const b = beacons[index]
+        if (!b) return null
+        projV.copy(b.g.position)
+        projV.y += b.mk.position.y
+      } else if (index === 4) {
+        if (!brand) return null
+        projV.copy(brand.g.position)
+        projV.y += brand.mk.position.y
+      } else if (index === 5) {
+        if (!answer) return null
+        projV.copy(answer.position)
+      } else return null
+      projV.project(camera)
+      if (projV.z > 1 || projV.z < -1) return null
+      return { x: rect.left + ((projV.x + 1) / 2) * rect.width, y: rect.top + ((1 - projV.y) / 2) * rect.height }
+    },
     setScores(next) {
       beacons.forEach((b, i) => {
         const score = next[i] ?? null

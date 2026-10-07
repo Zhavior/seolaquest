@@ -17,13 +17,17 @@ import { useHomeStage } from './HomeStage'
 
 const TEAL = '#5DD6B0'
 const MUTED = '#6E6590'
+const BRAND_TONE = '#8E86A8'
+/** The visitor's own site, after the four cited sources. */
+const BRAND = SAMPLE_GEO_CITED.length
 
 type Pick = 'target' | 'skipped'
 
 /**
  * The hero: copy on the scene, then one sample AI-citation scan as a source
- * list and a source card. Picking a source lights its beacon in the valley;
- * adding it to the plan fires a light pillar. The scan, the sites and the
+ * list and a source card. Picking a source lights its beacon in the valley
+ * (clicking a beacon picks it back); adding it to the plan fires a light
+ * pillar. Your own site can be picked too, to see why it was left out. The scan, the sites and the
  * ranks are invented and labelled; the fields and the "is my site cited"
  * verdict follow the product's own scan rules.
  */
@@ -32,18 +36,22 @@ export function GeoHeroStage({ children }: { children: ReactNode }) {
   const [picks, setPicks] = useState<Record<string, Pick>>({})
   const stage = useHomeStage()
 
-  const source = SAMPLE_GEO_CITED[sel]
+  const brandRow = SAMPLE_GEO_SOURCES.find((s) => s.domain === SAMPLE_GEO_BRAND)!
+  const isBrand = sel === BRAND
+  const source = isBrand ? brandRow : SAMPLE_GEO_CITED[sel]
   const info = SOURCE_TYPE_INFO[source.sourceType]
-  const done = picks[source.url] ?? null
+  const done = isBrand ? null : (picks[source.url] ?? null)
   const targets = Object.values(picks).filter((p) => p === 'target').length
-  const brandRow = SAMPLE_GEO_SOURCES.find((s) => s.domain === SAMPLE_GEO_BRAND)
 
   const beacons: BeaconView[] = useMemo(
     () =>
-      SAMPLE_GEO_CITED.map((s, i) => ({
-        state: picks[s.url] === 'target' ? 'claimed' : picks[s.url] === 'skipped' ? 'dismissed' : 'open',
-        selected: i === sel,
-      })),
+      [
+        ...SAMPLE_GEO_CITED.map((s, i): BeaconView => ({
+          state: picks[s.url] === 'target' ? 'claimed' : picks[s.url] === 'skipped' ? 'dismissed' : 'open',
+          selected: i === sel,
+        })),
+        { state: 'open', selected: sel === BRAND },
+      ],
     [picks, sel],
   )
 
@@ -51,24 +59,34 @@ export function GeoHeroStage({ children }: { children: ReactNode }) {
     stage.setBeacons(beacons)
   }, [stage, beacons])
 
+  useEffect(() => {
+    stage.onPick((index) => {
+      valleyAudio.hover()
+      setSel(index)
+    })
+    return () => stage.onPick(null)
+  }, [stage])
+
   function onTarget() {
-    if (done) return
+    if (done || isBrand) return
     valleyAudio.claim()
     setPicks((current) => ({ ...current, [source.url]: 'target' }))
     stage.fire(sel)
   }
 
   function onSkip() {
-    if (done) return
+    if (done || isBrand) return
     valleyAudio.dismiss()
     setPicks((current) => ({ ...current, [source.url]: 'skipped' }))
   }
 
-  const tint = done === 'target' ? TEAL : done === 'skipped' ? MUTED : info.color
+  const tint = isBrand ? BRAND_TONE : done === 'target' ? TEAL : done === 'skipped' ? MUTED : info.color
 
   return (
     <>
-      <div className="hb-hero-top">{children}</div>
+      <div className="hb-hero-top">
+        <div className="hb-hero-copy">{children}</div>
+      </div>
       <div className="hb-deck">
         <section className="hb-panel hb-log" aria-label="Sample scan, cited sources">
           <div className="hb-ph">
@@ -115,17 +133,23 @@ export function GeoHeroStage({ children }: { children: ReactNode }) {
             })}
           </ul>
 
-          <div className="hb-geo-brand" role="note">
+          <button
+            type="button"
+            className="hb-geo-brand"
+            aria-pressed={isBrand}
+            onClick={() => setSel(BRAND)}
+            onMouseEnter={() => valleyAudio.hover()}
+          >
             <span className="hb-lv">YOUR SITE</span>
-            <p>
+            <span className="hb-geo-brand-text">
               <b>{SAMPLE_GEO_BRAND}</b>{' '}
               {SAMPLE_GEO_PRESENCE.brandCited
                 ? `cited at #${SAMPLE_GEO_PRESENCE.brandCitedRank}.`
                 : SAMPLE_GEO_PRESENCE.brandRetrieved
-                  ? `found by the search${brandRow?.retrievedRank ? ` (result ${brandRow.retrievedRank})` : ''}, but not cited in the answer.`
+                  ? `found by the search${brandRow.retrievedRank ? ` (result ${brandRow.retrievedRank})` : ''}, but not cited in the answer.`
                   : 'not found by the search at all.'}
-            </p>
-          </div>
+            </span>
+          </button>
         </section>
 
         <section
@@ -143,12 +167,12 @@ export function GeoHeroStage({ children }: { children: ReactNode }) {
                 <h2 className="hb-tip-name" style={{ color: tint }}>
                   {source.domain}
                 </h2>
-                <small>{info.label} · cited source</small>
+                <small>{isBrand ? 'Your site · left out' : `${info.label} · cited source`}</small>
               </div>
             </div>
             <div className="hb-bigscore">
-              <b>#{source.citedRank}</b>
-              <span>CITED IN THE ANSWER</span>
+              <b>{isBrand ? '–' : `#${source.citedRank}`}</b>
+              <span>{isBrand ? 'NOT CITED IN THE ANSWER' : 'CITED IN THE ANSWER'}</span>
             </div>
             <hr />
             <blockquote className="hb-quote">{source.title}</blockquote>
@@ -156,14 +180,16 @@ export function GeoHeroStage({ children }: { children: ReactNode }) {
             <div className="hb-facts">
               <p className="hb-good">
                 <Icon name="compass" size={20} />
-                {info.what}
+                {isBrand
+                  ? `The search found this page${source.retrievedRank ? ` as result ${source.retrievedRank}` : ''}, and the answer cited ${SAMPLE_GEO_CITED.length} other pages instead.`
+                  : info.what}
               </p>
               <p className="hb-src">
                 <Icon name="flag" size={20} />
                 Your move: {info.move}
               </p>
             </div>
-            {!done ? (
+            {isBrand ? null : !done ? (
               <div className="hb-acts">
                 <button type="button" className="hb-btn hb-btn--small" onClick={onTarget}>
                   Add to plan

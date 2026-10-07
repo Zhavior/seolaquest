@@ -41,7 +41,7 @@ export default function PricingPage() {
             published here once there is.
           </p>
 
-          <AccessLedger />
+          <AccessLedger legacy />
 
           <div className="hb-stack" style={{ '--gap': '1rem' } as React.CSSProperties}>
             <h2 className="hb-h3">Already on an X lead finder plan?</h2>

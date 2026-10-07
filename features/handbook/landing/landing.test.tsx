@@ -4,7 +4,7 @@ import { Hero } from './Hero'
 import { AccessLedger } from './AccessChapter'
 import { ErrataList, FaqList } from './ErrataChapter'
 import { FAQ, errataItems } from './errata'
-import { SAMPLE_GEO_CITED, SAMPLE_GEO_PRESENCE, SAMPLE_GEO_SOURCES } from '../geo/sample'
+import { SAMPLE_GEO_CITED, SAMPLE_GEO_PINS, SAMPLE_GEO_PRESENCE, SAMPLE_GEO_SOURCES } from '../geo/sample'
 
 describe('Hero', () => {
   it('leads with the GEO promise and two honest actions', () => {
@@ -29,11 +29,25 @@ describe('Hero', () => {
     expect(screen.getByText(/In your plan\. The beacon burns teal/)).toBeInTheDocument()
     expect(screen.getByRole('status')).toHaveTextContent(`1 of ${SAMPLE_GEO_CITED.length} cited sources in your plan.`)
   })
+
+  it('opens your own site as left out, with no plan actions', () => {
+    render(<Hero />)
+    fireEvent.click(screen.getByRole('button', { name: /YOUR SITE/ }))
+    expect(screen.getByText('NOT CITED IN THE ANSWER')).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Add to plan' })).not.toBeInTheDocument()
+  })
 })
 
 describe('GEO sample', () => {
   it('uses only reserved example domains, so no real site is shown as cited', () => {
     for (const source of SAMPLE_GEO_SOURCES) expect(source.domain).toMatch(/\.example$/)
+  })
+
+  it('pins one label per landmark, each taken from the sample', () => {
+    expect(SAMPLE_GEO_PINS).toHaveLength(SAMPLE_GEO_CITED.length + 2)
+    SAMPLE_GEO_CITED.forEach((s, i) => expect(SAMPLE_GEO_PINS[i].label).toBe(s.domain))
+    expect(SAMPLE_GEO_PINS[SAMPLE_GEO_CITED.length].note).toBe('Found by the search, not cited')
+    expect(SAMPLE_GEO_PINS.at(-1)!.label).toMatch(/^Sample /)
   })
 
   it('shows the brand found but not cited, through the product rule', () => {
@@ -47,6 +61,14 @@ describe('AccessLedger', () => {
     expect(within(screen.getByRole('row', { name: /Price per scan/ })).getByText('Not set')).toBeInTheDocument()
     expect(within(screen.getByRole('row', { name: /GEO scans/ })).getByText('Not switched on')).toBeInTheDocument()
     expect(screen.queryByText(/\$\d/)).not.toBeInTheDocument()
+  })
+
+  it('names the X lead finder only where existing plans are explained', () => {
+    const { unmount } = render(<AccessLedger />)
+    expect(screen.queryByText('X lead finder')).not.toBeInTheDocument()
+    unmount()
+    render(<AccessLedger legacy />)
+    expect(screen.getByText('X lead finder')).toBeInTheDocument()
   })
 })
 

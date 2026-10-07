@@ -449,7 +449,7 @@
   }
 }
 
-/* ── hero: bare text on the scene ──────────────────────────────────── */
+/* ── hero: copy on a solid panel, the valley beside it ─────────────── */
 
 .hb-hero-stage {
   min-height: auto;
@@ -460,6 +460,15 @@
   min-height: clamp(26rem, 78svh, 52rem);
   padding-bottom: clamp(2rem, 6vw, 4rem);
   max-width: 44rem;
+}
+
+/* Solid, not a scrim: no beacon, glow or ridge ever runs behind the copy. */
+.hb-hero-copy {
+  max-width: min(38rem, 46vw);
+  padding: clamp(1.4rem, 3vw, 2.4rem);
+  background: #0e0a1c;
+  border: 1px solid #5a4720;
+  box-shadow: 0 0 0 3px #0e0a1c, 0 0 0 4px #3b2f14, 0 28px 60px rgb(0 0 0 / 0.55);
 }
 
 .hb-eyebrow {
@@ -476,7 +485,7 @@
 
 .hb-hero-stage .hb-display {
   margin: 0;
-  font-size: clamp(2.9rem, 7.4vw, 6rem);
+  font-size: clamp(2.6rem, 5.4vw, 4.75rem);
   line-height: 1;
   text-wrap: balance;
   background: linear-gradient(180deg, #fff8e0 0%, #f4d88c 46%, #b88a2e 54%, #f0cf7a 100%);
@@ -1037,19 +1046,8 @@
   .hb-hero-top {
     min-height: clamp(22rem, 62svh, 40rem);
   }
-  /* On a phone the copy covers the busiest part of the valley, beacons
-     included; a soft night wash behind it keeps every line readable. */
-  .hb-hero-top {
-    position: relative;
-    isolation: isolate;
-  }
-  .hb-hero-top::before {
-    content: '';
-    position: absolute;
-    z-index: -1;
-    inset: -1.5rem -1rem;
-    background: linear-gradient(180deg, rgb(11 8 24 / 0.35), rgb(11 8 24 / 0.72) 30%, rgb(11 8 24 / 0.72) 80%, rgb(11 8 24 / 0));
-    pointer-events: none;
+  .hb-hero-copy {
+    max-width: none;
   }
   .hb-home .hb-board:not(.hb-hero-stage) {
     min-height: auto;
@@ -1098,12 +1096,25 @@
   flex-wrap: wrap;
   align-items: baseline;
   gap: 0.4rem 0.7rem;
+  width: 100%;
   margin-top: 0.9rem;
-  padding-top: 0.9rem;
-  border-top: 1px solid #2d2350;
+  padding: 0.9rem 0.6rem 0.6rem;
+  font: inherit;
+  text-align: left;
+  color: inherit;
+  background: none;
+  border: 1px solid transparent;
+  border-top-color: #2d2350;
+  cursor: pointer;
 }
 
-.hb-geo-brand p {
+.hb-geo-brand:hover,
+.hb-geo-brand[aria-pressed='true'] {
+  border-color: #8e86a8;
+  background: rgb(142 134 168 / 0.08);
+}
+
+.hb-geo-brand-text {
   margin: 0;
   min-width: 0;
   font-size: 0.95rem;
@@ -1240,4 +1251,73 @@
 
 .hb-geo-moves b {
   color: var(--ink);
+}
+
+/* ── scan view pins: labels that follow the valley's landmarks ──────── */
+
+.hb-pins {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.hb-pin {
+  position: absolute;
+  top: 0;
+  left: 0;
+  opacity: 0;
+  will-change: transform;
+}
+
+.hb-pin[data-selected] {
+  z-index: 2;
+}
+
+.hb-pin-card {
+  display: grid;
+  gap: 0.15rem;
+  width: max-content;
+  max-width: 17rem;
+  padding: 0.35rem 0.55rem;
+  font-size: 0.7rem;
+  line-height: 1.35;
+  color: #b9b0cf;
+  background: rgb(11 8 24 / 0.88);
+  border: 1px solid #2d2350;
+  border-left: 3px solid var(--tone);
+}
+
+.hb-pin-card b {
+  font-weight: 500;
+  font-size: 0.76rem;
+  color: var(--tone);
+}
+
+.hb-pin-card em {
+  margin-top: 0.2rem;
+  padding-top: 0.3rem;
+  font-style: normal;
+  color: #eadfc8;
+  border-top: 1px solid #2d2350;
+}
+
+.hb-pin[data-selected] .hb-pin-card {
+  border-color: var(--tone);
+  box-shadow: 0 0 22px rgb(11 8 24 / 0.9);
+}
+
+.hb-pin[data-kind='answer'] .hb-pin-card {
+  text-align: center;
+  border-left-width: 1px;
+  border-top: 3px solid var(--tone);
+}
+
+/* On a phone the copy panel covers most of the valley; the threads and the
+   grid still show, and the panels below carry every label. */
+@media (max-width: 47.99rem) {
+  .hb-pins {
+    display: none;
+  }
 }
