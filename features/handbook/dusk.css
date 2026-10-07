@@ -32,8 +32,9 @@
   --vermilion: #cc3d2a;
 
   --font-display: var(--font-hb-display), Georgia, 'Times New Roman', serif;
+  --font-gothic: var(--font-hb-gothic), var(--font-hb-display), Georgia, serif;
   --font-text: var(--font-hb-text), system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --font-sans: var(--font-hb-sans), 'Barlow', system-ui, sans-serif;
+  --font-sans: var(--font-hb-text), system-ui, sans-serif;
   --font-quote: var(--font-hb-quote), Georgia, serif;
 
   background: var(--night);

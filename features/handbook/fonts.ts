@@ -1,51 +1,56 @@
-import { Barlow, Barlow_Semi_Condensed, Cinzel, Cormorant_Garamond, Geist_Mono } from 'next/font/google'
+import { Alegreya, Alegreya_Sans, Grenze, Grenze_Gotisch, Martian_Mono } from 'next/font/google'
 
 /**
- * The Dusk Hunt type system, scoped to the public-site wrapper so the signed-in
- * product keeps its own type.
- *   display — Cinzel, an inscriptional serif for headings and the wordmark
- *   text    — Barlow, for reading
- *   sans    — Barlow Semi Condensed, for controls, tabs and labels
- *   quote   — Cormorant Garamond, for ledes and quoted posts
- *   mono    — machine voice: scores, XP, keystroke legends, sample labels
+ * The SEOlaQuest type system, loaded once in the root layout and used by every
+ * page, public and signed-in. It reads like a quest log rather than a dashboard.
+ *   gothic  — Grenze Gotisch, the blackletter cut, for the wordmark, the home
+ *             headline and page titles only. Its capitals run together (X, XP,
+ *             API, III are unreadable), so wrap any of those in `.hb-plain`.
+ *   display — Grenze, the same design with roman capitals, for every other heading
+ *   text    — Alegreya Sans, a calligraphic humanist sans for reading
+ *   sans    — Alegreya Sans again, for controls, tabs and capitalised labels
+ *   quote   — Alegreya italic, for ledes and quoted posts
+ *   mono    — Martian Mono, slightly narrowed: scores, XP, ledgers, sample labels
  */
-export const handbookDisplay = Cinzel({
+export const handbookGothic = Grenze_Gotisch({
   subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-hb-gothic',
+})
+
+export const handbookDisplay = Grenze({
+  subsets: ['latin'],
+  weight: ['500', '600', '700', '800'],
   display: 'swap',
   variable: '--font-hb-display',
 })
 
-export const handbookText = Barlow({
+export const handbookText = Alegreya_Sans({
   subsets: ['latin'],
-  weight: ['400', '500', '600', '700'],
+  weight: ['400', '500', '700', '800'],
+  style: ['normal', 'italic'],
   display: 'swap',
   variable: '--font-hb-text',
 })
 
-export const handbookSans = Barlow_Semi_Condensed({
-  subsets: ['latin'],
-  weight: ['500', '600', '700'],
-  display: 'swap',
-  variable: '--font-hb-sans',
-})
-
-export const handbookQuote = Cormorant_Garamond({
+export const handbookQuote = Alegreya({
   subsets: ['latin'],
   style: ['normal', 'italic'],
   display: 'swap',
   variable: '--font-hb-quote',
 })
 
-export const handbookMono = Geist_Mono({
+export const handbookMono = Martian_Mono({
   subsets: ['latin'],
+  axes: ['wdth'],
   display: 'swap',
   variable: '--font-hb-mono',
 })
 
 export const handbookFontVariables = [
+  handbookGothic.variable,
   handbookDisplay.variable,
   handbookText.variable,
-  handbookSans.variable,
   handbookQuote.variable,
   handbookMono.variable,
 ].join(' ')

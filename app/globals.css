@@ -1,8 +1,9 @@
 @import "tailwindcss";
 
 @theme {
-  --font-display: var(--font-fraunces), Georgia, serif;
-  --font-sans: var(--font-dm-sans), ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --font-display: var(--font-hb-display), Georgia, serif;
+  --font-sans: var(--font-hb-text), ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --font-mono: var(--font-hb-mono), ui-monospace, "SF Mono", Menlo, monospace;
 }
 
 /* ══ THEME PALETTES ═══════════════════════════════════════════════════════
@@ -497,13 +498,17 @@
   /* Canvas colours live here rather than as an inline style on <body>, which
      no stylesheet (and therefore no theme) could ever override. */
   h1, h2 {
-    font-family: var(--font-fraunces), Georgia, serif;
-    font-weight: 500;
-    letter-spacing: -0.025em;
+    font-family: var(--font-display);
+    font-weight: 600;
+    letter-spacing: 0;
     overflow-wrap: break-word;
   }
 
   body {
+    /* Martian Mono is wide at its default width; narrow it everywhere. The
+       other faces have no width axis and ignore this. Set here rather than via
+       font-stretch, which every font shorthand would reset. */
+    font-variation-settings: 'wdth' 87.5;
     background-color: var(--bg-base);
     background-image: var(--canvas-texture);
     background-size: auto, 40px 40px, 40px 40px;

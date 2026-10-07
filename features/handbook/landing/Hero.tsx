@@ -13,7 +13,7 @@ export function Hero() {
       <HeroStage>
         <p className="hb-eyebrow">A hunt for founders who sell on X</p>
         <h1 id="hero-title" className="hb-display">
-          Find buyers on&nbsp;X.
+          Find buyers on&nbsp;<span className="hb-plain">X</span>.
         </h1>
         <p className="hb-hero-lead">
           Scan X for the problems you solve. Every match is scored for buyer intent and arrives with its source post,

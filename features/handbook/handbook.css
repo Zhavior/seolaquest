@@ -21,7 +21,7 @@
   --step: 90ms steps(2, end);
 
   --font-text: var(--font-hb-text), 'Iowan Old Style', Georgia, serif;
-  --font-sans: var(--font-hb-sans), 'Helvetica Neue', Arial, sans-serif;
+  --font-sans: var(--font-hb-text), 'Helvetica Neue', Arial, sans-serif;
   --font-mono: var(--font-hb-mono), ui-monospace, 'SF Mono', Menlo, monospace;
 
   --board: #f2c400;
@@ -1804,8 +1804,8 @@ html:has(.hb) {
   --link-color: #14120e;
   --focus-ring: #14120e;
   --focus-halo: #f2c400;
-  --font-display: var(--font-hb-sans), 'Helvetica Neue', Arial, sans-serif;
-  --font-sans: var(--font-hb-sans), 'Helvetica Neue', Arial, sans-serif;
+  --font-display: var(--font-hb-text), 'Helvetica Neue', Arial, sans-serif;
+  --font-sans: var(--font-hb-text), 'Helvetica Neue', Arial, sans-serif;
   --radius-md: 0;
   --radius-lg: 0;
   --radius-xl: 0;

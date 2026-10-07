@@ -25,7 +25,7 @@ export default function ApiTermsPage() {
   return (
     <HandbookPage
       volume="errata"
-      title="API"
+      title={<span className="hb-plain">API</span>}
       note="Fail-closed developer status."
     >
       <div className="hb-stack" style={{ '--gap': '2.25rem' } as React.CSSProperties}>
