@@ -19,7 +19,7 @@ type BillingHeroProps = {
 
 export function BillingHero({ itemVariants, userCredits, isLowMana, sfxEnabled, setSfxEnabled }: BillingHeroProps) {
   return (
-    <motion.section variants={itemVariants} className="grid gap-6 rounded-2xl bg-forest p-6 text-on-forest sm:p-8 lg:grid-cols-[1.4fr_1fr]">
+    <motion.section variants={itemVariants} className="dq-panel grid gap-6 p-6 text-on-forest sm:p-8 lg:grid-cols-[1.4fr_1fr]">
       <div>
         <p className="text-xs font-medium tracking-wide text-forest-muted">Your field supplies</p>
         <h1 className="mt-3 font-display text-4xl font-medium sm:text-5xl">Ready for your next discovery.</h1>

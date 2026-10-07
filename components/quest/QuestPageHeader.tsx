@@ -35,7 +35,7 @@ export function QuestPageHeader({
   return (
     <div
       className={clsx(
-        'flex flex-col items-start justify-between gap-5 md:flex-row md:items-end',
+        'flex flex-col items-start justify-between gap-5 lg:flex-row lg:items-end',
         className
       )}
     >

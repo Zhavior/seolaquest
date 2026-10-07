@@ -179,7 +179,7 @@ export function DashboardValleyHero({ name, level, title, leads, filter, onFilte
       </div>
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 -z-10 bg-[linear-gradient(90deg,rgb(8_6_20/0.78),rgb(8_6_20/0.35)_50%,rgb(8_6_20/0)_78%)]"
+        className="pointer-events-none absolute inset-0 -z-10 bg-[linear-gradient(180deg,rgb(8_6_20/0.72),rgb(8_6_20/0)_42%),linear-gradient(90deg,rgb(8_6_20/0.78),rgb(8_6_20/0.35)_50%,rgb(8_6_20/0)_78%)]"
       />
 
       <div className="flex min-h-[max(420px,55vh)] flex-col justify-between gap-6 p-5 sm:p-7">

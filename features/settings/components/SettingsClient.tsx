@@ -101,7 +101,7 @@ export default function SettingsClient({ initial }: { initial: { name: string; t
                     <p className="font-medium flex items-center gap-2 normal-case">
                       <Shield size={18} /> Signed-in email
                     </p>
-                    <p className="font-semibold bg-black text-white px-3 py-2 mt-2 inline-block shadow-none">
+                    <p className="mt-2 inline-block max-w-full break-all border border-[#5a4720] bg-[rgb(11_8_24/0.6)] px-3 py-2 font-semibold text-[#f6ebd2]">
                       {initial.email || 'Not provided'}
                     </p>
                   </div>
