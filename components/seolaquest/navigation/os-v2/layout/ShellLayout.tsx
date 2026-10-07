@@ -20,7 +20,8 @@ export default function ShellLayout({
     // and a scroll-container ancestor is what `position: sticky` resolves
     // against — so the row on the second line below would silently stop the
     // sidebar rail from pinning. `clip` contains overflow without that effect.
-    <div className="h-dvh max-w-full overflow-hidden overscroll-none bg-canvas text-ink flex flex-col font-sans selection:bg-yellow-400 selection:text-ink">
+    <div className="dq-world flex h-dvh max-w-full flex-col overflow-hidden overscroll-none font-sans selection:bg-[#d8a93b] selection:text-[#1a1206]">
+      <div aria-hidden="true" className="dq-ridge" />
       {statusBar}
       <div className="flex flex-1 min-w-0 max-w-full overflow-hidden">
         {sidebar}

@@ -4,11 +4,11 @@ import React, { type ReactNode } from 'react'
 import Link from 'next/link'
 import {
   Menu,
-  Sword,
   Zap,
   PanelLeftClose,
   PanelLeftOpen,
 } from 'lucide-react'
+import { Icon } from '@/features/handbook/artifact/IconSprite'
 import { sfx } from '@/lib/sfx'
 import { SoundControls } from './SoundControls'
 
@@ -37,7 +37,7 @@ export default function StatusBar({
   return (
     <header
       aria-label="SEOlaQuest navigation"
-      className="sticky inset-x-0 top-0 z-50 border-b border-outline bg-canvas/95 pt-[env(safe-area-inset-top)] backdrop-blur-md select-none"
+      className="dq-topbar sticky inset-x-0 top-0 z-50 pt-[env(safe-area-inset-top)] select-none"
     >
       <div className="relative z-10 mx-auto flex h-14 max-w-7xl items-center justify-between gap-2 pl-[max(0.5rem,env(safe-area-inset-left))] pr-[max(0.5rem,env(safe-area-inset-right))] sm:h-16 sm:gap-3 sm:px-6">
 
@@ -47,9 +47,9 @@ export default function StatusBar({
             type="button"
             onClick={onOpenNavigation}
             aria-label="Open navigation"
-            className="grid size-9 shrink-0 place-items-center rounded-lg border border-outline bg-highlight-strong shadow-none transition-transform duration-150 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none md:hidden"
+            className="grid size-10 shrink-0 place-items-center border border-outline text-[#f3d58a] transition-colors hover:border-[#d8a93b] md:hidden"
           >
-            <Menu className="size-4 text-on-accent" strokeWidth={1.75} />
+            <Menu className="size-4" strokeWidth={1.75} />
           </button>
 
           {onToggleCollapsed && (
@@ -60,28 +60,21 @@ export default function StatusBar({
               onFocus={() => sfx.playSidebarHover()}
               title={collapsed ? 'Expand Sidebar (Cmd+B)' : 'Collapse Sidebar (Cmd+B)'}
               aria-label={collapsed ? 'Expand navigation' : 'Collapse navigation'}
-              className="hidden size-9 shrink-0 place-items-center rounded-lg border border-outline bg-highlight-strong shadow-none transition-transform duration-150 hover:-translate-y-0.5 hover:shadow-sm active:translate-y-0 active:shadow-none md:grid"
+              className="hidden size-9 shrink-0 place-items-center border border-outline text-[#d9d0ec] transition-colors hover:border-[#d8a93b] hover:text-[#f3d58a] md:grid"
             >
               {collapsed ? (
-                <PanelLeftOpen className="size-4 text-ink" strokeWidth={1.75} />
+                <PanelLeftOpen className="size-4" strokeWidth={1.75} />
               ) : (
-                <PanelLeftClose className="size-4 text-ink" strokeWidth={1.75} />
+                <PanelLeftClose className="size-4" strokeWidth={1.75} />
               )}
             </button>
           )}
 
-          <Link href="/app" className="flex min-w-0 shrink-0 items-center gap-2">
-            <div className="flex h-8 w-8 shrink-0  items-center justify-center rounded-lg border border-outline bg-highlight-strong shadow-none sm:h-9 sm:w-9">
-              <Sword aria-hidden="true" size={16} strokeWidth={1.75} className="text-on-accent" />
-            </div>
-            <div className="hidden min-[400px]:flex flex-col">
-              <span className="font-display text-base font-semibold leading-none tracking-[0.04em] text-ink sm:text-xl">
-                SEOlaQuest
-              </span>
-              <span className="font-mono text-[8px] normal-case tracking-[0.2em] text-ink-muted sm:text-[9px]">
-                Quest journal
-              </span>
-            </div>
+          <Link href="/app" aria-label="SEOlaQuest home" className="flex min-h-11 min-w-0 shrink-0 items-center gap-2.5">
+            <Icon name="crest" size={34} className="shrink-0" />
+            <span className="dq-brand-word hidden text-lg leading-none min-[400px]:inline sm:text-[1.4rem]">
+              SEOlaQuest
+            </span>
           </Link>
         </div>
 
@@ -90,16 +83,16 @@ export default function StatusBar({
           {hud}
 
           {/* Thin divider */}
-          <div className="hidden sm:block w-px h-6 bg-outline mx-0.5" />
+          <div aria-hidden="true" className="mx-0.5 hidden h-6 w-px bg-outline sm:block" />
 
           <SoundControls />
 
           {/* Recharge CTA */}
           <Link
             href="/app/billing?offer=founder"
-            className="flex h-9 shrink-0 items-center gap-1.5 rounded-lg border border-outline bg-accent-2 px-2.5 sm:px-3.5 font-semibold normal-case tracking-normal text-on-accent text-[11px] shadow-none transition-transform duration-150 hover:-translate-y-0.5 hover:shadow-sm active:translate-y-0 active:shadow-none"
+            className="dq-plate shrink-0 px-3 sm:px-4"
           >
-            <Zap aria-hidden="true" className="size-3.5 text-white" strokeWidth={1.75} />
+            <Zap aria-hidden="true" className="size-3.5" strokeWidth={2} />
             <span className="hidden sm:inline">Add credits</span>
             <span className="sm:hidden text-[10px] font-semibold">+</span>
           </Link>

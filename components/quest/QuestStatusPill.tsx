@@ -1,13 +1,12 @@
 import clsx from 'clsx'
-import { questSurface } from './questStyles'
 
 export interface QuestStatusPillProps {
-  /** Small grey caption, e.g. "SIGNAL STREAMS". */
+  /** Small mono caption, e.g. "SIGNAL STREAMS". */
   label: string
-  /** Bold black value, e.g. "12 ACTIVE". */
+  /** The value, e.g. "12 ACTIVE". */
   value: string
   /**
-   * `live` pulses an emerald dot, `idle` shows a static grey dot.
+   * `live` pulses a teal gem, `idle` shows a dim one.
    * The pulse is purely decorative and is disabled under reduced motion.
    */
   state?: 'live' | 'idle'
@@ -15,27 +14,23 @@ export interface QuestStatusPillProps {
 }
 
 /**
- * The bordered status card in the top-right of every quest page header.
+ * The status card in the top-right of every quest page header: dark glass,
+ * a gold edge and a diamond gem for state.
  */
 export function QuestStatusPill({ label, value, state = 'live', className }: QuestStatusPillProps) {
   const isLive = state === 'live'
 
   return (
-    <div className={questSurface({ className: clsx('flex items-center gap-3 px-5 py-3', className) })}>
-      <span aria-hidden="true" className="relative flex h-4 w-4 shrink-0">
+    <div className={clsx('dq-glass flex items-center gap-3 border-[#8a6420] px-5 py-3', className)}>
+      <span aria-hidden="true" className="relative flex size-3.5 shrink-0 rotate-45">
         {isLive ? (
-          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75 motion-reduce:animate-none" />
+          <span className="absolute inline-flex size-full animate-ping bg-success opacity-60 motion-reduce:animate-none" />
         ) : null}
-        <span
-          className={clsx(
-            'relative inline-flex h-4 w-4 rounded-full border border-outline',
-            isLive ? 'bg-emerald-500' : 'bg-zinc-400'
-          )}
-        />
+        <span className={clsx('relative inline-flex size-3.5', isLive ? 'bg-success' : 'bg-[#5a4d7a]')} />
       </span>
-      <div className="flex min-w-0 flex-col">
-        <span className="text-xs font-bold normal-case text-ink-muted">{label}</span>
-        <span className="text-lg font-semibold normal-case leading-none text-ink">{value}</span>
+      <div className="flex min-w-0 flex-col gap-1">
+        <span className="dq-section-label">{label}</span>
+        <span className="font-display text-lg font-semibold leading-none text-[#f6ebd2]">{value}</span>
       </div>
     </div>
   )

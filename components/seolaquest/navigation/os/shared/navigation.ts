@@ -10,11 +10,14 @@ import {
   Settings,
   type LucideIcon,
 } from 'lucide-react'
+import type { IconName } from '@/features/handbook/artifact/IconSprite'
 
 export interface NavigationItem {
   label: string
   href: string
   icon: LucideIcon
+  /** Painted emblem from the landing page's icon sprite, used by the rail. */
+  emblem: IconName
   section: 'tactical' | 'guild' | 'system'
   color?: string
   badge?: string
@@ -26,6 +29,7 @@ export const navigation: NavigationItem[] = [
   {
     label: 'LIVING HQ',
     href: '/app',
+    emblem: 'map',
     icon: LayoutDashboard,
     section: 'tactical',
     color: 'bg-emerald-400',
@@ -35,6 +39,7 @@ export const navigation: NavigationItem[] = [
   {
     label: 'QUEST BOARD',
     href: '/app/quests',
+    emblem: 'scroll',
     icon: Scroll,
     section: 'tactical',
     color: 'bg-yellow-400',
@@ -46,6 +51,7 @@ export const navigation: NavigationItem[] = [
   {
     label: 'SCAN RUNS',
     href: '/app/runs',
+    emblem: 'spyglass',
     icon: History,
     section: 'tactical',
     color: 'bg-lime-400',
@@ -55,16 +61,18 @@ export const navigation: NavigationItem[] = [
   {
     label: 'QUEST LOG',
     href: '/app/keywords',
+    emblem: 'flag',
     icon: Swords,
     section: 'tactical',
     color: 'bg-orange-400',
-    badge: '0/3',
+    // No badge: '0/3' was a literal on every account, not a count.
     hotkey: 'Q',
     description: 'Daily objectives, streaks, and keyword quests.',
   },
   {
     label: 'GUILD HALL',
     href: '/app/guild',
+    emblem: 'crown',
     icon: Castle,
     section: 'guild',
     color: 'bg-cyan-400',
@@ -74,6 +82,7 @@ export const navigation: NavigationItem[] = [
   {
     label: 'CAMPAIGN BROADCAST',
     href: '/app/deliveries',
+    emblem: 'lighthouse',
     icon: Send,
     section: 'guild',
     color: 'bg-sky-400',
@@ -83,6 +92,7 @@ export const navigation: NavigationItem[] = [
   {
     label: 'KNOWLEDGE LORE',
     href: '/app/profile',
+    emblem: 'medal',
     icon: UserCircle,
     section: 'system',
     color: 'bg-rose-400',
@@ -92,6 +102,7 @@ export const navigation: NavigationItem[] = [
   {
     label: 'BAZAAR & SUPPLIES',
     href: '/app/billing',
+    emblem: 'chest',
     icon: CreditCard,
     section: 'system',
     color: 'bg-amber-400',
@@ -101,6 +112,7 @@ export const navigation: NavigationItem[] = [
   {
     label: 'ARMORY & SPELLS',
     href: '/app/settings',
+    emblem: 'sword',
     icon: Settings,
     section: 'system',
     color: 'bg-purple-400',

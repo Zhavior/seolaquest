@@ -76,113 +76,11 @@
   --canvas-texture: none;
 }
 
-[data-theme="grey"] {
-  color-scheme: dark;
-
-  --bg-base: #17231F;
-  --bg-surface: #1F3029;
-  --bg-card: #293C32;
-  --bg-inset: #1B2923;
-
-  --border-main: #41584A;
-  --border-strong: #647D6A;
-
-  /* A black slab is invisible on a near-black ground, so on dark themes the
-     light border carries the silhouette and the offset slab is off by
-     default. `shadow-brutal-accent` opts hero/CTA cards back in. */
-  --shadow-color: transparent;
-  --shadow-accent: rgba(0, 0, 0, 0.16);
-
-  --ink-primary-base: #F5EFDF;
-  --ink-muted-base: #BAC4B6;
-  --text-primary: var(--ink-primary-base);
-  --text-muted: var(--ink-muted-base);
-  --text-inverse: #17231F;
-  --text-on-accent: #000000;
-
-  --forest-surface: #253C33;
-  --forest-ink: #FCF4DC;
-  --forest-muted: #D2DACB;
-
-  --accent-primary: #E5B75D;
-  --accent-secondary: #E5B75D;
-
-  /* Highlighter panels stay light in every theme, so the black text they
-     carry keeps working — a sticky-note accent, not a surface. */
-  --bg-highlight: #F3E7C9;
-  --bg-highlight-strong: #EBCB89;
-
-  --status-success: #4ADE80;
-  --status-warning: #FBBF24;
-  --status-danger: #F87171;
-  /* Light enough to read on the dark surfaces, so ink and fill agree here. */
-  --status-danger-ink: #F87171;
-  --status-info: #38BDF8;
-
-  --focus-ring: #F5EFDF;
-  --focus-halo: #E5B75D;
-
-  --link-color: #EBCB89;
-
-  /* HUD grid, not ruled paper. */
-  --canvas-texture: none;
-}
-
-[data-theme="blue"] {
-  color-scheme: dark;
-
-  --bg-base: #111F2C;
-  --bg-surface: #192C38;
-  --bg-card: #223846;
-  --bg-inset: #142631;
-
-  --border-main: #3D5663;
-  --border-strong: #688491;
-
-  --shadow-color: transparent;
-  --shadow-accent: rgba(0, 0, 0, 0.16);
-
-  --ink-primary-base: #F3EDDB;
-  --ink-muted-base: #BCC8CA;
-  --text-primary: var(--ink-primary-base);
-  --text-muted: var(--ink-muted-base);
-  --text-inverse: #111F2C;
-  --text-on-accent: #000000;
-
-  --forest-surface: #253C33;
-  --forest-ink: #FCF4DC;
-  --forest-muted: #D2DACB;
-
-  --accent-primary: #E5B75D;
-  /* #FF007F reads at ~4:1 here — fine on a 900-weight badge, not on 12px
-     label text. Rose-400 carries the cyber-coral note and passes AA. */
-  --accent-secondary: #E5B75D;
-
-  /* Highlighter panels stay light in every theme, so the black text they
-     carry keeps working — a sticky-note accent, not a surface. */
-  --bg-highlight: #F3E7C9;
-  --bg-highlight-strong: #EBCB89;
-
-  --status-success: #4ADE80;
-  --status-warning: #FBBF24;
-  --status-danger: #F87171;
-  /* Light enough to read on the dark surfaces, so ink and fill agree here. */
-  --status-danger-ink: #F87171;
-  --status-info: #38BDF8;
-
-  --focus-ring: #F3EDDB;
-  --focus-halo: #E5B75D;
-
-  --link-color: #EBCB89;
-
-  --canvas-texture: none;
-}
-
-/* Dusk: the public site's night-violet and old-gold palette, used by the
-   signed-in dashboard so it reads as the same world as the valley header.
-   Applied with data-theme="dusk" on the dashboard root, so it overrides the
-   app-wide theme for that subtree only. Bright fills keep dark ink
-   (--text-on-accent), as in every other theme. */
+/* Dusk: the public site's night-violet and old-gold palette, and the only
+   theme. ThemeScript puts data-theme="dusk" on <html> before first paint, so
+   the signed-in app, onboarding and anything portalled to <body> share the
+   landing page's world. The :root block above stays as the base the Dusk
+   values override. Bright fills keep dark ink (--text-on-accent). */
 [data-theme="dusk"] {
   color-scheme: dark;
 
@@ -455,11 +353,6 @@
   }
   /* END generated */
 }
-
-/* Escape hatches for the rare per-theme special case. */
-@custom-variant theme-parchment (&:where([data-theme="parchment"] *));
-@custom-variant theme-grey (&:where([data-theme="grey"] *));
-@custom-variant theme-blue (&:where([data-theme="blue"] *));
 
 /* Freeze transitions for one frame during a swap (see ThemeProvider). */
 [data-theme-switching] *,
@@ -846,4 +739,389 @@ html.sfx-muted .sfx-icon-on {
 [data-theme="dusk"] .bg-highlight.text-on-accent,
 [data-theme="dusk"] .bg-highlight > .text-on-accent:not([class*="bg-"]) {
   color: var(--ink-primary-base);
+}
+
+/* ══ DUSK APP CHROME ══════════════════════════════════════════════════════
+   The signed-in app in the landing page's language (features/handbook/
+   artifact.css): a night sky with a ridge line, dark glass for anything that
+   is read, engraved panels framed in old gold with diamond corners, the
+   bevelled gold plate as the one action colour, Grenze Gotisch for page
+   titles and Martian Mono for labels.
+
+   In `@layer components` so a Tailwind utility on the same element still
+   wins: these set the frame, pages keep control of their own spacing.
+   ═════════════════════════════════════════════════════════════════════════ */
+
+@layer components {
+  /* The shell root: dusk sky, a few stars, the gem glow at the top. */
+  .dq-world {
+    position: relative;
+    isolation: isolate;
+    color: var(--text-primary);
+    background-color: #0b0818;
+    background-image:
+      radial-gradient(1.2px 1.2px at 12% 18%, rgb(255 255 255 / 0.5), transparent 60%),
+      radial-gradient(1.4px 1.4px at 71% 9%, rgb(255 255 255 / 0.45), transparent 60%),
+      radial-gradient(1px 1px at 38% 32%, rgb(255 255 255 / 0.35), transparent 60%),
+      radial-gradient(1.2px 1.2px at 88% 41%, rgb(255 255 255 / 0.4), transparent 60%),
+      radial-gradient(1px 1px at 56% 22%, rgb(255 255 255 / 0.3), transparent 60%),
+      radial-gradient(70rem 30rem at 62% -10rem, rgb(108 58 106 / 0.5), transparent 70%),
+      linear-gradient(180deg, #1a1546 0, #0b0818 42rem);
+  }
+
+  /* The ridge that closes every board on the public site, pinned to the
+     bottom of the viewport behind the content. */
+  .dq-ridge {
+    position: fixed;
+    inset: auto 0 0 0;
+    z-index: -1;
+    height: clamp(5rem, 16vh, 10rem);
+    background: #07050f;
+    opacity: 0.85;
+    clip-path: polygon(
+      0 100%, 0 60%, 6% 44%, 12% 58%, 19% 30%, 26% 52%, 33% 38%, 41% 62%, 49% 28%, 56% 50%, 63% 36%,
+      71% 60%, 78% 26%, 85% 50%, 92% 38%, 97% 56%, 100% 42%, 100% 100%
+    );
+    pointer-events: none;
+  }
+
+  /* ── top bar and rail ─────────────────────────────────────────────── */
+
+  .dq-topbar {
+    background: rgb(11 8 24 / 0.82);
+    border-bottom: 1px solid #2d2350;
+    backdrop-filter: blur(10px);
+  }
+
+  .dq-topbar::after {
+    content: '';
+    position: absolute;
+    inset: auto 0 -1px 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, #8a6420 20%, #d8a93b 50%, #8a6420 80%, transparent);
+    opacity: 0.55;
+    pointer-events: none;
+  }
+
+  .dq-brand-word {
+    font-family: var(--font-hb-display), Georgia, serif;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+    color: #f6ebd2;
+  }
+
+  .dq-rail {
+    background: linear-gradient(180deg, rgb(26 20 51 / 0.94), rgb(12 9 25 / 0.96));
+    border-right: 1px solid #5a4720;
+    box-shadow: inset -1px 0 0 rgb(255 255 255 / 0.04), 8px 0 32px rgb(0 0 0 / 0.35);
+  }
+
+  .dq-section-label {
+    font-family: var(--font-mono);
+    font-size: 0.66rem;
+    font-weight: 500;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: #a99fc9;
+  }
+
+  .dq-navitem {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    min-height: 44px;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid transparent;
+    color: #d9d0ec;
+    font-family: var(--font-sans);
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: background-color 0.15s, border-color 0.15s, color 0.15s;
+  }
+
+  .dq-navitem:hover {
+    background: rgb(216 169 59 / 0.08);
+    border-color: #3b2f14;
+    color: #f6ebd2;
+  }
+
+  .dq-navitem[aria-current='page'] {
+    background: linear-gradient(90deg, rgb(216 169 59 / 0.24), rgb(216 169 59 / 0.04));
+    border-color: #8a6420;
+    color: #f3d58a;
+    box-shadow: inset 3px 0 0 #d8a93b;
+  }
+
+  .dq-navitem--icon {
+    justify-content: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    padding: 0;
+  }
+
+  .dq-key {
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    line-height: 1;
+    padding: 0.2rem 0.35rem;
+    color: #f6ebd2;
+    background: #241b44;
+    border: 1px solid #5a4720;
+    border-bottom-width: 2px;
+  }
+
+  /* ── panels ───────────────────────────────────────────────────────── */
+
+  /* Engraved panel: the landing page's framed card. */
+  .dq-panel {
+    position: relative;
+    background: linear-gradient(180deg, rgb(26 20 51 / 0.92), rgb(12 9 25 / 0.94));
+    border: 1px solid #a8832f;
+    box-shadow:
+      0 0 0 3px #0e0a1c,
+      0 0 0 4px #5a4720,
+      inset 0 1px 0 rgb(255 255 255 / 0.08),
+      0 24px 48px rgb(0 0 0 / 0.55);
+  }
+
+  .dq-panel::before,
+  .dq-panel::after {
+    content: '';
+    position: absolute;
+    width: 11px;
+    height: 11px;
+    background: linear-gradient(135deg, #fbe9b0, #b88a2e);
+    transform: rotate(45deg);
+    box-shadow: 0 0 0 1px #3a2a0a;
+    pointer-events: none;
+  }
+
+  .dq-panel::before {
+    top: -7px;
+    left: -7px;
+  }
+
+  .dq-panel::after {
+    bottom: -7px;
+    right: -7px;
+  }
+
+  /* Dark glass: for content that is read, with a quieter frame. */
+  .dq-glass {
+    background: rgb(11 8 24 / 0.8);
+    border: 1px solid #3b2f14;
+    box-shadow: 0 18px 40px rgb(0 0 0 / 0.45);
+    backdrop-filter: blur(12px);
+  }
+
+  /* ── type ─────────────────────────────────────────────────────────── */
+
+  .dq-eyebrow {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #ffd6a0;
+  }
+
+  /* Page titles in the blackletter, gilded like the landing headline.
+     Its capitals run together, so titles stay in title case. */
+  .dq-title {
+    font-family: var(--font-hb-gothic), var(--font-hb-display), Georgia, serif;
+    font-weight: 400;
+    line-height: 1.04;
+    letter-spacing: 0.005em;
+    color: #f3d58a;
+    background: linear-gradient(180deg, #fbe9b0 10%, #d8a93b 62%, #a8832f);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 2px 0 rgb(11 8 24 / 0.9)) drop-shadow(0 0 18px rgb(11 8 24 / 0.8));
+  }
+
+  /* ── controls ─────────────────────────────────────────────────────── */
+
+  /* The bevelled gold plate. */
+  .dq-plate {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    min-height: 44px;
+    padding: 0.6rem 1.2rem;
+    background: #d8a93b;
+    color: #1a1206;
+    font-family: var(--font-sans);
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    text-decoration: none;
+    box-shadow: inset 0 2px 0 #f3d58a, inset 0 -3px 0 #8a6420;
+    clip-path: polygon(8px 0, calc(100% - 8px) 0, 100% 8px, 100% calc(100% - 8px), calc(100% - 8px) 100%, 8px 100%, 0 calc(100% - 8px), 0 8px);
+    transition: transform 0.15s, filter 0.15s;
+  }
+
+  .dq-plate:hover {
+    transform: translateY(-1px);
+    filter: brightness(1.08);
+  }
+
+  .dq-plate:active {
+    transform: translateY(0);
+  }
+
+  /* Secondary: a gold outline on dark glass. */
+  .dq-plate--ghost {
+    background: rgb(11 8 24 / 0.82);
+    color: #f6ebd2;
+    border: 1px solid #d8a93b;
+    box-shadow: none;
+    clip-path: none;
+    font-weight: 700;
+  }
+
+  .dq-plate--ghost:hover {
+    background: #1b1432;
+    border-color: #f3d58a;
+    filter: none;
+  }
+
+  .dq-plate--square {
+    width: 2.75rem;
+    padding: 0;
+  }
+
+  .dq-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.3rem 0.65rem;
+    border: 1px solid #8a6420;
+    background: rgb(11 8 24 / 0.6);
+    color: #f3d58a;
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  /* ── pending state: the compass turning ───────────────────────────── */
+
+  .dq-loader {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.1rem;
+    text-align: center;
+  }
+
+  .dq-loader-sigil {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 5.5rem;
+    height: 5.5rem;
+  }
+
+  .dq-loader-sigil--small {
+    width: 3rem;
+    height: 3rem;
+  }
+
+  /* Two counter-turning gold rings, each with a bright sweep, around the gem. */
+  .dq-loader-sigil::before,
+  .dq-loader-sigil::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: conic-gradient(from 0deg, #5a4720 0 62%, #f3d58a 86%, #5a4720 100%);
+    -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 2px), #000 calc(100% - 2px));
+    mask: radial-gradient(farthest-side, transparent calc(100% - 2px), #000 calc(100% - 2px));
+    animation: dq-turn 2.4s linear infinite;
+  }
+
+  .dq-loader-sigil::after {
+    inset: 20%;
+    background: conic-gradient(from 180deg, #3b2f14 0 62%, #d8a93b 86%, #3b2f14 100%);
+    animation-duration: 3.6s;
+    animation-direction: reverse;
+  }
+
+  .dq-loader-gem {
+    width: 26%;
+    height: 26%;
+    background: radial-gradient(circle at 35% 30%, #fff 0 10%, #f3d58a 38%, #8a6420 100%);
+    transform: rotate(45deg);
+    box-shadow: 0 0 0 1px #3a2a0a, 0 0 18px rgb(243 213 138 / 0.55);
+    animation: dq-glow 1.6s ease-in-out infinite alternate;
+  }
+
+  .dq-loader-label {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: #d9d0ec;
+  }
+
+  .dq-loader-title {
+    font-family: var(--font-hb-display), Georgia, serif;
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: #f3d58a;
+  }
+}
+
+@keyframes dq-turn {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes dq-glow {
+  from { opacity: 0.65; box-shadow: 0 0 0 1px #3a2a0a, 0 0 8px rgb(243 213 138 / 0.3); }
+  to { opacity: 1; box-shadow: 0 0 0 1px #3a2a0a, 0 0 22px rgb(243 213 138 / 0.7); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dq-loader-sigil::before,
+  .dq-loader-sigil::after,
+  .dq-loader-gem {
+    animation: none;
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .dq-topbar,
+  .dq-glass {
+    backdrop-filter: none;
+    background: #0b0818;
+  }
+}
+
+/* Square corners across the signed-in app, as on the landing page's engraved
+   panels. Unlayered so it outranks the rounded-* utilities that page
+   components already carry; pills (rounded-full) and small dots keep their
+   shape. Scoped to the shell, so the public site is untouched. */
+.dq-world :is(.rounded-lg, .rounded-xl, .rounded-2xl, .rounded-3xl, [class*='rounded-[1'], [class*='rounded-[2'], [class*='rounded-[3']) {
+  border-radius: 3px;
+}
+
+/* Page titles that do not use QuestPageHeader (settings, billing, profile,
+   keys, leads, admin, detail pages) still read as the landing page's gilded
+   headings. Grenze rather than the blackletter, because several of these
+   titles carry capitals the blackletter runs together (API, XP, CRM). */
+.dq-world main h1:not(.dq-title) {
+  font-family: var(--font-hb-display), Georgia, serif;
+  font-weight: 700;
+  text-transform: none;
+  letter-spacing: 0.005em;
+  color: #f3d58a;
+  text-shadow: 0 2px 0 rgb(11 8 24 / 0.9);
 }

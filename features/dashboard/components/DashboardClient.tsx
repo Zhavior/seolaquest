@@ -16,7 +16,6 @@ import { DashboardValleyHero } from '@/features/dashboard/components/DashboardVa
 import { DashboardQuotaDock } from '@/features/dashboard/components/DashboardQuotaDock'
 import { matchesIntentFilter, type LeadIntentFilter } from '@/features/dashboard/lib/leadScore'
 import Link from 'next/link'
-import { handbookFontVariables } from '@/features/handbook/fonts'
 import MissionControlShell from '@/features/dashboard/components/layout/MissionControlShell'
 import { TodaysMissionPanel } from '@/features/dashboard/components/mission/TodaysMissionPanel'
 import { CampaignPulsePanel } from '@/features/dashboard/components/mission/CampaignPulsePanel'
@@ -126,9 +125,11 @@ export default function DashboardClient({
   }
 
   return (
+    // Dusk and the handbook faces come from <html> now, which the whole app
+    // shares; a second data-theme here would repaint the theme's gradient
+    // over the shell's sky.
     <div
-      data-theme="dusk"
-      className={`${handbookFontVariables} relative min-h-[100dvh] w-full max-w-full overflow-x-clip bg-canvas px-2 pb-12 pt-3 text-ink sm:px-4 md:px-6 md:pb-12 md:pt-5`}
+      className={`relative min-h-[100dvh] w-full max-w-full overflow-x-clip px-2 pb-12 pt-3 text-ink sm:px-4 md:px-6 md:pb-12 md:pt-5`}
     >
       <AnimatePresence mode="wait">
         {state.activeQuickStrikeLead ? (

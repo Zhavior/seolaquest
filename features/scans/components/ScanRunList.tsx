@@ -177,9 +177,9 @@ export function ScanRunList({ runs: initialRuns, hasMore: initialHasMore }: Scan
               <QuestCountGrid
                 className="mt-4"
                 counts={[
-                  { label: 'Attempts', value: run.counts.providerAttempts, accent: 'bg-card' },
-                  { label: 'Returned', value: run.counts.providerResults, accent: 'bg-accent' },
-                  { label: 'Source matches', value: run.counts.leadsCreated, accent: 'bg-info text-on-accent' },
+                  { label: 'Attempts', value: run.counts.providerAttempts },
+                  { label: 'Returned', value: run.counts.providerResults, accent: 'text-accent' },
+                  { label: 'Source matches', value: run.counts.leadsCreated, accent: 'text-info' },
                 ]}
               />
             </Link>

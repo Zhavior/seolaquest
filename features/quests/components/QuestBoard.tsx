@@ -29,7 +29,7 @@ function ProgressBar({ percent, target, progress }: { percent: number; target: n
         assistive tech rather than announced twice.
       */}
       <div aria-hidden="true" className="h-3 w-full border border-outline bg-inset rounded-xl">
-        <div className="h-full rounded-xl bg-emerald-400 motion-safe:transition-[width] motion-safe:duration-300" style={{ width: `${percent}%` }} />
+        <div className="h-full rounded-xl bg-accent motion-safe:transition-[width] motion-safe:duration-300" style={{ width: `${percent}%` }} />
       </div>
       <p className="mt-1 text-xs font-semibold normal-case tracking-wider text-ink-muted">
         {progress} / {target} complete

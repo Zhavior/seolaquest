@@ -23,21 +23,17 @@ vi.mock('next/link', () => ({
   ),
 }))
 
-import { THEME_META } from '@/components/theme/theme-config'
-import { ThemeProvider } from '@/components/theme/ThemeProvider'
 import Sidebar, { SidebarNavigation } from './Sidebar'
 
-// The theme picker reads `useTheme()`, so the rail cannot render outside a
-// provider. In the app that provider lives in the root layout, above the shell.
 function renderSidebar(props: Partial<Parameters<typeof Sidebar>[0]> = {}) {
-  return render(<Sidebar {...props} />, { wrapper: ThemeProvider })
+  return render(<Sidebar {...props} />)
 }
 
 describe('SEOlaQuest OS Sidebar', () => {
   it('renders the navigation index and branding', () => {
     renderSidebar()
 
-    expect(screen.getByText('SEOlaQuest')).toBeInTheDocument()
+    expect(screen.getByText('Quest journal')).toBeInTheDocument()
     expect(screen.getByText('LIVING HQ')).toBeInTheDocument()
     expect(screen.getByText('QUEST BOARD')).toBeInTheDocument()
     expect(screen.getByText('SCAN RUNS')).toBeInTheDocument()
@@ -88,11 +84,11 @@ describe('SEOlaQuest OS Sidebar', () => {
     expect(screen.getByRole('link', { name: /^Admin/ })).toHaveAttribute('href', '/app/admin')
     collapsed.unmount()
 
-    const mobile = render(<SidebarNavigation mobile isAdmin />, { wrapper: ThemeProvider })
+    const mobile = render(<SidebarNavigation mobile isAdmin />)
     expect(screen.getByRole('link', { name: /^Admin/ })).toHaveAttribute('href', '/app/admin')
     mobile.unmount()
 
-    render(<SidebarNavigation mobile />, { wrapper: ThemeProvider })
+    render(<SidebarNavigation mobile />)
     expect(screen.queryByRole('link', { name: /^Admin/ })).not.toBeInTheDocument()
   })
 
@@ -123,45 +119,33 @@ describe('SEOlaQuest OS Sidebar', () => {
     expect(onToggleCollapsed).toHaveBeenCalledTimes(2)
   })
 
-  describe('theme picker', () => {
-    it('exposes the themes as a single radio group with the active one checked', () => {
-      renderSidebar()
+  /*
+   * The app has one look now — the landing page's Dusk — so the rail no longer
+   * offers a theme picker, and each destination carries its painted emblem from
+   * the shared sprite instead of a generic line icon.
+   */
+  it('offers no theme picker and draws each destination with its emblem', () => {
+    const { container } = renderSidebar()
 
-      const group = screen.getByRole('radiogroup', { name: 'Interface theme' })
-      const options = screen.getAllByRole('radio')
+    expect(screen.queryByRole('radiogroup', { name: 'Interface theme' })).not.toBeInTheDocument()
+    expect(screen.queryAllByRole('radio')).toHaveLength(0)
+    const questBoard = screen.getByRole('link', { name: /QUEST BOARD/ })
+    expect(questBoard.querySelector('use')).toHaveAttribute('href', '#i-scroll')
+    expect(container.querySelectorAll('a use')).toHaveLength(9)
+  })
 
-      expect(options).toHaveLength(3)
-      expect(options.every((option) => group.contains(option))).toBe(true)
-      // Parchment is the default, so it is the one reporting itself as checked.
-      expect(screen.getByRole('radio', { name: 'Parchment (light)' })).toBeChecked()
-      expect(screen.getByRole('radio', { name: THEME_META.grey.label })).not.toBeChecked()
-    })
+  it('names every destination in the collapsed rail, where only emblems show', () => {
+    renderSidebar({ collapsed: true })
 
-    it('moves the checked state to the theme the user picks', async () => {
-      renderSidebar()
-
-      await userEvent.click(screen.getByRole('radio', { name: 'Midnight Blue (dark)' }))
-
-      expect(screen.getByRole('radio', { name: 'Midnight Blue (dark)' })).toBeChecked()
-      expect(screen.getByRole('radio', { name: 'Parchment (light)' })).not.toBeChecked()
-      expect(document.documentElement).toHaveAttribute('data-theme', 'blue')
-    })
-
-    it('keeps the swatches named and grouped in the collapsed rail', () => {
-      renderSidebar({ collapsed: true })
-
-      // Collapsed swatches are colour only — the name has to come from ARIA.
-      const group = screen.getByRole('radiogroup', { name: 'Interface theme' })
-      expect(screen.getAllByRole('radio')).toHaveLength(3)
-      expect(group.contains(screen.getByRole('radio', { name: THEME_META.grey.label }))).toBe(true)
-    })
+    expect(screen.getByRole('link', { name: 'SCAN RUNS' })).toHaveAttribute('href', '/app/runs')
+    expect(screen.getByRole('link', { name: 'LIVING HQ' })).toHaveAttribute('aria-current', 'page')
   })
 })
 
 describe('SidebarNavigation in the mobile drawer', () => {
   it('closes the drawer from its own header and after a destination is chosen', async () => {
     const onNavigate = vi.fn()
-    render(<SidebarNavigation mobile onNavigate={onNavigate} />, { wrapper: ThemeProvider })
+    render(<SidebarNavigation mobile onNavigate={onNavigate} />)
 
     await userEvent.click(screen.getByRole('button', { name: 'Close navigation' }))
     expect(onNavigate).toHaveBeenCalledTimes(1)

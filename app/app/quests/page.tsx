@@ -60,7 +60,7 @@ async function QuestBoardData({ searchParams }: { searchParams: Promise<{ before
         }
       />
 
-      <section aria-labelledby="practical-quests" className="mb-6 space-y-4 rounded-[20px] border border-outline bg-card p-5">
+      <section aria-labelledby="practical-quests" className="dq-panel mb-8 space-y-4 p-5 md:p-6">
         <h2 id="practical-quests" className="font-display text-2xl">Move one conversation forward.</h2>
         <p className="text-sm text-ink-muted">These steps guide your work. Reporting a reply or sale does not earn XP.</p>
         <ol className="grid gap-4 md:grid-cols-3">

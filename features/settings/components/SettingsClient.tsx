@@ -38,7 +38,7 @@ export default function SettingsClient({ initial }: { initial: { name: string; t
   }
 
   return (
-    <div className="min-h-[100dvh] w-full bg-canvas relative">
+    <div className="relative min-h-[100dvh] w-full">
       <div className="min-h-[100dvh] w-full max-w-[1400px] mx-auto p-4 md:p-8 relative z-10">
         <motion.div
           variants={container}
