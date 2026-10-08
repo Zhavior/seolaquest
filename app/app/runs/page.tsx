@@ -34,7 +34,7 @@ export default function ScanRunsPage() {
         icon={<History className="h-8 w-8" />}
         eyebrow={<>SIGNAL EXPEDITIONS</>}
         title="Scan Runs"
-        subtitle="Durable Record of Every Queued Scan"
+        subtitle="Every scan you have run"
         status={<QuestStatusPill label="Durable ledger" value="Active [Monitored]" />}
       />
 

@@ -48,7 +48,7 @@ describe('deriveTodaysMission', () => {
     const mission = deriveTodaysMission(input())
     expect(mission.action.kind).toBe('add_keyword')
     expect(mission.confidence).toBe('measured')
-    expect(mission.why).toMatch(/no keywords/i)
+    expect(mission.why).toMatch(/first keyword|add a phrase/i)
   })
 
   it('routes to billing when credits are empty', () => {
@@ -60,6 +60,18 @@ describe('deriveTodaysMission', () => {
     )
     expect(mission.action.kind).toBe('open_billing')
     expect(mission.tone).toBe('risk')
+  })
+
+  it('sends a new account with sample leads to its leads, not billing', () => {
+    const mission = deriveTodaysMission(
+      input({
+        keywords: [{ id: 'k1', phrase: 'looking for CRM', active: true }],
+        leads: [lead({ id: 's1' }), lead({ id: 's2' }), lead({ id: 's3' })],
+        remainingQuests: 0,
+        user: { ...baseUser, entitlements: { canUsePaidScans: false, canGenerateAIReplies: false, canExportToCRM: false } },
+      })
+    )
+    expect(mission.action.kind).toBe('review_leads')
   })
 
   it('prioritizes a LIVE high-scoring lead for claim', () => {
@@ -103,7 +115,7 @@ describe('deriveTodaysMission', () => {
       })
     )
     expect(mission.action.kind).toBe('review_leads')
-    expect(mission.why).toMatch(/none currently have a LIVE Aurora score/i)
+    expect(mission.why).toMatch(/none have a score yet/i)
   })
 
   it('recommends a scan when keywords and credits exist but the queue is empty', () => {

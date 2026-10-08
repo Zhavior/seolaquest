@@ -70,9 +70,10 @@ export default function ShellHud({ user }: { user?: Partial<ShellUser> }) {
   // meter reads as "18" then "/50" to anything walking the DOM — a screen reader
   // included — and the number the user sees stops being a number anyone can
   // assert on.
-  const questLabel = `${openQuests} QUESTS`
+  const questLabel = `${openQuests} ${openQuests === 1 ? 'lead' : 'leads'} to review`
   const xpLabel = `XP ${playerXp.toLocaleString()}/${xpRequired.toLocaleString()}`
-  const mpLabel = `${currentMp}/${maxMp} MP`
+  // Plain words, one name everywhere: "scan credits", never MP or mana.
+  const mpLabel = maxMp > 0 ? `${currentMp}/${maxMp} scan credits` : `${currentMp} scan credits`
   const levelLabel = `LVL ${playerLevel}`
 
   return (
@@ -82,7 +83,7 @@ export default function ShellHud({ user }: { user?: Partial<ShellUser> }) {
         <Link
           href="/app"
           aria-label={questLabel}
-          title={`${openQuests} signals waiting for action`}
+          title={questLabel}
           className="flex h-9 items-center gap-1 rounded-[3px] border border-outline bg-accent-2 px-2 text-[9px] font-semibold normal-case text-on-accent shadow-none"
         >
           <Scroll aria-hidden="true" className="size-2.5 shrink-0" strokeWidth={1.75} />
@@ -120,10 +121,10 @@ export default function ShellHud({ user }: { user?: Partial<ShellUser> }) {
       */}
       <div className="hidden items-center gap-1.5 md:flex">
 
-        {/* Quests waiting */}
+        {/* Leads waiting */}
         <Link
           href="/app"
-          title={`${openQuests} signals waiting for action`}
+          title={questLabel}
           className="flex h-9 items-center gap-1.5 rounded-[3px] border border-outline bg-accent-2 px-2.5 text-[11px] font-semibold normal-case tracking-normal text-on-accent shadow-none transition-transform duration-150 hover:-translate-y-0.5 hover:shadow-sm active:translate-y-0 active:shadow-none"
         >
           <Scroll aria-hidden="true" className="size-3.5 shrink-0" strokeWidth={1.75} />
@@ -143,9 +144,9 @@ export default function ShellHud({ user }: { user?: Partial<ShellUser> }) {
           <span className="hidden font-mono text-[10px] text-ink xl:inline">{xpLabel}</span>
         </div>
 
-        {/* MP / scan credits */}
+        {/* Scan credits */}
         <div
-          title={`${currentMp} scan credits — each scan costs 1 MP`}
+          title={`${currentMp} scan credits left. Each scan uses 1 credit.`}
           className="flex h-9 items-center gap-1.5 rounded-[3px] border border-outline bg-card px-2.5 text-[11px] font-semibold normal-case tracking-normal shadow-none"
         >
           <Zap aria-hidden="true" className="size-3.5 shrink-0 text-[#06B6D4] animate-pulse" strokeWidth={1.75} />

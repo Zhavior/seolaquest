@@ -218,7 +218,7 @@ describe('useDashboardState', () => {
 
     expect(result.current.claimedCount).toBe(1)
     expect(result.current.user.xp).toBe(1250)
-    expect(result.current.notice).toBe('Quest claimed.')
+    expect(result.current.notice).toBe('Marked as contacted.')
   })
 
   it('only confirms a keyword after it is saved, and stays quiet on failure', async () => {

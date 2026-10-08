@@ -175,7 +175,7 @@ export default function DashboardClient({
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div className="min-w-0">
                   <h2 id="discovered-opportunities-title" className="font-mono text-sm font-semibold tracking-wider text-ink">
-                    DISCOVERED OPPORTUNITIES
+                    YOUR LEADS
                   </h2>
                   {intentFilter !== 'all' ? (
                     <p className="text-xs text-ink-muted">
@@ -349,8 +349,6 @@ export default function DashboardClient({
                   keywords={state.keywords}
                   newKeyword={state.newKeyword}
                   setNewKeyword={state.setNewKeyword}
-                  selectedHeroClass={state.selectedHeroClass}
-                  setSelectedHeroClass={state.setSelectedHeroClass}
                   addKeyword={state.addKeyword}
                   removeKeyword={state.removeKeyword}
                   PRESET_KEYWORDS={state.PRESET_KEYWORDS}
@@ -395,11 +393,14 @@ export default function DashboardClient({
                 leadsSliceStatus={state.leadsSliceStatus}
                 shareStats={state.shareStats}
               />
-              <DashboardLeaderboard
-                item={reveal}
-                dbLeaderboard={dbLeaderboard}
-                dbAnalytics={dbAnalytics}
-              />
+              {/* The page passes no leaderboard or chart data yet; an always-empty panel only adds noise. */}
+              {dbLeaderboard.length > 0 || dbAnalytics.length > 0 ? (
+                <DashboardLeaderboard
+                  item={reveal}
+                  dbLeaderboard={dbLeaderboard}
+                  dbAnalytics={dbAnalytics}
+                />
+              ) : null}
             </div>
           }
         />

@@ -100,7 +100,7 @@ function NavigationContent({
                 aria-label={item.label}
                 {...navHandlers(item)}
                 onClick={() => sfx.playCoinDrop()}
-                title={item.hotkey ? `${item.label} (${item.hotkey})` : item.label}
+                title={item.label}
                 className="dq-navitem dq-navitem--icon group"
               >
                 <Icon name={item.emblem} size={26} />
@@ -202,8 +202,6 @@ function NavigationContent({
                       </span>
                       {item.badge ? (
                         <span className="bg-accent px-1.5 py-0.5 font-mono text-[9px] text-on-accent">{item.badge}</span>
-                      ) : item.hotkey ? (
-                        <kbd className="dq-key">{item.hotkey}</kbd>
                       ) : null}
                     </Link>
                   )

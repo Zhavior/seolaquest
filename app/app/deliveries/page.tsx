@@ -30,7 +30,7 @@ export default function DeliveriesPage() {
         icon={<Radio className="h-8 w-8" />}
         eyebrow={<>COMMANDER&apos;S MAP &amp; CAMPAIGN DISPATCHES</>}
         title="Campaign Broadcast"
-        subtitle="CRM Deliveries & Recorded Worker Status"
+        subtitle="Leads you sent to your CRM"
         status={<QuestStatusPill label="Dispatch engine" value="Active [Monitored]" />}
       />
 

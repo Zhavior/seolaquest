@@ -21,7 +21,6 @@ export interface NavigationItem {
   section: 'tactical' | 'guild' | 'system'
   color?: string
   badge?: string
-  hotkey?: string
   description?: string
 }
 
@@ -33,7 +32,6 @@ export const navigation: NavigationItem[] = [
     icon: LayoutDashboard,
     section: 'tactical',
     color: 'bg-emerald-400',
-    hotkey: 'B',
     description: 'Core command dashboard and battlefield overview.',
   },
   {
@@ -45,7 +43,6 @@ export const navigation: NavigationItem[] = [
     color: 'bg-yellow-400',
     // No badge. The one that used to sit here was the literal string '12' on
     // every account, which is worse than no count at all.
-    hotkey: 'S',
     description: 'Active quests, progress, and rewards waiting to be claimed.',
   },
   {
@@ -55,7 +52,6 @@ export const navigation: NavigationItem[] = [
     icon: History,
     section: 'tactical',
     color: 'bg-lime-400',
-    hotkey: 'R',
     description: 'Durable ledger of every scan this account has queued.',
   },
   {
@@ -66,7 +62,6 @@ export const navigation: NavigationItem[] = [
     section: 'tactical',
     color: 'bg-orange-400',
     // No badge: '0/3' was a literal on every account, not a count.
-    hotkey: 'Q',
     description: 'Daily objectives, streaks, and keyword quests.',
   },
   {
@@ -76,7 +71,6 @@ export const navigation: NavigationItem[] = [
     icon: Castle,
     section: 'guild',
     color: 'bg-cyan-400',
-    hotkey: 'G',
     description: 'Guild activity, wins, and community rewards.',
   },
   {
@@ -86,7 +80,6 @@ export const navigation: NavigationItem[] = [
     icon: Send,
     section: 'guild',
     color: 'bg-sky-400',
-    hotkey: 'C',
     description: 'Outbound campaigns, deliveries, and broadcast ops.',
   },
   {
@@ -96,7 +89,6 @@ export const navigation: NavigationItem[] = [
     icon: UserCircle,
     section: 'system',
     color: 'bg-rose-400',
-    hotkey: 'L',
     description: 'Saved knowledge, profile, and account identity.',
   },
   {
@@ -106,7 +98,6 @@ export const navigation: NavigationItem[] = [
     icon: CreditCard,
     section: 'system',
     color: 'bg-amber-400',
-    hotkey: 'M',
     description: 'Mana balance, billing, and account controls.',
   },
   {
@@ -116,7 +107,6 @@ export const navigation: NavigationItem[] = [
     icon: Settings,
     section: 'system',
     color: 'bg-purple-400',
-    hotkey: 'K',
     description: 'Preferences, system options, and app settings.',
   },
 ]

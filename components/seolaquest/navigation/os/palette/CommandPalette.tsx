@@ -26,8 +26,7 @@ export default function CommandPalette() {
     return navigation.filter(
       (item) =>
         item.label.toLowerCase().includes(q) ||
-        item.description?.toLowerCase().includes(q) ||
-        item.hotkey?.toLowerCase() === q
+        item.description?.toLowerCase().includes(q)
     )
   }, [query])
 
@@ -196,11 +195,6 @@ export default function CommandPalette() {
                       </div>
 
                       <div className="flex items-center gap-2">
-                        {item.hotkey ? (
-                          <span className="border border-outline bg-card px-2 py-1 text-[10px] font-semibold normal-case text-ink rounded-xl">
-                            {item.hotkey}
-                          </span>
-                        ) : null}
                         <ArrowRight className="h-4 w-4 text-ink" />
                       </div>
                     </button>

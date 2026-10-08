@@ -8,6 +8,7 @@ import {
   Sparkles,
   Coins,
   Sword,
+  Check,
   ShieldAlert,
   ChevronRight,
   Crown,
@@ -21,6 +22,7 @@ import {
   LayoutGrid,
   List,
 } from 'lucide-react'
+import { LocalTime } from '@/components/LocalTime'
 import { isSampleQuest, SAMPLE_QUEST_PLATFORM } from '@/src/modules/onboarding/domain/sampleQuests'
 import type { DashboardLead } from '@/features/dashboard/types'
 import { XTwitterIcon, RedditIcon } from '@/components/PlatformIcons'
@@ -46,7 +48,7 @@ const signalBadgeStyles: Record<
   { label: string; wrap: string; badge: string; border: string; accent: string }
 > = {
   LIVE_SCORED: {
-    label: 'LIVE SCORED',
+    label: 'SCORED',
     wrap: 'bg-amber-500/10',
     badge: 'bg-highlight-strong text-amber-950 border-amber-500',
     border: 'border-l-8 border-l-amber-500',
@@ -60,7 +62,7 @@ const signalBadgeStyles: Record<
     accent: 'bg-slate-700 hover:bg-slate-800 text-white',
   },
   SCORING_UNAVAILABLE: {
-    label: 'SCORING UNAVAILABLE',
+    label: 'SCORE NOT AVAILABLE',
     wrap: 'bg-blue-500/10',
     badge: 'bg-[#BAE6FD] text-blue-900 border-blue-400',
     border: 'border-l-8 border-l-blue-500',
@@ -329,10 +331,7 @@ function DashboardFeedComponent({
               className={`h-4 w-4 text-on-accent ${shouldReduceMotion ? '' : 'animate-spin'}`}
               aria-hidden
             />
-            Updating queue — keeping current leads visible
-          </span>
-          <span className="hidden sm:inline-block border border-outline bg-card text-ink px-2 py-0.5 text-[10px] font-semibold normal-case">
-            Measured queue
+            Updating your leads…
           </span>
         </div>
       )}
@@ -347,25 +346,20 @@ function DashboardFeedComponent({
           <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-2 mb-1">
               <span className="bg-black text-accent normal-case text-[10px] sm:text-xs font-semibold tracking-wide px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-lg border border-outline ">
-                Opportunity Queue
+                Your leads
               </span>
             </div>
 
             <h2
               className="font-display text-2xl sm:text-3xl normal-case tracking-tight text-ink mt-0.5"
             >
-              Open leads to triage
+              Leads to look at
             </h2>
 
             <div className="mt-3 flex flex-wrap items-center gap-2">
               <div className="inline-flex items-center gap-1.5 rounded-lg border sm:rounded-[20px] border border-outline bg-accent px-2.5 py-1 text-[11px] sm:text-xs font-semibold normal-case shadow-none sm:shadow-none">
                 <Crosshair className="h-3.5 w-3.5" />
-                {displayedLeads.length} {displayedLeads.length === 1 ? 'signal' : 'signals'}
-              </div>
-
-              <div className="inline-flex items-center gap-1.5 rounded-lg border sm:rounded-[20px] border border-outline bg-info px-2.5 py-1 text-[11px] sm:text-xs font-semibold normal-case shadow-none sm:shadow-none text-on-accent">
-                <Sparkles className="h-3.5 w-3.5" />
-                Fresh intent
+                {displayedLeads.length} {displayedLeads.length === 1 ? 'lead' : 'leads'}
               </div>
             </div>
           </div>
@@ -511,7 +505,7 @@ function DashboardFeedComponent({
                         className="inline-flex min-h-[34px] items-center gap-1 rounded-lg border border-outline bg-accent px-2.5 py-1 text-[11px] font-semibold normal-case shadow-none hover:bg-highlight-strong disabled:opacity-60"
                       >
                         <Sparkles className="h-3 w-3" />
-                        Draft
+                        Draft a reply
                       </button>
 
                       <button
@@ -523,8 +517,8 @@ function DashboardFeedComponent({
                         disabled={isPending}
                         className={`inline-flex min-h-[34px] items-center gap-1 rounded-lg border border-outline px-2.5 py-1 text-[11px] font-semibold normal-case shadow-none disabled:opacity-60 ${badgeStyle.accent}`}
                       >
-                        <Sword className="h-3 w-3" />
-                        Claim
+                        <Check className="h-3 w-3" />
+                        Mark as contacted
                       </button>
 
                       <button
@@ -632,7 +626,7 @@ function DashboardFeedComponent({
                               shouldReduceMotion ? '' : 'animate-pulse'
                             }`}
                           >
-                            ⚡ Pending Aurora Evaluation
+                            Score coming soon
                           </span>
                         )}
                       </div>
@@ -665,7 +659,7 @@ function DashboardFeedComponent({
                             className="inline-flex min-h-[40px] items-center justify-center gap-1.5 rounded-[20px] border border-outline bg-accent px-3 py-2 text-xs font-semibold normal-case shadow-none hover:bg-highlight-strong disabled:opacity-60 transition active:translate-x-[1px] active:translate-y-[1px]"
                           >
                             <Sparkles className="h-3.5 w-3.5" />
-                            Cast AI draft
+                            Draft a reply
                           </button>
 
                           <button
@@ -674,8 +668,8 @@ function DashboardFeedComponent({
                             disabled={isPending}
                             className={`inline-flex min-h-[40px] items-center justify-center gap-1.5 rounded-[20px] border border-outline px-3 py-2 text-xs font-semibold normal-case shadow-none disabled:opacity-60 transition active:translate-x-[1px] active:translate-y-[1px] ${badgeStyle.accent}`}
                           >
-                            <Sword className="h-3.5 w-3.5" />
-                            Claim lead
+                            <Check className="h-3.5 w-3.5" />
+                            Mark as contacted
                           </button>
                         </div>
 
@@ -707,7 +701,7 @@ function DashboardFeedComponent({
                               type="button"
                               onClick={() => dismissLead(lead.id)}
                               disabled={isPending}
-                              title="Dismiss lead from queue"
+                              title="Dismiss this lead"
                               aria-label={`Dismiss ${lead.author || 'lead'}`}
                               className="inline-flex min-h-[32px] items-center gap-1 rounded-lg border border-outline bg-inset px-2 py-1 text-[10px] font-semibold normal-case shadow-none hover:bg-danger/15 text-danger-ink disabled:opacity-60"
                             >
@@ -778,8 +772,8 @@ function DashboardFeedComponent({
                     ? 'Recent evidence passed the buying-intent and business-fit checks.'
                     : 'This lead has not passed every current priority check. Review the source before acting.'}</p>
                   <p className="mt-2 text-xs text-ink-muted">{activeDetailLead.aurora?.evaluatedAt
-                    ? `Evaluated ${new Date(activeDetailLead.aurora.evaluatedAt).toISOString().replace('T', ' ').slice(0, 16)} UTC`
-                    : 'Evaluation time unavailable'} · {activeDetailLead.aurora?.evaluationStatus === 'LIVE' ? 'AI assessment' : 'No live AI assessment'}</p>
+                    ? <LocalTime iso={new Date(activeDetailLead.aurora.evaluatedAt).toISOString()} prefix="Checked " />
+                    : 'Check time unknown'} · {activeDetailLead.aurora?.evaluationStatus === 'LIVE' ? 'Checked by AI' : 'Not checked by AI yet'}</p>
                   <p className="mt-1 text-xs text-ink-muted">Priority scores are estimates, not the probability of making a sale.</p>
                 </section>
                 {/* Intent & Value Banner */}
@@ -831,7 +825,7 @@ function DashboardFeedComponent({
                           shouldReduceMotion ? '' : 'animate-pulse'
                         }`}
                       >
-                        ⚡ Pending Aurora Evaluation
+                        Score coming soon
                       </span>
                     )
                   }
@@ -883,7 +877,7 @@ function DashboardFeedComponent({
                       className="inline-flex min-h-[44px] items-center justify-center gap-1.5 rounded-[20px] border border-outline bg-accent px-3 py-2.5 text-xs font-semibold normal-case shadow-none hover:bg-highlight-strong"
                     >
                       <Sparkles className="h-4 w-4" />
-                      AI Reply
+                      Draft a reply
                     </button>
 
                     <button
@@ -894,8 +888,8 @@ function DashboardFeedComponent({
                       }}
                       className="inline-flex min-h-[44px] items-center justify-center gap-1.5 rounded-[20px] border border-outline bg-accent-2 px-3 py-2.5 text-xs font-semibold normal-case text-on-accent shadow-none"
                     >
-                      <Sword className="h-4 w-4" />
-                      Claim Lead
+                      <Check className="h-4 w-4" />
+                      Mark as contacted
                     </button>
                   </div>
 

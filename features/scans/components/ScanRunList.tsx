@@ -93,13 +93,13 @@ export function ScanRunList({ runs: initialRuns, hasMore: initialHasMore }: Scan
     return (
       <QuestPanel shadow="xl" padding="lg" className="text-center">
         <QuestBadge tone="gold" className="mx-auto mb-4" icon={<ShieldAlert aria-hidden="true" className="h-4 w-4" />}>
-          No scan runs recorded
+          No scans yet
         </QuestBadge>
         <h2 className="text-2xl font-semibold normal-case sm:text-3xl">
-          Durable scans will appear here after they are queued.
+          Your scans will be listed here.
         </h2>
         <p className="mx-auto mt-3 max-w-xl text-sm font-bold text-ink-muted">
-          This ledger reports saved backend state only. It does not invent provider activity or results.
+          Each time you run a scan, it shows up here with what it found.
         </p>
         <Link href="/app" className={questButton({ tone: 'gold', className: 'mt-6 hover:bg-yellow-300' })}>
           Return to dashboard

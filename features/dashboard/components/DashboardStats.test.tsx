@@ -52,7 +52,7 @@ describe('DashboardStats honesty', () => {
     expect(screen.queryByText(/last synced/i)).toBeNull()
     expect(screen.queryByText(/next auto-run/i)).toBeNull()
     expect(screen.queryByText(/\+100 xp/i)).toBeNull()
-    expect(screen.getByRole('heading', { name: /providers & entitlements/i })).toBeVisible()
+    expect(screen.getByRole('heading', { name: /sources and your plan/i })).toBeVisible()
     expect(screen.getByRole('heading', { name: /hunter progression/i })).toBeVisible()
     expect(within(screen.getByTestId('telemetry-open-leads')).getByText('1')).toBeVisible()
     expect(within(screen.getByTestId('telemetry-live-aurora')).getByText('0')).toBeVisible()

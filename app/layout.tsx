@@ -67,7 +67,7 @@ export default function RootLayout({
         <ThemeScript />
         <script
           dangerouslySetInnerHTML={{
-            __html: `try{if(localStorage.getItem('coquest_sfx_enabled')==='false'){document.documentElement.classList.add('sfx-muted')}}catch(e){}`,
+            __html: `try{if(localStorage.getItem('coquest_sfx_enabled')!=='true'){document.documentElement.classList.add('sfx-muted')}}catch(e){}`,
           }}
         />
       </head>

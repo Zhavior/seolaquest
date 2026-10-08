@@ -59,7 +59,6 @@ export function useDashboardState({
   const [keywords, setKeywords] = useState(dbKeywords)
   const [leads, setLeads] = useState<DashboardLead[]>(dbLeads)
   const [newKeyword, setNewKeyword] = useState('')
-  const [selectedHeroClass, setSelectedHeroClass] = useState('Warrior 🥷')
   const [notice, setNotice] = useState('')
   
   const [asyncStatus, setAsyncStatus] = useState<DashboardAsyncStatus>('idle')
@@ -432,12 +431,12 @@ export function useDashboardState({
         sfx.playConfirm()
         setClaimedCount((current) => current + 1)
         setLeads((current) => current.filter((lead) => lead.id !== leadId))
-        setNotice(result.message ?? 'Quest claimed.')
+        setNotice(result.message ?? 'Marked as contacted.')
         router.refresh()
         return
       }
 
-      setNotice(result.message ?? 'Failed to claim quest.')
+      setNotice(result.message ?? 'Could not mark this lead as contacted. Try again.')
     })
   }
 
@@ -517,8 +516,6 @@ export function useDashboardState({
     setLeads,
     newKeyword,
     setNewKeyword,
-    selectedHeroClass,
-    setSelectedHeroClass,
     filter,
     setFilter,
     notice,

@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { LocalTime } from '@/components/LocalTime'
 import { requireCurrentUser } from '@/lib/auth'
 import { LeadQueryService } from '@/src/modules/leads/application/LeadQueryService'
 import { OutcomeControls } from './OutcomeControls'
@@ -18,7 +19,7 @@ export default async function LeadsPage() {
       <details><summary className="cursor-pointer py-2">Recent history</summary>
         {!lead.outcomes.length ? <p>No recorded transitions. This status comes from an older record.</p> :
           <ol className="space-y-2">{lead.outcomes.map(outcome => <li key={outcome.id}>
-            <time dateTime={outcome.createdAt.toISOString()}>{outcome.createdAt.toISOString().replace('T', ' ').slice(0, 16)} UTC</time>
+            <LocalTime iso={outcome.createdAt.toISOString()} />
             {' · '}{outcome.action.toLowerCase()}{' · '}{outcome.evidenceKind === 'CUSTOMER_REPORTED' ? 'Customer reported' : 'User action'}
             {outcome.notes && <p>{outcome.notes}</p>}
           </li>)}</ol>}

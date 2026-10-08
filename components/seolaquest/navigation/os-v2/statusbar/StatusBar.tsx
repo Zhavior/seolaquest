@@ -4,7 +4,6 @@ import React, { type ReactNode } from 'react'
 import Link from 'next/link'
 import {
   Menu,
-  Zap,
   PanelLeftClose,
   PanelLeftOpen,
 } from 'lucide-react'
@@ -87,15 +86,11 @@ export default function StatusBar({
 
           <SoundControls />
 
-          {/* Recharge CTA */}
-          <Link
-            href="/app/billing?offer=founder"
-            className="dq-plate shrink-0 px-3 sm:px-4"
-          >
-            <Zap aria-hidden="true" className="size-3.5" strokeWidth={2} />
-            <span className="hidden sm:inline">Add credits</span>
-            <span className="sm:hidden text-[10px] font-semibold">+</span>
-          </Link>
+          {/*
+            No "Add credits" button here: the dashboard's credits bar carries the
+            one upgrade link, and Billing is in the menu. A second prompt that can
+            lead to a closed checkout only adds noise.
+          */}
         </div>
       </div>
     </header>

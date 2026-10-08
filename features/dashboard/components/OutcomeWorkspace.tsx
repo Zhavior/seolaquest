@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { LocalTime } from '@/components/LocalTime'
 import { OutcomeControls } from '@/app/app/leads/OutcomeControls'
 import type { ScanRunView } from '@/features/scans/types'
 
@@ -15,7 +16,7 @@ export function OutcomeWorkspace({ pipeline, scans, checkedAt }: {
     <header className="flex flex-wrap items-start justify-between gap-3">
       <div><p className="text-xs uppercase tracking-widest text-ink-muted">Your customer pipeline</p>
         <h2 id="outcome-workspace" className="font-display text-2xl sm:text-3xl">Turn conversations into progress.</h2>
-        <p className="mt-2 text-sm text-ink-muted">Saved snapshot · <time dateTime={checkedAt}>{checkedAt.replace('T', ' ').slice(0, 16)} UTC</time></p>
+        <p className="mt-2 text-sm text-ink-muted">Saved snapshot · <LocalTime iso={checkedAt} /></p>
       </div><Link href="/app/leads" className="inline-flex min-h-11 items-center underline">All follow-ups →</Link>
     </header>
     {pipeline ? <>
@@ -42,7 +43,7 @@ export function OutcomeWorkspace({ pipeline, scans, checkedAt }: {
         {scans === null ? <p role="status">Scan history unavailable.</p> : !scans.length ? <p className="text-sm text-ink-muted">No saved scans yet. Start a scan from your dashboard.</p> : scans.slice(0, 3).map(run => <Link key={run.id} href={`/app/runs/${run.id}`} className="block rounded-xl border border-hairline p-3">
           <span className="text-sm font-semibold">{run.status.replaceAll('_', ' ')}</span>
           <p className="mt-1 text-sm">{run.statusMessage}</p><p className="mt-1 text-xs text-ink-muted">{run.providerSummary}</p>
-          <p className="mt-2 text-xs">{run.counts.leadsCreated} saved leads · <time dateTime={run.updatedAt}>{run.updatedAt.replace('T', ' ').slice(0, 16)} UTC</time></p>
+          <p className="mt-2 text-xs">{run.counts.leadsCreated} saved leads · <LocalTime iso={run.updatedAt} /></p>
         </Link>)}
         <Link href="/app/runs" className="inline-flex min-h-11 items-center text-sm underline">Open scan history for current status →</Link>
       </div>

@@ -67,8 +67,8 @@ export function DashboardRadar({
           >
             <Sparkles className="h-4 w-4 text-ink" aria-hidden />
             {hasKeywords
-              ? 'Keywords armed — spend 1 scan credit to run a durable scan'
-              : 'Scanner idle — add a keyword on the Keyword Battlefield first'}
+              ? 'Ready. A scan uses 1 scan credit.'
+              : 'Add a keyword first, then you can scan.'}
           </span>
         </div>
 

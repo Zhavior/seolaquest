@@ -52,7 +52,7 @@ export default function GuildClient({ stats }: { stats: GuildStats }) {
               icon={<Shield className="h-8 w-8" />}
               eyebrow="Your activity journal"
               title="Guild Hall"
-              subtitle="Tenant Activity & Outcome Ledger"
+              subtitle="Your activity and results"
               status={<QuestStatusPill state="idle" label="Provider status" value="Not shown here" />}
             />
           </motion.div>
@@ -65,8 +65,8 @@ export default function GuildClient({ stats }: { stats: GuildStats }) {
                   Guild rankings unavailable
                 </h2>
                 <p className="mt-2 max-w-2xl text-sm font-medium leading-relaxed text-ink-muted">
-                  SEOlaQuest does not publish cross-account rankings until a consented public-profile model exists. Your private,
-                  tenant-scoped activity remains visible below.
+                  We do not show rankings against other users yet, because that would need their permission. Your own activity
+                  is below, and only you can see it.
                 </p>
               </QuestPanel>
             </motion.div>
