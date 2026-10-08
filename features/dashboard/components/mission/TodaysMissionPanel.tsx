@@ -84,13 +84,10 @@ export function TodaysMissionPanel({
               <Swords className="size-3.5 shrink-0" aria-hidden />
               {mission.label}
             </span>
-            <span className="rounded-lg border border-outline bg-card px-2.5 py-1 text-[10px] font-semibold normal-case tracking-wide text-ink shadow-none sm:text-xs">
-              Confidence: {mission.confidence}
-            </span>
           </div>
 
           <p className="mt-4 text-[10px] font-semibold normal-case tracking-[0.2em] text-on-forest/70 sm:text-[11px]">
-            Highest-value next step
+            Your next step
           </p>
 
           <h2

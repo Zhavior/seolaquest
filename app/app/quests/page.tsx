@@ -10,8 +10,8 @@ import { QuestBoardSkeleton } from './loading'
 const QuestBoard = dynamic(() => import('@/features/quests/components/QuestBoard'))
 
 export const metadata: Metadata = {
-  title: 'Quest Board | SEOlaQuest',
-  description: 'Your active quests, their progress, and the rewards waiting to be claimed.',
+  title: 'Goals | SEOlaQuest',
+  description: 'Small goals that earn XP as you work.',
 }
 
 /**
@@ -25,8 +25,8 @@ export const metadata: Metadata = {
 export default function QuestBoardPage({ searchParams }: { searchParams: Promise<{ before?: string | string[] }> }) {
   return (
     <QuestPageShell watermark={<Scroll className="h-[650px] w-[650px] text-ink" />}>
-      <QuestTicker label="Quest board. Active bounties and rewards.">
-        <Sparkles className="h-5 w-5 text-ink" /> 📜 QUEST BOARD{' '}
+      <QuestTicker label="Goals.">
+        <Sparkles className="h-5 w-5 text-ink" /> 📜 GOALS{' '}
         <Sparkles className="h-5 w-5 text-ink" /> 🏆 ACTIVE BOUNTIES
       </QuestTicker>
 
@@ -48,8 +48,8 @@ async function QuestBoardData({ searchParams }: { searchParams: Promise<{ before
       <QuestPageHeader
         className="mt-4"
         icon={<Scroll className="h-8 w-8" />}
-        eyebrow={<>COMMANDER&apos;S BOARD</>}
-        title="Quest Board"
+        eyebrow={<>SMALL GOALS THAT EARN XP</>}
+        title="Goals"
         subtitle={`Level ${board.progression.level} — ${board.progression.lifetimeXp.toLocaleString()} lifetime XP`}
         status={
           <QuestStatusPill
@@ -60,11 +60,11 @@ async function QuestBoardData({ searchParams }: { searchParams: Promise<{ before
         }
       />
 
-      <section aria-labelledby="practical-quests" className="mb-6 space-y-4 rounded-[20px] border border-outline bg-card p-5">
+      <section aria-labelledby="practical-quests" className="dq-panel mb-8 space-y-4 p-5 md:p-6">
         <h2 id="practical-quests" className="font-display text-2xl">Move one conversation forward.</h2>
         <p className="text-sm text-ink-muted">These steps guide your work. Reporting a reply or sale does not earn XP.</p>
         <ol className="grid gap-4 md:grid-cols-3">
-          <li><h3 className="font-semibold">1. Review the evidence</h3><p className="mt-2 text-sm">Check the source, business fit and freshness before claiming a lead.</p><Link href="/app#battle-ready-signals" className="inline-flex min-h-11 items-center underline">Review leads →</Link></li>
+          <li><h3 className="font-semibold">1. Review the evidence</h3><p className="mt-2 text-sm">Read the post and check it fits your business before you save it to follow-ups.</p><Link href="/app#battle-ready-signals" className="inline-flex min-h-11 items-center underline">Review leads →</Link></li>
           <li><h3 className="font-semibold">2. Follow up</h3><p className="mt-2 text-sm">Contact a saved lead, then record what actually happened.</p><Link href="/app/leads" className="inline-flex min-h-11 items-center underline">Open follow-ups →</Link></li>
           <li><h3 className="font-semibold">3. Learn from replies</h3><p className="mt-2 text-sm">Review recorded outcomes and refine your keywords for the next scan.</p><Link href="/app/leads" className="inline-flex min-h-11 items-center underline">Review outcome history →</Link></li>
         </ol>

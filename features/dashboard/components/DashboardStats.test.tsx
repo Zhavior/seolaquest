@@ -1,6 +1,7 @@
 import { render, screen, within } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 import { DashboardStats } from './DashboardStats'
+import { GameModeProvider } from '@/components/seolaquest/GameModeContext'
 import type { DashboardLead, DashboardUser } from '@/features/dashboard/types'
 
 const user: DashboardUser = {
@@ -52,8 +53,9 @@ describe('DashboardStats honesty', () => {
     expect(screen.queryByText(/last synced/i)).toBeNull()
     expect(screen.queryByText(/next auto-run/i)).toBeNull()
     expect(screen.queryByText(/\+100 xp/i)).toBeNull()
-    expect(screen.getByRole('heading', { name: /providers & entitlements/i })).toBeVisible()
-    expect(screen.getByRole('heading', { name: /hunter progression/i })).toBeVisible()
+    expect(screen.getByRole('heading', { name: /sources and your plan/i })).toBeVisible()
+    // Level and XP are part of the optional game layer, which is off by default.
+    expect(screen.queryByRole('heading', { name: /hunter progression/i })).toBeNull()
     expect(within(screen.getByTestId('telemetry-open-leads')).getByText('1')).toBeVisible()
     expect(within(screen.getByTestId('telemetry-live-aurora')).getByText('0')).toBeVisible()
     expect(within(screen.getByTestId('telemetry-scan-credits')).getByText('2/10')).toBeVisible()
@@ -98,5 +100,25 @@ describe('DashboardStats honesty', () => {
 
     expect(within(screen.getByTestId('telemetry-live-aurora')).getByText('1')).toBeVisible()
     expect(within(screen.getByTestId('telemetry-open-leads')).getByText('2')).toBeVisible()
+  })
+
+  it('shows level and XP once the game layer is turned on', () => {
+    render(
+      <GameModeProvider on>
+        <DashboardStats
+          item={{}}
+          user={user}
+          characterTitle="Scout"
+          isScanning={false}
+          recentLevelUp={false}
+          xpPercent={40}
+          leads={leads}
+          remainingQuests={2}
+          maxCredits={10}
+        />
+      </GameModeProvider>
+    )
+
+    expect(screen.getByRole('heading', { name: /hunter progression/i })).toBeVisible()
   })
 })

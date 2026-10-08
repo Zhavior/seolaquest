@@ -1,110 +1,137 @@
 import {
-  Castle,
+  Activity,
   LayoutDashboard,
   History,
-  Scroll,
+  ListChecks,
   Send,
+  Tags,
+  Trophy,
   UserCircle,
-  Swords,
   CreditCard,
   Settings,
   type LucideIcon,
 } from 'lucide-react'
+import type { IconName } from '@/features/handbook/artifact/IconSprite'
 
 export interface NavigationItem {
   label: string
   href: string
   icon: LucideIcon
+  /** Painted emblem from the landing page's icon sprite, used by the rail. */
+  emblem: IconName
   section: 'tactical' | 'guild' | 'system'
   color?: string
   badge?: string
-  hotkey?: string
   description?: string
+  /** Part of the optional game layer; hidden unless the person turned it on. */
+  game?: boolean
 }
 
+/**
+ * One plain name per page. The same name is used in the rail, the phone tray,
+ * the browser tab title, the page heading and the loading message, so a person
+ * never has to work out that two words mean the same place. The description is
+ * shown under each name in the rail and searched by the command palette.
+ */
 export const navigation: NavigationItem[] = [
   {
-    label: 'LIVING HQ',
+    label: 'Home',
     href: '/app',
+    emblem: 'map',
     icon: LayoutDashboard,
     section: 'tactical',
     color: 'bg-emerald-400',
-    hotkey: 'B',
-    description: 'Core command dashboard and battlefield overview.',
+    description: 'Your next step and the leads to look at.',
   },
   {
-    label: 'QUEST BOARD',
-    href: '/app/quests',
-    icon: Scroll,
+    label: 'Follow-ups',
+    href: '/app/leads',
+    emblem: 'scroll',
+    icon: ListChecks,
     section: 'tactical',
     color: 'bg-yellow-400',
-    // No badge. The one that used to sit here was the literal string '12' on
-    // every account, which is worse than no count at all.
-    hotkey: 'S',
-    description: 'Active quests, progress, and rewards waiting to be claimed.',
+    description: 'Leads you contacted, and what happened next.',
   },
   {
-    label: 'SCAN RUNS',
+    label: 'Keywords',
+    href: '/app/keywords',
+    emblem: 'flag',
+    icon: Tags,
+    section: 'tactical',
+    color: 'bg-orange-400',
+    // No badge: '0/3' was a literal on every account, not a count.
+    description: 'The phrases we search for.',
+  },
+  {
+    label: 'Scans',
     href: '/app/runs',
+    emblem: 'spyglass',
     icon: History,
     section: 'tactical',
     color: 'bg-lime-400',
-    hotkey: 'R',
-    description: 'Durable ledger of every scan this account has queued.',
+    description: 'Every scan and what it found.',
   },
   {
-    label: 'QUEST LOG',
-    href: '/app/keywords',
-    icon: Swords,
-    section: 'tactical',
-    color: 'bg-orange-400',
-    badge: '0/3',
-    hotkey: 'Q',
-    description: 'Daily objectives, streaks, and keyword quests.',
-  },
-  {
-    label: 'GUILD HALL',
-    href: '/app/guild',
-    icon: Castle,
-    section: 'guild',
-    color: 'bg-cyan-400',
-    hotkey: 'G',
-    description: 'Guild activity, wins, and community rewards.',
-  },
-  {
-    label: 'CAMPAIGN BROADCAST',
+    label: 'CRM exports',
     href: '/app/deliveries',
+    emblem: 'lighthouse',
     icon: Send,
-    section: 'guild',
+    section: 'tactical',
     color: 'bg-sky-400',
-    hotkey: 'C',
-    description: 'Outbound campaigns, deliveries, and broadcast ops.',
+    description: 'Leads you sent to your CRM.',
   },
   {
-    label: 'KNOWLEDGE LORE',
+    label: 'Goals',
+    href: '/app/quests',
+    emblem: 'crown',
+    icon: Trophy,
+    section: 'guild',
+    game: true,
+    color: 'bg-cyan-400',
+    // No badge. The one that used to sit here was the literal string '12' on
+    // every account, which is worse than no count at all.
+    description: 'Small goals that earn XP as you work.',
+  },
+  {
+    label: 'Activity',
+    href: '/app/guild',
+    emblem: 'medal',
+    icon: Activity,
+    section: 'guild',
+    game: true,
+    color: 'bg-cyan-400',
+    description: 'What you have done, and your results.',
+  },
+  {
+    label: 'Profile',
     href: '/app/profile',
+    emblem: 'shield',
     icon: UserCircle,
     section: 'system',
     color: 'bg-rose-400',
-    hotkey: 'L',
-    description: 'Saved knowledge, profile, and account identity.',
+    description: 'Your name, details and saved notes.',
   },
   {
-    label: 'BAZAAR & SUPPLIES',
+    label: 'Billing',
     href: '/app/billing',
+    emblem: 'chest',
     icon: CreditCard,
     section: 'system',
     color: 'bg-amber-400',
-    hotkey: 'M',
-    description: 'Mana balance, billing, and account controls.',
+    description: 'Your plan and scan credits.',
   },
   {
-    label: 'ARMORY & SPELLS',
+    label: 'Settings',
     href: '/app/settings',
+    emblem: 'sword',
     icon: Settings,
     section: 'system',
     color: 'bg-purple-400',
-    hotkey: 'K',
-    description: 'Preferences, system options, and app settings.',
+    description: 'Your preferences.',
   },
 ]
+
+/** The menu for this person: game pages only when they turned the game layer on. */
+export function visibleNavigation(gameMode: boolean): NavigationItem[] {
+  return gameMode ? navigation : navigation.filter((item) => !item.game)
+}

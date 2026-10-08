@@ -38,7 +38,7 @@ export class LeadQueryService {
     return prisma.lead.findMany({
       where: { userId, status: { in: ['CLAIMED', 'CONTACTED', 'REPLIED', 'QUALIFIED', 'CONVERTED'] } },
       orderBy: [{ createdAt: 'desc' }, { id: 'desc' }], take: 50,
-      select: { id: true, content: true, status: true, outcomes: {
+      select: { id: true, author: true, content: true, status: true, outcomes: {
         orderBy: [{ createdAt: 'desc' }, { id: 'desc' }], take: 10,
         select: { id: true, action: true, evidenceKind: true, notes: true, createdAt: true },
       } },

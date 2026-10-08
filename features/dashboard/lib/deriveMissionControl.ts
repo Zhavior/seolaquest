@@ -1,4 +1,5 @@
 import type { DashboardKeyword, DashboardLead, DashboardUser } from '@/features/dashboard/types'
+import { SCORE_NOTE, actionLabel, formatScore } from '@/features/dashboard/lib/leadScore'
 
 export type MissionActionKind =
   | 'add_keyword'
@@ -54,6 +55,8 @@ export type MissionControlInput = {
   maxCredits: number
   user: Pick<DashboardUser, 'level' | 'xp' | 'planLabel' | 'entitlements'>
   isScanning?: boolean
+  /** The optional game layer (Settings). Level and XP are only mentioned when on. */
+  gameMode?: boolean
 }
 
 function isLiveScored(lead: DashboardLead): boolean {
@@ -71,6 +74,9 @@ function pickHighestLiveLead(leads: DashboardLead[]): DashboardLead | null {
 /**
  * Picks exactly one next-best action from current dashboard facts.
  * Never invents scores, streaks, ARR, or scan freshness.
+ *
+ * Leads come before credits: a new free account has sample leads and no
+ * credits, and its first step should be practising on a lead, not billing.
  */
 export function deriveTodaysMission(input: MissionControlInput): TodaysMission {
   const { keywords, leads, remainingQuests, user, isScanning } = input
@@ -82,10 +88,10 @@ export function deriveTodaysMission(input: MissionControlInput): TodaysMission {
   if (isScanning) {
     return {
       label: "Today's Mission",
-      title: 'Scan in progress',
-      why: 'A durable scan run is already queued or running. Wait for verified results rather than starting another scan.',
+      title: 'A scan is running',
+      why: 'A scan is already running. New matches will appear in your lead list when it finishes.',
       tone: 'neutral',
-      action: { kind: 'wait_scan', ctaLabel: 'View scan status' },
+      action: { kind: 'wait_scan', ctaLabel: 'See scan progress' },
       confidence: 'measured',
     }
   }
@@ -93,23 +99,10 @@ export function deriveTodaysMission(input: MissionControlInput): TodaysMission {
   if (keywordCount === 0) {
     return {
       label: "Today's Mission",
-      title: 'Track your first keyword',
-      why: 'No keywords are tracked yet, so the scanner has nothing to match against public posts.',
+      title: 'Add your first keyword',
+      why: 'Add a phrase your buyers use, like "looking for a CRM". We use it to find posts that match.',
       tone: 'action',
       action: { kind: 'add_keyword', ctaLabel: 'Add a keyword' },
-      confidence: 'measured',
-    }
-  }
-
-  if (remainingQuests <= 0) {
-    return {
-      label: "Today's Mission",
-      title: canScan ? 'Scan credits are empty' : 'Paid scans are not available on this plan',
-      why: canScan
-        ? `You have ${keywordCount} tracked keyword${keywordCount === 1 ? '' : 's'}, but 0 scan credits remaining.`
-        : `You have ${keywordCount} tracked keyword${keywordCount === 1 ? '' : 's'}, but this account cannot run paid scans yet.`,
-      tone: 'risk',
-      action: { kind: 'open_billing', ctaLabel: 'Open billing' },
       confidence: 'measured',
     }
   }
@@ -119,12 +112,12 @@ export function deriveTodaysMission(input: MissionControlInput): TodaysMission {
     const score = topLive.aurora!.score
     return {
       label: "Today's Mission",
-      title: 'Review a high-scoring live lead',
-      why: `Aurora scored a ${topLive.platform} post from ${topLive.author} at ${score}/100 (LIVE). Recommended action: ${topLive.aurora!.recommendedAction}.`,
+      title: 'Look at your best lead',
+      why: `A ${topLive.platform} post from ${topLive.author} scored ${formatScore(score)}. ${actionLabel(topLive.aurora!.recommendedAction)}. ${SCORE_NOTE}`,
       tone: 'opportunity',
       action: {
         kind: 'claim_lead',
-        ctaLabel: 'Open lead to claim',
+        ctaLabel: 'Open this lead',
         leadId: topLive.id,
       },
       confidence: 'inferred',
@@ -133,36 +126,50 @@ export function deriveTodaysMission(input: MissionControlInput): TodaysMission {
 
   if (leadCount > 0) {
     const unscored = leads.filter((lead) => !isLiveScored(lead)).length
+    const plural = leadCount === 1 ? '' : 's'
     return {
       label: "Today's Mission",
-      title: 'Triage your open lead queue',
+      title: `Go through your ${leadCount} lead${plural}`,
       why:
         unscored === leadCount
-          ? `You have ${leadCount} open lead${leadCount === 1 ? '' : 's'} waiting for review. None currently have a LIVE Aurora score.`
-          : `You have ${leadCount} open lead${leadCount === 1 ? '' : 's'} ready for claim, dismiss, reply, or CRM export.`,
+          ? `You have ${leadCount} lead${plural} to look at. None have a score yet, so read each one and decide.`
+          : `You have ${leadCount} lead${plural} to look at. For each one, save it to follow up, draft a reply, or dismiss it.`,
       tone: 'action',
-      action: { kind: 'review_leads', ctaLabel: 'Review open leads' },
+      action: { kind: 'review_leads', ctaLabel: 'Go to leads' },
       confidence: 'measured',
     }
   }
 
-  if (activeKeywords.length > 0 && remainingQuests > 0) {
+  if (remainingQuests <= 0) {
     return {
       label: "Today's Mission",
-      title: 'Run a scan for new matches',
-      why: `${activeKeywords.length} active keyword${activeKeywords.length === 1 ? '' : 's'} and ${remainingQuests} scan credit${remainingQuests === 1 ? '' : 's'} are ready. Your open lead queue is empty.`,
+      title: canScan ? 'You are out of scan credits' : 'Your plan does not include scans',
+      why: canScan
+        ? 'Each scan uses one credit, and you have none left. Your keywords are saved.'
+        : 'Your keywords are saved, but this plan cannot run scans yet.',
+      tone: 'risk',
+      action: { kind: 'open_billing', ctaLabel: 'See plans' },
+      confidence: 'measured',
+    }
+  }
+
+  if (activeKeywords.length > 0) {
+    return {
+      label: "Today's Mission",
+      title: 'Scan for new posts',
+      why: `You have no leads to look at. A scan checks your ${activeKeywords.length} keyword${activeKeywords.length === 1 ? '' : 's'} for new posts. You have ${remainingQuests} scan credit${remainingQuests === 1 ? '' : 's'}.`,
       tone: 'action',
-      action: { kind: 'scan', ctaLabel: 'Start scan' },
+      action: { kind: 'scan', ctaLabel: 'Start a scan' },
       confidence: 'measured',
     }
   }
 
   return {
     label: "Today's Mission",
-    title: 'Check campaign runs',
-    why: 'No higher-priority action is clear from the current keyword and lead counts. Inspect durable run history next.',
+    title: 'Check your past scans',
+    why: 'Nothing needs you right now. Your past scans show what was found and when.',
     tone: 'neutral',
-    action: { kind: 'open_runs', ctaLabel: 'Open runs' },
+    action: { kind: 'open_runs', ctaLabel: 'See past scans' },
     confidence: 'inferred',
   }
 }
@@ -177,29 +184,29 @@ export function deriveCampaignPulse(input: MissionControlInput): CampaignPulse {
   const risks: string[] = []
 
   if (leads.length > 0) {
-    wins.push(`${leads.length} open lead${leads.length === 1 ? '' : 's'} in queue`)
+    wins.push(`${leads.length} lead${leads.length === 1 ? '' : 's'} to look at`)
   }
   if (liveScoredLeads.length > 0) {
-    wins.push(`${liveScoredLeads.length} with LIVE Aurora score`)
+    wins.push(`${liveScoredLeads.length} with a score`)
   }
   if (activeKeywords.length > 0) {
     wins.push(`${activeKeywords.length} active keyword${activeKeywords.length === 1 ? '' : 's'}`)
   }
-  if (user.level > 0) {
-    wins.push(`Hunter level ${user.level} (${user.xp} XP)`)
+  if (input.gameMode && user.level > 0) {
+    wins.push(`Level ${user.level} (${user.xp} XP)`)
   }
 
   if (keywords.length === 0) {
-    risks.push('No keywords tracked')
+    risks.push('No keywords yet')
   }
   if (remainingQuests <= 0) {
-    risks.push('No scan credits remaining')
+    risks.push('No scan credits left')
   }
   if (!canScan) {
-    risks.push('Paid scans locked by plan entitlements')
+    risks.push('Your plan does not include scans')
   }
   if (leads.length > 0 && liveScoredLeads.length === 0) {
-    risks.push('Open leads have no LIVE Aurora score yet')
+    risks.push('Your leads have no score yet')
   }
 
   let trend: CampaignPulseTrend = 'unknown'
@@ -207,29 +214,29 @@ export function deriveCampaignPulse(input: MissionControlInput): CampaignPulse {
 
   if (keywords.length === 0) {
     trend = 'idle'
-    summary = 'Campaign is idle — track a keyword before scanning.'
-  } else if (remainingQuests <= 0) {
-    trend = 'blocked'
-    summary = 'Campaign is armed with keywords but blocked on scan credits.'
+    summary = 'Add a keyword to get started.'
   } else if (leads.length > 0) {
     trend = 'active'
-    summary = 'Campaign has an open lead queue ready for triage.'
+    summary = 'You have leads to look at.'
+  } else if (remainingQuests <= 0) {
+    trend = 'blocked'
+    summary = 'Your keywords are saved, but you have no scan credits.'
   } else if (activeKeywords.length > 0) {
     trend = 'armed'
-    summary = 'Keywords and credits are ready; queue is empty pending a scan.'
+    summary = 'Ready to scan. No leads to look at yet.'
   } else {
     trend = 'unknown'
-    summary = 'Not enough measured movement data to call a directional trend.'
+    summary = 'Not enough activity yet to show a trend.'
   }
 
   return {
     trend,
     summary,
-    wins: wins.length ? wins : ['No measured wins yet'],
-    risks: risks.length ? risks : ['No measured risks right now'],
+    wins: wins.length ? wins : ['Nothing yet'],
+    risks: risks.length ? risks : ['Nothing needs fixing'],
     freshness: {
       state: 'unknown',
-      detail: 'Last scan time is not available on this dashboard payload.',
+      detail: 'Last scan time is not available here yet.',
     },
     credits: {
       remaining: Math.max(0, remainingQuests),

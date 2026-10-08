@@ -1,5 +1,6 @@
 'use client'
 
+import { useGameMode } from '@/components/seolaquest/GameModeContext'
 import Link from 'next/link'
 import { motion, type Variants } from 'framer-motion'
 import {
@@ -38,21 +39,21 @@ function ProviderStatusStrip() {
   const providers = [
     {
       label: 'X',
-      state: 'LIVE',
-      detail: 'Only live public source today',
+      state: 'WORKING',
+      detail: 'The only source we search today',
       tone: 'bg-success',
       text: 'text-ink',
     },
     {
       label: 'Reddit',
-      state: 'IN BUILD',
+      state: 'NOT YET',
       detail: 'Not available yet',
       tone: 'bg-highlight-strong',
       text: 'text-ink',
     },
     {
       label: 'LinkedIn',
-      state: 'IN BUILD',
+      state: 'NOT YET',
       detail: 'Not available yet',
       tone: 'bg-card',
       text: 'text-ink',
@@ -129,6 +130,7 @@ export function DashboardStats({
   maxCredits,
   leadsSliceStatus = 'ok',
 }: DashboardStatsProps) {
+  const gameMode = useGameMode()
   const entitlements = user.entitlements ?? {
     canUsePaidScans: false,
     canGenerateAIReplies: false,
@@ -140,19 +142,19 @@ export function DashboardStats({
 
   const measuredChecklist = [
     {
-      label: 'Open leads in queue',
+      label: 'Leads to look at',
       progressLabel: `${leads.length}`,
       done: leads.length > 0,
       tone: 'bg-success',
     },
     {
-      label: 'LIVE Aurora scores present',
+      label: 'Leads with a score',
       progressLabel: `${liveScored}`,
       done: liveScored > 0,
       tone: 'bg-highlight-strong',
     },
     {
-      label: 'Scan credits available',
+      label: 'Scan credits left',
       progressLabel: creditReading,
       done: remainingQuests > 0,
       tone: 'bg-success',
@@ -168,9 +170,9 @@ export function DashboardStats({
         <div className="flex flex-col gap-4">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
-              <p className="text-[10px] font-semibold normal-case tracking-[0.18em] text-ink-muted">System health</p>
+              <p className="text-[10px] font-semibold normal-case tracking-[0.18em] text-ink-muted">Status</p>
               <h2 id="system-health-heading" className="font-display mt-1 text-xl font-semibold normal-case text-ink sm:text-2xl">
-                Providers & entitlements
+                Sources and your plan
               </h2>
             </div>
             <span
@@ -178,7 +180,7 @@ export function DashboardStats({
                 leadsSliceStatus === 'degraded' ? 'bg-highlight text-ink' : 'bg-card text-ink'
               }`}
             >
-              Queue: {leadsSliceStatus === 'degraded' ? 'degraded' : 'ok'}
+              Leads: {leadsSliceStatus === 'degraded' ? 'loading slowly' : 'up to date'}
             </span>
           </div>
 
@@ -188,8 +190,8 @@ export function DashboardStats({
             <Radar className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
             <span>
               {isScanning
-                ? 'A scan is running or the scanner modal is open.'
-                : 'No scan freshness timestamp is available on this payload — status is not claimed as live-synced.'}
+                ? 'A scan is running.'
+                : 'We cannot show when your last scan ran yet.'}
             </span>
           </p>
 
@@ -213,6 +215,8 @@ export function DashboardStats({
 
       <div className="grid min-w-0 grid-cols-1 gap-6 xl:grid-cols-[1.2fr_0.95fr]">
         <div className="flex min-w-0 flex-col gap-6">
+          {/* Level and XP belong to the optional game layer (Settings). */}
+          {gameMode ? (
           <section
             aria-labelledby="progress-path-heading"
             className="rounded-[20px] border border-outline bg-highlight p-5 shadow-sm sm:p-6"
@@ -257,25 +261,26 @@ export function DashboardStats({
               </div>
             </div>
           </section>
+          ) : null}
 
           <div className="grid flex-1 grid-cols-1 gap-6 sm:grid-cols-2">
             <TelemetryCard
               testId="telemetry-open-leads"
               icon={<Swords className="h-6 w-6 text-ink" />}
-              label="Open lead queue"
+              label="Leads to look at"
               value={`${leads.length}`}
-              detail="Measured count of NEW/VIEWED leads currently in the dashboard feed."
+              detail="Leads you have not acted on yet."
               tone="bg-card"
             />
             <TelemetryCard
               testId="telemetry-live-aurora"
               icon={<Crosshair className="h-6 w-6 text-ink" />}
-              label="LIVE Aurora scores"
+              label="Leads with a score"
               value={`${liveScored}`}
               detail={
                 liveScored > 0
-                  ? 'Leads with evaluationStatus LIVE only — FALLBACK scores are not counted as intent.'
-                  : 'No LIVE Aurora verdicts in the current queue.'
+                  ? 'Only leads our AI has checked. Estimates are not counted.'
+                  : 'None of your leads have a score yet.'
               }
               tone="bg-highlight-strong"
             />
@@ -284,7 +289,7 @@ export function DashboardStats({
               icon={<Radar className="h-6 w-6 text-ink" />}
               label="Scan credits"
               value={creditReading}
-              detail="Remaining scan credits versus this account's measured high-water mark."
+              detail="Scan credits left, out of the most you have had."
               tone="bg-info"
             />
             <TelemetryCard
@@ -294,8 +299,8 @@ export function DashboardStats({
               value={user.planLabel ?? 'NO ACTIVE PLAN'}
               detail={
                 entitlements.canUsePaidScans
-                  ? 'Paid scans entitled on this account.'
-                  : 'Paid scans are locked by current entitlements.'
+                  ? 'Your plan includes scans.'
+                  : 'Your plan does not include scans.'
               }
               tone="bg-highlight"
             />
@@ -307,12 +312,12 @@ export function DashboardStats({
             aria-labelledby="ops-checklist-heading"
             className="flex flex-col rounded-[20px] border border-outline bg-card p-5 shadow-sm sm:p-6"
           >
-            <p className="text-xs font-semibold normal-case tracking-wide text-ink-muted">Operations checklist</p>
+            <p className="text-xs font-semibold normal-case tracking-wide text-ink-muted">Checklist</p>
             <h3 id="ops-checklist-heading" className="font-display mt-1 text-2xl font-semibold normal-case text-ink">
-              Measured readiness
+              Ready to go?
             </h3>
             <p className="mt-2 text-xs font-medium text-ink-muted">
-              No bonus XP is promised here — progression is decided by the Gamify ledger after real events.
+              Ticks come from your real account, not from estimates.
             </p>
 
             <div className="mt-4 flex flex-1 flex-col gap-2">
@@ -338,9 +343,9 @@ export function DashboardStats({
           >
             <div className="flex items-start justify-between gap-3 pb-4">
               <div>
-                <p className="text-xs font-semibold normal-case tracking-wide text-ink-muted">Entitlements</p>
+                <p className="text-xs font-semibold normal-case tracking-wide text-ink-muted">Your plan</p>
                 <h3 id="unlock-track-heading" className="font-display mt-1 text-2xl font-semibold normal-case text-ink">
-                  Unlock track
+                  What your plan includes
                 </h3>
               </div>
               <div className="rounded-lg border border-outline bg-highlight p-2 shadow-none">
@@ -353,34 +358,34 @@ export function DashboardStats({
                 {
                   title: 'AI reply drafts',
                   detail: entitlements.canGenerateAIReplies
-                    ? 'Entitled — draft replies from signal cards.'
-                    : 'Locked — included with a paid plan.',
-                  state: entitlements.canGenerateAIReplies ? 'UNLOCKED' : 'LOCKED',
+                    ? 'Included. Use “Draft a reply” on any lead.'
+                    : 'Not included. Comes with a paid plan.',
+                  state: entitlements.canGenerateAIReplies ? 'INCLUDED' : 'NOT INCLUDED',
                 },
                 {
                   title: 'CRM export',
                   detail: entitlements.canExportToCRM
-                    ? 'Entitled — queue CRM webhook deliveries from signal cards.'
-                    : 'Locked — included with a paid plan.',
-                  state: entitlements.canExportToCRM ? 'UNLOCKED' : 'LOCKED',
+                    ? 'Included. Send any lead to your CRM.'
+                    : 'Not included. Comes with a paid plan.',
+                  state: entitlements.canExportToCRM ? 'INCLUDED' : 'NOT INCLUDED',
                 },
                 {
                   title: 'Paid scans',
                   detail: entitlements.canUsePaidScans
-                    ? 'Entitled — manual scans spend scan credits.'
-                    : 'Locked — upgrade required for paid scans.',
-                  state: entitlements.canUsePaidScans ? 'UNLOCKED' : 'LOCKED',
+                    ? 'Included. Each scan uses 1 scan credit.'
+                    : 'Not included. Comes with a paid plan.',
+                  state: entitlements.canUsePaidScans ? 'INCLUDED' : 'NOT INCLUDED',
                 },
                 {
-                  title: 'Multi-feed scanner',
-                  detail: 'X is the only live source. Reddit and LinkedIn are still in build.',
-                  state: 'IN BUILD',
+                  title: 'More sources',
+                  detail: 'We only search X today. Reddit and LinkedIn are not ready yet.',
+                  state: 'COMING LATER',
                 },
               ].map((perk) => (
                 <li
                   key={perk.title}
                   className={`rounded-[20px] border border-outline p-4 shadow-none ${
-                    perk.state === 'UNLOCKED' ? 'bg-success' : 'bg-highlight'
+                    perk.state === 'INCLUDED' ? 'bg-success' : 'bg-highlight'
                   }`}
                 >
                   <div className="flex items-start justify-between gap-3">
@@ -398,7 +403,7 @@ export function DashboardStats({
 
             <p className="mt-4 inline-flex items-center gap-2 text-xs font-medium text-ink/65">
               <CheckCircle2 className="h-4 w-4 shrink-0" aria-hidden />
-              Entitlements come from EntitlementService — not from hunter level.
+              What you can use depends on your plan, not your level.
             </p>
           </section>
         </div>

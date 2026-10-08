@@ -3,7 +3,7 @@ import type { ReactNode } from 'react'
 type MissionControlShellProps = {
   /** Compact page chrome / context */
   chrome: ReactNode
-  /** The lead list and scan control, straight under the header */
+  /** The lead list and scan control, under the next step */
   opportunities?: ReactNode
   /** Dominant Today's Mission */
   mission: ReactNode
@@ -19,7 +19,8 @@ type MissionControlShellProps = {
 
 /**
  * First-viewport-first layout for Mission Control: the valley header, then the
- * lead list, then the mission and supporting panels.
+ * one next step, then the lead list and supporting panels. The next step comes
+ * before the list so a new user sees what to do without scrolling past it.
  * Mobile source order matches decision priority; desktop keeps the same stack
  * with wider rhythm rather than equal-weight bento cards.
  */
@@ -35,8 +36,8 @@ export default function MissionControlShell({
   return (
     <div className="flex w-full min-w-0 flex-col gap-6">
       {chrome}
-      {opportunities}
       {mission}
+      {opportunities}
       {urgent}
       {pulse}
       {operations}

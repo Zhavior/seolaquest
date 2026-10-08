@@ -105,25 +105,25 @@ export const scanForLeadsAction = withServerAction(
     const user = await requireCurrentUser()
     const entitlements = await EntitlementService.forUser(user.id)
     if (!entitlements.canUsePaidScans) {
-      return { ok: false, message: 'Manual scanning requires an active paid subscription.' }
+      return { ok: false, message: 'Scans need a paid plan.' }
     }
 
     const { ScanRunService } = await import('@/src/modules/leads/application/ScanRunService')
     const result = await ScanRunService.enqueueManual(user.id)
     if (!result.queued && 'reason' in result && result.reason === 'NO_ACTIVE_KEYWORDS') {
-      return { ok: false, message: 'Add a keyword before scanning.' }
+      return { ok: false, message: 'Add a keyword before you scan.' }
     }
     if (!result.queued && 'reason' in result && result.reason === 'NOT_ENTITLED') {
-      return { ok: false, message: 'Manual scanning requires an active paid subscription.' }
+      return { ok: false, message: 'Scans need a paid plan.' }
     }
     if (!result.queued && 'reason' in result && result.reason === 'NO_CREDITS') {
-      return { ok: false, message: 'No scan credits remaining.' }
+      return { ok: false, message: 'You have no scan credits left.' }
     }
     return {
       ok: true,
       queued: true,
       runId: result.runId,
-      message: result.queued ? 'Scan queued. Results will appear after processing.' : 'A scan is already queued for this window.',
+      message: result.queued ? 'Scan started. New leads will appear here when it finishes.' : 'A scan is already running. New leads will appear here when it finishes.',
     }
   },
 )

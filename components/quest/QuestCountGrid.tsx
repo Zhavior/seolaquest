@@ -4,7 +4,7 @@ import { questSurface, type QuestBorder, type QuestShadow, type QuestTone } from
 export interface QuestCount {
   label: string
   value: number | string
-  /** Optional per-tile background, e.g. `bg-accent`. */
+  /** Optional numeral colour, e.g. `text-accent`. Tiles stay dark glass. */
   accent?: string
 }
 
@@ -25,7 +25,7 @@ export interface QuestCountGridProps {
  */
 export function QuestCountGrid({
   counts,
-  tone = 'sand',
+  tone = 'muted',
   border = 3,
   shadow = 'sm',
   size = 'md',
@@ -38,19 +38,18 @@ export function QuestCountGrid({
         border,
         shadow,
         className: clsx(
-          'grid grid-cols-1 divide-y-2 divide-black sm:grid-cols-3 sm:divide-x-2 sm:divide-y-0',
+          'grid grid-cols-1 divide-y divide-outline sm:grid-cols-3 sm:divide-x sm:divide-y-0',
           className
         ),
       })}
     >
       {counts.map((count) => (
-        <div key={count.label} className={clsx('min-w-0 p-3.5', count.accent)}>
-          <dt className="text-[10px] font-semibold normal-case tracking-wider text-ink-muted">
-            {count.label}
-          </dt>
+        <div key={count.label} className="min-w-0 p-3.5">
+          <dt className="dq-section-label">{count.label}</dt>
           <dd
             className={clsx(
-              'mt-1 font-semibold text-ink',
+              'mt-1 font-mono font-semibold',
+              count.accent ?? 'text-ink',
               size === 'md' ? 'text-xl sm:text-2xl' : 'text-2xl'
             )}
           >

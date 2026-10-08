@@ -16,8 +16,9 @@ import { DashboardValleyHero } from '@/features/dashboard/components/DashboardVa
 import { DashboardQuotaDock } from '@/features/dashboard/components/DashboardQuotaDock'
 import { matchesIntentFilter, type LeadIntentFilter } from '@/features/dashboard/lib/leadScore'
 import Link from 'next/link'
-import { handbookFontVariables } from '@/features/handbook/fonts'
 import MissionControlShell from '@/features/dashboard/components/layout/MissionControlShell'
+import { ReplyDraftPanel } from '@/features/dashboard/components/ReplyDraftPanel'
+import { useGameMode } from '@/components/seolaquest/GameModeContext'
 import { TodaysMissionPanel } from '@/features/dashboard/components/mission/TodaysMissionPanel'
 import { CampaignPulsePanel } from '@/features/dashboard/components/mission/CampaignPulsePanel'
 import { UrgentSignalsStrip } from '@/features/dashboard/components/mission/UrgentSignalsStrip'
@@ -65,7 +66,6 @@ export default function DashboardClient({
   const noticeIsError = /could not|failed|unavailable|did not return|not configured|requires|insufficient/i.test(
     state.notice
   )
-  const [activeMobileTab, setActiveMobileTab] = useState<'overview' | 'signals' | 'guild'>('overview')
   const [intentFilter, setIntentFilter] = useState<LeadIntentFilter>('all')
   const feedLeads = useMemo(
     () => state.filteredLeads.filter((lead) => matchesIntentFilter(lead, intentFilter)),
@@ -76,10 +76,8 @@ export default function DashboardClient({
   const shouldReduceMotion = useReducedMotion()
   const reveal = dashboardReveal(shouldReduceMotion)
 
-  const isOverview = activeMobileTab === 'overview'
-  const isSignals = activeMobileTab === 'signals'
-  const isGuild = activeMobileTab === 'guild'
 
+  const gameMode = useGameMode()
   const missionInput = useMemo(
     () => ({
       keywords: state.keywords,
@@ -88,6 +86,7 @@ export default function DashboardClient({
       maxCredits: state.maxCredits,
       user: state.user,
       isScanning: state.isScannerModalOpen || state.asyncStatus === 'scanning',
+      gameMode,
     }),
     [
       state.keywords,
@@ -97,6 +96,7 @@ export default function DashboardClient({
       state.user,
       state.isScannerModalOpen,
       state.asyncStatus,
+      gameMode,
     ]
   )
 
@@ -104,12 +104,10 @@ export default function DashboardClient({
   const pulse = useMemo(() => deriveCampaignPulse(missionInput), [missionInput])
 
   const openLeadQueue = () => {
-    setActiveMobileTab('signals')
     requestAnimationFrame(() => scrollToDashboardId('battle-ready-signals', shouldReduceMotion))
   }
 
   const openKeywordForm = () => {
-    setActiveMobileTab('overview')
     requestAnimationFrame(() => {
       scrollToDashboardId('tracked-keywords', shouldReduceMotion)
       document.getElementById('keyword-input')?.focus()
@@ -126,9 +124,11 @@ export default function DashboardClient({
   }
 
   return (
+    // Dusk and the handbook faces come from <html> now, which the whole app
+    // shares; a second data-theme here would repaint the theme's gradient
+    // over the shell's sky.
     <div
-      data-theme="dusk"
-      className={`${handbookFontVariables} relative min-h-[100dvh] w-full max-w-full overflow-x-clip bg-canvas px-2 pb-12 pt-3 text-ink sm:px-4 md:px-6 md:pb-12 md:pt-5`}
+      className={`relative min-h-[100dvh] w-full max-w-full overflow-x-clip px-2 pb-12 pt-3 text-ink sm:px-4 md:px-6 md:pb-12 md:pt-5`}
     >
       <AnimatePresence mode="wait">
         {state.activeQuickStrikeLead ? (
@@ -174,11 +174,11 @@ export default function DashboardClient({
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div className="min-w-0">
                   <h2 id="discovered-opportunities-title" className="font-mono text-sm font-semibold tracking-wider text-ink">
-                    DISCOVERED OPPORTUNITIES
+                    YOUR LEADS
                   </h2>
                   {intentFilter !== 'all' ? (
                     <p className="text-xs text-ink-muted">
-                      Showing {intentFilter === 'engage' ? 'leads scoring 80 or more' : 'leads without a live score'}.{' '}
+                      Showing {intentFilter === 'engage' ? 'leads scoring 80 or more' : 'leads with no score yet'}.{' '}
                       <button type="button" className="underline" onClick={() => setIntentFilter('all')}>
                         Show all
                       </button>
@@ -203,6 +203,13 @@ export default function DashboardClient({
                   </Link>
                 )}
               </div>
+              {state.replyDraft ? (
+                <ReplyDraftPanel
+                  key={state.replyDraft.leadId}
+                  draft={state.replyDraft}
+                  onClose={() => state.setReplyDraft(null)}
+                />
+              ) : null}
               <DashboardFeed
                 item={reveal}
                 filteredLeads={feedLeads}
@@ -231,7 +238,7 @@ export default function DashboardClient({
             />
           }
           urgent={
-            <div className={isOverview || isSignals ? 'block' : 'hidden sm:block'}>
+            <div>
               <UrgentSignalsStrip
                 item={reveal}
                 leads={state.leads}
@@ -241,7 +248,7 @@ export default function DashboardClient({
             </div>
           }
           pulse={
-            <div className={`${isOverview ? 'block' : 'hidden'} sm:block space-y-3`}>
+            <div className="space-y-3">
               {state.leadsSliceStatus === 'degraded' ? (
                 <div
                   role="status"
@@ -296,60 +303,13 @@ export default function DashboardClient({
 
               {outcomeWorkspace}
 
-              <div
-                className="flex rounded-[20px] border border-outline bg-card p-1 shadow-sm sm:hidden"
-                role="tablist"
-                aria-label="Mission Control sections"
-              >
-                <button
-                  type="button"
-                  role="tab"
-                  aria-selected={isOverview}
-                  onClick={() => setActiveMobileTab('overview')}
-                  className={`min-h-11 flex-1 rounded-lg border px-2 py-2.5 text-xs font-semibold normal-case tracking-[0.08em] transition-all ${
-                    isOverview
-                      ? 'border-outline bg-accent text-on-accent shadow-none'
-                      : 'border-transparent bg-transparent text-ink/55'
-                  }`}
-                >
-                  Mission
-                </button>
-                <button
-                  type="button"
-                  role="tab"
-                  aria-selected={isSignals}
-                  onClick={() => setActiveMobileTab('signals')}
-                  className={`min-h-11 flex-1 rounded-lg border px-2 py-2.5 text-xs font-semibold normal-case tracking-[0.08em] transition-all ${
-                    isSignals
-                      ? 'border-outline bg-accent text-on-accent shadow-none'
-                      : 'border-transparent bg-transparent text-ink/55'
-                  }`}
-                >
-                  Queue
-                </button>
-                <button
-                  type="button"
-                  role="tab"
-                  aria-selected={isGuild}
-                  onClick={() => setActiveMobileTab('guild')}
-                  className={`min-h-11 flex-1 rounded-lg border px-2 py-2.5 text-xs font-semibold normal-case tracking-[0.08em] transition-all ${
-                    isGuild
-                      ? 'border-outline bg-accent text-on-accent shadow-none'
-                      : 'border-transparent bg-transparent text-ink/55'
-                  }`}
-                >
-                  Progress
-                </button>
-              </div>
 
-              <div className={`${isOverview ? 'block' : 'hidden'} sm:block`}>
+              <div>
                 <DashboardKeywords
                   item={reveal}
                   keywords={state.keywords}
                   newKeyword={state.newKeyword}
                   setNewKeyword={state.setNewKeyword}
-                  selectedHeroClass={state.selectedHeroClass}
-                  setSelectedHeroClass={state.setSelectedHeroClass}
                   addKeyword={state.addKeyword}
                   removeKeyword={state.removeKeyword}
                   PRESET_KEYWORDS={state.PRESET_KEYWORDS}
@@ -358,7 +318,7 @@ export default function DashboardClient({
                 />
               </div>
 
-              <div className={`${isSignals ? 'block' : 'hidden'} sm:block`}>
+              <div>
                 <DashboardRadar
                   item={reveal}
                   particles={state.particles}
@@ -368,7 +328,7 @@ export default function DashboardClient({
                 />
               </div>
 
-              <div className={`${isSignals || isGuild ? 'block' : 'hidden'} sm:block`}>
+              <div>
                 <IntelLogPanel
                   item={reveal}
                   notice={state.notice}
@@ -380,7 +340,7 @@ export default function DashboardClient({
             </>
           }
           strategy={
-            <div className={`${isGuild ? 'grid' : 'hidden'} grid-cols-1 gap-6 sm:grid sm:gap-8`}>
+            <div className="grid grid-cols-1 gap-6 sm:gap-8">
               <DashboardStats
                 item={reveal}
                 user={state.user}
@@ -394,11 +354,14 @@ export default function DashboardClient({
                 leadsSliceStatus={state.leadsSliceStatus}
                 shareStats={state.shareStats}
               />
-              <DashboardLeaderboard
-                item={reveal}
-                dbLeaderboard={dbLeaderboard}
-                dbAnalytics={dbAnalytics}
-              />
+              {/* The page passes no leaderboard or chart data yet; an always-empty panel only adds noise. */}
+              {dbLeaderboard.length > 0 || dbAnalytics.length > 0 ? (
+                <DashboardLeaderboard
+                  item={reveal}
+                  dbLeaderboard={dbLeaderboard}
+                  dbAnalytics={dbAnalytics}
+                />
+              ) : null}
             </div>
           }
         />

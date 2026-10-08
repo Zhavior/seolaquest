@@ -7,6 +7,7 @@ import { useSettingsForm } from '@/features/profile/hooks/useSettingsForm'
 
 import GuildLawsModal from '@/features/settings/components/GuildLawsModal'
 import DangerZoneCard from '@/features/settings/components/DangerZoneCard'
+import { GameModeSetting } from '@/features/settings/components/GameModeSetting'
 
 export default function SettingsClient({ initial }: { initial: { name: string; title: string; email: string; emailDigest: boolean; radarAlerts: boolean; crmWebhookUrl: string } }) {
   const {
@@ -38,7 +39,7 @@ export default function SettingsClient({ initial }: { initial: { name: string; t
   }
 
   return (
-    <div className="min-h-[100dvh] w-full bg-canvas relative">
+    <div className="relative min-h-[100dvh] w-full">
       <div className="min-h-[100dvh] w-full max-w-[1400px] mx-auto p-4 md:p-8 relative z-10">
         <motion.div
           variants={container}
@@ -70,6 +71,10 @@ export default function SettingsClient({ initial }: { initial: { name: string; t
             </motion.div>
           )}
 
+          <motion.div variants={item}>
+            <GameModeSetting />
+          </motion.div>
+
           {/* Operations Center 2-Column Grid */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* LEFT COLUMN: ADVENTURER & GUILD */}
@@ -78,7 +83,7 @@ export default function SettingsClient({ initial }: { initial: { name: string; t
               <motion.section variants={item} className="rounded-[20px] border border-outline bg-card shadow-sm overflow-hidden flex flex-col">
                 <div className="border-b border-outline bg-highlight p-4 flex items-center gap-3">
                   <User className="text-on-accent" size={28} />
-                  <h2 className="font-display text-2xl font-semibold normal-case">Adventurer Profile</h2>
+                  <h2 className="font-display text-2xl font-semibold normal-case">Your profile</h2>
                 </div>
                 <div className="p-6 space-y-6 grow bg-card">
                   <label className="block">
@@ -90,7 +95,7 @@ export default function SettingsClient({ initial }: { initial: { name: string; t
                     />
                   </label>
                   <label className="block">
-                    <span className="font-semibold normal-case flex items-center gap-2 mb-2">Hunter Title</span>
+                    <span className="font-semibold normal-case flex items-center gap-2 mb-2">Title</span>
                     <input
                       value={values.title}
                       onChange={(event) => setField('title', event.target.value)}
@@ -101,7 +106,7 @@ export default function SettingsClient({ initial }: { initial: { name: string; t
                     <p className="font-medium flex items-center gap-2 normal-case">
                       <Shield size={18} /> Signed-in email
                     </p>
-                    <p className="font-semibold bg-black text-white px-3 py-2 mt-2 inline-block shadow-none">
+                    <p className="mt-2 inline-block max-w-full break-all border border-[#5a4720] bg-[rgb(11_8_24/0.6)] px-3 py-2 font-semibold text-[#f6ebd2]">
                       {initial.email || 'Not provided'}
                     </p>
                   </div>

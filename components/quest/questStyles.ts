@@ -75,11 +75,12 @@ const SHADOW_CLASS: Record<QuestShadow, string> = {
   xl: 'shadow-brutal-lg',
 }
 
+/** Gold-edged and square-cornered, like the landing page's engraved panels. */
 const BORDER_CLASS: Record<QuestBorder, string> = {
   0: '',
-  2: 'border border-hairline rounded-xl',
-  3: 'border border-hairline rounded-xl',
-  4: 'border border-hairline rounded-xl',
+  2: 'border border-outline',
+  3: 'border border-outline',
+  4: 'border border-outline',
 }
 
 /** Hover "lift" used by clickable cards (keyword streams, scan runs, features). */
@@ -103,7 +104,7 @@ export function questSurface({
   className,
 }: QuestSurfaceOptions = {}) {
   return clsx(
-    'min-w-0 rounded-2xl',
+    'min-w-0 rounded-[3px]',
     BORDER_CLASS[border],
     TONE_CLASS[tone],
     SHADOW_CLASS[shadow],
@@ -136,7 +137,7 @@ export function questButton({
   className,
 }: QuestSurfaceOptions = {}) {
   return clsx(
-    'inline-flex min-h-11 rounded-xl items-center justify-center gap-2 px-6 py-3 text-sm font-semibold',
+    'inline-flex min-h-11 rounded-[3px] items-center justify-center gap-2 px-6 py-3 text-sm font-semibold',
     BORDER_CLASS[border],
     TONE_CLASS[tone],
     SHADOW_CLASS[shadow],
@@ -147,7 +148,7 @@ export function questButton({
 }
 
 /** Section eyebrow text used above panel titles. */
-export const QUEST_EYEBROW = 'text-xs font-semibold tracking-wider text-ink-muted'
+export const QUEST_EYEBROW = 'dq-eyebrow'
 
 /** Outline applied to large display headings — follows the theme's hard edge. */
 export const QUEST_TITLE_STROKE = { WebkitTextStroke: '0px' } as const

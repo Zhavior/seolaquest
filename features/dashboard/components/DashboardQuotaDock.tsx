@@ -25,7 +25,7 @@ export function DashboardQuotaDock({ remaining, max, plan, canUsePaidScans }: Pr
       <div className="flex items-center justify-between gap-3">
         <div className="flex min-w-0 items-center gap-3 sm:gap-5">
           <div className="min-w-0">
-            <span className="block font-mono text-[10px] tracking-wider text-[#a99fc9]">CREDITS</span>
+            <span className="block font-mono text-[10px] tracking-wider text-[#a99fc9]">SCAN CREDITS</span>
             <span className="whitespace-nowrap font-mono text-sm font-semibold tabular-nums text-[#5dd6b0]">
               {remaining} / {max}
               <span className="hidden sm:inline"> remaining</span>

@@ -48,7 +48,7 @@ describe('deriveTodaysMission', () => {
     const mission = deriveTodaysMission(input())
     expect(mission.action.kind).toBe('add_keyword')
     expect(mission.confidence).toBe('measured')
-    expect(mission.why).toMatch(/no keywords/i)
+    expect(mission.why).toMatch(/first keyword|add a phrase/i)
   })
 
   it('routes to billing when credits are empty', () => {
@@ -60,6 +60,18 @@ describe('deriveTodaysMission', () => {
     )
     expect(mission.action.kind).toBe('open_billing')
     expect(mission.tone).toBe('risk')
+  })
+
+  it('sends a new account with sample leads to its leads, not billing', () => {
+    const mission = deriveTodaysMission(
+      input({
+        keywords: [{ id: 'k1', phrase: 'looking for CRM', active: true }],
+        leads: [lead({ id: 's1' }), lead({ id: 's2' }), lead({ id: 's3' })],
+        remainingQuests: 0,
+        user: { ...baseUser, entitlements: { canUsePaidScans: false, canGenerateAIReplies: false, canExportToCRM: false } },
+      })
+    )
+    expect(mission.action.kind).toBe('review_leads')
   })
 
   it('prioritizes a LIVE high-scoring lead for claim', () => {
@@ -82,8 +94,9 @@ describe('deriveTodaysMission', () => {
     )
     expect(mission.action.kind).toBe('claim_lead')
     expect(mission.action.leadId).toBe('hot')
-    expect(mission.why).toMatch(/91\/100/)
-    expect(mission.why).toMatch(/ENGAGE/)
+    expect(mission.why).toMatch(/91\/100 · Strong match/)
+    expect(mission.why).toMatch(/Worth replying to/)
+    expect(mission.why).toMatch(/not a prediction of a sale/)
   })
 
   it('does not treat FALLBACK aurora as a scored opportunity', () => {
@@ -103,7 +116,7 @@ describe('deriveTodaysMission', () => {
       })
     )
     expect(mission.action.kind).toBe('review_leads')
-    expect(mission.why).toMatch(/none currently have a LIVE Aurora score/i)
+    expect(mission.why).toMatch(/none have a score yet/i)
   })
 
   it('recommends a scan when keywords and credits exist but the queue is empty', () => {
@@ -180,5 +193,11 @@ describe('deriveCampaignPulse', () => {
       liveScoredLeads: 1,
     })
     expect(pulse.trend).toBe('active')
+  })
+
+  it('mentions level and XP only when the game layer is on', () => {
+    const base = input({ keywords: [{ id: 'k1', phrase: 'CRM', active: true }] })
+    expect(deriveCampaignPulse(base).wins.some((win) => /XP/.test(win))).toBe(false)
+    expect(deriveCampaignPulse({ ...base, gameMode: true }).wins).toContain('Level 3 (400 XP)')
   })
 })

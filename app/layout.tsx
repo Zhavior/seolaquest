@@ -5,8 +5,6 @@ import { ThemeProvider } from '@/components/theme/ThemeProvider'
 import { ThemeScript } from '@/components/theme/ThemeScript'
 import { siteUrl } from '@/lib/siteUrl'
 import { handbookFontVariables } from '@/features/handbook/fonts'
-import { Analytics } from '@vercel/analytics/next'
-import { SpeedInsights } from '@vercel/speed-insights/next'
 
 const TITLE = 'SEOlaQuest | See Who AI Answers Cite'
 const DESCRIPTION =
@@ -69,7 +67,7 @@ export default function RootLayout({
         <ThemeScript />
         <script
           dangerouslySetInnerHTML={{
-            __html: `try{if(localStorage.getItem('coquest_sfx_enabled')==='false'){document.documentElement.classList.add('sfx-muted')}}catch(e){}`,
+            __html: `try{if(localStorage.getItem('coquest_sfx_enabled')!=='true'){document.documentElement.classList.add('sfx-muted')}}catch(e){}`,
           }}
         />
       </head>
@@ -82,13 +80,6 @@ export default function RootLayout({
             {children}
           </div>
         </ThemeProvider>
-        {/*
-          Last in <body> so neither script competes with the first paint.
-          Both are inert outside Vercel, so local development and the test
-          environment are unaffected — no config flag needed.
-        */}
-        <Analytics />
-        <SpeedInsights />
       </body>
     </html>
   )

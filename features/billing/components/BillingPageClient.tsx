@@ -18,7 +18,7 @@ export type BrewStatus = 'idle' | 'brewing' | 'redirecting' | 'error'
 
 export function VerificationPanel({ model }: { model: BillingUnavailableViewModel | BillingLoadingViewModel }) {
   return (
-    <div className="min-h-[100dvh] min-w-0 break-words bg-surface p-3 text-ink sm:p-5 md:p-10">
+    <div className="min-h-[100dvh] min-w-0 break-words p-3 text-ink sm:p-5 md:p-10">
       <section aria-live="polite" className="mx-auto min-w-0 max-w-4xl border border-outline bg-card p-4 shadow-brutal-lg sm:p-7 md:p-10 rounded-xl">
         <div className="inline-flex max-w-full min-w-0 items-center gap-2 border border-outline bg-info px-3 py-2 text-xs font-semibold normal-case shadow-brutal-sm rounded-xl">
           {model.status === 'loading' ? <RefreshCw aria-hidden className="h-4 w-4 animate-spin" /> : <AlertTriangle aria-hidden className="h-4 w-4" />}
@@ -122,7 +122,7 @@ function BillingApp({ model, highlightPlan }: { model: BillingReadyViewModel; hi
       : 'bg-amber-200'
 
   return (
-    <div className="min-h-[100dvh] w-full bg-surface relative">
+    <div className="relative min-h-[100dvh] w-full">
       <div className="min-h-[100dvh] w-full max-w-[1400px] mx-auto p-4 md:p-8 font-semibold overflow-hidden relative z-10">
         
         {model.checkoutReturn.state !== 'none' && (

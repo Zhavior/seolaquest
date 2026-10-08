@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { MoreHorizontal } from 'lucide-react'
+import { Icon } from '@/features/handbook/artifact/IconSprite'
 
 import { navigation } from '../../os/shared/navigation'
 import { MOBILE_NAV_ID } from './MobileAppShell'
@@ -10,9 +11,9 @@ import { MOBILE_NAV_ID } from './MobileAppShell'
 /** Primary destinations, with thumb-sized labels for the tray. */
 const PRIMARY = [
   { href: '/app', label: 'Home' },
-  { href: '/app/quests', label: 'Quests' },
+  { href: '/app/leads', label: 'Follow-ups' },
   { href: '/app/keywords', label: 'Keywords' },
-  { href: '/app/guild', label: 'Guild' },
+  { href: '/app/runs', label: 'Scans' },
 ] as const
 
 interface MobileBottomNavProps {
@@ -36,8 +37,6 @@ export default function MobileBottomNav({
         const isActive =
           pathname === item.href ||
           (pathname?.startsWith(item.href) && item.href !== '/app' && item.href !== '/')
-        const Icon = item.icon
-        const colorClass = 'bg-highlight'
 
         return (
           <Link
@@ -46,14 +45,10 @@ export default function MobileBottomNav({
             aria-current={isActive ? 'page' : undefined}
             onPointerDown={() => router.prefetch(item.href)}
             onFocus={() => router.prefetch(item.href)}
-            className={`flex flex-1 flex-col items-center justify-center gap-1 rounded-[20px] border border-outline py-2 text-xs font-semibold normal-case tracking-wide transition-all ${
-              isActive
-                ? `${colorClass} -translate-y-0.5 shadow-none`
-                : 'bg-card active:translate-y-0 active:shadow-none'
-            }`}
+            className="dq-navitem flex-1 flex-col justify-center gap-0.5 px-1 py-1 text-xs normal-case tracking-normal"
           >
-            <Icon className="size-4 shrink-0 text-ink" strokeWidth={1.75} />
-            <span className="text-ink">{entry.label}</span>
+            <Icon name={item.emblem} size={24} className="shrink-0" />
+            <span>{entry.label}</span>
           </Link>
         )
       })}
@@ -63,10 +58,10 @@ export default function MobileBottomNav({
         onClick={onOpenNavigation}
         aria-controls={MOBILE_NAV_ID}
         aria-expanded={mobileOpen}
-        className="flex flex-1 flex-col items-center justify-center gap-1 rounded-[20px] border border-outline bg-card py-2 text-xs font-semibold normal-case tracking-wide active:translate-x-[1px] active:translate-y-[1px] active:shadow-none"
+        className="dq-navitem flex-1 flex-col justify-center gap-0.5 px-1 py-1 text-xs normal-case tracking-normal"
       >
-        <MoreHorizontal className="size-4 shrink-0 text-on-accent" strokeWidth={1.75} />
-        <span className="text-ink">More</span>
+        <MoreHorizontal className="size-6 shrink-0" strokeWidth={1.5} />
+        <span>More</span>
       </button>
     </nav>
   )

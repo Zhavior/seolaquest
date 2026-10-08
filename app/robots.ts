@@ -23,6 +23,7 @@ export default function robots(): MetadataRoute.Robots {
         '/dev/',
         '/monitoring',
         '/onboarding',
+        '/welcome',
         '/os-preview',
         '/sign-in',
         '/sign-up',
