@@ -8,7 +8,7 @@ type Pipeline = {
   reports: Record<string, number>
   followUps: { id: string; content: string; status: string }[]
 }
-const stages = [['CLAIMED', 'Claimed'], ['CONTACTED', 'Contacted'], ['REPLIED', 'Replied'], ['QUALIFIED', 'Qualified'], ['CONVERTED', 'Converted']] as const
+const stages = [['CLAIMED', 'Saved'], ['CONTACTED', 'Contacted'], ['REPLIED', 'Replied'], ['QUALIFIED', 'Good fit'], ['CONVERTED', 'Became a customer']] as const
 export function OutcomeWorkspace({ pipeline, scans, checkedAt }: {
   pipeline: Pipeline | null; scans: ScanRunView[] | null; checkedAt: string
 }) {
@@ -32,7 +32,7 @@ export function OutcomeWorkspace({ pipeline, scans, checkedAt }: {
     </> : <p role="status">Pipeline unavailable. Counts could not be loaded.</p>}
     <div className="grid gap-5 lg:grid-cols-2">
       <div className="min-w-0 space-y-3"><h3 className="font-display text-xl">Next follow-ups</h3>
-        {pipeline && !pipeline.followUps.length && <p className="text-sm text-ink-muted">Claim a lead from the review queue to start following up.</p>}
+        {pipeline && !pipeline.followUps.length && <p className="text-sm text-ink-muted">Save a lead to follow-ups to start tracking it here.</p>}
         {pipeline?.followUps.map(lead => <details key={lead.id} className="rounded-xl border border-hairline p-3">
           <summary className="min-h-11 cursor-pointer break-words text-sm"><span className="font-semibold">{lead.status.toLowerCase()}</span> · {lead.content.slice(0, 180)}{lead.content.length > 180 ? '…' : ''}</summary>
           <div className="mt-3"><OutcomeControls key={lead.status} leadId={lead.id} status={lead.status} /></div>

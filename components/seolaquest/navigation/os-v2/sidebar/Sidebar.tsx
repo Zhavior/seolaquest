@@ -17,9 +17,9 @@ interface SidebarProps {
 }
 
 const sections = [
-  { key: 'tactical', label: 'Your workspace' },
-  { key: 'guild', label: 'Community & growth' },
-  { key: 'system', label: 'Account & resources' },
+  { key: 'tactical', label: 'Your work' },
+  { key: 'guild', label: 'Progress' },
+  { key: 'system', label: 'Account' },
 ] as const
 
 /**
@@ -105,7 +105,7 @@ function NavigationContent({
               >
                 <Icon name={item.emblem} size={26} />
                 {item.badge && (
-                  <span className="absolute -right-1 -top-1 bg-accent px-1 font-mono text-[8px] text-on-accent">
+                  <span className="absolute -right-1 -top-1 bg-accent px-1 font-mono text-xs text-on-accent">
                     {item.badge}
                   </span>
                 )}
@@ -113,7 +113,7 @@ function NavigationContent({
                 {/* Tooltip on hover */}
                 <span
                   aria-hidden="true"
-                  className="dq-glass pointer-events-none absolute left-full z-50 ml-3 whitespace-nowrap px-3 py-1.5 text-[11px] text-[#f6ebd2] opacity-0 transition-opacity group-hover:opacity-100"
+                  className="dq-glass pointer-events-none absolute left-full z-50 ml-3 whitespace-nowrap px-3 py-1.5 text-xs text-[#f6ebd2] opacity-0 transition-opacity group-hover:opacity-100"
                 >
                   {item.label}
                 </span>
@@ -155,7 +155,7 @@ function NavigationContent({
           </div>
         ) : (
           <div className="flex items-center justify-between border-b border-outline pb-3">
-            <span className="dq-section-label">Quest journal</span>
+            <span className="dq-section-label">Menu</span>
             <button
               type="button"
               onClick={handleToggle}
@@ -163,7 +163,7 @@ function NavigationContent({
               onFocus={() => sfx.playSidebarHover()}
               title="Collapse Sidebar (Cmd+B)"
               aria-label="Collapse navigation"
-              className="grid size-9 place-items-center border border-outline text-[#d9d0ec] transition-colors hover:border-[#d8a93b] hover:text-[#f3d58a]"
+              className="grid size-11 place-items-center border border-outline text-[#d9d0ec] transition-colors hover:border-[#d8a93b] hover:text-[#f3d58a]"
             >
               <PanelLeftClose className="size-4" strokeWidth={1.75} />
             </button>
@@ -183,25 +183,37 @@ function NavigationContent({
               <div className="space-y-1">
                 {sectionItems.map((item) => {
                   const isActive = isActiveItem(item)
+                  const descriptionId = item.description ? `nav-desc-${item.href.replace(/\W+/g, '-')}` : undefined
 
                   return (
                     <Link
                       key={item.href}
                       href={item.href}
                       aria-current={isActive ? 'page' : undefined}
+                      // Name and description kept apart, so the link is announced as
+                      // "Scans" with the description read after it.
+                      aria-label={item.label}
+                      aria-describedby={descriptionId}
                       {...navHandlers(item)}
                       onClick={() => {
                         sfx.playCoinDrop()
                         onNavigate?.()
                       }}
-                      className="dq-navitem justify-between"
+                      className="dq-navitem justify-between normal-case tracking-normal"
                     >
                       <span className="flex min-w-0 items-center gap-3">
                         <Icon name={item.emblem} size={24} className="shrink-0" />
-                        <span className="truncate">{item.label}</span>
+                        <span className="flex min-w-0 flex-col">
+                          <span className="truncate text-[0.95rem]">{item.label}</span>
+                          {item.description ? (
+                            <span id={descriptionId} className="text-[0.8rem] font-normal leading-snug text-[#b9b0d4]">
+                              {item.description}
+                            </span>
+                          ) : null}
+                        </span>
                       </span>
                       {item.badge ? (
-                        <span className="bg-accent px-1.5 py-0.5 font-mono text-[9px] text-on-accent">{item.badge}</span>
+                        <span className="bg-accent px-1.5 py-0.5 font-mono text-xs text-on-accent">{item.badge}</span>
                       ) : null}
                     </Link>
                   )

@@ -94,8 +94,9 @@ describe('deriveTodaysMission', () => {
     )
     expect(mission.action.kind).toBe('claim_lead')
     expect(mission.action.leadId).toBe('hot')
-    expect(mission.why).toMatch(/91\/100/)
-    expect(mission.why).toMatch(/ENGAGE/)
+    expect(mission.why).toMatch(/91\/100 · Strong match/)
+    expect(mission.why).toMatch(/Worth replying to/)
+    expect(mission.why).toMatch(/not a prediction of a sale/)
   })
 
   it('does not treat FALLBACK aurora as a scored opportunity', () => {

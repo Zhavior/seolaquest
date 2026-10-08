@@ -32,6 +32,8 @@ function wait(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
+export type ReplyDraft = { leadId: string; author: string; url: string; text: string }
+
 export function useDashboardState({
   dbUser,
   dbKeywords,
@@ -76,6 +78,7 @@ export function useDashboardState({
 
   const [isScannerModalOpen, setIsScannerModalOpen] = useState(false)
   const [scanLogs, setScanLogs] = useState<string[]>([])
+  const [replyDraft, setReplyDraft] = useState<ReplyDraft | null>(null)
   const [scanStep, setScanStep] = useState(0)
   const [scanOutcome, setScanOutcome] = useState<ScanOutcome>('waiting')
   const restoredScanRef = useRef<string | null>(null)
@@ -230,9 +233,9 @@ export function useDashboardState({
 
     setIsScannerModalOpen(true)
     setScanLogs([
-      'Preparing durable scan request...',
-      'Saving query state...',
-      'Queueing provider work...',
+      'Starting your scan…',
+      'Sending your keywords to the scanner…',
+      'Asking X for matching posts…',
     ])
     setScanStep(1)
     setScanOutcome('waiting')
@@ -255,7 +258,7 @@ export function useDashboardState({
         }
 
         const scanRunId = result.runId
-        setScanLogs((current) => [...current, `Scan queued with durable run ${scanRunId}.`])
+        setScanLogs((current) => [...current, `Scan started (reference ${scanRunId}).`])
         setScanStep(2)
 
         const deadline = Date.now() + SCAN_STATUS_TIMEOUT_MS
@@ -281,7 +284,7 @@ export function useDashboardState({
 
             if (scan.status !== lastStatus) {
               lastStatus = scan.status
-              setScanLogs((current) => [...current, `Server status: ${scan.status}`])
+              setScanLogs((current) => [...current, `Status: ${String(scan.status).toLowerCase()}`])
               sfx.playRadarBlip()
             }
 
@@ -294,7 +297,7 @@ export function useDashboardState({
               if (leadsCreated > 0) sfx.playDiscovery()
               else sfx.playConfirm()
               const providerStatus = scan.provider?.status ?? 'unknown'
-              const completed = `Scan completed: ${leadsCreated} new source match${leadsCreated === 1 ? '' : 'es'}; provider status ${providerStatus}.`
+              const completed = `Scan finished: ${leadsCreated} new ${leadsCreated === 1 ? 'lead' : 'leads'} found.${providerStatus === 'AVAILABLE' ? '' : ` Search status: ${String(providerStatus).toLowerCase()}.`}`
               setScanLogs((current) => [...current, completed])
               setNotice(completed)
               if (typeof scan.balance === 'number') setRemainingQuests(scan.balance)
@@ -309,7 +312,7 @@ export function useDashboardState({
 
             if (scan.status === 'FAILED_REFUNDED') {
               sfx.playCriticalWarning()
-              const failed = 'Scan failed after provider retries. The scan credit was refunded.'
+              const failed = 'The scan failed after several tries. Your scan credit was given back.'
               setScanLogs((current) => [...current, failed])
               setNotice(failed)
               if (typeof scan.balance === 'number') setRemainingQuests(scan.balance)
@@ -321,7 +324,7 @@ export function useDashboardState({
 
             if (scan.status === 'DEAD' || scan.status === 'CANCELLED' || scan.status === 'UNKNOWN') {
               sfx.playCriticalWarning()
-              const failed = `Scan ended with status ${scan.status}. No successful result is being claimed.`
+              const failed = `The scan stopped (status: ${String(scan.status).toLowerCase()}). No new leads were added.`
               setScanLogs((current) => [...current, failed])
               setNotice(failed)
               setScanOutcome('failed')
@@ -337,7 +340,7 @@ export function useDashboardState({
 
         if (signal.aborted) return
 
-        const pending = 'Scan is still queued. Its run reference is preserved; refresh to check verified results.'
+        const pending = 'The scan is still waiting to start. Reload the page later to see results.'
         setScanLogs((current) => [...current, pending])
         setNotice(pending)
         setScanOutcome('pending')
@@ -356,7 +359,7 @@ export function useDashboardState({
     if (!runId || restoredScanRef.current === runId) return
     restoredScanRef.current = runId
     setIsScannerModalOpen(true)
-    setScanLogs(['Restored durable scan reference.', `Run reference: ${runId}`])
+    setScanLogs(['Picking up your scan where it left off.', `Scan reference: ${runId}`])
     setScanStep(2)
     let cancelled = false
     void (async () => {
@@ -371,7 +374,7 @@ export function useDashboardState({
           const previousStatus = lastStatus
           if (status !== lastStatus) {
             lastStatus = status
-            setScanLogs((current) => [...current, `Server status: ${status}`])
+            setScanLogs((current) => [...current, `Status: ${String(status).toLowerCase()}`])
             sfx.playRadarBlip()
           }
           if (status === 'RUNNING') setScanStep(3)
@@ -395,7 +398,7 @@ export function useDashboardState({
         await wait(SCAN_STATUS_POLL_MS)
       }
       if (!cancelled) {
-        setScanLogs((current) => [...current, 'The run is still active. Its URL is saved; you can close this window and return later.'])
+        setScanLogs((current) => [...current, 'The scan is still running. You can close this window and come back later.'])
         setScanOutcome('pending')
         setScanStep(5)
       }
@@ -431,12 +434,12 @@ export function useDashboardState({
         sfx.playConfirm()
         setClaimedCount((current) => current + 1)
         setLeads((current) => current.filter((lead) => lead.id !== leadId))
-        setNotice(result.message ?? 'Marked as contacted.')
+        setNotice(result.message ?? 'Saved to Follow-ups.')
         router.refresh()
         return
       }
 
-      setNotice(result.message ?? 'Could not mark this lead as contacted. Try again.')
+      setNotice(result.message ?? 'Could not save this lead. Try again.')
     })
   }
 
@@ -457,13 +460,16 @@ export function useDashboardState({
   }
 
   function generateAIReply(lead: DashboardLead) {
-    setNotice(`🤖 Generating AI reply for this ${lead.platform} lead...`)
+    setNotice('Writing a draft reply…')
     setAsyncStatus('replying')
     startTransition(async () => {
       const result = await generateAIReplyAction(lead.id)
       setAsyncStatus('idle')
       if (result.ok && result.reply) {
-        setNotice(`🤖 AI Suggested Reply: "${result.reply}"`)
+        // Kept in its own box until closed, so it can be read, edited and
+        // copied; a notice line is replaced by the next message.
+        setReplyDraft({ leadId: lead.id, author: lead.author, url: lead.url, text: result.reply })
+        setNotice('Your draft reply is ready above your leads.')
       } else {
         setNotice(result.message ?? 'Failed to generate AI reply.')
       }
@@ -509,6 +515,8 @@ export function useDashboardState({
   }, [dbUser])
 
   return {
+    replyDraft,
+    setReplyDraft,
     user,
     keywords,
     setKeywords,

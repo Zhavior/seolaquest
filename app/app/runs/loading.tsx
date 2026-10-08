@@ -5,7 +5,7 @@ import { QuestPending, QuestRoutePending } from '@/components/quest'
  * load.
  */
 export default function ScanRunsLoading() {
-  return <QuestRoutePending label="Opening Scan Runs" />
+  return <QuestRoutePending label="Opening Scans" />
 }
 
 /**
@@ -13,5 +13,5 @@ export default function ScanRunsLoading() {
  * synchronously and suspends just this list, so the header must not repeat.
  */
 export function ScanRunListSkeleton() {
-  return <QuestPending label="Loading scan runs" />
+  return <QuestPending label="Loading scans" />
 }

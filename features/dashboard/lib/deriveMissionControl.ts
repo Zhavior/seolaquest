@@ -1,4 +1,5 @@
 import type { DashboardKeyword, DashboardLead, DashboardUser } from '@/features/dashboard/types'
+import { SCORE_NOTE, actionLabel, formatScore } from '@/features/dashboard/lib/leadScore'
 
 export type MissionActionKind =
   | 'add_keyword'
@@ -110,7 +111,7 @@ export function deriveTodaysMission(input: MissionControlInput): TodaysMission {
     return {
       label: "Today's Mission",
       title: 'Look at your best lead',
-      why: `A ${topLive.platform} post from ${topLive.author} scored ${score}/100. Suggested next step: ${topLive.aurora!.recommendedAction}.`,
+      why: `A ${topLive.platform} post from ${topLive.author} scored ${formatScore(score)}. ${actionLabel(topLive.aurora!.recommendedAction)}. ${SCORE_NOTE}`,
       tone: 'opportunity',
       action: {
         kind: 'claim_lead',
@@ -130,7 +131,7 @@ export function deriveTodaysMission(input: MissionControlInput): TodaysMission {
       why:
         unscored === leadCount
           ? `You have ${leadCount} lead${plural} to look at. None have a score yet, so read each one and decide.`
-          : `You have ${leadCount} lead${plural} to look at. For each one, mark it as contacted, draft a reply, or dismiss it.`,
+          : `You have ${leadCount} lead${plural} to look at. For each one, save it to follow up, draft a reply, or dismiss it.`,
       tone: 'action',
       action: { kind: 'review_leads', ctaLabel: 'Go to leads' },
       confidence: 'measured',

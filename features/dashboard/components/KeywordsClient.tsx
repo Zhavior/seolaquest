@@ -95,9 +95,9 @@ export function KeywordsClient({ initialKeywords }: KeywordsClientProps) {
         className="space-y-8"
       >
         <motion.div variants={item}>
-          <QuestTicker label="Quest log and keyword monitors. Live signal streams.">
-            <Sparkles className="h-5 w-5 text-ink" /> ⚔️ QUEST LOG &amp; KEYWORD MONITORS{' '}
-            <Sparkles className="h-5 w-5 text-ink" /> 🛡️ LIVE SIGNAL STREAMS
+          <QuestTicker label="Keywords.">
+            <Sparkles className="h-5 w-5 text-ink" /> ⚔️ KEYWORDS{' '}
+            <Sparkles className="h-5 w-5 text-ink" /> 🛡️ THE PHRASES WE SEARCH FOR
           </QuestTicker>
         </motion.div>
 
@@ -105,10 +105,10 @@ export function KeywordsClient({ initialKeywords }: KeywordsClientProps) {
           <QuestPageHeader
             className="mt-4"
             icon={<Swords className="h-8 w-8" />}
-            eyebrow={<>COMMANDER&apos;S MAP &amp; SIGNAL TARGETS</>}
-            title="Quest Log"
-            subtitle="Active Keyword Monitors & Tracked Streams"
-            status={<QuestStatusPill label="Signal streams" value={`${keywords.length} Active`} />}
+            eyebrow={<>WHAT WE SEARCH FOR</>}
+            title="Keywords"
+            subtitle="Phrases your buyers use. We look for posts that contain them."
+            status={<QuestStatusPill label="Keywords" value={`${keywords.length} saved`} />}
           />
         </motion.div>
 

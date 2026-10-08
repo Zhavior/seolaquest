@@ -11,9 +11,9 @@ import { MOBILE_NAV_ID } from './MobileAppShell'
 /** Primary destinations, with thumb-sized labels for the tray. */
 const PRIMARY = [
   { href: '/app', label: 'Home' },
-  { href: '/app/quests', label: 'Quests' },
+  { href: '/app/leads', label: 'Follow-ups' },
   { href: '/app/keywords', label: 'Keywords' },
-  { href: '/app/guild', label: 'Guild' },
+  { href: '/app/runs', label: 'Scans' },
 ] as const
 
 interface MobileBottomNavProps {
@@ -45,7 +45,7 @@ export default function MobileBottomNav({
             aria-current={isActive ? 'page' : undefined}
             onPointerDown={() => router.prefetch(item.href)}
             onFocus={() => router.prefetch(item.href)}
-            className="dq-navitem flex-1 flex-col justify-center gap-0.5 px-1 py-1 text-[10px]"
+            className="dq-navitem flex-1 flex-col justify-center gap-0.5 px-1 py-1 text-xs normal-case tracking-normal"
           >
             <Icon name={item.emblem} size={24} className="shrink-0" />
             <span>{entry.label}</span>
@@ -58,7 +58,7 @@ export default function MobileBottomNav({
         onClick={onOpenNavigation}
         aria-controls={MOBILE_NAV_ID}
         aria-expanded={mobileOpen}
-        className="dq-navitem flex-1 flex-col justify-center gap-0.5 px-1 py-1 text-[10px]"
+        className="dq-navitem flex-1 flex-col justify-center gap-0.5 px-1 py-1 text-xs normal-case tracking-normal"
       >
         <MoreHorizontal className="size-6 shrink-0" strokeWidth={1.5} />
         <span>More</span>

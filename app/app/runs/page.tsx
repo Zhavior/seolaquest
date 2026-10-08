@@ -9,7 +9,7 @@ import { ScanRunListSkeleton } from './loading'
 const ScanRunList = dynamic(() => import('@/features/scans/components/ScanRunList').then((m) => m.ScanRunList))
 
 export const metadata: Metadata = {
-  title: 'Scan Runs | SEOlaQuest',
+  title: 'Scans | SEOlaQuest',
   description: 'Review the durable backend status of every scan this account has queued.',
 }
 
@@ -24,18 +24,18 @@ export const metadata: Metadata = {
 export default function ScanRunsPage() {
   return (
     <QuestPageShell watermark={<History className="h-[650px] w-[650px] text-ink" />}>
-      <QuestTicker label="Battle scans. Measured run ledger.">
-        <Sparkles className="h-5 w-5 text-ink" /> 🛡️ BATTLE SCANS{' '}
-        <Sparkles className="h-5 w-5 text-ink" /> 📊 MEASURED RUN LEDGER
+      <QuestTicker label="Scans.">
+        <Sparkles className="h-5 w-5 text-ink" /> 🛡️ SCANS{' '}
+        <Sparkles className="h-5 w-5 text-ink" /> 📊 EVERY SCAN YOU HAVE RUN
       </QuestTicker>
 
       <QuestPageHeader
         className="mt-4"
         icon={<History className="h-8 w-8" />}
-        eyebrow={<>SIGNAL EXPEDITIONS</>}
-        title="Scan Runs"
+        eyebrow={<>SCAN HISTORY</>}
+        title="Scans"
         subtitle="Every scan you have run"
-        status={<QuestStatusPill label="Durable ledger" value="Active [Monitored]" />}
+        status={<QuestStatusPill label="History" value="Saved" />}
       />
 
       <Suspense fallback={<ScanRunListSkeleton />}>

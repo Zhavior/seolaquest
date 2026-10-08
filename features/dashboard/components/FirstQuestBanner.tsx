@@ -75,8 +75,8 @@ export default function FirstQuestBanner() {
 
             {Number.isFinite(sampleCount) && sampleCount > 0 ? (
               <p className="mt-2 rounded-xl border border-outline bg-card p-2 text-sm font-semibold">
-                Try it now: open one of the {sampleCount} sample leads below and mark it as
-                contacted. Sample leads are examples, not real people.
+                Try it now: open one of the {sampleCount} sample leads below and save it to
+                follow-ups. Sample leads are examples, not real people.
               </p>
             ) : null}
           </div>

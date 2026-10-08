@@ -16,7 +16,6 @@ import {
   Copy,
   Check,
   ExternalLink,
-  Ban,
 } from 'lucide-react'
 import { sfx } from '@/lib/sfx'
 
@@ -176,11 +175,11 @@ export function DashboardScannerModal({
 
               <div className="min-w-0">
                 <div className="flex items-center gap-2">
-                  <p className="text-[10px] md:text-xs font-semibold normal-case tracking-[0.14em] text-ink/75">
+                  <p className="text-xs md:text-xs font-semibold normal-case tracking-[0.14em] text-ink/75">
                     Durable scan run
                   </p>
                   {scanRunId && (
-                    <span className="hidden sm:inline-block bg-black text-accent text-[9px] font-mono font-semibold px-1.5 py-0.5 border border-outline ">
+                    <span className="hidden sm:inline-block bg-black text-accent text-xs font-mono font-semibold px-1.5 py-0.5 border border-outline ">
                       RUN #{scanRunId.slice(0, 8)}
                     </span>
                   )}
@@ -196,8 +195,8 @@ export function DashboardScannerModal({
                 <button
                   type="button"
                   onClick={copyRunId}
-                  title="Copy durable run reference ID"
-                  className="hidden sm:flex min-h-11 items-center gap-1 rounded-[20px] border border-outline bg-card px-2.5 py-1 text-[10px] font-semibold normal-case text-ink shadow-none hover:bg-accent active:translate-x-[1px] active:translate-y-[1px] transition-all"
+                  title="Copy the scan reference (for support)"
+                  className="hidden sm:flex min-h-11 items-center gap-1 rounded-[20px] border border-outline bg-card px-2.5 py-1 text-xs font-semibold normal-case text-ink shadow-none hover:bg-accent active:translate-x-[1px] active:translate-y-[1px] transition-all"
                 >
                   {copied ? <Check className="size-3.5 text-green-600" /> : <Copy className="size-3.5" />}
                   <span>{copied ? 'COPIED!' : 'COPY ID'}</span>
@@ -241,19 +240,21 @@ export function DashboardScannerModal({
           <div className="flex flex-col min-w-0 rounded-[20px] border border-outline bg-forest p-4 text-on-forest shadow-sm">
             <div className="mb-3 flex flex-wrap items-center justify-between gap-2 border-b border-on-forest/30 pb-3 text-xs font-semibold normal-case tracking-[0.1em]">
               <div className="flex items-center gap-2">
-                <span className="h-2 w-2 rounded-full bg-on-forest animate-pulse" />
-                <span>&gt; Tactical Signal Terminal</span>
+                <span className="h-2 w-2 rounded-full bg-on-forest" aria-hidden />
+                <span>Progress</span>
               </div>
 
               {/* Log Search Filter Input */}
               <div className="relative flex items-center">
                 <Search className="absolute left-2 size-3 text-on-forest/60 pointer-events-none" />
+                <label htmlFor="scan-log-filter" className="sr-only">Search the progress messages</label>
                 <input
-                  type="text"
+                  id="scan-log-filter"
+                  type="search"
                   value={logFilter}
                   onChange={(e) => setLogFilter(e.target.value)}
-                  placeholder="Filter logs..."
-                  className="w-28 sm:w-36 bg-forest text-on-forest placeholder-on-forest/40 border border-on-forest/40 pl-6 pr-2 py-0.5 text-[10px] font-mono font-medium focus:outline-none focus:border-on-forest"
+                  placeholder="Search messages"
+                  className="w-28 sm:w-36 bg-forest text-on-forest placeholder-on-forest/40 border border-on-forest/40 pl-6 pr-2 py-0.5 text-xs font-mono font-medium focus:outline-none focus:border-on-forest"
                 />
               </div>
             </div>
@@ -342,7 +343,7 @@ export function DashboardScannerModal({
 
               <div className="mt-3 grid grid-cols-2 gap-3">
                 <div className="rounded-[20px] border border-outline bg-card p-2.5 text-center shadow-none">
-                  <p className="text-[10px] font-semibold normal-case tracking-[0.1em] text-ink-muted">
+                  <p className="text-xs font-semibold normal-case tracking-[0.1em] text-ink-muted">
                     Leads
                   </p>
                   <p className="mt-1 text-2xl font-semibold normal-case text-ink">
@@ -351,7 +352,7 @@ export function DashboardScannerModal({
                 </div>
 
                 <div className="rounded-[20px] border border-outline bg-card p-2.5 text-center shadow-none">
-                  <p className="text-[10px] font-semibold normal-case tracking-[0.1em] text-ink-muted">
+                  <p className="text-xs font-semibold normal-case tracking-[0.1em] text-ink-muted">
                     Posts
                   </p>
                   <p className="mt-1 text-2xl font-semibold normal-case text-ink">
@@ -364,17 +365,17 @@ export function DashboardScannerModal({
             {/* Command Notes */}
             <div className="rounded-[20px] border border-outline bg-card p-4 shadow-sm">
               <p className="text-xs font-semibold normal-case tracking-[0.12em] text-ink-muted">
-                Command Notes
+                Good to know
               </p>
 
               <div className="mt-2.5 space-y-2 text-xs font-medium normal-case tracking-[0.04em] text-ink/80">
                 <div className="flex items-start gap-2">
                   <ShieldAlert className="mt-0.5 h-3.5 w-3.5 shrink-0 text-ink" />
-                  <span>Review fresh matches first for highest conversion.</span>
+                  <span>Look at the newest posts first. They are the most likely to still want help.</span>
                 </div>
                 <div className="flex items-start gap-2">
                   <Sparkles className="mt-0.5 h-3.5 w-3.5 shrink-0 text-ink" />
-                  <span>Durable runs preserve state across page reloads.</span>
+                  <span>You can close this window or reload the page. The scan keeps running and its results are saved.</span>
                 </div>
               </div>
             </div>
@@ -392,11 +393,11 @@ export function DashboardScannerModal({
                   <div className="flex items-start gap-2.5">
                     <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-[#15803D]" />
                     <div className="min-w-0">
-                      <p className="text-[10px] font-semibold normal-case tracking-[0.12em] text-ink-muted">
-                        Outcome Report
+                      <p className="text-xs font-semibold normal-case tracking-[0.12em] text-ink-muted">
+                        Done
                       </p>
                       <p className="mt-1 text-xs font-semibold normal-case tracking-[0.04em] text-ink">
-                        Hunt Completed Successfully!
+                        The scan finished. New leads are in your list.
                       </p>
                     </div>
                   </div>
@@ -412,11 +413,11 @@ export function DashboardScannerModal({
                   <div className="flex items-start gap-3">
                     <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-[#E11D48]" />
                     <div className="min-w-0">
-                      <p className="text-[10px] font-semibold normal-case tracking-[0.12em] text-ink-muted">
-                        Scan Interrupted
+                      <p className="text-xs font-semibold normal-case tracking-[0.12em] text-ink-muted">
+                        The scan did not finish
                       </p>
                       <p className="mt-1 text-xs font-semibold normal-case tracking-[0.04em] text-ink">
-                        Scan credit was refunded or paused.
+                        See the progress messages above for what happened.
                       </p>
                     </div>
                   </div>
@@ -435,11 +436,11 @@ export function DashboardScannerModal({
                       aria-hidden
                     />
                     <div className="min-w-0">
-                      <p className="text-[10px] font-semibold normal-case tracking-[0.12em] text-ink-muted">
-                        Awaiting result
+                      <p className="text-xs font-semibold normal-case tracking-[0.12em] text-ink-muted">
+                        Still running
                       </p>
                       <p className="mt-1 text-xs font-semibold normal-case tracking-[0.04em] text-ink leading-snug">
-                        Polling the durable run. You can close this and reopen from Intel or the run URL.
+                        You can close this window. The scan keeps running, and you can check it later on the Scans page.
                       </p>
                     </div>
                   </div>
@@ -456,17 +457,8 @@ export function DashboardScannerModal({
                   className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-[20px] border border-outline bg-accent px-4 py-2.5 text-xs font-semibold normal-case tracking-[0.08em] text-on-accent shadow-sm hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-sm active:translate-x-0 active:translate-y-0 transition-all"
                 >
                   <ExternalLink className="h-4 w-4" />
-                  <span>VIEW QUEST BOARD</span>
+                  <span>See your scans</span>
                 </Link>
-              ) : !scanOutcome ? (
-                <button
-                  type="button"
-                  onClick={close}
-                  className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 rounded-[20px] border border-outline bg-accent-2 text-on-accent px-3 py-2 text-xs font-semibold normal-case tracking-[0.08em] shadow-none hover:bg-highlight-strong transition-all"
-                >
-                  <Ban className="h-3.5 w-3.5" />
-                  <span>CANCEL SCAN</span>
-                </button>
               ) : null}
 
               <button
@@ -474,7 +466,7 @@ export function DashboardScannerModal({
                 onClick={close}
                 className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-[20px] border border-outline bg-black px-4 py-2.5 text-xs font-semibold normal-case tracking-[0.08em] text-accent shadow-sm hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-sm active:translate-x-0 active:translate-y-0 transition-all"
               >
-                <span>RETURN TO COMMAND</span>
+                <span>{scanOutcome === 'succeeded' || scanOutcome === 'failed' ? 'Back to Home' : 'Close (the scan keeps running)'}</span>
                 <ArrowRight className="h-4 w-4" />
               </button>
             </div>

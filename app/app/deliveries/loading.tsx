@@ -2,7 +2,7 @@ import { QuestPending, QuestRoutePending } from '@/components/quest'
 
 /** Quiet route boundary used while Campaign Broadcast streams. */
 export default function DeliveriesLoading() {
-  return <QuestRoutePending label="Opening Campaign Broadcast" />
+  return <QuestRoutePending label="Opening CRM exports" />
 }
 
 /**
@@ -10,5 +10,5 @@ export default function DeliveriesLoading() {
  * own chrome synchronously.
  */
 export function DeliveryListSkeleton() {
-  return <QuestPending label="Loading CRM deliveries" />
+  return <QuestPending label="Loading CRM exports" />
 }

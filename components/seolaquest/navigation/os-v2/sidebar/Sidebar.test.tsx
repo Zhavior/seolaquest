@@ -33,18 +33,15 @@ describe('SEOlaQuest OS Sidebar', () => {
   it('renders the navigation index and branding', () => {
     renderSidebar()
 
-    expect(screen.getByText('Quest journal')).toBeInTheDocument()
-    expect(screen.getByText('LIVING HQ')).toBeInTheDocument()
-    expect(screen.getByText('QUEST BOARD')).toBeInTheDocument()
-    expect(screen.getByText('SCAN RUNS')).toBeInTheDocument()
-    expect(screen.getByText('QUEST LOG')).toBeInTheDocument()
-    expect(screen.getByText('GUILD HALL')).toBeInTheDocument()
-    expect(screen.getByText('CAMPAIGN BROADCAST')).toBeInTheDocument()
-    expect(screen.getByText('KNOWLEDGE LORE')).toBeInTheDocument()
-    expect(screen.getByText('BAZAAR & SUPPLIES')).toBeInTheDocument()
-    expect(screen.getByText('ARMORY & SPELLS')).toBeInTheDocument()
+    expect(screen.getByText('Menu')).toBeInTheDocument()
+    for (const name of ['Home', 'Follow-ups', 'Keywords', 'Scans', 'CRM exports', 'Goals', 'Activity', 'Profile', 'Billing', 'Settings']) {
+      expect(screen.getByRole('link', { name })).toBeInTheDocument()
+    }
+    // Each page's plain description is on screen, not hidden in a tooltip.
+    expect(screen.getByText('Every scan and what it found.')).toBeVisible()
+    expect(screen.getByRole('link', { name: 'Scans' })).toHaveAccessibleDescription('Every scan and what it found.')
     expect(screen.queryByText('Party Status')).not.toBeInTheDocument()
-    expect(screen.getByRole('link', { name: /LIVING HQ/ })).toHaveAttribute('aria-current', 'page')
+    expect(screen.getByRole('link', { name: 'Home' })).toHaveAttribute('aria-current', 'page')
     expect(screen.getByRole('button', { name: /LOG OUT/i })).toBeInTheDocument()
   })
 
@@ -54,19 +51,20 @@ describe('SEOlaQuest OS Sidebar', () => {
    * including one with nothing on its board. Both were the same failure: the rail
    * describing something other than what the destination actually holds.
    */
-  it('sends QUEST BOARD to the board and SCAN RUNS to the run ledger', () => {
+  it('sends Goals to the board, Scans to the run ledger and lists Follow-ups', () => {
     renderSidebar()
 
-    expect(screen.getByRole('link', { name: /QUEST BOARD/ })).toHaveAttribute('href', '/app/quests')
-    expect(screen.getByRole('link', { name: /SCAN RUNS/ })).toHaveAttribute('href', '/app/runs')
-    expect(screen.getByRole('link', { name: /QUEST BOARD/ })).not.toHaveTextContent('12')
+    expect(screen.getByRole('link', { name: 'Goals' })).toHaveAttribute('href', '/app/quests')
+    expect(screen.getByRole('link', { name: 'Scans' })).toHaveAttribute('href', '/app/runs')
+    expect(screen.getByRole('link', { name: 'Follow-ups' })).toHaveAttribute('href', '/app/leads')
+    expect(screen.getByRole('link', { name: 'Goals' })).not.toHaveTextContent('12')
   })
 
   it('warms a destination when the user shows intent', async () => {
     prefetchMock.mockClear()
     renderSidebar()
 
-    await userEvent.hover(screen.getByRole('link', { name: /QUEST BOARD/ }))
+    await userEvent.hover(screen.getByRole('link', { name: 'Goals' }))
 
     expect(prefetchMock).toHaveBeenCalledWith('/app/quests')
   })
@@ -129,16 +127,16 @@ describe('SEOlaQuest OS Sidebar', () => {
 
     expect(screen.queryByRole('radiogroup', { name: 'Interface theme' })).not.toBeInTheDocument()
     expect(screen.queryAllByRole('radio')).toHaveLength(0)
-    const questBoard = screen.getByRole('link', { name: /QUEST BOARD/ })
-    expect(questBoard.querySelector('use')).toHaveAttribute('href', '#i-scroll')
-    expect(container.querySelectorAll('a use')).toHaveLength(9)
+    const followUps = screen.getByRole('link', { name: 'Follow-ups' })
+    expect(followUps.querySelector('use')).toHaveAttribute('href', '#i-scroll')
+    expect(container.querySelectorAll('a use')).toHaveLength(10)
   })
 
   it('names every destination in the collapsed rail, where only emblems show', () => {
     renderSidebar({ collapsed: true })
 
-    expect(screen.getByRole('link', { name: 'SCAN RUNS' })).toHaveAttribute('href', '/app/runs')
-    expect(screen.getByRole('link', { name: 'LIVING HQ' })).toHaveAttribute('aria-current', 'page')
+    expect(screen.getByRole('link', { name: 'Scans' })).toHaveAttribute('href', '/app/runs')
+    expect(screen.getByRole('link', { name: 'Home' })).toHaveAttribute('aria-current', 'page')
   })
 })
 
@@ -150,7 +148,7 @@ describe('SidebarNavigation in the mobile drawer', () => {
     await userEvent.click(screen.getByRole('button', { name: 'Close navigation' }))
     expect(onNavigate).toHaveBeenCalledTimes(1)
 
-    await userEvent.click(screen.getByRole('link', { name: /LIVING HQ/ }))
+    await userEvent.click(screen.getByRole('link', { name: 'Home' }))
     expect(onNavigate).toHaveBeenCalledTimes(2)
   })
 })

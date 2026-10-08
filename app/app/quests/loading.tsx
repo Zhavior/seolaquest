@@ -5,7 +5,7 @@ import { QuestPending, QuestRoutePending } from '@/components/quest'
  * load.
  */
 export default function QuestBoardLoading() {
-  return <QuestRoutePending label="Opening Quest Board" />
+  return <QuestRoutePending label="Opening Goals" />
 }
 
 /**
@@ -14,5 +14,5 @@ export default function QuestBoardLoading() {
  * depend on the same assignment read.
  */
 export function QuestBoardSkeleton() {
-  return <QuestPending label="Loading quests" />
+  return <QuestPending label="Loading goals" />
 }

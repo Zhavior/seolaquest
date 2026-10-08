@@ -59,7 +59,7 @@ export default function StatusBar({
               onFocus={() => sfx.playSidebarHover()}
               title={collapsed ? 'Expand Sidebar (Cmd+B)' : 'Collapse Sidebar (Cmd+B)'}
               aria-label={collapsed ? 'Expand navigation' : 'Collapse navigation'}
-              className="hidden size-9 shrink-0 place-items-center border border-outline text-[#d9d0ec] transition-colors hover:border-[#d8a93b] hover:text-[#f3d58a] md:grid"
+              className="hidden size-11 shrink-0 place-items-center border border-outline text-[#d9d0ec] transition-colors hover:border-[#d8a93b] hover:text-[#f3d58a] md:grid"
             >
               {collapsed ? (
                 <PanelLeftOpen className="size-4" strokeWidth={1.75} />

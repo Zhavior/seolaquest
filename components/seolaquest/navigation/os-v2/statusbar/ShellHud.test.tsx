@@ -86,12 +86,12 @@ describe('ShellHud telemetry', () => {
     }
   })
 
-  it('names the abbreviated mobile readings for assistive tech', () => {
+  it('shows words, not bare numbers, on phones and names them in full', () => {
     renderHud({ level: 4, xp: 60, xpRequired: 340, questsRemaining: 18, maxCredits: 50, openQuests: 7 })
 
-    // "18/50" and "L4" are what fits on a phone; the full reading is what a
-    // screen reader gets.
+    // Tooltips never reach a phone, so the short reading carries its own word.
+    expect(screen.getByText('7 leads')).toBeInTheDocument()
+    expect(screen.getByText('18 credits')).toBeInTheDocument()
     expect(screen.getByRole('img', { name: '18/50 scan credits' })).toBeInTheDocument()
-    expect(screen.getByRole('img', { name: 'LVL 4' })).toBeInTheDocument()
   })
 })

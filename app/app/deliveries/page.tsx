@@ -13,25 +13,25 @@ const DeliveryList = nextDynamic(() =>
 export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
-  title: 'Campaign Broadcast & CRM Deliveries | SEOlaQuest',
+  title: 'CRM exports | SEOlaQuest',
   description: 'Review the recorded worker status and dispatch history of your CRM deliveries.',
 }
 
 export default function DeliveriesPage() {
   return (
     <QuestPageShell watermark={<Radio className="h-[650px] w-[650px] text-ink" />}>
-      <QuestTicker label="Campaign broadcast. CRM dispatch ledger.">
-        <Sparkles className="h-5 w-5 text-ink" /> 📡 CAMPAIGN BROADCAST{' '}
-        <Sparkles className="h-5 w-5 text-ink" /> 🛡️ CRM DISPATCH LEDGER
+      <QuestTicker label="CRM exports.">
+        <Sparkles className="h-5 w-5 text-ink" /> 📡 CRM EXPORTS{' '}
+        <Sparkles className="h-5 w-5 text-ink" /> 🛡️ LEADS SENT TO YOUR CRM
       </QuestTicker>
 
       <QuestPageHeader
         className="mt-4"
         icon={<Radio className="h-8 w-8" />}
-        eyebrow={<>COMMANDER&apos;S MAP &amp; CAMPAIGN DISPATCHES</>}
-        title="Campaign Broadcast"
+        eyebrow={<>YOUR CRM</>}
+        title="CRM exports"
         subtitle="Leads you sent to your CRM"
-        status={<QuestStatusPill label="Dispatch engine" value="Active [Monitored]" />}
+        status={<QuestStatusPill label="Sending" value="On" />}
       />
 
       <Suspense fallback={<DeliveryListSkeleton />}>
