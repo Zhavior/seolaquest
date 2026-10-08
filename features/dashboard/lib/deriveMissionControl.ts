@@ -55,6 +55,8 @@ export type MissionControlInput = {
   maxCredits: number
   user: Pick<DashboardUser, 'level' | 'xp' | 'planLabel' | 'entitlements'>
   isScanning?: boolean
+  /** The optional game layer (Settings). Level and XP are only mentioned when on. */
+  gameMode?: boolean
 }
 
 function isLiveScored(lead: DashboardLead): boolean {
@@ -190,7 +192,7 @@ export function deriveCampaignPulse(input: MissionControlInput): CampaignPulse {
   if (activeKeywords.length > 0) {
     wins.push(`${activeKeywords.length} active keyword${activeKeywords.length === 1 ? '' : 's'}`)
   }
-  if (user.level > 0) {
+  if (input.gameMode && user.level > 0) {
     wins.push(`Level ${user.level} (${user.xp} XP)`)
   }
 

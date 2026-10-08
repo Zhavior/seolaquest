@@ -1,5 +1,6 @@
 'use client'
 
+import { useGameMode } from '@/components/seolaquest/GameModeContext'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import type { BeaconView, ValleyHandle } from '@/features/handbook/valley/scene'
 import type { DashboardLead } from '@/features/dashboard/types'
@@ -78,6 +79,7 @@ export function DashboardValleyHero({ name, level, title, leads, filter, onFilte
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const handle = useRef<ValleyHandle | null>(null)
   const syncRef = useRef<() => void>(() => {})
+  const gameMode = useGameMode()
   const [live, setLive] = useState(false)
   // Starts false on both server and client so the button's first render
   // matches; the stored choice is applied once the scene loads.
@@ -203,7 +205,7 @@ export function DashboardValleyHero({ name, level, title, leads, filter, onFilte
           <h1 className="font-display text-3xl leading-tight tracking-tight sm:text-4xl">Home</h1>
           <p className="mt-1 text-base text-[#f6ebd2]">{status}</p>
           <p className="mt-1 text-sm text-[#d9d0ec]">
-            {name} · Level {level} · {title}
+            {gameMode ? `${name} · Level ${level} · ${title}` : name}
           </p>
         </div>
 

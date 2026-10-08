@@ -12,8 +12,9 @@ vi.mock('next/link', () => ({
 
 import ShellHud from './ShellHud'
 
-function renderHud(user?: Parameters<typeof ShellHud>[0]['user']) {
-  return render(<ShellHud user={user} />)
+// Most cases here check the XP reading, which only shows with the game layer on.
+function renderHud(user?: Parameters<typeof ShellHud>[0]['user'], gameMode = true) {
+  return render(<ShellHud user={user} gameMode={gameMode} />)
 }
 
 describe('ShellHud telemetry', () => {
@@ -93,5 +94,13 @@ describe('ShellHud telemetry', () => {
     expect(screen.getByText('7 leads')).toBeInTheDocument()
     expect(screen.getByText('18 credits')).toBeInTheDocument()
     expect(screen.getByRole('img', { name: '18/50 scan credits' })).toBeInTheDocument()
+  })
+
+  it('leaves out level and XP when the game layer is off (the default)', () => {
+    renderHud({ level: 4, xp: 60, xpRequired: 340, questsRemaining: 18, maxCredits: 50, openQuests: 7 }, false)
+
+    expect(screen.queryByText('LVL 4')).toBeNull()
+    expect(screen.queryByText(/XP 60/)).toBeNull()
+    expect(screen.getByText('7 leads to review')).toBeInTheDocument()
   })
 })

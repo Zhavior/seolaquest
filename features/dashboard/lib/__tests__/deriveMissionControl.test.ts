@@ -194,4 +194,10 @@ describe('deriveCampaignPulse', () => {
     })
     expect(pulse.trend).toBe('active')
   })
+
+  it('mentions level and XP only when the game layer is on', () => {
+    const base = input({ keywords: [{ id: 'k1', phrase: 'CRM', active: true }] })
+    expect(deriveCampaignPulse(base).wins.some((win) => /XP/.test(win))).toBe(false)
+    expect(deriveCampaignPulse({ ...base, gameMode: true }).wins).toContain('Level 3 (400 XP)')
+  })
 })

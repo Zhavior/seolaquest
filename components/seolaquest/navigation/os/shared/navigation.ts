@@ -23,6 +23,8 @@ export interface NavigationItem {
   color?: string
   badge?: string
   description?: string
+  /** Part of the optional game layer; hidden unless the person turned it on. */
+  game?: boolean
 }
 
 /**
@@ -84,6 +86,7 @@ export const navigation: NavigationItem[] = [
     emblem: 'crown',
     icon: Trophy,
     section: 'guild',
+    game: true,
     color: 'bg-cyan-400',
     // No badge. The one that used to sit here was the literal string '12' on
     // every account, which is worse than no count at all.
@@ -95,6 +98,7 @@ export const navigation: NavigationItem[] = [
     emblem: 'medal',
     icon: Activity,
     section: 'guild',
+    game: true,
     color: 'bg-cyan-400',
     description: 'What you have done, and your results.',
   },
@@ -126,3 +130,8 @@ export const navigation: NavigationItem[] = [
     description: 'Your preferences.',
   },
 ]
+
+/** The menu for this person: game pages only when they turned the game layer on. */
+export function visibleNavigation(gameMode: boolean): NavigationItem[] {
+  return gameMode ? navigation : navigation.filter((item) => !item.game)
+}

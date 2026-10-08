@@ -42,7 +42,7 @@ function Meter({ filled, fillClass }: { filled: number; fillClass: string }) {
  * server and ships no JavaScript. Keeping it out of `StatusBar` is also what
  * lets the account record stop crossing the client boundary entirely.
  */
-export default function ShellHud({ user }: { user?: Partial<ShellUser> }) {
+export default function ShellHud({ user, gameMode = false }: { user?: Partial<ShellUser>; gameMode?: boolean }) {
   const userName = user?.name || 'HUNTER'
 
   // Progression mirrors the server's model exactly: `xp` is progress inside the
@@ -121,7 +121,8 @@ export default function ShellHud({ user }: { user?: Partial<ShellUser> }) {
           <span>{questLabel}</span>
         </Link>
 
-        {/* EXP toward the next level */}
+        {/* EXP toward the next level — only with the game layer turned on */}
+        {gameMode ? (
         <div
           title={`${playerXp} of ${xpRequired} XP toward level ${playerLevel + 1}`}
           className="flex h-11 items-center gap-1.5 rounded-[3px] border border-outline bg-card px-2.5 text-xs font-semibold normal-case tracking-normal shadow-none"
@@ -133,6 +134,7 @@ export default function ShellHud({ user }: { user?: Partial<ShellUser> }) {
           <Meter filled={segmentsFor(playerXp, xpRequired)} fillClass="bg-accent" />
           <span className="hidden font-mono text-xs text-ink xl:inline">{xpLabel}</span>
         </div>
+        ) : null}
 
         {/* Scan credits */}
         <div
@@ -158,6 +160,6 @@ export default function ShellHud({ user }: { user?: Partial<ShellUser> }) {
   )
 }
 
-export async function ShellHudData({ user }: { user: DatabaseUser }) {
-  return <ShellHud user={await toShellUser(user)} />
+export async function ShellHudData({ user, gameMode = false }: { user: DatabaseUser; gameMode?: boolean }) {
+  return <ShellHud user={await toShellUser(user)} gameMode={gameMode} />
 }

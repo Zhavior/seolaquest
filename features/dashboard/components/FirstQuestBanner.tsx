@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { Sparkles, X } from 'lucide-react'
+import { useGameMode } from '@/components/seolaquest/GameModeContext'
 
 /**
  * The reward banner shown once, immediately after first-run setup commits.
@@ -33,6 +34,7 @@ export default function FirstQuestBanner() {
     sampleCount: Number.parseInt(params.get('samples') ?? '', 10),
   }))
   const { questComplete, questCount, sampleCount } = arrival
+  const gameMode = useGameMode()
 
   const [visible, setVisible] = useState(questComplete)
 
@@ -68,7 +70,7 @@ export default function FirstQuestBanner() {
 
             <p className="mt-2 text-sm font-semibold text-ink/80">
               Your keyword is saved.
-              {Number.isFinite(questCount) && questCount > 0
+              {gameMode && Number.isFinite(questCount) && questCount > 0
                 ? ` ${questCount} ${questCount === 1 ? 'task is' : 'tasks are'} waiting for you.`
                 : ''}
             </p>

@@ -18,6 +18,7 @@ import { matchesIntentFilter, type LeadIntentFilter } from '@/features/dashboard
 import Link from 'next/link'
 import MissionControlShell from '@/features/dashboard/components/layout/MissionControlShell'
 import { ReplyDraftPanel } from '@/features/dashboard/components/ReplyDraftPanel'
+import { useGameMode } from '@/components/seolaquest/GameModeContext'
 import { TodaysMissionPanel } from '@/features/dashboard/components/mission/TodaysMissionPanel'
 import { CampaignPulsePanel } from '@/features/dashboard/components/mission/CampaignPulsePanel'
 import { UrgentSignalsStrip } from '@/features/dashboard/components/mission/UrgentSignalsStrip'
@@ -76,6 +77,7 @@ export default function DashboardClient({
   const reveal = dashboardReveal(shouldReduceMotion)
 
 
+  const gameMode = useGameMode()
   const missionInput = useMemo(
     () => ({
       keywords: state.keywords,
@@ -84,6 +86,7 @@ export default function DashboardClient({
       maxCredits: state.maxCredits,
       user: state.user,
       isScanning: state.isScannerModalOpen || state.asyncStatus === 'scanning',
+      gameMode,
     }),
     [
       state.keywords,
@@ -93,6 +96,7 @@ export default function DashboardClient({
       state.user,
       state.isScannerModalOpen,
       state.asyncStatus,
+      gameMode,
     ]
   )
 

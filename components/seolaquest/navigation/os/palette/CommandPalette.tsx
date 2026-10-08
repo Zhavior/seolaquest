@@ -4,7 +4,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { ArrowRight, History, Search, X } from 'lucide-react'
 
-import { navigation } from '../shared/navigation'
+import { visibleNavigation } from '../shared/navigation'
+import { useGameMode } from '@/components/seolaquest/GameModeContext'
 
 const sectionLabels: Record<string, string> = {
   tactical: 'Tactical',
@@ -19,6 +20,8 @@ export default function CommandPalette() {
   const [manualActiveIndex, setManualActiveIndex] = useState(0)
   const [recent, setRecent] = useState<string[]>([])
   const inputRef = useRef<HTMLInputElement>(null)
+  const gameMode = useGameMode()
+  const navigation = useMemo(() => visibleNavigation(gameMode), [gameMode])
 
   const results = useMemo(() => {
     const q = query.trim().toLowerCase()
@@ -28,14 +31,14 @@ export default function CommandPalette() {
         item.label.toLowerCase().includes(q) ||
         item.description?.toLowerCase().includes(q)
     )
-  }, [query])
+  }, [query, navigation])
 
   const recentItems = useMemo(
     () =>
       recent
         .map((href) => navigation.find((item) => item.href === href))
         .filter((item): item is (typeof navigation)[number] => Boolean(item)),
-    [recent]
+    [recent, navigation]
   )
 
   const activeIndex = Math.min(manualActiveIndex, Math.max(results.length - 1, 0))

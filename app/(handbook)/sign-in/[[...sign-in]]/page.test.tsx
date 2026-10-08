@@ -20,7 +20,7 @@ describe('sign-in page', () => {
 
     expect(screen.getByRole('heading', { name: /welcome back/i })).toBeVisible()
     expect(mocks.signIn).toHaveBeenCalledWith(expect.objectContaining({
-      fallbackRedirectUrl: '/onboarding',
+      fallbackRedirectUrl: '/app',
       signUpUrl: '/sign-up',
       appearance: expect.objectContaining({
         options: { autoFocus: false },

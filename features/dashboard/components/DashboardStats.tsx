@@ -1,5 +1,6 @@
 'use client'
 
+import { useGameMode } from '@/components/seolaquest/GameModeContext'
 import Link from 'next/link'
 import { motion, type Variants } from 'framer-motion'
 import {
@@ -129,6 +130,7 @@ export function DashboardStats({
   maxCredits,
   leadsSliceStatus = 'ok',
 }: DashboardStatsProps) {
+  const gameMode = useGameMode()
   const entitlements = user.entitlements ?? {
     canUsePaidScans: false,
     canGenerateAIReplies: false,
@@ -213,6 +215,8 @@ export function DashboardStats({
 
       <div className="grid min-w-0 grid-cols-1 gap-6 xl:grid-cols-[1.2fr_0.95fr]">
         <div className="flex min-w-0 flex-col gap-6">
+          {/* Level and XP belong to the optional game layer (Settings). */}
+          {gameMode ? (
           <section
             aria-labelledby="progress-path-heading"
             className="rounded-[20px] border border-outline bg-highlight p-5 shadow-sm sm:p-6"
@@ -257,6 +261,7 @@ export function DashboardStats({
               </div>
             </div>
           </section>
+          ) : null}
 
           <div className="grid flex-1 grid-cols-1 gap-6 sm:grid-cols-2">
             <TelemetryCard

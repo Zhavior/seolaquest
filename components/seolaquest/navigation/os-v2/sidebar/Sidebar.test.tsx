@@ -1,3 +1,4 @@
+import { GameModeProvider } from '@/components/seolaquest/GameModeContext'
 import type { ReactNode } from 'react'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
@@ -25,11 +26,25 @@ vi.mock('next/link', () => ({
 
 import Sidebar, { SidebarNavigation } from './Sidebar'
 
-function renderSidebar(props: Partial<Parameters<typeof Sidebar>[0]> = {}) {
-  return render(<Sidebar {...props} />)
+// Rendered with the optional game layer on, so every page is listed.
+function renderSidebar(props: Partial<Parameters<typeof Sidebar>[0]> = {}, gameMode = true) {
+  return render(
+    <GameModeProvider on={gameMode}>
+      <Sidebar {...props} />
+    </GameModeProvider>,
+  )
 }
 
 describe('SEOlaQuest OS Sidebar', () => {
+  it('hides Goals and Activity unless the game layer is turned on', () => {
+    renderSidebar({}, false)
+
+    expect(screen.queryByRole('link', { name: 'Goals' })).toBeNull()
+    expect(screen.queryByRole('link', { name: 'Activity' })).toBeNull()
+    expect(screen.queryByText('Progress')).toBeNull()
+    expect(screen.getByRole('link', { name: 'Follow-ups' })).toBeInTheDocument()
+  })
+
   it('renders the navigation index and branding', () => {
     renderSidebar()
 

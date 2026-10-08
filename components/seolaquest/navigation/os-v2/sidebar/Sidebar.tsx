@@ -7,7 +7,8 @@ import LogOutButton from '@/components/auth/LogOutButton'
 import { Icon } from '@/features/handbook/artifact/IconSprite'
 import { sfx } from '@/lib/sfx'
 
-import { navigation, type NavigationItem } from '../../os/shared/navigation'
+import { visibleNavigation, type NavigationItem } from '../../os/shared/navigation'
+import { useGameMode } from '@/components/seolaquest/GameModeContext'
 import clsx from 'clsx'
 
 interface SidebarProps {
@@ -41,6 +42,7 @@ function NavigationContent({
 }) {
   const pathname = usePathname()
   const router = useRouter()
+  const navigation = visibleNavigation(useGameMode())
   const items: NavigationItem[] = isAdmin
     ? [...navigation, { label: 'Admin', href: '/app/admin', icon: ShieldCheck, emblem: 'padlock', section: 'system' }]
     : navigation

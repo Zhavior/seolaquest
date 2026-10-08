@@ -7,6 +7,7 @@ import { useSettingsForm } from '@/features/profile/hooks/useSettingsForm'
 
 import GuildLawsModal from '@/features/settings/components/GuildLawsModal'
 import DangerZoneCard from '@/features/settings/components/DangerZoneCard'
+import { GameModeSetting } from '@/features/settings/components/GameModeSetting'
 
 export default function SettingsClient({ initial }: { initial: { name: string; title: string; email: string; emailDigest: boolean; radarAlerts: boolean; crmWebhookUrl: string } }) {
   const {
@@ -70,6 +71,10 @@ export default function SettingsClient({ initial }: { initial: { name: string; t
             </motion.div>
           )}
 
+          <motion.div variants={item}>
+            <GameModeSetting />
+          </motion.div>
+
           {/* Operations Center 2-Column Grid */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* LEFT COLUMN: ADVENTURER & GUILD */}
@@ -78,7 +83,7 @@ export default function SettingsClient({ initial }: { initial: { name: string; t
               <motion.section variants={item} className="rounded-[20px] border border-outline bg-card shadow-sm overflow-hidden flex flex-col">
                 <div className="border-b border-outline bg-highlight p-4 flex items-center gap-3">
                   <User className="text-on-accent" size={28} />
-                  <h2 className="font-display text-2xl font-semibold normal-case">Adventurer Profile</h2>
+                  <h2 className="font-display text-2xl font-semibold normal-case">Your profile</h2>
                 </div>
                 <div className="p-6 space-y-6 grow bg-card">
                   <label className="block">
@@ -90,7 +95,7 @@ export default function SettingsClient({ initial }: { initial: { name: string; t
                     />
                   </label>
                   <label className="block">
-                    <span className="font-semibold normal-case flex items-center gap-2 mb-2">Hunter Title</span>
+                    <span className="font-semibold normal-case flex items-center gap-2 mb-2">Title</span>
                     <input
                       value={values.title}
                       onChange={(event) => setField('title', event.target.value)}

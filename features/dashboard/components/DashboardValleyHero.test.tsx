@@ -23,7 +23,9 @@ describe('DashboardValleyHero', () => {
     render(<DashboardValleyHero {...base} leads={[]} />)
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Home')
     expect(screen.getByText('No leads to look at yet.')).toBeInTheDocument()
-    expect(screen.getByText('Hunter · Level 2 · Lead Hunter')).toBeInTheDocument()
+    // Level and title are part of the optional game layer, off by default.
+    expect(screen.getByText('Hunter')).toBeInTheDocument()
+    expect(screen.queryByText(/Level 2/)).toBeNull()
     expect(screen.getByText('Each light will stand for one of your newest leads')).toBeInTheDocument()
   })
 
