@@ -52,6 +52,15 @@ export const PUBLIC_ROUTE_PATTERNS = [
 
 const isPublicRoute = createRouteMatcher(PUBLIC_ROUTE_PATTERNS)
 
+/** A malformed escape such as /blog/100% cannot name a post, so it is a 404, not a URIError. */
+function isPublishedBlogSlug(rawSlug: string): boolean {
+  try {
+    return BLOG_POST_SLUGS.includes(decodeURIComponent(rawSlug))
+  } catch {
+    return false
+  }
+}
+
 export default clerkMiddleware(async (auth, request) => {
   const legacyRedirects: Record<string, string> = {
     '/landing': '/',
@@ -75,7 +84,7 @@ export default clerkMiddleware(async (auth, request) => {
   // and a notFound() thrown under this middleware's rewrite answers HTTP 200,
   // which search engines read as a soft 404.
   const blogSlug = /^\/blog\/([^/]+)\/?$/.exec(request.nextUrl.pathname)?.[1]
-  if (blogSlug !== undefined && !BLOG_POST_SLUGS.includes(decodeURIComponent(blogSlug))) {
+  if (blogSlug !== undefined && !isPublishedBlogSlug(blogSlug)) {
     return NextResponse.rewrite(new URL('/_blog-not-found', request.url), { status: 404 })
   }
   if (!isPublicRoute(request)) {

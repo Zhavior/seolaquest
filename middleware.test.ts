@@ -140,7 +140,7 @@ describe('Clerk public route boundary', () => {
     expect(response?.headers.get('location')).toBe(new URL(destination, ORIGIN).href)
   })
 
-  it.each(['/blog/does-not-exist', '/blog/phase-zero', '/blog/does-not-exist/'])(
+  it.each(['/blog/does-not-exist', '/blog/phase-zero', '/blog/does-not-exist/', '/blog/100%', '/blog/%FF'])(
     'answers an unknown article %s with a real 404, without auth',
     async (path) => {
       const { protect, response } = await invokeProxy(path)
