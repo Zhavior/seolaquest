@@ -1,5 +1,6 @@
 import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'
 import { NextResponse } from 'next/server'
+import { BLOG_POST_SLUGS } from '@/lib/generated/blogSlugs'
 
 export const PUBLIC_ROUTE_PATTERNS = [
   '/',
@@ -68,6 +69,14 @@ export default clerkMiddleware(async (auth, request) => {
     const redirectUrl = new URL(request.url)
     redirectUrl.pathname = destination
     return NextResponse.redirect(redirectUrl, 308)
+  }
+  // Unknown article slugs get a real 404 here. The post route renders on
+  // demand (Cloudflare Workers has no cache to serve prerendered pages from),
+  // and a notFound() thrown under this middleware's rewrite answers HTTP 200,
+  // which search engines read as a soft 404.
+  const blogSlug = /^\/blog\/([^/]+)\/?$/.exec(request.nextUrl.pathname)?.[1]
+  if (blogSlug !== undefined && !BLOG_POST_SLUGS.includes(decodeURIComponent(blogSlug))) {
+    return NextResponse.rewrite(new URL('/_blog-not-found', request.url), { status: 404 })
   }
   if (!isPublicRoute(request)) {
     await auth.protect()

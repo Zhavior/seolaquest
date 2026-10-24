@@ -1,11 +1,8 @@
-import fs from 'fs'
-import path from 'path'
 import { Post, PostMetadata, TocHeading, calculateReadingTime } from './blog-types'
+import { BLOG_POST_SOURCES } from './generated/blogPosts'
 
 export type { Post, PostMetadata, TocHeading }
 export { calculateReadingTime }
-
-const POSTS_DIR = path.join(process.cwd(), 'content', 'posts')
 
 /**
  * Basic Frontmatter Parser for Markdown/MDX without heavy native binary dependencies
@@ -76,18 +73,13 @@ function extractTocHeadings(content: string): TocHeading[] {
  * Get all published posts sorted by date (newest first)
  */
 export function getAllPosts(): Post[] {
-  if (!fs.existsSync(POSTS_DIR)) {
-    return []
-  }
-
-  const fileNames = fs.readdirSync(POSTS_DIR)
-  const posts: Post[] = fileNames
-    .filter((file) => file.endsWith('.mdx') || file.endsWith('.md'))
-    .flatMap((fileName) => {
+  // Posts come from a module generated at build time, not from fs: the live
+  // site runs on Cloudflare Workers, which has no content/ directory at runtime.
+  // See scripts/generate-blog-posts.mjs.
+  const posts: Post[] = BLOG_POST_SOURCES
+    .flatMap(({ fileName, source }) => {
       const slugFromFile = fileName.replace(/\.mdx?$/, '')
-      const filePath = path.join(POSTS_DIR, fileName)
-      const fileContent = fs.readFileSync(filePath, 'utf8')
-      const { data, content } = parseFrontmatter(fileContent)
+      const { data, content } = parseFrontmatter(source)
 
       // Legacy articles contain unverified product and performance claims.
       // Publish only content that has been explicitly reviewed and opted in.

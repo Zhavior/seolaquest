@@ -17,25 +17,26 @@ export async function generateStaticParams() {
 }
 
 /**
- * Posts are files on disk, so `generateStaticParams` above is the complete list
- * of valid slugs — anything else is a 404, and the router can answer it without
- * rendering.
+ * Posts are bundled at build time (lib/generated/blogPosts.ts), so
+ * `generateStaticParams` above is the complete list of valid slugs.
  *
- * This has to live at the routing layer rather than in `notFound()`: because
- * proxy.ts runs clerkMiddleware on this path, the request arrives rewritten,
- * and a `notFound()` under that rewrite serves the not-found body with HTTP
- * 200. Verified in a production build — /blog/<anything> returned 200. Google
- * reads 200-plus-not-found-content as a soft 404 and can discount the whole
- * directory, which is every article we have.
+ * `dynamicParams` stays true on purpose. On Cloudflare Workers there is no
+ * incremental cache to serve the prerendered pages from, and with
+ * `dynamicParams = false` every article returned 404 in production. Pages
+ * render on demand instead, from the bundled posts.
+ *
+ * Unknown slugs never reach this page: middleware.ts answers them with a real
+ * 404. A `notFound()` thrown here under the Clerk middleware's rewrite would be
+ * served with HTTP 200, which search engines read as a soft 404.
  */
-export const dynamicParams = false
+export const dynamicParams = true
 
 export async function generateMetadata({ params }: PostPageProps): Promise<Metadata> {
   const resolvedParams = await params
   const post = getPostBySlug(resolvedParams.slug)
 
   if (!post) {
-    // Reachable in dev, where dynamicParams is not enforced. Keep it noindex so
+    // Normally unreachable: middleware.ts 404s unknown slugs first. Keep it noindex so
     // a crawler that somehow sees this body never treats it as content.
     return {
       title: 'Article Not Found | SEOlaQuest',

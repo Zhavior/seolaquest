@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "prisma generate && next build",
+    "build": "node scripts/generate-blog-posts.mjs && prisma generate && next build",
+    "blog:generate": "node scripts/generate-blog-posts.mjs",
     "start": "next start",
     "lint": "eslint app components lib features src prisma/seed.ts middleware.ts --ignore-pattern '**/* 2.*' --max-warnings=0",
     "test": "vitest run",
