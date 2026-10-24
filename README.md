@@ -165,6 +165,12 @@ tests/            Accessibility route manifest and fixtures
 
 ---
 
+## License
+
+All rights reserved. The source is public so it can be read and evaluated; it is not open source. See [LICENSE](LICENSE).
+
+---
+
 ## Contact
 
 Built by [@Zhavior](https://github.com/Zhavior). Open to opportunities — reach me through GitHub or at the email on my profile.
