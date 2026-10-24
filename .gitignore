@@ -80,3 +80,19 @@ public/models/
 
 # Raw Perplexity response from scripts/geo-probe.ts
 .geo-probe-last.json
+
+# AI coding-tool workspaces and working notes. These are local to whoever is
+# working on the repo; they were committed early on and are not part of the
+# product. AGENTS.md and CLAUDE.md stay tracked because they hold the
+# project's shared instructions.
+/.agents/
+/.claude/
+/.windsurf/
+/.cursor/
+/.agent-lessons/
+/.agent-plans/
+/.impeccable/
+/skills-lock.json
+/PRODUCT.md
+/CHUNK_AUDIT_REPORT.md
+/SEOLAQUEST_DESIGN_HANDOFF.md

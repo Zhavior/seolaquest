@@ -45,12 +45,12 @@ A full-stack SaaS application, built solo. Not a tutorial project or a CRUD demo
 | Layer | Choice |
 |---|---|
 | Framework | Next.js 16 (App Router, Server Components), React 19, TypeScript |
-| Styling | Tailwind CSS v4, custom neo-brutalist design system with multi-theme tokens |
-| Data | PostgreSQL via Prisma, 19 models, versioned migrations |
+| Styling | Tailwind CSS v4, custom design tokens (the Dusk palette on the public site) |
+| Data | PostgreSQL via Prisma, 32 models, versioned migrations |
 | Auth | Clerk sessions plus server-side tenant authorization |
 | Billing | Stripe Checkout, signed webhooks, credit ledger |
 | AI | Google Gemini for the in-app assistant and blog content generation |
-| Infra | Vercel, Upstash Redis for rate limiting, cron-driven job runner |
+| Infra | Cloudflare Workers via OpenNext (`wrangler.jsonc`), Upstash Redis for rate limiting, durable job runner |
 | Graphics | three.js for the valley scene on the home page, sample radar and dashboard |
 | Testing | Vitest, Testing Library, axe-core accessibility gate |
 
@@ -66,7 +66,7 @@ Stripe delivers webhooks at least once, sometimes more. Credits are applied thro
 
 **Durable background work with lease-based claiming** — `DurableJob`, [`/api/v1/cron/jobs`](app/api/v1/cron/jobs/route.ts)
 
-Scans are long-running and providers fail, so work is enqueued as durable job rows drained by a per-minute Vercel cron. Each job carries a unique `dedupeKey` so the same work can't be queued twice, an attempt counter with a `nextAttemptAt` backoff, and a `leaseOwner` / `leaseGeneration` / `leaseExpiresAt` triple. The lease is the interesting part: a worker claims a job for a bounded window, so if an invocation dies mid-job the lease simply expires and the work is reclaimed — without a second worker ever running it concurrently. Jobs that exhaust `maxAttempts` are marked `deadAt` rather than silently dropped, and an ops endpoint behind a bearer secret reports the counts.
+Scans are long-running and providers fail, so work is enqueued as durable job rows drained by a cron endpoint. (That endpoint was called every minute by a Vercel cron; since the move to Cloudflare Workers no schedule is configured in this repo, so this is listed under *Not yet done* below.) Each job carries a unique `dedupeKey` so the same work can't be queued twice, an attempt counter with a `nextAttemptAt` backoff, and a `leaseOwner` / `leaseGeneration` / `leaseExpiresAt` triple. The lease is the interesting part: a worker claims a job for a bounded window, so if an invocation dies mid-job the lease simply expires and the work is reclaimed — without a second worker ever running it concurrently. Jobs that exhaust `maxAttempts` are marked `deadAt` rather than silently dropped, and an ops endpoint behind a bearer secret reports the counts.
 
 **Modular architecture** — `src/modules/<domain>/{domain,application,infrastructure}`
 
@@ -76,7 +76,7 @@ Business logic lives in `src/modules`, separated from the Next.js route layer, s
 
 `npm run test:a11y` builds and boots a real production server, drives headless Chromium across every public route, and fails on axe-core violations. It runs in GitHub Actions on every pull request and every push to `main` — accessibility is enforced by CI, not by good intentions.
 
-**Test suite** — 112 files covering domain logic, API handlers, webhook idempotency, SSRF rejection, and component rendering. 620 passing, 6 currently failing: the UI progression tests assert an XP/Mana display format the status bar no longer renders, and one auth test still expects a throw that [7154cc7](https://github.com/Zhavior/seolaquest/commit/7154cc7) deliberately removed. Listed here rather than hidden, because a README that claims a green suite you can check in thirty seconds is worse than no README.
+**Test suite** — 171 test files covering domain logic, API handlers, webhook idempotency, SSRF rejection, and component rendering. CI runs the suite on every push and pull request; see the badge above for the current result.
 
 ---
 
@@ -84,9 +84,9 @@ Business logic lives in `src/modules`, separated from the Next.js route layer, s
 
 This is an honest section, because overstated production claims are easy to check.
 
-**Working and deployed:** authentication, keyword tracking, X scanning, the lead dashboard and triage flow, Stripe checkout and webhook processing, CRM webhook delivery, the durable job runner, the Gemini-backed assistant and blog generator.
+**Working and deployed:** authentication, keyword tracking, X scanning, the lead dashboard and triage flow, Stripe checkout and webhook processing, CRM webhook delivery, the durable job runner's code and endpoint, the Gemini-backed assistant and blog generator.
 
-**Not yet done:** a database backup and restore rehearsal, a signed Stripe sandbox replay against the deployed preview, published uptime and latency objectives, runtime rate limiting and operational alerting, and verified end-to-end account deletion across every downstream system.
+**Not yet done:** a per-minute schedule for the job runner on Cloudflare Workers (the old one lived in `vercel.json` and does not run there), a database backup and restore rehearsal, a signed Stripe sandbox replay against the deployed preview, published uptime and latency objectives, runtime rate limiting and operational alerting, and verified end-to-end account deletion across every downstream system.
 
 No uptime SLA is offered, and none is claimed. The app publishes this same status at [seolaquest.com/specs](https://seolaquest.com/specs).
 
@@ -162,6 +162,12 @@ prisma/           Schema and migrations
 docs/             Architecture notes and operational runbooks
 tests/            Accessibility route manifest and fixtures
 ```
+
+---
+
+## License
+
+All rights reserved. The source is public so it can be read and evaluated; it is not open source. See [LICENSE](LICENSE).
 
 ---
 
