@@ -6,33 +6,32 @@
 ![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178C6?logo=typescript&logoColor=white)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Prisma-4169E1?logo=postgresql&logoColor=white)
 
-**Find real buyer pain before you build the wrong thing.**
+**Be the source the answer cites.**
 
-SEOlaQuest watches public conversations on X for the keywords that matter to your business and collects every match in a dashboard, with the original post attached, so you can read what people actually said instead of guessing. It's customer research for founders and operators who'd rather work from evidence than hunches.
+When a buyer asks an AI search engine which tool to use, the answer cites a handful of sites. SEOlaQuest asks that question for you, lists every source the answer used, sorts them into forums, review sites, articles and vendor pages, and shows whether your site made it in. This is often called GEO, generative engine optimization.
 
-🔗 **Live at [seolaquest.com](https://seolaquest.com)**
+🔗 **Live at [seolaquest.com](https://seolaquest.com)** — early access, free to join.
 
-![The SEOlaQuest landing page](docs/media/landing.png)
+![The SEOlaQuest landing page](docs/media/landing.jpg)
 
 ---
 
 ## For people evaluating this as a product
 
-**The problem.** You have a hunch about what your customers want. Validating it means trawling social feeds by hand, or paying for a listening tool built for enterprise brand monitoring that costs more than your runway.
+**Where it stands today.** Early access. The GEO scan is built and tested in code but not switched on: no real scan has run, so nothing on the site comes from an engine, and the sample scan on the landing page is labelled as invented. Joining is free and needs no card. Nothing on the site is for sale.
 
-**What SEOlaQuest does.**
+**How a scan works.**
 
-1. You tell it which keywords and phrases to watch.
-2. Scheduled scans sweep X for posts matching those phrases.
-3. Matches land in your dashboard with the author, the full text, and a link to the original post.
-4. You triage them yourself — claim, contact, or dismiss.
-5. Anything worth keeping can be pushed to your CRM via webhook.
+1. **Ask.** You type a question your buyers ask and the site you want named. SEOlaQuest puts the question to Perplexity, the only engine for now.
+2. **Read.** You see every page the search found and every page the answer cited, in order. "Found but not cited" is its own result.
+3. **Sort.** Each source is classified as a forum, a review site, an article or a vendor page. Sites the rules don't recognise are marked as a guess, not passed off as known.
+4. **Act.** Each type points to a different move: answer the thread, get listed, pitch the writer, or fix your own page. SEOlaQuest shows the map; you do the work.
 
-**Things it deliberately does not do.** It won't post, send, or DM on your behalf. It won't show you demo data dressed up as real results — if a provider is down, you get an honest "unavailable" instead of filler. And it won't hand you a confidence score it hasn't earned: a match is a keyword match, presented as a signal for you to judge, never as a verified sales lead. The empty states in the app say so in as many words.
+**Things it deliberately does not do.** It doesn't promise a citation: an answer is a snapshot, and the same question can cite different sources tomorrow. It covers one engine, Perplexity; ChatGPT, Gemini and Google AI answers are not covered. Scans run when you start them; there is no scheduled monitoring. And there is no price yet, because every scan records what the engine charged and no real scan has produced that number.
 
-The interface is built as a gamified RPG-style console — keywords are quests, scan credits are Mana, the dashboard is your guild hall. That's a deliberate product bet: research tools are tedious, and tedious tools go unused.
+**The earlier product.** SEOlaQuest started as an X lead finder: watch keywords on X, collect matching posts in a dashboard, triage them, and push the keepers to a CRM by webhook. It still runs inside the app for signed-in accounts, its paid checkout is paused, and most of the engineering below was built for it. Reddit scanning is implemented in the codebase but not switched on.
 
-Reddit scanning is implemented in the codebase but not yet switched on.
+The public site is styled as a quest — a game manual for founders. That's a deliberate bet: research tools are tedious, and tedious tools go unused.
 
 ---
 
@@ -49,7 +48,7 @@ A full-stack SaaS application, built solo. Not a tutorial project or a CRUD demo
 | Data | PostgreSQL via Prisma, 32 models, versioned migrations |
 | Auth | Clerk sessions plus server-side tenant authorization |
 | Billing | Stripe Checkout, signed webhooks, credit ledger |
-| AI | Google Gemini for the in-app assistant and blog content generation |
+| AI | Perplexity for GEO citation scans (off by default), Google Gemini for the in-app assistant and blog content generation |
 | Infra | Cloudflare Workers via OpenNext (`wrangler.jsonc`), Upstash Redis for rate limiting, durable job runner |
 | Graphics | three.js for the valley scene on the home page, sample radar and dashboard |
 | Testing | Vitest, Testing Library, axe-core accessibility gate |
@@ -70,7 +69,11 @@ Scans are long-running and providers fail, so work is enqueued as durable job ro
 
 **Modular architecture** — `src/modules/<domain>/{domain,application,infrastructure}`
 
-Business logic lives in `src/modules`, separated from the Next.js route layer, split by domain (billing, leads, keywords, lifecycle, progression, operations). Routes stay thin; domain rules are unit-testable without a running server.
+Business logic lives in `src/modules`, separated from the Next.js route layer, split by domain (billing, geo, leads, keywords, lifecycle, progression, operations). Routes stay thin; domain rules are unit-testable without a running server.
+
+**A GEO scan that admits what it doesn't know** — [`GeoScanService.ts`](src/modules/geo/application/GeoScanService.ts), [`sourceType.ts`](src/modules/geo/domain/sourceType.ts)
+
+Every cited URL is classified as a forum, review site, article or vendor page from a short hand-picked list of domains and URL patterns. Anything unrecognised falls through with `basis: 'FALLBACK'`, so the UI can show a guess as a guess instead of trusting it like a known match. Each scan stores what the engine charged, because pricing is waiting on that number. The whole path is off unless `GEO_SCAN_ENABLED=true` and `PERPLEXITY_API_KEY` are both set, and each account is capped at 20 scans per rolling 24 hours as a cost guard.
 
 **Accessibility as a build gate** — [`scripts/phase-5-accessibility-gate.mjs`](scripts/phase-5-accessibility-gate.mjs)
 
@@ -84,11 +87,11 @@ Business logic lives in `src/modules`, separated from the Next.js route layer, s
 
 This is an honest section, because overstated production claims are easy to check.
 
-**Working and deployed:** authentication, keyword tracking, X scanning, the lead dashboard and triage flow, Stripe checkout and webhook processing, CRM webhook delivery, the durable job runner's code and endpoint, the Gemini-backed assistant and blog generator.
+**Working and deployed:** the public early-access site, authentication, and the earlier X lead finder: keyword tracking, X scanning, the lead dashboard and triage flow, Stripe checkout and webhook processing, CRM webhook delivery, the durable job runner's code and endpoint, the Gemini-backed assistant.
 
-**Not yet done:** a per-minute schedule for the job runner on Cloudflare Workers (the old one lived in `vercel.json` and does not run there), a database backup and restore rehearsal, a signed Stripe sandbox replay against the deployed preview, published uptime and latency objectives, runtime rate limiting and operational alerting, and verified end-to-end account deletion across every downstream system.
+**Not yet done:** a first real GEO scan and its measured cost per scan, applying the GEO database table to production, showing blog posts on the live site (the blog page loads but lists no posts, because [`lib/blog.ts`](lib/blog.ts) reads them from disk at runtime and Cloudflare Workers has no filesystem), a per-minute schedule for the job runner on Cloudflare Workers (the old one lived in `vercel.json` and does not run there), a database backup and restore rehearsal, a signed Stripe sandbox replay against the deployed preview, published uptime and latency objectives, runtime rate limiting and operational alerting, and verified end-to-end account deletion across every downstream system.
 
-No uptime SLA is offered, and none is claimed. The app publishes this same status at [seolaquest.com/specs](https://seolaquest.com/specs).
+No uptime SLA is offered, and none is claimed. The app publishes this same status at [seolaquest.com/status](https://seolaquest.com/status).
 
 ---
 
@@ -152,11 +155,12 @@ app/              Next.js App Router — routes, API handlers, layouts
   api/v1/         Versioned public API (scans, keywords, webhooks, health)
 src/modules/      Domain logic by bounded context
   billing/        Stripe, credit ledger, entitlements
-  leads/          Scan orchestration, provider calls, CRM delivery
+  geo/            GEO citation scan: Perplexity client, source sorting, cost record
+  leads/          X lead finder: scan orchestration, provider calls, CRM delivery
   core/security/  SSRF guards, rate limiting, auth helpers
   operations/     Durable jobs, heartbeats, dead letters
 components/       Shared UI and the app shell
-features/         Feature-scoped components (landing, dashboard, blog, guild)
+features/         Feature-scoped components (handbook public site, dashboard, blog, guild)
 content/posts/    MDX blog content
 prisma/           Schema and migrations
 docs/             Architecture notes and operational runbooks
