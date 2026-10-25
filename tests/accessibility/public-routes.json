@@ -24,7 +24,7 @@
     },
     {
       "path": "/blog/no-such-article",
-      "title": "Article Not Found | SEOlaQuest",
+      "title": "Page Not Found | SEOlaQuest",
       "expectedStatus": 404,
       "requiredLandmarks": [
         "main"

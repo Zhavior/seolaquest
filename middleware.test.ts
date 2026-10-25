@@ -86,7 +86,7 @@ describe('Clerk public route boundary', () => {
     '/pricing',
     '/radar',
     '/blog',
-    '/blog/phase-zero',
+    '/blog/guild-lore-origin',
     '/status',
     '/login',
     '/sign-in',
@@ -139,6 +139,16 @@ describe('Clerk public route boundary', () => {
     expect(response?.status).toBe(308)
     expect(response?.headers.get('location')).toBe(new URL(destination, ORIGIN).href)
   })
+
+  it.each(['/blog/does-not-exist', '/blog/phase-zero', '/blog/does-not-exist/', '/blog/100%', '/blog/%FF'])(
+    'answers an unknown article %s with a real 404, without auth',
+    async (path) => {
+      const { protect, response } = await invokeProxy(path)
+
+      expect(protect).not.toHaveBeenCalled()
+      expect(response?.status).toBe(404)
+    },
+  )
 
   it('preserves a checkout return query while redirecting the legacy billing route', async () => {
     const { protect, response } = await invokeProxy('/billing?checkout=verifying&session_id=cs_test_1')
