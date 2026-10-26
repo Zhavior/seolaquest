@@ -155,6 +155,16 @@ function storedCalm(): boolean {
   }
 }
 
+// The home page is prerendered at build time, which cannot know the visitor's
+// clock. The server and the hydrating render both read no phase, so the toggle
+// says "Auto" until the browser's own phase replaces it right after.
+function subscribeClock(onChange: () => void): () => void {
+  const timer = window.setInterval(onChange, 60000)
+  return () => window.clearInterval(timer)
+}
+const clockPhase = () => skyInfo('auto').phase
+const noPhase = () => null
+
 function canRenderWebGL(): boolean {
   try {
     const probe = document.createElement('canvas')
@@ -211,6 +221,7 @@ export function ValleyStage({
   const [, setTick] = useState(0)
   const label = open ? skyInfo(mode).label : ''
   const sound = useSyncExternalStore(valleyAudio.subscribe, valleyAudio.getSnapshot, () => false)
+  const autoPhase = useSyncExternalStore(subscribeClock, clockPhase, noPhase)
 
   // Keep the clock in "Your sky" current while the panel is open.
   useEffect(() => {
@@ -395,7 +406,7 @@ export function ValleyStage({
             aria-controls="hb-valley-panel"
             onClick={() => setOpen((current) => !current)}
           >
-            Sky: {mode === 'auto' ? PHASE_LABEL[skyInfo('auto').phase] : PHASE_LABEL[mode]}
+            Sky: {mode !== 'auto' ? PHASE_LABEL[mode] : autoPhase ? PHASE_LABEL[autoPhase] : 'Auto'}
           </button>
           {hasScan && live ? (
             <button
