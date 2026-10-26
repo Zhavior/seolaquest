@@ -753,7 +753,12 @@ html.sfx-muted .sfx-icon-on {
    ═════════════════════════════════════════════════════════════════════════ */
 
 @layer components {
-  /* The shell root: dusk sky, a few stars, the gem glow at the top. */
+  /* The shell root: the landing page's dusk sky (.hb-sky), dimmed so panels
+     stay the brightest thing on screen. Light comes from the horizon, as on
+     the landing page, so the ridge reads as a silhouette against it. Stops
+     are in percent because the shell is one viewport tall (h-dvh): a fixed
+     rem stop left the lower part of tall screens flat black, and the ridge
+     disappeared into it. */
   .dq-world {
     position: relative;
     isolation: isolate;
@@ -765,8 +770,9 @@ html.sfx-muted .sfx-icon-on {
       radial-gradient(1px 1px at 38% 32%, rgb(255 255 255 / 0.35), transparent 60%),
       radial-gradient(1.2px 1.2px at 88% 41%, rgb(255 255 255 / 0.4), transparent 60%),
       radial-gradient(1px 1px at 56% 22%, rgb(255 255 255 / 0.3), transparent 60%),
-      radial-gradient(70rem 30rem at 62% -10rem, rgb(108 58 106 / 0.5), transparent 70%),
-      linear-gradient(180deg, #1a1546 0, #0b0818 42rem);
+      radial-gradient(70% 40% at 60% 100%, rgb(217 112 74 / 0.28), transparent 70%),
+      linear-gradient(90deg, rgb(8 6 20 / 0.55), rgb(8 6 20 / 0.2) 46%, rgb(8 6 20 / 0) 72%),
+      linear-gradient(180deg, #120f2a 0%, #1a1546 40%, #3a2350 78%, #5e3258 100%);
   }
 
   /* The ridge that closes every board on the public site, pinned to the
