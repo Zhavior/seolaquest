@@ -34,7 +34,10 @@ export type PhaseLook = {
 export const PHASE_LOOKS: Record<Phase, PhaseLook> = {
   night: { sky: ['#05061A', '#0F1236', '#232A66'], fog: '#10153E', fogD: 0.003, sun: '#9FB0FF', sunI: 0, moonO: 1, stars: 1, hemiS: '#1C2A6A', hemiG: '#07060F', hemiI: 0.42, dirC: '#8FA8FF', dirI: 0.75, lamp: 1.6, bloom: 0.9, exp: 1.0, cloudC: '#4A4E8C', cloudS: '#0E0F2A', cover: 0.35, tint: '#DDE4FF' },
   dawn: { sky: ['#22245A', '#7A4F8C', '#FFB07A'], fog: '#C98A8E', fogD: 0.0034, sun: '#FFB870', sunI: 1.0, moonO: 0, stars: 0.25, hemiS: '#7A6AA8', hemiG: '#2A2A40', hemiI: 0.8, dirC: '#FFB070', dirI: 3.0, lamp: 0.9, bloom: 0.75, exp: 1.1, cloudC: '#FFC9A8', cloudS: '#4B3A7C', cover: 0.45, tint: '#FFE8D8' },
-  day: { sky: ['#4F9FEA', '#8CCBF5', '#EAF6FC'], fog: '#CFE6F5', fogD: 0.0011, sun: '#FFF0C0', sunI: 0.8, moonO: 0, stars: 0, hemiS: '#9CC8FF', hemiG: '#4A6A3A', hemiI: 1.15, dirC: '#FFF1D6', dirI: 3.6, lamp: 0.25, bloom: 0.38, exp: 1.0, cloudC: '#FFFFFF', cloudS: '#9DB5D8', cover: 0.5, tint: '#FFFFFF' },
+  // Day is a clear afternoon held close to dusk's brightness. A pale sky and a
+  // near-white fog washed the valley into milky haze, and the gold headline sat
+  // on light grey.
+  day: { sky: ['#1F3F78', '#4F7FB4', '#A9C4D8'], fog: '#6F8FA8', fogD: 0.0011, sun: '#FFF0C0', sunI: 0.55, moonO: 0, stars: 0, hemiS: '#6E8FC8', hemiG: '#2E3F2A', hemiI: 0.72, dirC: '#FFE2B4', dirI: 2.3, lamp: 0.25, bloom: 0.22, exp: 0.76, cloudC: '#DCE6F0', cloudS: '#5D7396', cover: 0.5, tint: '#E8EEF8' },
   dusk: { sky: ['#1A1546', '#6C3A6A', '#F58B4C'], fog: '#C27A6A', fogD: 0.0034, sun: '#FF9D58', sunI: 1.1, moonO: 0.8, stars: 0.7, hemiS: '#6A4F8A', hemiG: '#1C1630', hemiI: 0.7, dirC: '#FF8F4A', dirI: 2.8, lamp: 1.1, bloom: 0.8, exp: 1.12, cloudC: '#D98A86', cloudS: '#3A2A63', cover: 0.5, tint: '#FFE0CC' },
 }
 
