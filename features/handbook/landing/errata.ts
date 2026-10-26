@@ -69,10 +69,6 @@ export const FAQ: FaqItem[] = [
     a: 'Nothing. Joining is free and asks for no card. GEO scans have no price yet, because no real scan has reported what it costs.',
   },
   {
-    q: 'What happened to the X lead finder?',
-    a: 'It still runs inside the app for signed-in accounts. The public site now describes GEO, which is where SEOlaQuest is heading.',
-  },
-  {
     q: 'What data do you keep?',
     a: 'Your email and display name, and for each scan the question, the site you checked, the answer text, the sources returned and what the engine charged. Card numbers stay with Stripe. The privacy page has the full list.',
   },

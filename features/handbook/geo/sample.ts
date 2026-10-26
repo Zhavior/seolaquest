@@ -1,6 +1,7 @@
 import type { IconName } from '../artifact/IconSprite'
 import { brandPresence, type BrandPresence, type GeoSource } from '@/src/modules/geo/domain/parseAgentResponse'
 import type { SourceType } from '@/src/modules/geo/domain/sourceType'
+import type { ScanPin } from '../valley/ValleyStage'
 
 /**
  * One invented AI-citation scan, used by the home hero and the /radar sample.
@@ -135,3 +136,29 @@ export const SAMPLE_GEO_MARKS = SAMPLE_GEO_CITED.map((s) => ({
   text: String(s.citedRank),
   fill: SOURCE_TYPE_INFO[s.sourceType].color,
 }))
+
+/** The sample's verdict on the visitor's own site, from the product's `brandPresence` rule. */
+export const SAMPLE_GEO_BRAND_VERDICT = SAMPLE_GEO_PRESENCE.brandCited
+  ? `Cited at #${SAMPLE_GEO_PRESENCE.brandCitedRank}`
+  : SAMPLE_GEO_PRESENCE.brandRetrieved
+    ? 'Found by the search, not cited'
+    : 'Not found by the search'
+
+/**
+ * Labels for the valley's scan view: the four cited sources on their beacons,
+ * the visitor's own site on the unlit tower, and the answer they feed. Every
+ * line comes from the sample above and is marked as a sample on the answer.
+ */
+export const SAMPLE_GEO_PINS: ScanPin[] = [
+  ...SAMPLE_GEO_CITED.map((s) => {
+    const info = SOURCE_TYPE_INFO[s.sourceType]
+    return { label: s.domain ?? new URL(s.url).hostname, note: `${info.label} · cited #${s.citedRank}`, move: `Your move: ${info.move}`, tone: info.color }
+  }),
+  {
+    label: SAMPLE_GEO_BRAND,
+    note: SAMPLE_GEO_BRAND_VERDICT,
+    move: `Your move: ${SOURCE_TYPE_INFO.DIRECT.move}`,
+    tone: '#8E86A8',
+  },
+  { label: 'Sample answer · Perplexity', note: `“${SAMPLE_GEO_QUERY}”`, tone: '#F3D58A' },
+]
