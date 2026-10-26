@@ -7,8 +7,7 @@ import {
   Crosshair,
   Sparkles,
   Coins,
-  Sword,
-  ShieldAlert,
+  Check,
   ChevronRight,
   Crown,
   Radar,
@@ -21,6 +20,8 @@ import {
   LayoutGrid,
   List,
 } from 'lucide-react'
+import { LocalTime } from '@/components/LocalTime'
+import { SCORE_NOTE, actionLabel, formatScore } from '@/features/dashboard/lib/leadScore'
 import { isSampleQuest, SAMPLE_QUEST_PLATFORM } from '@/src/modules/onboarding/domain/sampleQuests'
 import type { DashboardLead } from '@/features/dashboard/types'
 import { XTwitterIcon, RedditIcon } from '@/components/PlatformIcons'
@@ -46,7 +47,7 @@ const signalBadgeStyles: Record<
   { label: string; wrap: string; badge: string; border: string; accent: string }
 > = {
   LIVE_SCORED: {
-    label: 'LIVE SCORED',
+    label: 'SCORED',
     wrap: 'bg-amber-500/10',
     badge: 'bg-highlight-strong text-amber-950 border-amber-500',
     border: 'border-l-8 border-l-amber-500',
@@ -60,7 +61,7 @@ const signalBadgeStyles: Record<
     accent: 'bg-slate-700 hover:bg-slate-800 text-white',
   },
   SCORING_UNAVAILABLE: {
-    label: 'SCORING UNAVAILABLE',
+    label: 'COULD NOT SCORE',
     wrap: 'bg-blue-500/10',
     badge: 'bg-[#BAE6FD] text-blue-900 border-blue-400',
     border: 'border-l-8 border-l-blue-500',
@@ -140,7 +141,7 @@ function getIntentDisplay(lead: DashboardLead): IntentDisplay {
   // and UNAVAILABLE all still carry a finalScore, and showing it would restate
   // the same false precision this function exists to remove.
   if (aurora.evaluationStatus !== 'LIVE') {
-    return { kind: 'unscored', label: 'Scoring unavailable' }
+    return { kind: 'unscored', label: 'Could not score this one' }
   }
 
   return { kind: 'scored', score: aurora.score, action: aurora.recommendedAction, reasons: aurora.reasons ?? [] }
@@ -156,12 +157,12 @@ function getIntentDisplay(lead: DashboardLead): IntentDisplay {
  */
 function getTacticalRead(intent: IntentDisplay): string {
   if (intent.kind !== 'scored') {
-    return 'Pending Aurora evaluation.'
+    return 'No score yet.'
   }
   const evidence = intent.reasons.filter(reason => !/^[A-Z_]+$/.test(reason)).slice(0, 3)
   return evidence.length
     ? `${evidence.join('. ')}. Review the source before acting.`
-    : 'Heuristic priority only. Review the source to assess relevance and buying intent.'
+    : 'Read the post yourself to decide if it is a real buyer.'
 
 }
 
@@ -212,44 +213,45 @@ function EmptyRadarState({ handlePresetClick }: { handlePresetClick: (phrase: st
         <div className="relative mb-6 flex h-28 w-28 items-center justify-center rounded-full rounded-[20px] border border-outline bg-accent shadow-sm">
           <div className="absolute inset-3 rounded-full rounded-lg border border-outline/20" />
           <div className="absolute inset-6 rounded-full rounded-lg border border-outline/15" />
-          <div className="absolute h-[2px] w-12 origin-left -rotate-12 bg-black animate-pulse" />
+          
           <Radar className="relative z-10 h-12 w-12 text-ink" />
         </div>
 
-        <div className="inline-flex items-center gap-2 rounded-lg border border-outline bg-black px-3 py-1.5 text-xs font-mono font-semibold normal-case tracking-wide text-accent shadow-none">
-          <ShieldAlert className="h-4 w-4" />
-          [ RADAR CLEAR // NO ACTIVE SIGNALS IN SECTOR ]
-        </div>
-
-        <h3 className="font-display mt-6 text-3xl md:text-4xl font-semibold normal-case tracking-tight text-ink leading-none">
-          Arm a keyword and cast your first scan
+        <h3 className="font-display mt-2 text-3xl md:text-4xl font-semibold normal-case tracking-tight text-ink leading-none">
+          No leads yet
         </h3>
 
         <p className="mt-4 max-w-2xl text-base font-medium leading-relaxed text-ink/75">
-          Your loot board wakes up when the hunt begins. Target buyer pain, comparison intent, and replacement language to reveal high-value leads.
+          When you scan, posts that match your keywords show up here. Start by adding a phrase your buyers
+          use, like “looking for a CRM”.
         </p>
 
-        <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+        <button
+          type="button"
+          onClick={() => {
+            const input = document.getElementById('keyword-input')
+            input?.scrollIntoView({ block: 'center' })
+            input?.focus({ preventScroll: true })
+          }}
+          className="mt-6 inline-flex min-h-[44px] items-center gap-3 rounded-[20px] border border-outline bg-accent-2 px-6 py-3 text-sm font-semibold normal-case text-on-accent shadow-sm transition active:translate-x-[2px] active:translate-y-[2px] active:shadow-none"
+        >
+          Add a keyword
+        </button>
+
+        <p className="mt-8 text-sm text-ink-muted">Or add one of these with one tap:</p>
+        <div className="mt-3 flex flex-wrap items-center justify-center gap-3">
           {['hubspot alternative', 'looking for crm', 'pipeline analytics'].map((phrase) => (
             <button
               key={phrase}
               type="button"
               onClick={() => handlePresetClick(phrase)}
-              className="rounded-[20px] border border-outline bg-card px-4 py-2 text-xs font-semibold normal-case shadow-none transition hover:-translate-x-0.5 hover:-translate-y-0.5 hover:bg-accent min-h-[44px]"
+              aria-label={`Add the keyword ${phrase}`}
+              className="rounded-[20px] border border-outline bg-card px-4 py-2 text-sm font-semibold normal-case shadow-none transition hover:-translate-x-0.5 hover:-translate-y-0.5 hover:bg-accent min-h-[44px]"
             >
               {phrase}
             </button>
           ))}
         </div>
-
-        <button
-          type="button"
-          onClick={() => handlePresetClick('looking for crm')}
-          className="mt-6 inline-flex min-h-[44px] items-center gap-3 rounded-[20px] border border-outline bg-accent-2 px-6 py-3 text-sm font-semibold normal-case text-on-accent shadow-sm transition active:translate-x-[2px] active:translate-y-[2px] active:shadow-none"
-        >
-          <Sword className="h-5 w-5" />
-          Arm keyword & cast scan
-        </button>
       </div>
     </div>
   )
@@ -329,10 +331,7 @@ function DashboardFeedComponent({
               className={`h-4 w-4 text-on-accent ${shouldReduceMotion ? '' : 'animate-spin'}`}
               aria-hidden
             />
-            Updating queue — keeping current leads visible
-          </span>
-          <span className="hidden sm:inline-block border border-outline bg-card text-ink px-2 py-0.5 text-[10px] font-semibold normal-case">
-            Measured queue
+            Updating your leads…
           </span>
         </div>
       )}
@@ -346,26 +345,21 @@ function DashboardFeedComponent({
 
           <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-2 mb-1">
-              <span className="bg-black text-accent normal-case text-[10px] sm:text-xs font-semibold tracking-wide px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-lg border border-outline ">
-                Opportunity Queue
+              <span className="bg-black text-accent normal-case text-xs font-semibold tracking-wide px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-lg border border-outline ">
+                Your leads
               </span>
             </div>
 
             <h2
               className="font-display text-2xl sm:text-3xl normal-case tracking-tight text-ink mt-0.5"
             >
-              Open leads to triage
+              Leads to look at
             </h2>
 
             <div className="mt-3 flex flex-wrap items-center gap-2">
-              <div className="inline-flex items-center gap-1.5 rounded-lg border sm:rounded-[20px] border border-outline bg-accent px-2.5 py-1 text-[11px] sm:text-xs font-semibold normal-case shadow-none sm:shadow-none">
+              <div className="inline-flex items-center gap-1.5 rounded-lg border sm:rounded-[20px] border border-outline bg-accent px-2.5 py-1 text-xs font-semibold normal-case shadow-none sm:shadow-none">
                 <Crosshair className="h-3.5 w-3.5" />
-                {displayedLeads.length} {displayedLeads.length === 1 ? 'signal' : 'signals'}
-              </div>
-
-              <div className="inline-flex items-center gap-1.5 rounded-lg border sm:rounded-[20px] border border-outline bg-info px-2.5 py-1 text-[11px] sm:text-xs font-semibold normal-case shadow-none sm:shadow-none text-on-accent">
-                <Sparkles className="h-3.5 w-3.5" />
-                Fresh intent
+                {displayedLeads.length} {displayedLeads.length === 1 ? 'lead' : 'leads'}
               </div>
             </div>
           </div>
@@ -376,31 +370,31 @@ function DashboardFeedComponent({
           <button
             type="button"
             onClick={() => setViewMode('grid')}
-            aria-label="Grid view"
+            aria-label="Show as cards"
             aria-pressed={viewMode === 'grid'}
-            className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold normal-case transition ${
+            className={`inline-flex min-h-11 items-center gap-1.5 px-3 py-1.5 text-xs font-semibold normal-case transition ${
               viewMode === 'grid'
                 ? 'bg-accent text-on-accent rounded-lg border border-outline shadow-none'
                 : 'text-ink-muted hover:text-on-accent'
             }`}
           >
             <LayoutGrid className="h-3.5 w-3.5" />
-            <span className="hidden sm:inline">Grid View</span>
+            <span className="hidden sm:inline">Cards</span>
           </button>
 
           <button
             type="button"
             onClick={() => setViewMode('compact')}
-            aria-label="Compact list view"
+            aria-label="Show as a list"
             aria-pressed={viewMode === 'compact'}
-            className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold normal-case transition ${
+            className={`inline-flex min-h-11 items-center gap-1.5 px-3 py-1.5 text-xs font-semibold normal-case transition ${
               viewMode === 'compact'
                 ? 'bg-accent text-on-accent rounded-lg border border-outline shadow-none'
                 : 'text-ink-muted hover:text-on-accent'
             }`}
           >
             <List className="h-3.5 w-3.5" />
-            <span className="hidden sm:inline">Compact List</span>
+            <span className="hidden sm:inline">List</span>
           </button>
         </div>
       </div>
@@ -409,19 +403,21 @@ function DashboardFeedComponent({
       <div className="mb-6 space-y-3">
         {/* Full-width Search Bar */}
         <div className="relative flex items-center rounded-[20px] border border-outline bg-card shadow-sm">
-          <Search className="absolute left-3.5 h-4 w-4 text-ink-muted pointer-events-none" />
+          <Search className="absolute left-3.5 h-4 w-4 text-ink-muted pointer-events-none" aria-hidden />
+          <label htmlFor="lead-search" className="sr-only">Search your leads</label>
           <input
-            type="text"
+            id="lead-search"
+            type="search"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="SEARCH SIGNALS, PLAYERS, KEYWORDS..."
+            placeholder="Search by words in the post, author or keyword"
             className="w-full bg-transparent py-2.5 pl-10 pr-10 text-xs sm:text-sm font-semibold normal-case text-ink placeholder:text-ink-muted focus:outline-none focus:ring-4 focus:ring-[#FFE600]"
           />
           {searchQuery && (
             <button
               type="button"
               onClick={() => setSearchQuery('')}
-              className="absolute right-3 p-1 text-ink-muted hover:text-ink"
+              className="absolute right-1 grid size-11 place-items-center text-ink-muted hover:text-ink"
               aria-label="Clear search"
             >
               <X className="h-4 w-4" />
@@ -441,7 +437,8 @@ function DashboardFeedComponent({
                 key={platform}
                 type="button"
                 onClick={() => setFilter(platform)}
-                className={`flex shrink-0 min-h-[40px] items-center gap-2 rounded-[20px] border border-outline px-3.5 py-1.5 text-xs font-semibold normal-case shadow-none transition active:translate-x-[2px] active:translate-y-[2px] active:shadow-none ${
+                aria-pressed={filter === platform}
+                className={`flex shrink-0 min-h-11 items-center gap-2 rounded-[20px] border border-outline px-3.5 py-1.5 text-xs font-semibold normal-case shadow-none transition active:translate-x-[2px] active:translate-y-[2px] active:shadow-none ${
                   filter === platform ? 'bg-accent text-ink' : 'bg-card text-ink hover:bg-accent'
                 }`}
               >
@@ -467,26 +464,21 @@ function DashboardFeedComponent({
                 const freshness = formatTimestamp(lead.sourceCreatedAt)
 
                 return (
+                  // Not a button itself: buttons nested in a button are unreachable
+                  // for keyboard and screen-reader users. A click anywhere still
+                  // opens the details for mouse users; "Details" does it for everyone.
                   <article
                     key={`compact-${lead.id}`}
-                    role="button"
-                    tabIndex={0}
                     onClick={() => setActiveDetailLead(lead)}
-                    onKeyDown={(event) => {
-                      if (event.key === 'Enter' || event.key === ' ') {
-                        event.preventDefault()
-                        setActiveDetailLead(lead)
-                      }
-                    }}
-                    aria-label={`Open lead from ${lead.author} on ${lead.platform}`}
+                    aria-label={`Lead from ${lead.author} on ${lead.platform}`}
                     className={`cursor-pointer rounded-[20px] border border-outline bg-card p-3 ${badgeStyle.border} shadow-none hover:-translate-y-0.5 transition flex flex-col md:flex-row md:items-center justify-between gap-3 focus-visible:outline-none`}
                   >
                     <div className="flex items-center gap-3 min-w-0 flex-1">
-                      <span className={`inline-flex items-center gap-1 rounded-lg border border-outline px-2 py-0.5 text-[10px] font-semibold normal-case shrink-0 ${badgeStyle.badge} shadow-none`}>
-                        {intentDisplay.kind === 'scored' ? `${intentDisplay.score}% MATCH` : 'UNSCORED'}
+                      <span className={`inline-flex items-center gap-1 rounded-lg border border-outline px-2 py-0.5 text-xs font-semibold normal-case shrink-0 ${badgeStyle.badge} shadow-none`}>
+                        {intentDisplay.kind === 'scored' ? formatScore(intentDisplay.score) : 'No score yet'}
                       </span>
 
-                      <span className={`inline-flex items-center gap-1 border border-outline px-2 py-0.5 text-[10px] font-semibold normal-case shrink-0 ${platformTone.chip}`}>
+                      <span className={`inline-flex items-center gap-1 border border-outline px-2 py-0.5 text-xs font-semibold normal-case shrink-0 ${platformTone.chip}`}>
                         {platformTone.icon}
                         {platformTone.label}
                       </span>
@@ -497,7 +489,7 @@ function DashboardFeedComponent({
                     </div>
 
                     <div className="flex items-center gap-2 shrink-0 border-t pt-2 md:border-t-0 md:pt-0 border-outline/20">
-                      <span className="text-[10px] font-mono font-semibold text-ink-muted normal-case mr-1">
+                      <span className="text-xs font-mono font-semibold text-ink-muted normal-case mr-1">
                         {freshness}
                       </span>
 
@@ -508,10 +500,10 @@ function DashboardFeedComponent({
                           generateAIReply(lead)
                         }}
                         disabled={isPending}
-                        className="inline-flex min-h-[34px] items-center gap-1 rounded-lg border border-outline bg-accent px-2.5 py-1 text-[11px] font-semibold normal-case shadow-none hover:bg-highlight-strong disabled:opacity-60"
+                        className="inline-flex min-h-11 items-center gap-1 rounded-lg border border-outline bg-accent px-2.5 py-1 text-xs font-semibold normal-case shadow-none hover:bg-highlight-strong disabled:opacity-60"
                       >
                         <Sparkles className="h-3 w-3" />
-                        Draft
+                        Draft a reply
                       </button>
 
                       <button
@@ -521,10 +513,10 @@ function DashboardFeedComponent({
                           handleClaimBounty(lead)
                         }}
                         disabled={isPending}
-                        className={`inline-flex min-h-[34px] items-center gap-1 rounded-lg border border-outline px-2.5 py-1 text-[11px] font-semibold normal-case shadow-none disabled:opacity-60 ${badgeStyle.accent}`}
+                        className={`inline-flex min-h-11 items-center gap-1 rounded-lg border border-outline px-2.5 py-1 text-xs font-semibold normal-case shadow-none disabled:opacity-60 ${badgeStyle.accent}`}
                       >
-                        <Sword className="h-3 w-3" />
-                        Claim
+                        <Check className="h-3 w-3" />
+                        Save to follow-ups
                       </button>
 
                       <button
@@ -533,10 +525,11 @@ function DashboardFeedComponent({
                           e.stopPropagation()
                           setActiveDetailLead(lead)
                         }}
-                        className="inline-flex min-h-[34px] items-center justify-center rounded-lg border border-outline bg-card px-2 py-1 text-[10px] font-semibold normal-case shadow-none hover:bg-inset"
-                        aria-label="Inspect signal"
+                        className="inline-flex min-h-11 items-center justify-center gap-1 rounded-lg border border-outline bg-card px-2.5 py-1 text-xs font-semibold normal-case shadow-none hover:bg-inset"
+                        aria-label={`Details for the lead from ${lead.author}`}
                       >
-                        <SlidersHorizontal className="h-3 w-3" />
+                        <SlidersHorizontal className="h-3 w-3" aria-hidden />
+                        Details
                       </button>
                     </div>
                   </article>
@@ -572,18 +565,18 @@ function DashboardFeedComponent({
                     <div className={`border-b border-outline px-4 py-2.5 ${badgeStyle.wrap}`}>
                       <div className="flex flex-wrap items-center justify-between gap-2">
                         <div className="flex flex-wrap items-center gap-1.5">
-                          <span className={`inline-flex items-center gap-1 rounded-lg border border-outline px-2 py-0.5 text-[11px] font-semibold normal-case ${badgeStyle.badge} shadow-none`}>
+                          <span className={`inline-flex items-center gap-1 rounded-lg border border-outline px-2 py-0.5 text-xs font-semibold normal-case ${badgeStyle.badge} shadow-none`}>
                             {badge === 'LIVE_SCORED' ? <Crown className="h-3.5 w-3.5" /> : <Sparkles className="h-3.5 w-3.5" />}
                             {badgeStyle.label}
                           </span>
 
-                          <span className={`inline-flex items-center gap-1 rounded-lg border border-outline px-2 py-0.5 text-[11px] font-semibold normal-case shadow-none ${platformTone.chip}`}>
+                          <span className={`inline-flex items-center gap-1 rounded-lg border border-outline px-2 py-0.5 text-xs font-semibold normal-case shadow-none ${platformTone.chip}`}>
                             {platformTone.icon}
                             {platformTone.label}
                           </span>
                         </div>
 
-                        <span className="text-[11px] font-mono font-semibold normal-case tracking-normal text-ink-muted">
+                        <span className="text-xs font-mono font-semibold normal-case tracking-normal text-ink-muted">
                           {freshness}
                         </span>
                       </div>
@@ -598,11 +591,12 @@ function DashboardFeedComponent({
                             <>
                               <span className="inline-flex items-center gap-1.5 rounded-lg border border-outline bg-accent px-2.5 py-1 text-xs font-semibold normal-case shadow-none">
                                 <Crosshair className="h-3.5 w-3.5" />
-                                {intentDisplay.score}% intent match
+                                {formatScore(intentDisplay.score)}
                               </span>
                               <span className="inline-flex items-center gap-1.5 rounded-lg border border-outline bg-info px-2.5 py-1 text-xs font-semibold normal-case shadow-none text-on-accent">
-                                {intentDisplay.action}
+                                {actionLabel(intentDisplay.action)}
                               </span>
+                              <span className="w-full text-xs text-ink-muted">{SCORE_NOTE}</span>
                             </>
                           ) : (
                             <span className="inline-flex items-center gap-1.5 rounded-lg border border-outline bg-card px-2.5 py-1 text-xs font-semibold normal-case shadow-none text-ink-muted">
@@ -619,8 +613,8 @@ function DashboardFeedComponent({
 
                         {intentDisplay.kind === 'scored' ? (
                           <div className="border-l border-l-black bg-inset p-3 rounded-lg border border-outline shadow-none">
-                            <p className="text-[10px] font-semibold normal-case tracking-normal text-ink-muted">
-                              Tactical read
+                            <p className="text-xs font-semibold normal-case tracking-normal text-ink-muted">
+                              Why this score
                             </p>
                             <p className="mt-1 text-xs font-medium leading-relaxed text-ink">
                               {getTacticalRead(intentDisplay)}
@@ -628,11 +622,9 @@ function DashboardFeedComponent({
                           </div>
                         ) : (
                           <span
-                            className={`inline-flex items-center gap-1.5 rounded-lg border border-outline bg-inset px-2.5 py-1 text-[10px] font-semibold normal-case tracking-normal text-ink-muted shadow-none ${
-                              shouldReduceMotion ? '' : 'animate-pulse'
-                            }`}
+                            className={`inline-flex items-center gap-1.5 rounded-lg border border-outline bg-inset px-2.5 py-1 text-xs font-semibold normal-case tracking-normal text-ink-muted shadow-none`}
                           >
-                            ⚡ Pending Aurora Evaluation
+                            No score yet
                           </span>
                         )}
                       </div>
@@ -643,13 +635,13 @@ function DashboardFeedComponent({
                           keywords.map((keyword) => (
                             <span
                               key={`${lead.id}-${keyword}`}
-                              className="rounded-lg border border-outline bg-highlight-strong px-2 py-0.5 text-[10px] font-mono font-semibold normal-case shadow-none"
+                              className="rounded-lg border border-outline bg-highlight-strong px-2 py-0.5 text-xs font-mono font-semibold normal-case shadow-none"
                             >
                               #{keyword}
                             </span>
                           ))
                         ) : (
-                          <span className="rounded-lg border border-outline bg-card px-2 py-0.5 text-[10px] font-mono font-semibold normal-case shadow-none">
+                          <span className="rounded-lg border border-outline bg-card px-2 py-0.5 text-xs font-mono font-semibold normal-case shadow-none">
                             #general-intent
                           </span>
                         )}
@@ -662,20 +654,20 @@ function DashboardFeedComponent({
                             type="button"
                             onClick={() => generateAIReply(lead)}
                             disabled={isPending}
-                            className="inline-flex min-h-[40px] items-center justify-center gap-1.5 rounded-[20px] border border-outline bg-accent px-3 py-2 text-xs font-semibold normal-case shadow-none hover:bg-highlight-strong disabled:opacity-60 transition active:translate-x-[1px] active:translate-y-[1px]"
+                            className="inline-flex min-h-11 items-center justify-center gap-1.5 rounded-[20px] border border-outline bg-accent px-3 py-2 text-xs font-semibold normal-case shadow-none hover:bg-highlight-strong disabled:opacity-60 transition active:translate-x-[1px] active:translate-y-[1px]"
                           >
                             <Sparkles className="h-3.5 w-3.5" />
-                            Cast AI draft
+                            Draft a reply
                           </button>
 
                           <button
                             type="button"
                             onClick={() => handleClaimBounty(lead)}
                             disabled={isPending}
-                            className={`inline-flex min-h-[40px] items-center justify-center gap-1.5 rounded-[20px] border border-outline px-3 py-2 text-xs font-semibold normal-case shadow-none disabled:opacity-60 transition active:translate-x-[1px] active:translate-y-[1px] ${badgeStyle.accent}`}
+                            className={`inline-flex min-h-11 items-center justify-center gap-1.5 rounded-[20px] border border-outline px-3 py-2 text-xs font-semibold normal-case shadow-none disabled:opacity-60 transition active:translate-x-[1px] active:translate-y-[1px] ${badgeStyle.accent}`}
                           >
-                            <Sword className="h-3.5 w-3.5" />
-                            Claim lead
+                            <Check className="h-3.5 w-3.5" />
+                            Save to follow-ups
                           </button>
                         </div>
 
@@ -685,9 +677,9 @@ function DashboardFeedComponent({
                             href={lead.url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1 text-[11px] font-semibold normal-case text-ink underline-offset-4 hover:underline"
+                            className="inline-flex items-center gap-1 text-xs font-semibold normal-case text-ink underline-offset-4 hover:underline"
                           >
-                            {isSampleQuest(lead) ? 'Add keyword' : 'Inspect thread'}
+                            {isSampleQuest(lead) ? 'Add keyword' : 'Open the post'}
                             <ChevronRight className="h-3.5 w-3.5" />
                           </a>
 
@@ -696,20 +688,18 @@ function DashboardFeedComponent({
                               type="button"
                               onClick={() => exportToCRM(lead)}
                               disabled={isPending}
-                              title="Export lead to CRM"
-                              className="inline-flex min-h-[32px] items-center gap-1 rounded-lg border border-outline bg-card px-2 py-1 text-[10px] font-semibold normal-case shadow-none hover:bg-accent disabled:opacity-60"
+                              className="inline-flex min-h-11 items-center gap-1 rounded-lg border border-outline bg-card px-2 py-1 text-xs font-semibold normal-case shadow-none hover:bg-accent disabled:opacity-60"
                             >
                               <Coins className="h-3 w-3" />
-                              CRM
+                              Send to CRM
                             </button>
 
                             <button
                               type="button"
                               onClick={() => dismissLead(lead.id)}
                               disabled={isPending}
-                              title="Dismiss lead from queue"
                               aria-label={`Dismiss ${lead.author || 'lead'}`}
-                              className="inline-flex min-h-[32px] items-center gap-1 rounded-lg border border-outline bg-inset px-2 py-1 text-[10px] font-semibold normal-case shadow-none hover:bg-danger/15 text-danger-ink disabled:opacity-60"
+                              className="inline-flex min-h-11 items-center gap-1 rounded-lg border border-outline bg-inset px-2 py-1 text-xs font-semibold normal-case shadow-none hover:bg-danger/15 text-danger-ink disabled:opacity-60"
                             >
                               <X className="h-3 w-3" />
                               Dismiss
@@ -778,8 +768,8 @@ function DashboardFeedComponent({
                     ? 'Recent evidence passed the buying-intent and business-fit checks.'
                     : 'This lead has not passed every current priority check. Review the source before acting.'}</p>
                   <p className="mt-2 text-xs text-ink-muted">{activeDetailLead.aurora?.evaluatedAt
-                    ? `Evaluated ${new Date(activeDetailLead.aurora.evaluatedAt).toISOString().replace('T', ' ').slice(0, 16)} UTC`
-                    : 'Evaluation time unavailable'} · {activeDetailLead.aurora?.evaluationStatus === 'LIVE' ? 'AI assessment' : 'No live AI assessment'}</p>
+                    ? <LocalTime iso={new Date(activeDetailLead.aurora.evaluatedAt).toISOString()} prefix="Checked " />
+                    : 'Check time unknown'} · {activeDetailLead.aurora?.evaluationStatus === 'LIVE' ? 'Checked by AI' : 'Not checked by AI yet'}</p>
                   <p className="mt-1 text-xs text-ink-muted">Priority scores are estimates, not the probability of making a sale.</p>
                 </section>
                 {/* Intent & Value Banner */}
@@ -798,10 +788,10 @@ function DashboardFeedComponent({
                       <>
                         <div className="inline-flex items-center gap-1.5 rounded-lg border border-outline bg-accent px-3 py-1 text-xs font-semibold normal-case shadow-none">
                           <Crosshair className="h-4 w-4" />
-                          {detailIntent.score}% intent match
+                          {formatScore(detailIntent.score)}
                         </div>
                         <div className="inline-flex items-center gap-1.5 rounded-lg border border-outline bg-info px-3 py-1 text-xs font-semibold normal-case shadow-none text-on-accent">
-                          {detailIntent.action}
+                          {actionLabel(detailIntent.action)}
                         </div>
                       </>
                     )
@@ -810,7 +800,7 @@ function DashboardFeedComponent({
 
                 {/* Full Quote Content */}
                 <div className="rounded-[20px] border border-outline bg-card p-4 shadow-sm">
-                  <p className="text-xs font-semibold normal-case text-ink-muted mb-1">Raw Signal Content</p>
+                  <p className="text-xs font-semibold normal-case text-ink-muted mb-1">The post</p>
                   <p className="text-base font-semibold normal-case leading-relaxed text-ink">
                     “{activeDetailLead.content}”
                   </p>
@@ -827,18 +817,16 @@ function DashboardFeedComponent({
                   if (detailIntent.kind !== 'scored') {
                     return (
                       <span
-                        className={`inline-flex w-fit items-center gap-1.5 rounded-lg border border-outline bg-inset px-2.5 py-1 text-[10px] font-semibold normal-case tracking-normal text-ink-muted shadow-none ${
-                          shouldReduceMotion ? '' : 'animate-pulse'
-                        }`}
+                        className={`inline-flex w-fit items-center gap-1.5 rounded-lg border border-outline bg-inset px-2.5 py-1 text-xs font-semibold normal-case tracking-normal text-ink-muted shadow-none`}
                       >
-                        ⚡ Pending Aurora Evaluation
+                        No score yet
                       </span>
                     )
                   }
                   return (
                     <div className="border-l border-outline bg-highlight p-4 rounded-[20px] border border-outline shadow-none">
                       <p className="text-xs font-semibold normal-case tracking-normal text-ink-muted">
-                        Tactical read & Buyer state
+                        Why this score
                       </p>
                       <p className="mt-1.5 text-xs font-medium leading-relaxed text-ink/90">
                         {getTacticalRead(detailIntent)}
@@ -868,7 +856,7 @@ function DashboardFeedComponent({
                     className="flex items-center justify-between rounded-lg border border-outline bg-card p-3 text-xs font-semibold normal-case shadow-none hover:bg-accent"
                   >
                     <span>
-                      {isSampleQuest(activeDetailLead) ? 'Add a real keyword' : 'Inspect source thread'}
+                      {isSampleQuest(activeDetailLead) ? 'Add a real keyword' : 'Open the original post'}
                     </span>
                     <ExternalLink className="h-4 w-4" />
                   </a>
@@ -883,7 +871,7 @@ function DashboardFeedComponent({
                       className="inline-flex min-h-[44px] items-center justify-center gap-1.5 rounded-[20px] border border-outline bg-accent px-3 py-2.5 text-xs font-semibold normal-case shadow-none hover:bg-highlight-strong"
                     >
                       <Sparkles className="h-4 w-4" />
-                      AI Reply
+                      Draft a reply
                     </button>
 
                     <button
@@ -894,8 +882,8 @@ function DashboardFeedComponent({
                       }}
                       className="inline-flex min-h-[44px] items-center justify-center gap-1.5 rounded-[20px] border border-outline bg-accent-2 px-3 py-2.5 text-xs font-semibold normal-case text-on-accent shadow-none"
                     >
-                      <Sword className="h-4 w-4" />
-                      Claim Lead
+                      <Check className="h-4 w-4" />
+                      Save to follow-ups
                     </button>
                   </div>
 

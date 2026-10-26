@@ -9,7 +9,7 @@ import { readHunterProgression } from '@/src/modules/gamify/hunterProgression'
 export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
-  title: 'Mage Tower | SEOlaQuest',
+  title: 'Profile | SEOlaQuest',
   description: 'Review your guild master profile, class identity, and account state.',
 }
 

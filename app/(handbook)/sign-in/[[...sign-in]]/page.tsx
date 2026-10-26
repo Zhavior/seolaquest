@@ -26,7 +26,7 @@ export default function Page() {
           </p>
         }
       >
-        <SignIn fallbackRedirectUrl="/onboarding" signUpUrl="/sign-up" appearance={clerkAppearance} />
+        <SignIn fallbackRedirectUrl="/app" signUpUrl="/sign-up" appearance={clerkAppearance} />
       </AuthShell>
     </ClerkProvider>
   )

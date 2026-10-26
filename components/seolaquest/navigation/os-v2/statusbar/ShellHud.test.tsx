@@ -12,8 +12,9 @@ vi.mock('next/link', () => ({
 
 import ShellHud from './ShellHud'
 
-function renderHud(user?: Parameters<typeof ShellHud>[0]['user']) {
-  return render(<ShellHud user={user} />)
+// Most cases here check the XP reading, which only shows with the game layer on.
+function renderHud(user?: Parameters<typeof ShellHud>[0]['user'], gameMode = true) {
+  return render(<ShellHud user={user} gameMode={gameMode} />)
 }
 
 describe('ShellHud telemetry', () => {
@@ -31,8 +32,8 @@ describe('ShellHud telemetry', () => {
     // The mobile cluster abbreviates the same readings, so level appears twice.
     expect(screen.getAllByText('LVL 4').length).toBeGreaterThan(0)
     expect(screen.getByText('XP 60/340')).toBeInTheDocument()
-    expect(screen.getByText('18/50 MP')).toBeInTheDocument()
-    expect(screen.getByText('7 QUESTS')).toBeInTheDocument()
+    expect(screen.getByText('18/50 scan credits')).toBeInTheDocument()
+    expect(screen.getByText('7 leads to review')).toBeInTheDocument()
     // The badge is uppercased in CSS, so the DOM keeps the stored casing.
     expect(screen.getByText('Ada')).toBeInTheDocument()
   })
@@ -49,9 +50,9 @@ describe('ShellHud telemetry', () => {
     })
 
     expect(screen.getByText('XP 0/100')).toBeInTheDocument()
-    expect(screen.getByText('0/0 MP')).toBeInTheDocument()
+    expect(screen.getByText('0 scan credits')).toBeInTheDocument()
     // An empty board is information: the counter stays, showing zero.
-    expect(screen.getByText('0 QUESTS')).toBeInTheDocument()
+    expect(screen.getByText('0 leads to review')).toBeInTheDocument()
   })
 
   it('uses the live balance as the meter ceiling when it exceeds the recorded watermark', () => {
@@ -59,14 +60,14 @@ describe('ShellHud telemetry', () => {
     // catches up, and a bar over 100% would render as a lie in the other direction.
     renderHud({ level: 2, xp: 10, xpRequired: 150, questsRemaining: 80, maxCredits: 50, openQuests: 0 })
 
-    expect(screen.getByText('80/80 MP')).toBeInTheDocument()
+    expect(screen.getByText('80/80 scan credits')).toBeInTheDocument()
   })
 
   it('falls back to an empty account rather than sample telemetry when no user is supplied', () => {
     renderHud(undefined)
 
     expect(screen.getByText('XP 0/100')).toBeInTheDocument()
-    expect(screen.getByText('0/0 MP')).toBeInTheDocument()
+    expect(screen.getByText('0 scan credits')).toBeInTheDocument()
     expect(screen.getByText('HUNTER')).toBeInTheDocument()
   })
 
@@ -79,19 +80,27 @@ describe('ShellHud telemetry', () => {
   it('points the quest counter at the queue it is counting', () => {
     renderHud({ openQuests: 7, questsRemaining: 1, maxCredits: 1 })
 
-    const questLinks = screen.getAllByRole('link', { name: '7 QUESTS' })
+    const questLinks = screen.getAllByRole('link', { name: '7 leads to review' })
     expect(questLinks.length).toBeGreaterThan(0)
     for (const link of questLinks) {
       expect(link).toHaveAttribute('href', '/app')
     }
   })
 
-  it('names the abbreviated mobile readings for assistive tech', () => {
+  it('shows words, not bare numbers, on phones and names them in full', () => {
     renderHud({ level: 4, xp: 60, xpRequired: 340, questsRemaining: 18, maxCredits: 50, openQuests: 7 })
 
-    // "18/50" and "L4" are what fits on a phone; the full reading is what a
-    // screen reader gets.
-    expect(screen.getByRole('img', { name: '18/50 MP' })).toBeInTheDocument()
-    expect(screen.getByRole('img', { name: 'LVL 4' })).toBeInTheDocument()
+    // Tooltips never reach a phone, so the short reading carries its own word.
+    expect(screen.getByText('7 leads')).toBeInTheDocument()
+    expect(screen.getByText('18 credits')).toBeInTheDocument()
+    expect(screen.getByRole('img', { name: '18/50 scan credits' })).toBeInTheDocument()
+  })
+
+  it('leaves out level and XP when the game layer is off (the default)', () => {
+    renderHud({ level: 4, xp: 60, xpRequired: 340, questsRemaining: 18, maxCredits: 50, openQuests: 7 }, false)
+
+    expect(screen.queryByText('LVL 4')).toBeNull()
+    expect(screen.queryByText(/XP 60/)).toBeNull()
+    expect(screen.getByText('7 leads to review')).toBeInTheDocument()
   })
 })

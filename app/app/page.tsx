@@ -16,8 +16,8 @@ const FirstQuestBanner = nextDynamic(() => import('@/features/dashboard/componen
 export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
-  title: 'Battle Area | SEOlaQuest',
-  description: 'Command your Battle Area, manage keyword campaigns, and review active lead intelligence.',
+  title: 'Home | SEOlaQuest',
+  description: 'Your next step and the leads to look at.',
 }
 
 export default function AppHomePage() {

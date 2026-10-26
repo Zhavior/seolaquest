@@ -8,5 +8,5 @@ import { QuestRoutePending } from '@/components/quest'
  * app. It intentionally avoids drawing a fake dashboard before the real one.
  */
 export default function AppLoading() {
-  return <QuestRoutePending label="Opening Battle Area" />
+  return <QuestRoutePending label="Opening Home" />
 }

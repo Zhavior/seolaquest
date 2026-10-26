@@ -10,8 +10,6 @@ describe('DashboardKeywords accessibility', () => {
         keywords={[{ id: 'kw_1', phrase: 'need a website', active: true }]}
         newKeyword=""
         setNewKeyword={vi.fn()}
-        selectedHeroClass="Warrior 🥷"
-        setSelectedHeroClass={vi.fn()}
         isPending={false}
         PRESET_KEYWORDS={[]}
         addKeyword={vi.fn()}
@@ -21,7 +19,7 @@ describe('DashboardKeywords accessibility', () => {
     )
 
     expect(screen.getByRole('textbox', { name: /signal phrase to track/i })).toBeVisible()
-    expect(screen.getByRole('combobox', { name: /signal class/i })).toBeVisible()
+    expect(screen.queryByRole('combobox')).toBeNull()
     expect(screen.getByRole('button', { name: /remove need a website/i })).not.toHaveClass('opacity-0')
   })
 })

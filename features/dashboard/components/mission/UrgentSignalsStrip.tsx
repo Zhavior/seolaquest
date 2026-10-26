@@ -3,6 +3,7 @@
 import { motion, type Variants } from 'framer-motion'
 import { AlertTriangle, ChevronRight } from 'lucide-react'
 import type { DashboardLead } from '@/features/dashboard/types'
+import { actionLabel, formatScore } from '@/features/dashboard/lib/leadScore'
 
 type UrgentSignalsStripProps = {
   item: Variants
@@ -14,12 +15,12 @@ type UrgentSignalsStripProps = {
 function leadFact(lead: DashboardLead): string {
   const aurora = lead.aurora
   if (aurora?.evaluationStatus === 'LIVE') {
-    return `LIVE score ${aurora.score}/100 · ${aurora.recommendedAction}`
+    return `${formatScore(aurora.score)} · ${actionLabel(aurora.recommendedAction)}`
   }
   if (aurora) {
-    return `Scoring unavailable (${aurora.evaluationStatus})`
+    return 'Could not score this one'
   }
-  return 'Not scored yet'
+  return 'No score yet'
 }
 
 /**

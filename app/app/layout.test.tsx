@@ -6,6 +6,8 @@ vi.mock('@/lib/auth', () => ({
   getCurrentUser: vi.fn().mockResolvedValue({ onboardingComplete: true }),
 }))
 
+vi.mock('@/lib/gameMode.server', () => ({ readGameMode: vi.fn().mockResolvedValue(false) }))
+
 // The shell's Log Out control calls useClerk(), which requires a ClerkProvider.
 vi.mock('@clerk/nextjs', () => ({
   ClerkProvider: ({ children }: { children: ReactNode }) => children,

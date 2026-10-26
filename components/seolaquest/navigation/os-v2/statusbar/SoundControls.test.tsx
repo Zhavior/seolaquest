@@ -1,10 +1,12 @@
 import { fireEvent, render, screen } from '@testing-library/react'
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { SoundControls } from './SoundControls'
 import { sfx } from '@/lib/sfx'
 
 vi.unmock('@/lib/sfx')
-afterEach(() => { sfx.setEnabled(true); sfx.setVolume(0.5); localStorage.clear() })
+// Sound starts off; these tests turn it on to exercise the mute path.
+beforeEach(() => { sfx.setEnabled(true) })
+afterEach(() => { sfx.setEnabled(false); sfx.setVolume(0.5); localStorage.clear() })
 
 describe('sound settings', () => {
   it('exposes remembered controls and disables preview when muted', () => {

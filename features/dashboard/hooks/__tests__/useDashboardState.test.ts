@@ -218,7 +218,7 @@ describe('useDashboardState', () => {
 
     expect(result.current.claimedCount).toBe(1)
     expect(result.current.user.xp).toBe(1250)
-    expect(result.current.notice).toBe('Quest claimed.')
+    expect(result.current.notice).toBe('Saved to Follow-ups.')
   })
 
   it('only confirms a keyword after it is saved, and stays quiet on failure', async () => {
@@ -284,12 +284,12 @@ describe('useDashboardState', () => {
     expect(result.current.asyncStatus).toBe('idle')
     expect(result.current.isScannerModalOpen).toBe(true)
     expect(result.current.scanLogs).toEqual([
-      'Preparing durable scan request...',
-      'Saving query state...',
-      'Queueing provider work...',
-      'Scan queued with durable run scan-run-1.',
-      'Server status: SUCCEEDED',
-      'Scan completed: 2 new source matches; provider status AVAILABLE.',
+      'Starting your scan…',
+      'Sending your keywords to the scanner…',
+      'Asking X for matching posts…',
+      'Scan started (reference scan-run-1).',
+      'Status: succeeded',
+      'Scan finished: 2 new leads found.',
     ])
     expect(result.current.scanOutcome).toBe('succeeded')
     expect(result.current.remainingQuests).toBe(49)

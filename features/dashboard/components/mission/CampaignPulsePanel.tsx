@@ -9,10 +9,10 @@ const trendCopy: Record<
   CampaignPulse['trend'],
   { label: string; tone: string }
 > = {
-  active: { label: 'Active queue', tone: 'bg-success text-ink' },
-  armed: { label: 'Armed', tone: 'bg-highlight-strong text-ink' },
-  idle: { label: 'Idle', tone: 'bg-inset text-ink' },
-  blocked: { label: 'Blocked', tone: 'bg-highlight text-ink' },
+  active: { label: 'Leads waiting', tone: 'bg-success text-ink' },
+  armed: { label: 'Ready to scan', tone: 'bg-highlight-strong text-ink' },
+  idle: { label: 'Not started', tone: 'bg-inset text-ink' },
+  blocked: { label: 'Needs credits', tone: 'bg-highlight text-ink' },
   unknown: { label: 'Unknown', tone: 'bg-card text-ink' },
 }
 
@@ -28,7 +28,7 @@ export function CampaignPulsePanel({
   planLabel,
 }: CampaignPulsePanelProps) {
   const trend = trendCopy[pulse.trend]
-  const creditReading = `${pulse.credits.remaining}/${pulse.credits.max} credits`
+  const creditReading = `${pulse.credits.remaining}/${pulse.credits.max} scan credits`
 
   return (
     <motion.section
@@ -69,11 +69,11 @@ export function CampaignPulsePanel({
 
       <div className="grid grid-cols-1 gap-0 md:grid-cols-3">
         <div className="border-b border-outline p-4 md:border-b-0 md:border-r md:p-5">
-          <p className="text-[10px] font-semibold normal-case tracking-wide text-ink/55">Measured counts</p>
+          <p className="text-[10px] font-semibold normal-case tracking-wide text-ink/55">Your numbers</p>
           <ul className="mt-3 space-y-2 text-sm font-medium text-ink">
-            <li>{pulse.counts.keywords} tracked keywords ({pulse.counts.activeKeywords} active)</li>
-            <li>{pulse.counts.openLeads} open leads</li>
-            <li>{pulse.counts.liveScoredLeads} LIVE-scored</li>
+            <li>{pulse.counts.keywords} {pulse.counts.keywords === 1 ? 'keyword' : 'keywords'} ({pulse.counts.activeKeywords} on)</li>
+            <li>{pulse.counts.openLeads} {pulse.counts.openLeads === 1 ? 'lead' : 'leads'} to look at</li>
+            <li>{pulse.counts.liveScoredLeads} with a score</li>
             {planLabel ? <li className="text-ink-muted">{planLabel}</li> : null}
           </ul>
         </div>
@@ -81,7 +81,7 @@ export function CampaignPulsePanel({
         <div className="border-b border-outline p-4 md:border-b-0 md:border-r md:p-5">
           <p className="mb-3 flex items-center gap-2 text-[10px] font-semibold normal-case tracking-wide text-ink/55">
             <CheckCircle2 className="size-3.5 shrink-0 text-[#16A34A]" aria-hidden />
-            Wins
+            Going well
           </p>
           <ul className="space-y-2 text-sm font-medium text-ink">
             {pulse.wins.map((win) => (
@@ -93,7 +93,7 @@ export function CampaignPulsePanel({
         <div className="p-4 md:p-5">
           <p className="mb-3 flex items-center gap-2 text-[10px] font-semibold normal-case tracking-wide text-ink/55">
             <AlertTriangle className="size-3.5 shrink-0 text-[#D97706]" aria-hidden />
-            Risks
+            Needs attention
           </p>
           <ul className="space-y-2 text-sm font-medium text-ink">
             {pulse.risks.map((risk) => (
@@ -107,8 +107,7 @@ export function CampaignPulsePanel({
         <p className="inline-flex items-start gap-2 text-xs font-medium normal-case leading-snug text-ink-muted">
           <TimerReset className="mt-0.5 size-4 shrink-0" aria-hidden />
           <span>
-            Freshness: {pulse.freshness.state}. {pulse.freshness.detail} Do not treat this panel as
-            live-synced until a measured last-scan timestamp exists on the payload.
+            {pulse.freshness.detail}
           </span>
         </p>
         <Link

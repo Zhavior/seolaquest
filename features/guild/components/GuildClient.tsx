@@ -6,7 +6,6 @@ import {
   QuestPageHeader,
   QuestPageShell,
   QuestPanel,
-  QuestStatusPill,
 } from '@/components/quest'
 import GuildLeaderboardPodium from '@/features/guild/components/GuildLeaderboardPodium'
 import GuildLedgerTable from '@/features/guild/components/GuildLedgerTable'
@@ -50,10 +49,9 @@ export default function GuildClient({ stats }: { stats: GuildStats }) {
             <QuestPageHeader
               className="mt-6"
               icon={<Shield className="h-8 w-8" />}
-              eyebrow="Your activity journal"
-              title="Guild Hall"
-              subtitle="Tenant Activity & Outcome Ledger"
-              status={<QuestStatusPill state="idle" label="Provider status" value="Not shown here" />}
+              eyebrow="Only you can see this"
+              title="Activity"
+              subtitle="What you have done, and your results"
             />
           </motion.div>
 
@@ -62,11 +60,11 @@ export default function GuildClient({ stats }: { stats: GuildStats }) {
             <motion.div variants={item}>
               <QuestPanel padding="lg" className="mt-8" aria-labelledby="guild-rankings-heading">
                 <h2 id="guild-rankings-heading" className="font-display text-2xl font-semibold normal-case">
-                  Guild rankings unavailable
+                  No rankings
                 </h2>
                 <p className="mt-2 max-w-2xl text-sm font-medium leading-relaxed text-ink-muted">
-                  SEOlaQuest does not publish cross-account rankings until a consented public-profile model exists. Your private,
-                  tenant-scoped activity remains visible below.
+                  We do not show rankings against other users yet, because that would need their permission. Your own activity
+                  is below, and only you can see it.
                 </p>
               </QuestPanel>
             </motion.div>

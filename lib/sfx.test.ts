@@ -27,8 +27,16 @@ beforeEach(() => {
 afterEach(() => { vi.restoreAllMocks(); vi.unstubAllGlobals() })
 
 describe('sound preferences and browser safety', () => {
+  it('starts muted for a visitor who never turned sound on', async () => {
+    const sfx = await load()
+    expect(sfx.isEnabled()).toBe(false)
+    sfx.playQuestComplete()
+    expect(oscillators).toHaveLength(0)
+  })
+
   it('persists mute/volume and immediately mutes active audio', async () => {
     const sfx = await load()
+    sfx.setEnabled(true)
     sfx.playQuestComplete()
     expect(oscillators).toHaveLength(3)
     sfx.setVolume(0.2)
@@ -44,6 +52,7 @@ describe('sound preferences and browser safety', () => {
   })
 
   it('keeps hover silent and avoids repeating a burst of identical cues', async () => {
+    localStorage.setItem('coquest_sfx_enabled', 'true')
     const sfx = await load()
     sfx.playHoverBlip()
     sfx.playSidebarHover()

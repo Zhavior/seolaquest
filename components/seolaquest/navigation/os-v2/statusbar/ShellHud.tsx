@@ -42,7 +42,7 @@ function Meter({ filled, fillClass }: { filled: number; fillClass: string }) {
  * server and ships no JavaScript. Keeping it out of `StatusBar` is also what
  * lets the account record stop crossing the client boundary entirely.
  */
-export default function ShellHud({ user }: { user?: Partial<ShellUser> }) {
+export default function ShellHud({ user, gameMode = false }: { user?: Partial<ShellUser>; gameMode?: boolean }) {
   const userName = user?.name || 'HUNTER'
 
   // Progression mirrors the server's model exactly: `xp` is progress inside the
@@ -70,45 +70,37 @@ export default function ShellHud({ user }: { user?: Partial<ShellUser> }) {
   // meter reads as "18" then "/50" to anything walking the DOM — a screen reader
   // included — and the number the user sees stops being a number anyone can
   // assert on.
-  const questLabel = `${openQuests} QUESTS`
+  const questLabel = `${openQuests} ${openQuests === 1 ? 'lead' : 'leads'} to review`
   const xpLabel = `XP ${playerXp.toLocaleString()}/${xpRequired.toLocaleString()}`
-  const mpLabel = `${currentMp}/${maxMp} MP`
+  // Plain words, one name everywhere: "scan credits", never MP or mana.
+  const mpLabel = maxMp > 0 ? `${currentMp}/${maxMp} scan credits` : `${currentMp} scan credits`
   const levelLabel = `LVL ${playerLevel}`
 
   return (
     <>
-      {/* MOBILE: numbers only — there is no room for the words */}
+      {/*
+        MOBILE: short words, not bare numbers. Help that lives in a tooltip never
+        reaches a phone, so "3 leads" says what "3" alone could not. The level
+        pill is left to wider screens; leads and credits are what a visit needs.
+      */}
       <div className="flex items-center gap-1 md:hidden">
         <Link
           href="/app"
           aria-label={questLabel}
-          title={`${openQuests} signals waiting for action`}
-          className="flex h-9 items-center gap-1 rounded-lg border border-outline bg-accent-2 px-2 text-[9px] font-semibold normal-case text-on-accent shadow-none"
+          className="flex h-11 items-center gap-1 rounded-[3px] border border-outline bg-accent-2 px-2 text-xs font-semibold normal-case text-on-accent shadow-none"
         >
-          <Scroll aria-hidden="true" className="size-2.5 shrink-0" strokeWidth={1.75} />
-          <span>{openQuests}</span>
+          <Scroll aria-hidden="true" className="size-3 shrink-0" strokeWidth={1.75} />
+          <span aria-hidden="true">{`${openQuests} ${openQuests === 1 ? 'lead' : 'leads'}`}</span>
         </Link>
 
-        {/*
-          `role="img"` so the abbreviated reading is announced in full: a generic
-          div cannot carry an accessible name, and "18/50" on its own says
-          nothing about what is being counted.
-        */}
+        {/* `role="img"` so the short reading is announced in full. */}
         <div
           role="img"
           aria-label={mpLabel}
-          className="flex h-9 items-center gap-1 rounded-lg border border-outline bg-card px-2 text-[9px] font-semibold normal-case shadow-none"
+          className="flex h-11 items-center gap-1 rounded-[3px] border border-outline bg-card px-2 text-xs font-semibold normal-case shadow-none"
         >
-          <Zap aria-hidden="true" className="size-2.5 shrink-0 text-[#06B6D4] animate-pulse" strokeWidth={1.75} />
-          <span>{`${currentMp}/${maxMp}`}</span>
-        </div>
-
-        <div
-          role="img"
-          aria-label={levelLabel}
-          className="flex h-9 items-center rounded-lg border border-outline bg-highlight-strong px-2 font-mono text-[9px] font-semibold normal-case text-on-accent shadow-none"
-        >
-          {`L${playerLevel}`}
+          <Zap aria-hidden="true" className="size-3 shrink-0 text-[#06B6D4]" strokeWidth={1.75} />
+          <span>{`${currentMp} ${currentMp === 1 ? 'credit' : 'credits'}`}</span>
         </div>
       </div>
 
@@ -120,45 +112,46 @@ export default function ShellHud({ user }: { user?: Partial<ShellUser> }) {
       */}
       <div className="hidden items-center gap-1.5 md:flex">
 
-        {/* Quests waiting */}
+        {/* Leads waiting */}
         <Link
           href="/app"
-          title={`${openQuests} signals waiting for action`}
-          className="flex h-9 items-center gap-1.5 rounded-lg border border-outline bg-accent-2 px-2.5 text-[11px] font-semibold normal-case tracking-normal text-on-accent shadow-none transition-transform duration-150 hover:-translate-y-0.5 hover:shadow-sm active:translate-y-0 active:shadow-none"
+          className="flex h-11 items-center gap-1.5 rounded-[3px] border border-outline bg-accent-2 px-2.5 text-xs font-semibold normal-case tracking-normal text-on-accent shadow-none transition-transform duration-150 hover:-translate-y-0.5 hover:shadow-sm active:translate-y-0 active:shadow-none"
         >
           <Scroll aria-hidden="true" className="size-3.5 shrink-0" strokeWidth={1.75} />
           <span>{questLabel}</span>
         </Link>
 
-        {/* EXP toward the next level */}
+        {/* EXP toward the next level — only with the game layer turned on */}
+        {gameMode ? (
         <div
           title={`${playerXp} of ${xpRequired} XP toward level ${playerLevel + 1}`}
-          className="flex h-9 items-center gap-1.5 rounded-lg border border-outline bg-card px-2.5 text-[11px] font-semibold normal-case tracking-normal shadow-none"
+          className="flex h-11 items-center gap-1.5 rounded-[3px] border border-outline bg-card px-2.5 text-xs font-semibold normal-case tracking-normal shadow-none"
         >
           <Sparkles aria-hidden="true" className="size-3.5 shrink-0 text-warning" strokeWidth={1.75} />
-          <span className="rounded-lg border border-outline bg-highlight-strong px-1 font-mono text-[9px] font-semibold text-on-accent">
+          <span className="rounded-[3px] border border-outline bg-highlight-strong px-1 font-mono text-xs font-semibold text-on-accent">
             {levelLabel}
           </span>
           <Meter filled={segmentsFor(playerXp, xpRequired)} fillClass="bg-accent" />
-          <span className="hidden font-mono text-[10px] text-ink xl:inline">{xpLabel}</span>
+          <span className="hidden font-mono text-xs text-ink xl:inline">{xpLabel}</span>
         </div>
+        ) : null}
 
-        {/* MP / scan credits */}
+        {/* Scan credits */}
         <div
-          title={`${currentMp} scan credits — each scan costs 1 MP`}
-          className="flex h-9 items-center gap-1.5 rounded-lg border border-outline bg-card px-2.5 text-[11px] font-semibold normal-case tracking-normal shadow-none"
+          title={`${currentMp} scan credits left. Each scan uses 1 credit.`}
+          className="flex h-11 items-center gap-1.5 rounded-[3px] border border-outline bg-card px-2.5 text-xs font-semibold normal-case tracking-normal shadow-none"
         >
-          <Zap aria-hidden="true" className="size-3.5 shrink-0 text-[#06B6D4] animate-pulse" strokeWidth={1.75} />
+          <Zap aria-hidden="true" className="size-3.5 shrink-0 text-[#06B6D4]" strokeWidth={1.75} />
           <Meter filled={segmentsFor(currentMp, maxMp)} fillClass="bg-info" />
           <span className="text-ink">{mpLabel}</span>
         </div>
 
         {/* User name badge */}
-        <div className="hidden lg:flex items-center gap-2 rounded-lg border border-outline bg-card px-2.5 h-9 shadow-none">
-          <div className="grid size-5 shrink-0 place-items-center rounded-lg border border-outline bg-highlight-strong">
+        <div className="hidden lg:flex items-center gap-2 rounded-[3px] border border-outline bg-card px-2.5 h-11 shadow-none">
+          <div className="grid size-5 shrink-0 place-items-center rounded-[3px] border border-outline bg-highlight-strong">
             <User aria-hidden="true" className="size-3 text-on-accent" strokeWidth={1.75} />
           </div>
-          <span className="max-w-[8rem] truncate font-mono text-[11px] font-semibold normal-case tracking-normal text-ink">
+          <span className="max-w-[8rem] truncate font-mono text-xs font-semibold normal-case tracking-normal text-ink">
             {userName}
           </span>
         </div>
@@ -167,6 +160,6 @@ export default function ShellHud({ user }: { user?: Partial<ShellUser> }) {
   )
 }
 
-export async function ShellHudData({ user }: { user: DatabaseUser }) {
-  return <ShellHud user={await toShellUser(user)} />
+export async function ShellHudData({ user, gameMode = false }: { user: DatabaseUser; gameMode?: boolean }) {
+  return <ShellHud user={await toShellUser(user)} gameMode={gameMode} />
 }

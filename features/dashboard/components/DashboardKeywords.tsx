@@ -9,8 +9,6 @@ type DashboardKeywordsProps = {
   keywords: DashboardKeyword[]
   newKeyword: string
   setNewKeyword: (v: string) => void
-  selectedHeroClass: string
-  setSelectedHeroClass: (v: string) => void
   isPending: boolean
   PRESET_KEYWORDS: string[]
   addKeyword: () => void
@@ -29,8 +27,6 @@ export function DashboardKeywords({
   keywords,
   newKeyword,
   setNewKeyword,
-  selectedHeroClass,
-  setSelectedHeroClass,
   isPending,
   PRESET_KEYWORDS,
   addKeyword,
@@ -54,7 +50,7 @@ export function DashboardKeywords({
             <div className="mb-3 inline-flex items-center gap-2 rounded-[20px] border border-outline bg-highlight px-3 py-2 shadow-sm">
               <Crosshair className="h-4 w-4 text-on-accent" aria-hidden />
               <span className="text-xs font-semibold normal-case tracking-[0.12em] text-on-accent">
-                Keyword Battlefield
+                Your keywords
               </span>
             </div>
 
@@ -75,9 +71,11 @@ export function DashboardKeywords({
             <div className="rounded-[20px] border border-outline bg-card px-3 py-2 text-xs font-semibold normal-case shadow-sm">
               {`${keywords.length} tracked · ${activeCount} active`}
             </div>
-            <div className="rounded-[20px] border border-outline bg-highlight-strong px-3 py-2 text-xs font-semibold normal-case shadow-sm">
-              {isPending ? 'Updating…' : selectedHeroClass}
-            </div>
+            {isPending ? (
+              <div role="status" className="rounded-[20px] border border-outline bg-highlight-strong px-3 py-2 text-xs font-semibold normal-case shadow-sm">
+                Updating…
+              </div>
+            ) : null}
           </div>
         </div>
 
@@ -96,21 +94,6 @@ export function DashboardKeywords({
             placeholder="Add a keyword or phrase..."
             className="min-w-0 flex-[1.6] rounded-[20px] border border-outline bg-card px-4 py-3 text-base font-semibold shadow-sm focus:outline-none focus:ring-4 focus:ring-accent"
           />
-
-          <label htmlFor="keyword-class" className="sr-only">
-            Signal class
-          </label>
-
-          <select
-            id="keyword-class"
-            value={selectedHeroClass}
-            onChange={(e) => setSelectedHeroClass(e.target.value)}
-            className="min-w-0 rounded-[20px] border border-outline bg-highlight px-4 py-3 text-sm font-semibold normal-case shadow-sm focus:outline-none focus:ring-4 focus:ring-accent xl:w-[220px]"
-          >
-            <option value="Warrior 🥷">Warrior 🥷</option>
-            <option value="Mage 🧙‍♂️">Mage 🧙‍♂️</option>
-            <option value="Knight 🦸‍♂️">Knight 🦸‍♂️</option>
-          </select>
 
           <button
             type="button"
@@ -171,10 +154,6 @@ export function DashboardKeywords({
                       </p>
                       <p className="mt-1 text-[11px] font-medium normal-case text-ink/55">
                         {statusLabel}
-                        <span className="mx-2 text-ink/30" aria-hidden>
-                          ·
-                        </span>
-                        Presentation class: {selectedHeroClass}
                       </p>
                     </div>
 

@@ -1,12 +1,12 @@
 import type { ReactNode } from 'react'
 import clsx from 'clsx'
 
-/** Parchment / commander's map paper grain used behind every quest screen. */
-const PARCHMENT_NOISE = `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`
-
 export interface QuestPageShellProps {
   children: ReactNode
-  /** Oversized lucide icon watermarked into the top-right corner. */
+  /**
+   * Accepted for older call sites and not drawn: the dusk scene behind the
+   * shell replaced the oversized corner emblem.
+   */
   watermark?: ReactNode
   /** Vertical rhythm between top-level blocks. */
   gap?: 'none' | 'md' | 'lg'
@@ -22,39 +22,25 @@ const GAP_CLASS = {
 
 /**
  * Page chrome shared by Guild Hall, Quest Log, Quest Board and Campaign
- * Broadcast: parchment background + noise overlay, 1400px centred column,
- * responsive padding, and the faint corner emblem.
+ * Broadcast: a 1400px centred column with responsive padding. It is
+ * transparent on purpose — the dusk sky and ridge belong to the shell
+ * (`.dq-world`), so every page sits in the same scene. The bottom padding
+ * keeps the last panel clear of the ridge.
  *
  * Server-safe (no hooks, no framer-motion) so both server pages and client
  * screens can use it.
  */
 export function QuestPageShell({
   children,
-  watermark,
   gap = 'lg',
   className,
   contentClassName,
 }: QuestPageShellProps) {
   return (
-    // `overflow-x-clip` (not `hidden`) contains the watermark without turning
+    // `overflow-x-clip` (not `hidden`) contains wide children without turning
     // this into a scroll container, which would break sticky descendants.
-    <div className={clsx('relative min-h-[100dvh] w-full max-w-full overflow-x-clip bg-canvas', className)}>
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 z-0 opacity-[0.025]"
-        style={{ backgroundImage: PARCHMENT_NOISE, mixBlendMode: 'multiply' }}
-      />
-
-      <div className="relative z-10 mx-auto min-h-[100dvh] w-full max-w-[1400px] p-5 font-normal md:p-8">
-        {watermark ? (
-          <div
-            aria-hidden="true"
-            className="pointer-events-none absolute right-0 top-0 -mr-24 -mt-24 hidden opacity-[0.025] md:block"
-          >
-            {watermark}
-          </div>
-        ) : null}
-
+    <div className={clsx('relative w-full max-w-full overflow-x-clip', className)}>
+      <div className="relative z-10 mx-auto w-full max-w-[1400px] p-3 pb-24 font-normal sm:p-5 sm:pb-28 md:p-8 md:pb-32">
         <div className={clsx('relative z-10', GAP_CLASS[gap], contentClassName)}>{children}</div>
       </div>
     </div>

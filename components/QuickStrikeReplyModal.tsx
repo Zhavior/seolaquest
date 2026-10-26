@@ -33,19 +33,19 @@ export default function QuickStrikeReplyModal({ lead, onClose, onConfirmClaim }:
         </button>
 
         <div className="border border-outline bg-forest p-4 pr-16 text-white shadow-brutal rounded-xl">
-          <h2 id="quick-strike-dialog-title" className="text-2xl font-semibold normal-case text-accent">Mark lead as contacted?</h2>
-          <p className="mt-1 text-xs font-bold text-ink-muted">This changes workflow state only.</p>
+          <h2 id="quick-strike-dialog-title" className="text-2xl font-semibold normal-case text-accent">Save this lead to Follow-ups?</h2>
+          <p className="mt-1 text-xs font-bold text-ink-muted">It moves to your Follow-ups page. Nothing is posted or sent.</p>
         </div>
 
         <div className="border border-outline bg-card p-5 shadow-brutal rounded-xl">
-          <p className="text-xs font-semibold normal-case text-ink-muted">Stored source record</p>
+          <p className="text-xs font-semibold normal-case text-ink-muted">The post</p>
           <p className="mt-2 text-sm font-bold leading-relaxed text-ink">&quot;{lead.content}&quot;</p>
           <p className="mt-3 text-xs font-bold text-ink-muted">Author: {lead.author} · Platform: {lead.platform}</p>
         </div>
 
         <div id="quick-strike-dialog-description" className="border border-outline bg-highlight p-4 text-sm font-bold leading-relaxed rounded-xl">
-          SEOlaQuest will not post, send, or dispatch a reply from this action. Generate or copy a draft separately, then contact
-          the person through the original source if appropriate.
+          SEOlaQuest does not contact anyone for you. If you want to reply, use “Draft a reply”, then reply to the person on X
+          yourself. Afterwards, record it on the Follow-ups page.
         </div>
 
         <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
@@ -59,7 +59,7 @@ export default function QuickStrikeReplyModal({ lead, onClose, onConfirmClaim }:
             }}
             className="inline-flex items-center justify-center gap-2 border border-outline bg-success px-5 py-3 text-xs font-semibold normal-case shadow-brutal-sm rounded-xl"
           >
-            <CheckCircle2 size={17} /> Mark contacted
+            <CheckCircle2 size={17} /> Save to follow-ups
           </button>
         </div>
     </AccessibleDialog>

@@ -29,7 +29,7 @@ function ProgressBar({ percent, target, progress }: { percent: number; target: n
         assistive tech rather than announced twice.
       */}
       <div aria-hidden="true" className="h-3 w-full border border-outline bg-inset rounded-xl">
-        <div className="h-full rounded-xl bg-emerald-400 motion-safe:transition-[width] motion-safe:duration-300" style={{ width: `${percent}%` }} />
+        <div className="h-full rounded-xl bg-accent motion-safe:transition-[width] motion-safe:duration-300" style={{ width: `${percent}%` }} />
       </div>
       <p className="mt-1 text-xs font-semibold normal-case tracking-wider text-ink-muted">
         {progress} / {target} complete
@@ -142,11 +142,12 @@ export default function QuestBoard({ board }: { board: QuestBoardData }) {
   if (board.catalogEmpty) {
     return (
       <QuestPanel tone="parchment" padding="lg" className="mt-6 text-center">
-        <p className="text-lg font-semibold normal-case text-ink">No quests are published yet</p>
+        <p className="text-lg font-semibold normal-case text-ink">No goals yet</p>
         <p className="mt-2 text-sm font-bold text-ink-muted">
-          The quest catalog is empty, so there is nothing to assign. This is a configuration
-          state, not a reflection of your account.
+          We have not set up any goals yet. This is on our side, not something wrong with your account.
+          Your leads and scans work as normal.
         </p>
+        <Link href="/app" className="mt-3 inline-flex min-h-11 items-center font-semibold text-ink underline">Go to Home</Link>
       </QuestPanel>
     )
   }
@@ -196,9 +197,10 @@ export default function QuestBoard({ board }: { board: QuestBoardData }) {
       <section>
         <QuestSectionHeading title="In progress" as="h2" />
         {board.active.length === 0 ? (
-          <p className="mt-4 border border-dashed border-hairline p-5 text-center text-sm font-bold text-ink-muted rounded-xl">
-            Nothing in progress. Claim a signal in the Battle Area and it will start counting here.
-          </p>
+          <div className="mt-4 border border-dashed border-hairline p-5 text-center text-sm font-bold text-ink-muted rounded-xl">
+            <p>No goals in progress. When you save a lead to follow-ups, the goals it counts toward show up here.</p>
+            <Link href="/app" className="mt-2 inline-flex min-h-11 items-center font-semibold text-ink underline">Look at your leads</Link>
+          </div>
         ) : (
           <ul className="mt-4 grid gap-4 md:grid-cols-2">
             {board.active.map((entry) => (

@@ -3,10 +3,10 @@ import { useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 
 const choices: Record<string, [string, string][]> = {
-  CLAIMED: [['CONTACT', 'I contacted this lead']],
-  CONTACTED: [['REPLY', 'They replied'], ['QUALIFY', 'Mark qualified'], ['CONVERT', 'Report conversion']],
-  REPLIED: [['QUALIFY', 'Mark qualified'], ['CONVERT', 'Report conversion']],
-  QUALIFIED: [['CONVERT', 'Report conversion']],
+  CLAIMED: [['CONTACT', 'I contacted them']],
+  CONTACTED: [['REPLY', 'They replied'], ['QUALIFY', 'They are a good fit'], ['CONVERT', 'They became a customer']],
+  REPLIED: [['QUALIFY', 'They are a good fit'], ['CONVERT', 'They became a customer']],
+  QUALIFIED: [['CONVERT', 'They became a customer']],
 }
 export function OutcomeControls({ leadId, status }: { leadId: string; status: string }) {
   const router = useRouter()
@@ -28,11 +28,11 @@ export function OutcomeControls({ leadId, status }: { leadId: string; status: st
         headers: { 'Content-Type': 'application/json', 'Idempotency-Key': receipt.current.key }, body })
       const result = await response.json()
       if (!response.ok) { setMessage(result.error || 'Could not save this update.'); return }
-      setMessage('Outcome saved.'); setAction(''); setNotes(''); receipt.current = null; router.refresh()
-    } catch { setMessage('Could not confirm the save. Retry the same update safely.') }
+      setMessage('Update saved.'); setAction(''); setNotes(''); receipt.current = null; router.refresh()
+    } catch { setMessage('We could not confirm it saved. Try again; it will not be saved twice.') }
     finally { setPending(false) }
   }}>
-    <label className="block">Outcome
+    <label className="block">What happened?
       <select required disabled={pending} value={action} onChange={e => setAction(e.target.value)} className="ml-2 min-h-11 rounded border border-outline bg-card p-2">
         <option value="">Choose an update</option>{options.map(([value, label]) => <option key={value} value={value}>{label}</option>)}
       </select>
@@ -40,7 +40,7 @@ export function OutcomeControls({ leadId, status }: { leadId: string; status: st
     <label className="block">Notes (optional)
       <textarea disabled={pending} maxLength={1000} value={notes} onChange={e => setNotes(e.target.value)} className="block w-full rounded border border-outline bg-card p-2" />
     </label>
-    <button disabled={pending || !action} className="min-h-11 rounded border border-outline px-4 disabled:opacity-50">{pending ? 'Saving…' : 'Save reported outcome'}</button>
+    <button disabled={pending || !action} className="min-h-11 rounded border border-outline px-4 disabled:opacity-50">{pending ? 'Saving…' : 'Save update'}</button>
     <p role="status">{message}</p>
   </form>
 }

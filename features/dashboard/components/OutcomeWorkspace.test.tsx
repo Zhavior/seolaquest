@@ -23,7 +23,7 @@ it('renders real counts, follow-up actions and scan details without claiming ver
 it('renders an explicit empty fixture for visual verification', () => {
   const view = <OutcomeWorkspace pipeline={{ stages: {}, reports: {}, followUps: [] }} scans={[]} checkedAt="2026-09-05T12:00:00Z" />
   render(view)
-  expect(screen.getByText('Claim a lead from the review queue to start following up.')).toBeInTheDocument()
+  expect(screen.getByText('Save a lead to follow-ups to start tracking it here.')).toBeInTheDocument()
   if (process.env.DASHBOARD_PREVIEW_HTML) writeFileSync(process.env.DASHBOARD_PREVIEW_HTML,
     '<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Dashboard fixture</title><body><p>VISUAL TEST — EMPTY FIXTURE DATA</p>' + renderToStaticMarkup(view) + '</body></html>')
 })

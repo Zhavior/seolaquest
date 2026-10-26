@@ -13,7 +13,7 @@ const NOTES = {
 class RetroSFX {
   private ctx: AudioContext | null = null
   private master: GainNode | null = null
-  private enabled = true
+  private enabled = false
   private volume = 0.5
   private listeners = new Set<() => void>()
   private lastCue = ''

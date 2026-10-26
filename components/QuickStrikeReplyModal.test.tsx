@@ -20,15 +20,15 @@ describe('QuickStrikeReplyModal', () => {
       <QuickStrikeReplyModal lead={lead} onClose={vi.fn()} onConfirmClaim={onConfirmClaim} />,
     )
 
-    const dialog = screen.getByRole('dialog', { name: 'Mark lead as contacted?' })
+    const dialog = screen.getByRole('dialog', { name: 'Save this lead to Follow-ups?' })
     expect(dialog).toHaveAttribute('aria-modal', 'true')
     expect(dialog).toHaveStyle({ maxHeight: 'calc(100dvh - 2rem)', overflowY: 'auto' })
-    expect(dialog).toHaveAccessibleDescription(/will not post, send, or dispatch a reply/i)
+    expect(dialog).toHaveAccessibleDescription(/does not contact anyone for you/i)
     expect(screen.getByRole('button', { name: 'Close confirmation' })).toHaveFocus()
-    expect(screen.getByText(/will not post, send, or dispatch a reply/i)).toBeInTheDocument()
+    expect(screen.getByText(/does not contact anyone for you/i)).toBeInTheDocument()
     expect(screen.queryByText(/fire reply|auto-reply|\+150 xp/i)).not.toBeInTheDocument()
 
-    fireEvent.click(screen.getByRole('button', { name: 'Mark contacted' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Save to follow-ups' }))
     expect(onConfirmClaim).toHaveBeenCalledWith('lead-1')
   })
 })

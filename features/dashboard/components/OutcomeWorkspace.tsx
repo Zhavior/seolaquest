@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { LocalTime } from '@/components/LocalTime'
 import { OutcomeControls } from '@/app/app/leads/OutcomeControls'
 import type { ScanRunView } from '@/features/scans/types'
 
@@ -7,7 +8,7 @@ type Pipeline = {
   reports: Record<string, number>
   followUps: { id: string; content: string; status: string }[]
 }
-const stages = [['CLAIMED', 'Claimed'], ['CONTACTED', 'Contacted'], ['REPLIED', 'Replied'], ['QUALIFIED', 'Qualified'], ['CONVERTED', 'Converted']] as const
+const stages = [['CLAIMED', 'Saved'], ['CONTACTED', 'Contacted'], ['REPLIED', 'Replied'], ['QUALIFIED', 'Good fit'], ['CONVERTED', 'Became a customer']] as const
 export function OutcomeWorkspace({ pipeline, scans, checkedAt }: {
   pipeline: Pipeline | null; scans: ScanRunView[] | null; checkedAt: string
 }) {
@@ -15,7 +16,7 @@ export function OutcomeWorkspace({ pipeline, scans, checkedAt }: {
     <header className="flex flex-wrap items-start justify-between gap-3">
       <div><p className="text-xs uppercase tracking-widest text-ink-muted">Your customer pipeline</p>
         <h2 id="outcome-workspace" className="font-display text-2xl sm:text-3xl">Turn conversations into progress.</h2>
-        <p className="mt-2 text-sm text-ink-muted">Saved snapshot · <time dateTime={checkedAt}>{checkedAt.replace('T', ' ').slice(0, 16)} UTC</time></p>
+        <p className="mt-2 text-sm text-ink-muted">Saved snapshot · <LocalTime iso={checkedAt} /></p>
       </div><Link href="/app/leads" className="inline-flex min-h-11 items-center underline">All follow-ups →</Link>
     </header>
     {pipeline ? <>
@@ -31,7 +32,7 @@ export function OutcomeWorkspace({ pipeline, scans, checkedAt }: {
     </> : <p role="status">Pipeline unavailable. Counts could not be loaded.</p>}
     <div className="grid gap-5 lg:grid-cols-2">
       <div className="min-w-0 space-y-3"><h3 className="font-display text-xl">Next follow-ups</h3>
-        {pipeline && !pipeline.followUps.length && <p className="text-sm text-ink-muted">Claim a lead from the review queue to start following up.</p>}
+        {pipeline && !pipeline.followUps.length && <p className="text-sm text-ink-muted">Save a lead to follow-ups to start tracking it here.</p>}
         {pipeline?.followUps.map(lead => <details key={lead.id} className="rounded-xl border border-hairline p-3">
           <summary className="min-h-11 cursor-pointer break-words text-sm"><span className="font-semibold">{lead.status.toLowerCase()}</span> · {lead.content.slice(0, 180)}{lead.content.length > 180 ? '…' : ''}</summary>
           <div className="mt-3"><OutcomeControls key={lead.status} leadId={lead.id} status={lead.status} /></div>
@@ -42,7 +43,7 @@ export function OutcomeWorkspace({ pipeline, scans, checkedAt }: {
         {scans === null ? <p role="status">Scan history unavailable.</p> : !scans.length ? <p className="text-sm text-ink-muted">No saved scans yet. Start a scan from your dashboard.</p> : scans.slice(0, 3).map(run => <Link key={run.id} href={`/app/runs/${run.id}`} className="block rounded-xl border border-hairline p-3">
           <span className="text-sm font-semibold">{run.status.replaceAll('_', ' ')}</span>
           <p className="mt-1 text-sm">{run.statusMessage}</p><p className="mt-1 text-xs text-ink-muted">{run.providerSummary}</p>
-          <p className="mt-2 text-xs">{run.counts.leadsCreated} saved leads · <time dateTime={run.updatedAt}>{run.updatedAt.replace('T', ' ').slice(0, 16)} UTC</time></p>
+          <p className="mt-2 text-xs">{run.counts.leadsCreated} saved leads · <LocalTime iso={run.updatedAt} /></p>
         </Link>)}
         <Link href="/app/runs" className="inline-flex min-h-11 items-center text-sm underline">Open scan history for current status →</Link>
       </div>

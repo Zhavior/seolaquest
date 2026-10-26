@@ -34,7 +34,7 @@ describe('scanForLeadsAction durable acceptance', () => {
     mocks.entitlementsForUser.mockResolvedValue({ canUsePaidScans: false })
     await expect(scanForLeadsAction()).resolves.toEqual({
       ok: false,
-      message: 'Manual scanning requires an active paid subscription.',
+      message: 'Scans need a paid plan.',
     })
     expect(mocks.enqueueManual).not.toHaveBeenCalled()
   })
@@ -44,15 +44,15 @@ describe('scanForLeadsAction durable acceptance', () => {
       ok: true,
       queued: true,
       runId: 'run-1',
-      message: 'Scan queued. Results will appear after processing.',
+      message: 'Scan started. New leads will appear here when it finishes.',
     })
     expect(mocks.enqueueManual).toHaveBeenCalledWith('user-1')
   })
 
   it.each([
-    ['NO_ACTIVE_KEYWORDS', 'Add a keyword before scanning.'],
-    ['NOT_ENTITLED', 'Manual scanning requires an active paid subscription.'],
-    ['NO_CREDITS', 'No scan credits remaining.'],
+    ['NO_ACTIVE_KEYWORDS', 'Add a keyword before you scan.'],
+    ['NOT_ENTITLED', 'Scans need a paid plan.'],
+    ['NO_CREDITS', 'You have no scan credits left.'],
   ])('maps %s acceptance failure without claiming completion', async (reason, message) => {
     mocks.enqueueManual.mockResolvedValue({ queued: false, reason })
     await expect(scanForLeadsAction()).resolves.toEqual({ ok: false, message })
@@ -64,7 +64,7 @@ describe('scanForLeadsAction durable acceptance', () => {
       ok: true,
       queued: true,
       runId: 'run-existing',
-      message: 'A scan is already queued for this window.',
+      message: 'A scan is already running. New leads will appear here when it finishes.',
     })
   })
 

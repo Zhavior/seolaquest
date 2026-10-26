@@ -91,7 +91,7 @@ export function DeliveryList({ deliveries: initialDeliveries, hasMore: initialHa
         </div>
         <h2 className="text-2xl font-semibold normal-case sm:text-3xl">Exports will appear here after you send a lead.</h2>
         <p className="mx-auto mt-3 max-w-xl text-sm font-bold text-ink-muted">
-          This page reports backend delivery state. It does not claim a CRM accepted anything until the worker records delivery.
+          When you send a lead to your CRM, it shows up here. We only mark it as sent once your CRM confirms it.
         </p>
         <Link
           href="/app"

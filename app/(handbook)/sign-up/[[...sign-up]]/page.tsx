@@ -27,8 +27,8 @@ export default function Page() {
               (invented data, no account).
             </p>
             <p className="hb-prose">
-              Until GEO switches on, your account opens today&apos;s app: the X lead finder. Its setup takes six short
-              steps:
+              After you sign up, you will see where GEO stands. While you wait, you can also set up today&apos;s app,
+              the X lead finder, if you want it. Its setup takes six short steps:
             </p>
             <ol className="hb-card-fields" aria-label="Today's setup, six short steps">
               {QUEST_OBJECTIVES.map((objective) => (
@@ -55,7 +55,7 @@ export default function Page() {
           </>
         }
       >
-        <SignUp fallbackRedirectUrl="/onboarding" signInUrl="/sign-in" appearance={clerkAppearance} />
+        <SignUp fallbackRedirectUrl="/welcome" signInUrl="/sign-in" appearance={clerkAppearance} />
       </AuthShell>
     </ClerkProvider>
   )
