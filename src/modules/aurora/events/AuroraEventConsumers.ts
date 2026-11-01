@@ -6,7 +6,7 @@ import { DomainEvent } from '../../core/events/DomainEvent';
 import { AuroraService } from '../AuroraService';
 import prisma from '@/lib/prisma';
 import { DeterministicScorer } from '../classifiers/DeterministicScorer';
-import { GeminiSemanticClassifier } from '../classifiers/GeminiSemanticClassifier';
+import { ClaudeSemanticClassifier } from '../classifiers/ClaudeSemanticClassifier';
 import { CanonicalPolicyScorer } from '../classifiers/CanonicalPolicyScorer';
 
 // Uses the shared Prisma singleton. Instantiating a second PrismaClient here would
@@ -14,7 +14,7 @@ import { CanonicalPolicyScorer } from '../classifiers/CanonicalPolicyScorer';
 const auroraService = new AuroraService(
   prisma,
   new DeterministicScorer(),
-  new GeminiSemanticClassifier(),
+  new ClaudeSemanticClassifier(),
   new CanonicalPolicyScorer()
 );
 

@@ -1,10 +1,9 @@
 import 'server-only'
 
-import { Type } from '@google/genai'
+import Anthropic from '@anthropic-ai/sdk'
 import { z } from 'zod'
 
-import { getGeminiClient } from '@/lib/gemini'
-import { getServerEnv } from '@/lib/env'
+import { CLAUDE_FAST_MODEL, claudeText, getClaudeClient } from '@/lib/anthropic'
 import { logger } from '@/src/modules/core/infrastructure/logger'
 import { RateLimitError } from '@/src/modules/core/infrastructure/errors'
 import { RateLimiterService } from '@/src/modules/core/security/RateLimiter'
@@ -25,13 +24,6 @@ const CLASSIFY_TIMEOUT_MS = 8_000
 /** Bounds the prompt regardless of what a provider hands us. X content is capped at 500. */
 const MAX_TEXT_CHARS = 1_000
 
-class ClassifyTimeoutError extends Error {
-  constructor() {
-    super('Aurora semantic classification timed out')
-    this.name = 'ClassifyTimeoutError'
-  }
-}
-
 /**
  * The contract the model must answer in.
  *
@@ -43,24 +35,25 @@ class ClassifyTimeoutError extends Error {
  * reintroduce that class of mismatch.
  */
 const SEMANTIC_RESPONSE_SCHEMA = {
-  type: Type.OBJECT,
+  type: 'object',
+  additionalProperties: false,
   properties: {
-    relevance: { type: Type.STRING, enum: ['HIGH', 'MEDIUM', 'LOW'] },
-    commercialIntent: { type: Type.BOOLEAN },
+    relevance: { type: 'string', enum: ['HIGH', 'MEDIUM', 'LOW'] },
+    commercialIntent: { type: 'boolean' },
     intentCategory: {
-      type: Type.STRING,
+      type: 'string',
       enum: ['PURCHASE', 'RESEARCH', 'SUPPORT', 'COMPLAINT', 'DISCUSSION', 'NONE'],
     },
-    businessFit: { type: Type.STRING, enum: ['HIGH', 'MEDIUM', 'LOW'] },
-    confidence: { type: Type.NUMBER },
-    reasons: { type: Type.ARRAY, items: { type: Type.STRING } },
+    businessFit: { type: 'string', enum: ['HIGH', 'MEDIUM', 'LOW'] },
+    confidence: { type: 'number' },
+    reasons: { type: 'array', items: { type: 'string' } },
   },
   required: ['relevance', 'commercialIntent', 'intentCategory', 'businessFit', 'confidence', 'reasons'],
-} as const
+}
 
 /**
- * Parsed independently of the provider schema. `responseSchema` is an instruction to the
- * model, not a guarantee — a truncated or safety-filtered response still has to be rejected
+ * Parsed independently of the provider schema. The output format constrains the shape but
+ * not the ranges below, and a truncated or declined response still has to be rejected
  * here rather than flowing into the policy scorer as partial signals.
  */
 const semanticResponseSchema = z.object({
@@ -107,24 +100,23 @@ function failure(failureCode: SemanticFailureCode, reason: string): AuroraSemant
  * budget is the budget, and spending 16s on one lead starves the rest of the batch.
  */
 function isRetryableProviderError(error: unknown): boolean {
-  if (error instanceof ClassifyTimeoutError) return false
+  if (error instanceof Anthropic.APIConnectionTimeoutError) return false
 
   const status = (error as { status?: unknown })?.status
   if (typeof status === 'number') return status >= 500
 
-  // Undici/fetch surfaces connection failures as a TypeError with a cause; treat only those
-  // as transient. Anything we cannot classify is assumed non-transient, so the default is to
-  // stop rather than to spend again.
-  return error instanceof TypeError
+  // Only a dropped connection counts as transient. Anything we cannot classify is assumed
+  // non-transient, so the default is to stop rather than to spend again.
+  return error instanceof Anthropic.APIConnectionError
 }
 
-export class GeminiSemanticClassifier implements AuroraSemanticClassifier {
+export class ClaudeSemanticClassifier implements AuroraSemanticClassifier {
   async classify(input: AuroraSemanticInput): Promise<AuroraSemanticResult> {
     /**
      * The tenant that owns the lead, carried on the event payload because Aurora runs in the
      * outbox worker with no request and therefore no session. Without it there is nothing to
-     * meter against, and an unmetered classifier is exactly the shape of the bug that had the
-     * Gemini chat endpoint billing our key with no limit at all — so a missing userId is
+     * meter against, and an unmetered classifier is exactly the shape of the bug that once had
+     * the chat endpoint billing our key with no limit at all — so a missing userId is
      * treated as a hard stop, not as "skip the limiter".
      */
     const userId = typeof input.context?.userId === 'string' ? input.context.userId : null
@@ -158,16 +150,16 @@ export class GeminiSemanticClassifier implements AuroraSemanticClassifier {
       return failure('RATE_LIMITED', 'Semantic classification budget unavailable')
     }
 
-    const ai = getGeminiClient()
-    if (!ai) {
+    const client = getClaudeClient()
+    if (!client) {
       logger.error(
         { event: 'aurora_classify_unconfigured', outcomeCode: 'AURORA_CLASSIFY_NOT_CONFIGURED' },
-        'Gemini is not configured; Aurora cannot classify',
+        'Claude is not configured; Aurora cannot classify',
       )
       return failure('PROVIDER_ERROR', 'Semantic classifier is not configured')
     }
 
-    const model = getServerEnv().GEMINI_MODEL
+    const model = CLAUDE_FAST_MODEL
     const businessDescription = typeof input.context?.businessDescription === 'string' ? input.context.businessDescription.slice(0, 1000) : ''
     const targetCustomer = typeof input.context?.targetCustomer === 'string' ? input.context.targetCustomer.slice(0, 500) : ''
     const businessContextAvailable = Boolean(businessDescription.trim() && targetCustomer.trim())
@@ -178,32 +170,30 @@ export class GeminiSemanticClassifier implements AuroraSemanticClassifier {
     })
 
     for (let attempt = 1; attempt <= 2; attempt += 1) {
-      let timer: ReturnType<typeof setTimeout> | undefined
       try {
-        const timeout = new Promise<never>((_, reject) => {
-          timer = setTimeout(() => reject(new ClassifyTimeoutError()), CLASSIFY_TIMEOUT_MS)
-        })
-
-        const response = await Promise.race([
-          ai.models.generateContent({
+        const response = await client.messages.create(
+          {
             model,
-            contents: prompt,
-            config: {
-              systemInstruction: SYSTEM_INSTRUCTION,
-              responseMimeType: 'application/json',
-              responseSchema: SEMANTIC_RESPONSE_SCHEMA,
+            max_tokens: 1024,
+            system: SYSTEM_INSTRUCTION,
+            messages: [{ role: 'user', content: prompt }],
+            output_config: {
+              effort: 'low',
+              format: { type: 'json_schema', schema: SEMANTIC_RESPONSE_SCHEMA },
             },
-          }),
-          timeout,
-        ])
+          },
+          // Retries stay in this loop, which knows the outbox budget; the SDK's own would
+          // re-bill behind its back.
+          { timeout: CLASSIFY_TIMEOUT_MS, maxRetries: 0 },
+        )
 
-        const text = response.text
+        const text = claudeText(response)
         if (!text) {
-          // Empty and safety-blocked are indistinguishable on this SDK surface, and both mean
-          // the same thing to us: no signal. Not retried — a blocked prompt stays blocked.
+          // Empty and declined mean the same thing to us: no signal. Not retried — a declined
+          // prompt stays declined.
           logger.warn(
             { event: 'aurora_classify_empty', outcomeCode: 'AURORA_CLASSIFY_EMPTY_RESPONSE', model },
-            'Gemini returned an empty or safety-blocked classification',
+            'Claude returned an empty or declined classification',
           )
           return failure('MALFORMED_RESPONSE', 'Classifier returned an empty response')
         }
@@ -223,7 +213,7 @@ export class GeminiSemanticClassifier implements AuroraSemanticClassifier {
               outcomeCode: 'AURORA_CLASSIFY_SCHEMA_MISMATCH',
               issueCount: parsed.error.issues.length,
             },
-            'Gemini classification did not match the expected schema',
+            'Claude classification did not match the expected schema',
           )
           return failure('VALIDATION_ERROR', 'Classifier response did not match the schema')
         }
@@ -231,7 +221,7 @@ export class GeminiSemanticClassifier implements AuroraSemanticClassifier {
         const { confidence, reasons, ...semanticSignals } = parsed.data
         return { confidence, semanticSignals: { ...semanticSignals, businessContextAvailable }, reasons }
       } catch (error) {
-        const timedOut = error instanceof ClassifyTimeoutError
+        const timedOut = error instanceof Anthropic.APIConnectionTimeoutError
         const retryable = isRetryableProviderError(error) && attempt === 1
 
         logger.warn(
@@ -250,10 +240,6 @@ export class GeminiSemanticClassifier implements AuroraSemanticClassifier {
         return timedOut
           ? failure('TIMEOUT', 'Classifier timed out')
           : failure('PROVIDER_ERROR', 'Classifier provider error')
-      } finally {
-        // Without this the pending timer keeps the worker alive for the rest of the budget
-        // even when the provider answered immediately.
-        if (timer) clearTimeout(timer)
       }
     }
 

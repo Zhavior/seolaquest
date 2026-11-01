@@ -1,23 +1,25 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import Anthropic from '@anthropic-ai/sdk'
 import { RateLimitError } from '@/src/modules/core/infrastructure/errors'
 import type { AuroraSemanticInput } from '../../types'
 
 const mocks = vi.hoisted(() => ({
-  getGeminiClient: vi.fn(),
-  getServerEnv: vi.fn(),
-  generateContent: vi.fn(),
+  getClaudeClient: vi.fn(),
+  create: vi.fn(),
   enforce: vi.fn(),
 }))
 
-vi.mock('@/lib/gemini', () => ({ getGeminiClient: mocks.getGeminiClient }))
-vi.mock('@/lib/env', () => ({ getServerEnv: mocks.getServerEnv }))
+vi.mock('@/lib/anthropic', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/lib/anthropic')>()),
+  getClaudeClient: mocks.getClaudeClient,
+}))
 // Limiter internals are covered by RateLimiter.test.ts; these cases exercise how the
 // classifier reacts to its verdict.
 vi.mock('@/src/modules/core/security/RateLimiter', () => ({
   RateLimiterService: { enforce: mocks.enforce },
 }))
 
-import { GeminiSemanticClassifier } from '../GeminiSemanticClassifier'
+import { ClaudeSemanticClassifier } from '../ClaudeSemanticClassifier'
 
 const VALID_VERDICT = {
   relevance: 'HIGH',
@@ -28,6 +30,11 @@ const VALID_VERDICT = {
   reasons: ['Author asks for a recommendation', 'States a budget'],
 }
 
+const reply = (text: string, stop_reason = 'end_turn') => ({
+  stop_reason,
+  content: text ? [{ type: 'text', text }] : [],
+})
+
 const input = (overrides: Partial<AuroraSemanticInput> = {}): AuroraSemanticInput => ({
   opportunityId: 'opp-1',
   sourceEventId: 'evt-1',
@@ -36,21 +43,16 @@ const input = (overrides: Partial<AuroraSemanticInput> = {}): AuroraSemanticInpu
   ...overrides,
 })
 
-describe('GeminiSemanticClassifier', () => {
+describe('ClaudeSemanticClassifier', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     mocks.enforce.mockResolvedValue(undefined)
-    mocks.getServerEnv.mockReturnValue({ GEMINI_MODEL: 'gemini-2.5-flash' })
-    mocks.getGeminiClient.mockReturnValue({ models: { generateContent: mocks.generateContent } })
-    mocks.generateContent.mockResolvedValue({ text: JSON.stringify(VALID_VERDICT) })
-  })
-
-  afterEach(() => {
-    vi.useRealTimers()
+    mocks.getClaudeClient.mockReturnValue({ messages: { create: mocks.create } })
+    mocks.create.mockResolvedValue(reply(JSON.stringify(VALID_VERDICT)))
   })
 
   it('returns the parsed verdict and asks for structured JSON', async () => {
-    const result = await new GeminiSemanticClassifier().classify(input())
+    const result = await new ClaudeSemanticClassifier().classify(input())
 
     expect(result.failureCode).toBeUndefined()
     expect(result.confidence).toBe(0.82)
@@ -63,11 +65,12 @@ describe('GeminiSemanticClassifier', () => {
     expect(result.semanticSignals).not.toHaveProperty('confidence')
     expect(result.reasons).toEqual(VALID_VERDICT.reasons)
 
-    expect(mocks.generateContent).toHaveBeenCalledWith(
+    expect(mocks.create).toHaveBeenCalledWith(
       expect.objectContaining({
-        model: 'gemini-2.5-flash',
-        config: expect.objectContaining({ responseMimeType: 'application/json' }),
+        model: 'claude-haiku-5-5',
+        output_config: expect.objectContaining({ format: expect.objectContaining({ type: 'json_schema' }) }),
       }),
+      { timeout: 8_000, maxRetries: 0 },
     )
   })
 
@@ -77,53 +80,51 @@ describe('GeminiSemanticClassifier', () => {
    * identically to the worst. The response schema must not permit it back in.
    */
   it('rejects a verdict whose businessFit the policy scorer cannot read', async () => {
-    mocks.generateContent.mockResolvedValue({
-      text: JSON.stringify({ ...VALID_VERDICT, businessFit: 'EXCELLENT' }),
-    })
+    mocks.create.mockResolvedValue(reply(JSON.stringify({ ...VALID_VERDICT, businessFit: 'EXCELLENT' })))
 
-    const result = await new GeminiSemanticClassifier().classify(input())
+    const result = await new ClaudeSemanticClassifier().classify(input())
 
     expect(result.failureCode).toBe('VALIDATION_ERROR')
     expect(result.semanticSignals).toBeNull()
   })
 
   it('charges the tenant that owns the lead, not the caller', async () => {
-    await new GeminiSemanticClassifier().classify(input())
+    await new ClaudeSemanticClassifier().classify(input())
 
     expect(mocks.enforce).toHaveBeenCalledWith({ type: 'auroraClassify', identifier: 'user-1' })
   })
 
   it('refuses to classify at all when there is no tenant to meter against', async () => {
-    const result = await new GeminiSemanticClassifier().classify(input({ context: {} }))
+    const result = await new ClaudeSemanticClassifier().classify(input({ context: {} }))
 
     expect(result.failureCode).toBe('VALIDATION_ERROR')
     // The point of the guard: no metering means no provider call, not an unmetered one.
-    expect(mocks.generateContent).not.toHaveBeenCalled()
+    expect(mocks.create).not.toHaveBeenCalled()
   })
 
   it('degrades instead of spending when the budget is exhausted', async () => {
     mocks.enforce.mockRejectedValue(new RateLimitError('Rate limit exceeded'))
 
-    const result = await new GeminiSemanticClassifier().classify(input())
+    const result = await new ClaudeSemanticClassifier().classify(input())
 
     expect(result.failureCode).toBe('RATE_LIMITED')
-    expect(mocks.generateContent).not.toHaveBeenCalled()
+    expect(mocks.create).not.toHaveBeenCalled()
   })
 
   it('degrades when the limiter itself cannot be consulted', async () => {
     // An unconsultable limiter must not become an unbounded spend.
     mocks.enforce.mockRejectedValue(new Error('redis unreachable'))
 
-    const result = await new GeminiSemanticClassifier().classify(input())
+    const result = await new ClaudeSemanticClassifier().classify(input())
 
     expect(result.failureCode).toBe('RATE_LIMITED')
-    expect(mocks.generateContent).not.toHaveBeenCalled()
+    expect(mocks.create).not.toHaveBeenCalled()
   })
 
-  it('reports a configuration failure rather than throwing when Gemini is unset', async () => {
-    mocks.getGeminiClient.mockReturnValue(null)
+  it('reports a configuration failure rather than throwing when Claude is unset', async () => {
+    mocks.getClaudeClient.mockReturnValue(null)
 
-    const result = await new GeminiSemanticClassifier().classify(input())
+    const result = await new ClaudeSemanticClassifier().classify(input())
 
     expect(result.failureCode).toBe('PROVIDER_ERROR')
   })
@@ -132,71 +133,77 @@ describe('GeminiSemanticClassifier', () => {
     ['not valid JSON', 'not json at all'],
     ['an empty response', ''],
   ])('maps %s to MALFORMED_RESPONSE', async (_label, text) => {
-    mocks.generateContent.mockResolvedValue({ text })
+    mocks.create.mockResolvedValue(reply(text))
 
-    const result = await new GeminiSemanticClassifier().classify(input())
+    const result = await new ClaudeSemanticClassifier().classify(input())
 
     expect(result.failureCode).toBe('MALFORMED_RESPONSE')
     expect(result.semanticSignals).toBeNull()
   })
 
   it('maps a response missing required fields to VALIDATION_ERROR', async () => {
-    mocks.generateContent.mockResolvedValue({ text: JSON.stringify({ relevance: 'HIGH' }) })
+    mocks.create.mockResolvedValue(reply(JSON.stringify({ relevance: 'HIGH' })))
 
-    const result = await new GeminiSemanticClassifier().classify(input())
+    const result = await new ClaudeSemanticClassifier().classify(input())
 
     expect(result.failureCode).toBe('VALIDATION_ERROR')
   })
 
   it('retries a transient network error exactly once, then succeeds', async () => {
-    mocks.generateContent
-      .mockRejectedValueOnce(new TypeError('fetch failed'))
-      .mockResolvedValueOnce({ text: JSON.stringify(VALID_VERDICT) })
+    mocks.create
+      .mockRejectedValueOnce(new Anthropic.APIConnectionError({ message: 'fetch failed' }))
+      .mockResolvedValueOnce(reply(JSON.stringify(VALID_VERDICT)))
 
-    const result = await new GeminiSemanticClassifier().classify(input())
+    const result = await new ClaudeSemanticClassifier().classify(input())
 
-    expect(mocks.generateContent).toHaveBeenCalledTimes(2)
+    expect(mocks.create).toHaveBeenCalledTimes(2)
     expect(result.failureCode).toBeUndefined()
     expect(result.confidence).toBe(0.82)
   })
 
   it('gives up after one retry rather than looping', async () => {
-    mocks.generateContent.mockRejectedValue(new TypeError('fetch failed'))
+    mocks.create.mockRejectedValue(new Anthropic.APIConnectionError({ message: 'fetch failed' }))
 
-    const result = await new GeminiSemanticClassifier().classify(input())
+    const result = await new ClaudeSemanticClassifier().classify(input())
 
-    expect(mocks.generateContent).toHaveBeenCalledTimes(2)
+    expect(mocks.create).toHaveBeenCalledTimes(2)
     expect(result.failureCode).toBe('PROVIDER_ERROR')
   })
 
   it('does not retry a 4xx, which would fail identically', async () => {
     // An auth or quota rejection is a statement about our request, not a blip.
-    mocks.generateContent.mockRejectedValue(Object.assign(new Error('forbidden'), { status: 403 }))
+    mocks.create.mockRejectedValue(Object.assign(new Error('forbidden'), { status: 403 }))
 
-    const result = await new GeminiSemanticClassifier().classify(input())
+    const result = await new ClaudeSemanticClassifier().classify(input())
 
-    expect(mocks.generateContent).toHaveBeenCalledTimes(1)
+    expect(mocks.create).toHaveBeenCalledTimes(1)
     expect(result.failureCode).toBe('PROVIDER_ERROR')
   })
 
-  it('times out at the 8s budget and does not retry into a second budget', async () => {
-    vi.useFakeTimers()
-    mocks.generateContent.mockReturnValue(new Promise(() => {}))
+  it('reports the 8s timeout and does not retry into a second budget', async () => {
+    mocks.create.mockRejectedValue(new Anthropic.APIConnectionTimeoutError({ message: 'timed out' }))
 
-    const pending = new GeminiSemanticClassifier().classify(input())
-    await vi.advanceTimersByTimeAsync(8_000)
-    const result = await pending
+    const result = await new ClaudeSemanticClassifier().classify(input())
 
     expect(result.failureCode).toBe('TIMEOUT')
-    expect(mocks.generateContent).toHaveBeenCalledTimes(1)
+    expect(mocks.create).toHaveBeenCalledTimes(1)
+  })
+
+  it('treats a declined post as no signal, without retrying', async () => {
+    mocks.create.mockResolvedValue(reply('', 'refusal'))
+
+    const result = await new ClaudeSemanticClassifier().classify(input())
+
+    expect(result.failureCode).toBe('MALFORMED_RESPONSE')
+    expect(mocks.create).toHaveBeenCalledTimes(1)
   })
 
   it('never throws, so a failed classification is not an outbox retry', async () => {
     // AuroraService records FALLBACK from a returned failureCode. A throw would instead
     // dead-letter the event and re-bill the provider on every attempt.
-    mocks.generateContent.mockRejectedValue(new Error('boom'))
+    mocks.create.mockRejectedValue(new Error('boom'))
 
-    await expect(new GeminiSemanticClassifier().classify(input())).resolves.toMatchObject({
+    await expect(new ClaudeSemanticClassifier().classify(input())).resolves.toMatchObject({
       failureCode: 'PROVIDER_ERROR',
     })
   })

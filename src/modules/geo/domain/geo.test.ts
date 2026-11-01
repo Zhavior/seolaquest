@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { classifySource, normalizeBrandDomain } from './sourceType'
-import { brandPresence, parseAgentResponse } from './parseAgentResponse'
+import { brandPresence, parseAgentResponse, parseClaudeScanResponse } from './parseAgentResponse'
 
 describe('classifySource', () => {
   it.each([
@@ -131,5 +131,76 @@ describe('brandPresence', () => {
   it('reports absence', () => {
     const { sources } = parseAgentResponse(response)
     expect(brandPresence(sources, 'nobody.com')).toEqual({ brandCited: false, brandCitedRank: null, brandRetrieved: false })
+  })
+})
+
+describe('parseClaudeScanResponse', () => {
+  const message = {
+    id: 'msg_1',
+    model: 'claude-sonnet-5-5',
+    stop_reason: 'end_turn',
+    content: [
+      { type: 'server_tool_use', id: 'srv_1', name: 'web_search', input: { query: 'best crm' } },
+      {
+        type: 'web_search_tool_result',
+        tool_use_id: 'srv_1',
+        content: [
+          { type: 'web_search_result', url: 'https://www.g2.com/crm', title: 'G2 CRM', page_age: null, encrypted_content: 'x' },
+          { type: 'web_search_result', url: 'https://acme.com/', title: 'Acme', page_age: null, encrypted_content: 'y' },
+        ],
+      },
+      { type: 'web_search_tool_result', tool_use_id: 'srv_2', content: { type: 'web_search_tool_result_error', error_code: 'max_uses_exceeded' } },
+      { type: 'text', text: 'Teams prefer ' },
+      {
+        type: 'text',
+        text: 'this list',
+        citations: [
+          { type: 'web_search_result_location', url: 'https://www.g2.com/crm', title: 'G2 CRM', cited_text: 'Ranked by users', encrypted_index: 'i' },
+          { type: 'web_search_result_location', url: 'https://only-cited.com/post', title: 'Cited', cited_text: 'A quote', encrypted_index: 'j' },
+          { type: 'web_search_result_location', url: 'https://www.g2.com/crm', title: 'G2 CRM', cited_text: 'Again', encrypted_index: 'k' },
+        ],
+      },
+      { type: 'text', text: '.' },
+    ],
+    usage: { input_tokens: 900, output_tokens: 120, web_search_requests: 2 },
+  }
+
+  it('keeps retrieved and cited apart, in answer order', () => {
+    const parsed = parseClaudeScanResponse(message)
+
+    expect(parsed.answerText).toBe('Teams prefer this list.')
+    expect(parsed.sources.map((s) => [s.domain, s.retrievedRank, s.citedRank])).toEqual([
+      ['g2.com', 1, 1],
+      ['acme.com', 2, null],
+      ['only-cited.com', null, 2],
+    ])
+    expect(parsed.sources[0].snippet).toBe('Ranked by users')
+    expect(parsed.sources[2].title).toBe('Cited')
+  })
+
+  it('reads a brand as retrieved but not cited through the shared rule', () => {
+    const { sources } = parseClaudeScanResponse(message)
+
+    expect(brandPresence(sources, 'acme.com')).toEqual({ brandCited: false, brandCitedRank: null, brandRetrieved: true })
+  })
+
+  it('reports tokens and search counts, and invents no dollar cost', () => {
+    const parsed = parseClaudeScanResponse(message)
+
+    expect(parsed).toMatchObject({
+      responseId: 'msg_1',
+      model: 'claude-sonnet-5-5',
+      inputTokens: 900,
+      outputTokens: 120,
+      costUsd: null,
+      costDetails: { webSearchRequests: 2 },
+    })
+  })
+
+  it('treats an answer with no search as a scan with no sources', () => {
+    const parsed = parseClaudeScanResponse({ content: [{ type: 'text', text: 'From memory.' }] })
+
+    expect(parsed.answerText).toBe('From memory.')
+    expect(parsed.sources).toEqual([])
   })
 })

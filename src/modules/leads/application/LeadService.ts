@@ -1,6 +1,7 @@
 import { revalidatePath } from 'next/cache'
 import prisma from '@/lib/prisma'
 import { requireCurrentUser } from '@/lib/auth'
+import { CLAUDE_FAST_MODEL, claudeText, getClaudeClient } from '@/lib/anthropic'
 import { EntitlementService } from '@/src/modules/billing/application/EntitlementService'
 import { logger } from '@/src/modules/core/infrastructure/logger'
 import { LeadOutcomeService } from './LeadOutcomeService'
@@ -11,13 +12,6 @@ import {
   UnsafeCrmWebhookUrlError,
 } from '@/src/modules/core/security/crmWebhookUrl'
 import { CrmDeliveryService } from './CrmDeliveryService'
-import { z } from 'zod'
-
-const openAiReplySchema = z.object({
-  choices: z.array(z.object({
-    message: z.object({ content: z.string().trim().min(1).max(2_000) }),
-  })).min(1),
-})
 
 export class LeadService {
   static async claimQuest(leadId: string) {
@@ -50,8 +44,8 @@ export class LeadService {
       return { ok: false, message: 'AI replies require an active paid subscription.' }
     }
 
-    const openAiApiKey = process.env.OPENAI_API_KEY?.trim()
-    if (!openAiApiKey) {
+    const claude = getClaudeClient()
+    if (!claude) {
       return { ok: false, message: 'AI replies are temporarily unavailable.' }
     }
 
@@ -83,31 +77,22 @@ export class LeadService {
 
     let generatedReply = ''
     try {
-      const response = await fetch('https://api.openai.com/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${openAiApiKey}`
-        },
-        signal: AbortSignal.timeout(10_000),
-        body: JSON.stringify({
-          model: process.env.OPENAI_REPLY_MODEL?.trim() || 'gpt-4o-mini',
+      const response = await claude.messages.create(
+        {
+          model: CLAUDE_FAST_MODEL,
+          max_tokens: 512,
           messages: [{ role: 'user', content: prompt }],
-          temperature: 0.7,
-          max_tokens: 180,
-        })
-      })
+          output_config: { effort: 'low' },
+        },
+        { timeout: 10_000, maxRetries: 0 },
+      )
 
       // Stays a bare Error: this method's own catch below converts it to
-      // `{ ok: false, message }`, so it never reaches withApiHandler's error branch and
-      // the taxonomy is never consulted. The status code an AppError carried would be dead
-      // weight. Deliberately does not include the upstream body — that is logged, not returned.
-      if (!response.ok) {
-        throw new Error('OpenAI API request failed')
+      // `{ ok: false, message }`, so it never reaches withApiHandler's error branch.
+      generatedReply = claudeText(response).slice(0, 2_000)
+      if (!generatedReply) {
+        throw new Error('Claude returned no reply')
       }
-
-      const data = openAiReplySchema.parse(await response.json())
-      generatedReply = data.choices[0].message.content.trim()
 
       await prisma.user.update({
         where: { id: user.id },

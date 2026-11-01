@@ -22,12 +22,12 @@ When a buyer asks an AI search engine which tool to use, the answer cites a hand
 
 **How a scan works.**
 
-1. **Ask.** You type a question your buyers ask and the site you want named. SEOlaQuest puts the question to Perplexity, the only engine for now.
+1. **Ask.** You type a question your buyers ask and the site you want named. SEOlaQuest puts the question to Perplexity or Claude, whichever you pick.
 2. **Read.** You see every page the search found and every page the answer cited, in order. "Found but not cited" is its own result.
 3. **Sort.** Each source is classified as a forum, a review site, an article or a vendor page. Sites the rules don't recognise are marked as a guess, not passed off as known.
 4. **Act.** Each type points to a different move: answer the thread, get listed, pitch the writer, or fix your own page. SEOlaQuest shows the map; you do the work.
 
-**Things it deliberately does not do.** It doesn't promise a citation: an answer is a snapshot, and the same question can cite different sources tomorrow. It covers one engine, Perplexity; ChatGPT, Gemini and Google AI answers are not covered. Scans run when you start them; there is no scheduled monitoring. And there is no price yet, because every scan records what the engine charged and no real scan has produced that number.
+**Things it deliberately does not do.** It doesn't promise a citation: an answer is a snapshot, and the same question can cite different sources tomorrow. It covers two engines, Perplexity and Claude; ChatGPT, Gemini and Google AI answers are not covered. Scans run when you start them; there is no scheduled monitoring. And there is no price yet, because every scan records what the engine charged and no real scan has produced that number.
 
 **The earlier product.** SEOlaQuest started as an X lead finder: watch keywords on X, collect matching posts in a dashboard, triage them, and push the keepers to a CRM by webhook. It still runs inside the app for signed-in accounts, its paid checkout is paused, and most of the engineering below was built for it. Reddit scanning is implemented in the codebase but not switched on.
 
@@ -48,7 +48,7 @@ A full-stack SaaS application, built solo. Not a tutorial project or a CRUD demo
 | Data | PostgreSQL via Prisma, 32 models, versioned migrations |
 | Auth | Clerk sessions plus server-side tenant authorization |
 | Billing | Stripe Checkout, signed webhooks, credit ledger |
-| AI | Perplexity for GEO citation scans (off by default), Google Gemini for the in-app assistant and blog content generation |
+| AI | Perplexity or Claude Sonnet 5.5 for GEO citation scans (off by default), Claude Sonnet 5.5 for chat and blog drafts, Claude Haiku 5.5 for lead classification and AI replies |
 | Infra | Cloudflare Workers via OpenNext (`wrangler.jsonc`), Upstash Redis for rate limiting, durable job runner |
 | Graphics | three.js for the valley scene on the home page, sample radar and dashboard |
 | Testing | Vitest, Testing Library, axe-core accessibility gate |
@@ -97,7 +97,7 @@ No uptime SLA is offered, and none is claimed. The app publishes this same statu
 
 ## Running it locally
 
-Requires Node.js 20 or newer (CI runs 22), a PostgreSQL database, and a Clerk account. Stripe, Gemini, X API, and Upstash credentials are optional — the features that need them degrade to unavailable rather than crashing.
+Requires Node.js 20 or newer (CI runs 22), a PostgreSQL database, and a Clerk account. Stripe, Anthropic, X API, and Upstash credentials are optional — the features that need them degrade to unavailable rather than crashing.
 
 ```bash
 git clone https://github.com/Zhavior/seolaquest.git
@@ -120,7 +120,7 @@ CLERK_WEBHOOK_SIGNING_SECRET=whsec_...
 STRIPE_SECRET_KEY=sk_test_...
 STRIPE_WEBHOOK_SECRET=whsec_...
 STRIPE_PRICE_BETA=price_...
-GEMINI_API_KEY=...
+ANTHROPIC_API_KEY=...
 TWITTER_BEARER_TOKEN=...
 UPSTASH_REDIS_REST_URL=...
 UPSTASH_REDIS_REST_TOKEN=...
@@ -155,7 +155,7 @@ app/              Next.js App Router — routes, API handlers, layouts
   api/v1/         Versioned public API (scans, keywords, webhooks, health)
 src/modules/      Domain logic by bounded context
   billing/        Stripe, credit ledger, entitlements
-  geo/            GEO citation scan: Perplexity client, source sorting, cost record
+  geo/            GEO citation scan: Perplexity and Claude clients, source sorting, cost record
   leads/          X lead finder: scan orchestration, provider calls, CRM delivery
   core/security/  SSRF guards, rate limiting, auth helpers
   operations/     Durable jobs, heartbeats, dead letters

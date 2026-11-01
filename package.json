@@ -27,8 +27,8 @@
     "db:quests": "dotenv -e .env.local -- tsx scripts/sync-quest-catalog.ts"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^1.3.0",
     "@clerk/nextjs": "^7.6.2",
-    "@google/genai": "^2.15.0",
     "@opennextjs/cloudflare": "1.20.0",
     "@prisma/adapter-pg": "5.10.2",
     "@sentry/nextjs": "^10.69.0",

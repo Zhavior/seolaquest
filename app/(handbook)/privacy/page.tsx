@@ -18,7 +18,7 @@ const storedData = [
   },
   {
     title: 'GEO scans',
-    body: 'When GEO scans are switched on, each scan stores the question you asked, the site you checked, the answer text, the sources returned, and the tokens and cost the engine reported. The question is sent to Perplexity to run the scan.',
+    body: 'When GEO scans are switched on, each scan stores the question you asked, the site you checked, the answer text, the sources returned, and the tokens and cost the engine reported. The question is sent to the engine you pick, Perplexity or Anthropic (Claude), to run the scan.',
   },
   {
     title: 'Billing state',

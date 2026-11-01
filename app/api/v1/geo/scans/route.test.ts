@@ -6,6 +6,7 @@ const mocks = vi.hoisted(() => ({
 }))
 
 vi.mock('@/src/modules/geo/application/GeoScanService', () => ({
+  GEO_ENGINES: ['PERPLEXITY', 'CLAUDE'],
   GeoScanService: { runScan: mocks.runScan, listRecent: mocks.listRecent },
 }))
 // Rate limiting is covered by RateLimiter.test.ts; these cases exercise route behaviour.

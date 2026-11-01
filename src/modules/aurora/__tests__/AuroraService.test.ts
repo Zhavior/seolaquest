@@ -13,17 +13,17 @@ vi.mock('../../core/events/EventStore', () => ({
   }
 }));
 
-// Provenance is read from the configured model rather than hardcoded, so the orchestrator
-// now touches env. Pinned here so these cases do not depend on the machine's .env.local.
+// Provenance imports the model constant from lib/anthropic, which reads env for its client.
+// Pinned here so these cases do not depend on the machine's .env.local.
 vi.mock('@/lib/env', () => ({
-  getServerEnv: () => ({ GEMINI_MODEL: 'gemini-2.5-flash' }),
+  getServerEnv: () => ({}),
 }));
 
 /**
  * A classifier double.
  *
  * These cases cover the ORCHESTRATOR — idempotency, status selection, provenance, what gets
- * persisted and emitted. They used to construct the real `GeminiSemanticClassifier` and lean
+ * persisted and emitted. They used to construct the real `ClaudeSemanticClassifier` and lean
  * on its hardcoded stub output, which meant they silently became network- and limiter-bound
  * the moment it became a real adapter. The adapter has its own tests; this decouples them.
  */

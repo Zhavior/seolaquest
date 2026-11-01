@@ -8,7 +8,7 @@ const STOPS: Array<{ numeral: string; key: string; icon: IconName; label: string
     key: 'Ask',
     icon: 'spyglass',
     label: 'Ask: spyglass',
-    body: 'Type a question your buyers ask, and the site you want named in the answer. SEOlaQuest puts the question to Perplexity, one engine for now.',
+    body: 'Type a question your buyers ask, and the site you want named in the answer. SEOlaQuest puts the question to Perplexity or Claude, whichever you pick.',
   },
   {
     numeral: 'II',

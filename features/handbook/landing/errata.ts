@@ -17,7 +17,7 @@ export function errataItems(checkoutOpen: boolean): ErrataItem[] {
     {
       id: 'one-engine',
       kind: 'open',
-      text: 'One engine: Perplexity. Other AI search engines are not built, and a citation in one engine says nothing about another.',
+      text: 'Two engines: Perplexity and Claude. Other AI search engines are not built, and a citation in one engine says nothing about another.',
     },
     {
       id: 'cost',
@@ -62,7 +62,7 @@ export const FAQ: FaqItem[] = [
   },
   {
     q: 'Which AI engines does it check?',
-    a: 'Perplexity only, once scans are switched on. ChatGPT, Gemini and Google AI answers are not covered.',
+    a: 'Perplexity and Claude, once scans are switched on. ChatGPT, Gemini and Google AI answers are not covered.',
   },
   {
     q: 'What does early access cost?',

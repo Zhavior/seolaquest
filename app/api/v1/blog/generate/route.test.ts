@@ -32,7 +32,7 @@ describe('blog generation boundary', () => {
     vi.unstubAllEnvs()
     vi.stubEnv('NODE_ENV', 'test')
     vi.stubEnv('BLOG_ADMIN_USER_IDS', 'user-admin')
-    vi.stubEnv('OPENAI_API_KEY', 'server-owned-key')
+    vi.stubEnv('ANTHROPIC_API_KEY', 'server-owned-key')
     mocks.getCurrentUser.mockResolvedValue({ id: 'user-admin' })
     mocks.generateAndSaveBlogPost.mockResolvedValue({
       slug: 'safe-post',
@@ -76,7 +76,6 @@ describe('blog generation boundary', () => {
       tag: 'SaaS',
       author: undefined,
       authorRole: undefined,
-      apiKey: 'server-owned-key',
     })
     expect(body).not.toHaveProperty('filePath')
     expect(JSON.stringify(body)).not.toContain('/secret/runtime/path')

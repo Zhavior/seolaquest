@@ -18,8 +18,8 @@ const ROWS: Array<{ item: string; state: string; detail: string }> = [
   },
   {
     item: 'Engines',
-    state: 'Perplexity',
-    detail: 'One engine to start. Others are not built.',
+    state: 'Perplexity, Claude',
+    detail: 'Two engines to start. Others are not built.',
   },
   {
     item: 'Price per scan',

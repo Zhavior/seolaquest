@@ -36,18 +36,18 @@ const LIMITER_CONFIG = {
   // inside Basic's 100. X's own 429 (surfaced by the route) remains the backstop if
   // the allowlist ever grows past that.
   xPost: { limit: 8, window: '24 h', prefix: '@upstash/ratelimit/seolaquest/x-post' },
-  // LLM endpoints that bill a real balance on OUR Gemini key (app/api/gemini/chat).
+  // LLM endpoints that bill a real balance on OUR Claude key (app/api/v1/chat).
   // Identifier is a userId, and sign-up is public, so the per-account budget is the only
   // thing standing between an attacker with a free account and our invoice. Sizing: a chat
-  // turn carries roughly 8k input + 1k output tokens, which on Gemini Flash pricing is on
-  // the order of half a cent; 20/h therefore caps one account at ~$0.10/h, ~$2.40/day if it
-  // never stops. That is small enough to absorb across a fleet of abusive signups and still
-  // generous for a human — 20 turns an hour is a continuous conversation, not a UI accident.
+  // turn carries roughly 8k input + 1k output tokens, which at Sonnet 5.5's $2/$10 per MTok
+  // is about 2.6 cents before any thinking tokens; 20/h therefore caps one account at about
+  // $0.52/h, ~$12.50/day if it never stops, until AiUsageLimiter's daily cap cuts it off.
+  // That is still generous for a human — 20 turns an hour is a continuous conversation, not a UI accident.
   // A 1 h window (rather than a day) is chosen so a legitimate heavy user recovers the same
   // day instead of being locked out until tomorrow. This is a rate brake only; the per-tenant
   // SPEND cap remains AiUsageLimiter's job, and the two are meant to be used together.
   ai: { limit: 20, window: '1 h', prefix: '@upstash/ratelimit/seolaquest/ai' },
-  // Aurora's semantic classifier, one Gemini call per newly discovered lead, charged to the
+  // Aurora's semantic classifier, one Claude Haiku call per newly discovered lead, charged to the
   // tenant who owns the lead. Deliberately NOT the `ai` tier and NOT AiUsageLimiter: both of
   // those are the human's own budget for chat and AI replies, and Aurora spends without the
   // user asking for anything. Sharing either would let a background scan silently consume the
@@ -57,10 +57,11 @@ const LIMITER_CONFIG = {
   // tenant per day — MAX_ACTIVE_KEYWORDS_PER_TENANT (10) x max_results=10 x one scan per day
   // (SCHEDULE_INTERVAL_MS) x one enabled provider — and only if every result is a first sight,
   // which `skipDuplicates` on `@@unique([userId, externalPostId])` makes unlikely. At roughly
-  // 400 input + 150 output tokens a call, that ceiling is about $0.05/tenant/day. 300/day
+  // 400 input + 150 output tokens a call at Haiku 5.5's $0.10/$0.50 per MTok, that ceiling is
+  // about $0.01/tenant/day. 300/day
   // therefore sits 3x above anything the current pipeline can generate: it never fires in
   // normal operation, and it is the thing that stops a raised keyword cap, a second enabled
-  // provider, or a shortened scan interval from scaling our Gemini bill with nothing in the
+  // provider, or a shortened scan interval from scaling our Claude bill with nothing in the
   // way. Exceeding it degrades that lead to a deterministic-only decision — never a failure,
   // because a metered-out classifier is not an error the outbox should retry.
   auroraClassify: { limit: 300, window: '24 h', prefix: '@upstash/ratelimit/seolaquest/aurora-classify' },

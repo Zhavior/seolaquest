@@ -18,8 +18,7 @@ const serverEnvSchema = z.object({
   X_API_SECRET: z.string().optional(),
   X_ACCESS_TOKEN: z.string().optional(),
   X_ACCESS_TOKEN_SECRET: z.string().optional(),
-  GEMINI_API_KEY: z.string().optional(),
-  GEMINI_MODEL: z.string().optional().default('gemini-2.5-flash'),
+  ANTHROPIC_API_KEY: z.string().trim().optional(),
   NEXT_PUBLIC_APP_URL: z.string().optional().default('http://localhost:3000'),
 })
 
@@ -34,8 +33,7 @@ export function getServerEnv(): ServerEnv {
     X_API_SECRET: process.env.X_API_SECRET,
     X_ACCESS_TOKEN: process.env.X_ACCESS_TOKEN,
     X_ACCESS_TOKEN_SECRET: process.env.X_ACCESS_TOKEN_SECRET,
-    GEMINI_API_KEY: process.env.GEMINI_API_KEY,
-    GEMINI_MODEL: process.env.GEMINI_MODEL,
+    ANTHROPIC_API_KEY: process.env.ANTHROPIC_API_KEY,
     NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
   })
 }

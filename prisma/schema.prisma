@@ -240,7 +240,7 @@ model GeoQuery {
   user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   query              String
   brandDomain        String
-  engine             String // PERPLEXITY
+  engine             String // PERPLEXITY, CLAUDE
   engineModel        String?
   enginePreset       String?
   providerResponseId String?

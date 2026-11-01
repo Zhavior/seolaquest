@@ -11,7 +11,7 @@ import { CanonicalPolicyScorer } from '@/src/modules/aurora/classifiers/Canonica
 import { EventStore } from '@/src/modules/core/events/EventStore'
 
 vi.mock('@/src/modules/admin/authorization', () => ({ requireAdmin: async () => ({ id: owner }) }))
-vi.mock('@/lib/env', () => ({ getServerEnv: () => ({ GEMINI_MODEL: 'test-model' }) }))
+vi.mock('@/lib/env', () => ({ getServerEnv: () => ({}) }))
 
 const enabled = process.env.GOVERNED_INTEGRATION_TEST === 'true'
 if (enabled && new URL(process.env.DATABASE_URL!).hostname !== '127.0.0.1') {

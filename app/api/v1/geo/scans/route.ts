@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { withApiHandler } from '@/src/modules/core/infrastructure/api-handler'
 import { safeJson } from '@/src/modules/core/infrastructure/safeJson'
-import { GeoScanService } from '@/src/modules/geo/application/GeoScanService'
+import { GEO_ENGINES, GeoScanService } from '@/src/modules/geo/application/GeoScanService'
 
 export const GET = withApiHandler(async () => {
   const scans = await GeoScanService.listRecent()
@@ -12,6 +12,7 @@ export const GET = withApiHandler(async () => {
 const PostGeoScanSchema = z.object({
   query: z.string().min(3, 'Use at least 3 characters for the query.').max(300, 'Query is too long.'),
   brandDomain: z.string().min(3, 'Enter a domain like example.com.').max(253, 'Domain is too long.'),
+  engine: z.enum(GEO_ENGINES).optional(),
 })
 
 // Runs the engine call inline (one request ≈ one scan) rather than through the

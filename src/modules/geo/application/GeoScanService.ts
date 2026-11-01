@@ -5,26 +5,34 @@ import prisma from '@/lib/prisma'
 import { getCurrentUser } from '@/lib/auth'
 import { AppError, RateLimitError, UnauthorizedError, ValidationError } from '@/src/modules/core/infrastructure/errors'
 import { logger } from '@/src/modules/core/infrastructure/logger'
-import { brandPresence, parseAgentResponse, type GeoSource } from '../domain/parseAgentResponse'
+import { brandPresence, parseAgentResponse, parseClaudeScanResponse, type GeoSource } from '../domain/parseAgentResponse'
 import { hostMatches, normalizeBrandDomain } from '../domain/sourceType'
 import {
   PERPLEXITY_PRESET,
   PerplexityRequestError,
   runPerplexityAgent,
 } from '../infrastructure/PerplexityAgentClient'
+import { CLAUDE_SCAN_TOOL, ClaudeScanRequestError, runClaudeScan } from '../infrastructure/ClaudeScanClient'
 
 /**
  * Single-user AI-citation scan prototype (decision 2026-10-04).
  *
  * Every scan spends real money, so the feature fails closed: it runs only when
- * GEO_SCAN_ENABLED is exactly 'true' AND a Perplexity key is configured, and
- * each user is capped per rolling 24 hours. The cap is a cost guard for the
+ * GEO_SCAN_ENABLED is exactly 'true' AND the chosen engine's key is configured,
+ * and each user is capped per rolling 24 hours across both engines. The cap is a cost guard for the
  * prototype, not a pricing tier — tier limits wait until per-scan cost is known.
  */
 
 export const MAX_GEO_SCANS_PER_DAY = 20
 const DAY_MS = 24 * 60 * 60 * 1000
-const ENGINE = 'PERPLEXITY'
+
+export const GEO_ENGINES = ['PERPLEXITY', 'CLAUDE'] as const
+export type GeoEngine = (typeof GEO_ENGINES)[number]
+
+const ENGINE_RUNNERS = {
+  PERPLEXITY: { keyEnv: 'PERPLEXITY_API_KEY', preset: PERPLEXITY_PRESET, run: runPerplexityAgent, parse: parseAgentResponse },
+  CLAUDE: { keyEnv: 'ANTHROPIC_API_KEY', preset: CLAUDE_SCAN_TOOL, run: runClaudeScan, parse: parseClaudeScanResponse },
+} as const
 
 export class GeoScanDisabledError extends AppError {
   constructor() {
@@ -36,8 +44,8 @@ function cleanQuery(value: string) {
   return value.replace(/\s+/g, ' ').trim().slice(0, 300)
 }
 
-function scanConfig() {
-  const apiKey = process.env.PERPLEXITY_API_KEY?.trim()
+function scanConfig(engine: GeoEngine) {
+  const apiKey = process.env[ENGINE_RUNNERS[engine].keyEnv]?.trim()
   if (process.env.GEO_SCAN_ENABLED !== 'true' || !apiKey) throw new GeoScanDisabledError()
   return { apiKey }
 }
@@ -103,9 +111,11 @@ async function requireUserId() {
 }
 
 export class GeoScanService {
-  static async runScan(input: { query: string; brandDomain: string }): Promise<GeoScanDto> {
+  static async runScan(input: { query: string; brandDomain: string; engine?: GeoEngine }): Promise<GeoScanDto> {
     const userId = await requireUserId()
-    const { apiKey } = scanConfig()
+    const engine = input.engine ?? 'PERPLEXITY'
+    const runner = ENGINE_RUNNERS[engine]
+    const { apiKey } = scanConfig(engine)
 
     const query = cleanQuery(input.query)
     if (query.length < 3) throw new ValidationError('Use at least 3 characters for the query.')
@@ -124,7 +134,7 @@ export class GeoScanService {
         throw new RateLimitError(`AI citation scans are limited to ${MAX_GEO_SCANS_PER_DAY} per 24 hours.`)
       }
       return tx.geoQuery.create({
-        data: { userId, query, brandDomain, engine: ENGINE, enginePreset: PERPLEXITY_PRESET, status: 'RUNNING' },
+        data: { userId, query, brandDomain, engine, enginePreset: runner.preset, status: 'RUNNING' },
         select: { id: true },
       })
     })
@@ -132,9 +142,9 @@ export class GeoScanService {
     const startedAt = Date.now()
     let raw: unknown
     try {
-      raw = await runPerplexityAgent(query, apiKey)
+      raw = await runner.run(query, apiKey)
     } catch (error) {
-      const errorCode = error instanceof PerplexityRequestError
+      const errorCode = error instanceof PerplexityRequestError || error instanceof ClaudeScanRequestError
         ? `${error.code}${error.httpStatus ? `_${error.httpStatus}` : ''}`
         : 'UNKNOWN'
       const row = await prisma.geoQuery.update({
@@ -146,9 +156,9 @@ export class GeoScanService {
     }
     const latencyMs = Date.now() - startedAt
 
-    let parsed: ReturnType<typeof parseAgentResponse>
+    let parsed: ReturnType<typeof runner.parse>
     try {
-      parsed = parseAgentResponse(raw)
+      parsed = runner.parse(raw)
     } catch {
       const row = await prisma.geoQuery.update({
         where: { id: reserved.id },
@@ -182,11 +192,12 @@ export class GeoScanService {
     logger.info(
       {
         geoQueryId: row.id,
-        engine: ENGINE,
+        engine,
         model: parsed.model,
         inputTokens: parsed.inputTokens,
         outputTokens: parsed.outputTokens,
         costUsd: parsed.costUsd,
+        costDetails: parsed.costDetails,
         latencyMs,
         sourceCount: row.sourceCount,
         citedCount: row.citedCount,

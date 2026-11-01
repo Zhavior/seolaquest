@@ -1,3 +1,4 @@
+// @vitest-environment node
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 const mocks = vi.hoisted(() => ({
@@ -78,7 +79,7 @@ describe('LeadService tenant boundaries', () => {
     mocks.recordOutcome.mockReset().mockResolvedValue({ replayed: false })
     vi.unstubAllGlobals()
     vi.unstubAllEnvs()
-    vi.stubEnv('OPENAI_API_KEY', 'test-openai-key')
+    vi.stubEnv('ANTHROPIC_API_KEY', 'test-anthropic-key')
     mocks.requireCurrentUser.mockResolvedValue({
       id: 'user-1',
       crmWebhookUrl: 'https://hooks.example.com/crm',
@@ -125,7 +126,7 @@ describe('LeadService tenant boundaries', () => {
     })
   })
 
-  it('denies AI replies to a free user before reading data or calling OpenAI', async () => {
+  it('denies AI replies to a free user before reading data or calling Claude', async () => {
     mocks.entitlementsForUser.mockResolvedValue({
       plan: 'FREE',
       subscriptionStatus: 'inactive',
@@ -146,8 +147,8 @@ describe('LeadService tenant boundaries', () => {
     expect(fetchMock).not.toHaveBeenCalled()
   })
 
-  it('fails closed before reading lead data when the OpenAI key is missing', async () => {
-    vi.stubEnv('OPENAI_API_KEY', '')
+  it('fails closed before reading lead data when the Claude key is missing', async () => {
+    vi.stubEnv('ANTHROPIC_API_KEY', '')
     const fetchMock = vi.fn()
     vi.stubGlobal('fetch', fetchMock)
 
@@ -160,7 +161,7 @@ describe('LeadService tenant boundaries', () => {
     expect(fetchMock).not.toHaveBeenCalled()
   })
 
-  it('uses the configured OpenAI key with a bounded request', async () => {
+  it('uses the configured Claude key with a bounded request', async () => {
     mocks.userFindUnique.mockResolvedValue({ id: 'user-1', name: 'Hunter' })
     mocks.leadFindUnique.mockResolvedValue({
       id: 'lead-1',
@@ -169,27 +170,28 @@ describe('LeadService tenant boundaries', () => {
       keyword: { phrase: 'need a CRM' },
     })
     const fetchMock = vi.fn().mockResolvedValue(new Response(JSON.stringify({
-      choices: [{ message: { content: 'A helpful response.' } }],
-    }), { status: 200 }))
+      id: 'msg_1',
+      type: 'message',
+      role: 'assistant',
+      stop_reason: 'end_turn',
+      content: [{ type: 'text', text: 'A helpful response.' }],
+    }), { status: 200, headers: { 'content-type': 'application/json' } }))
     vi.stubGlobal('fetch', fetchMock)
 
     await expect(LeadService.generateAIReply('lead-1')).resolves.toEqual({
       ok: true,
       reply: 'A helpful response.',
     })
-    expect(fetchMock).toHaveBeenCalledWith(
-      'https://api.openai.com/v1/chat/completions',
-      expect.objectContaining({
-        headers: expect.objectContaining({ Authorization: 'Bearer test-openai-key' }),
-        signal: expect.any(AbortSignal),
-      }),
-    )
-    const [, init] = fetchMock.mock.calls[0]
-    expect(JSON.parse(init.body)).toMatchObject({ model: 'gpt-4o-mini', max_tokens: 180 })
+    expect(fetchMock).toHaveBeenCalledTimes(1)
+    const [url, init] = fetchMock.mock.calls[0]
+    expect(String(url)).toBe('https://api.anthropic.com/v1/messages')
+    expect(new Headers(init.headers).get('authorization')).toBe('Bearer test-anthropic-key')
+    expect(init.signal).toBeInstanceOf(AbortSignal)
+    expect(JSON.parse(init.body)).toMatchObject({ model: 'claude-haiku-5-5', max_tokens: 512 })
     expect(mocks.aiUsageCheck).toHaveBeenCalledWith('user-1')
   })
 
-  it('fails closed before OpenAI when the distributed AI limit is unavailable', async () => {
+  it('fails closed before Claude when the distributed AI limit is unavailable', async () => {
     mocks.userFindUnique.mockResolvedValue({ id: 'user-1', name: 'Hunter' })
     mocks.leadFindUnique.mockResolvedValue({
       id: 'lead-1', platform: 'REDDIT', content: 'Need a CRM', keyword: { phrase: 'CRM' },
@@ -205,7 +207,7 @@ describe('LeadService tenant boundaries', () => {
     expect(fetchMock).not.toHaveBeenCalled()
   })
 
-  it('stops OpenAI cost after the daily tenant quota', async () => {
+  it('stops Claude cost after the daily tenant quota', async () => {
     mocks.userFindUnique.mockResolvedValue({ id: 'user-1', name: 'Hunter' })
     mocks.leadFindUnique.mockResolvedValue({
       id: 'lead-1', platform: 'REDDIT', content: 'Need a CRM', keyword: { phrase: 'CRM' },

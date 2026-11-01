@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
-import { getGeminiClient } from '@/lib/gemini'
-import { getServerEnv } from '@/lib/env'
+import Anthropic from '@anthropic-ai/sdk'
+import { CLAUDE_REFUSAL_FALLBACK, CLAUDE_SMART_MODEL, claudeText, getClaudeClient } from '@/lib/anthropic'
 import { getCurrentUser } from '@/lib/auth'
 import { logger } from '@/src/modules/core/infrastructure/logger'
 import { withApiHandler } from '@/src/modules/core/infrastructure/api-handler'
@@ -27,17 +27,6 @@ const SYSTEM_INSTRUCTION =
 
 const TIMEOUT_MS = 15000
 
-/**
- * Distinguishes "we gave up waiting" (504) from "the provider failed" (500) without matching
- * on an error message string, which the SDK is free to reuse for something else.
- */
-class GeminiTimeoutError extends Error {
-  constructor() {
-    super('Gemini request timed out')
-    this.name = 'GeminiTimeoutError'
-  }
-}
-
 /** RFC 9110 Retry-After is a whole-second delta and must never round down to zero. */
 function retryAfterSecondsUntil(retryAt: Date | undefined): number | undefined {
   if (!retryAt) return undefined
@@ -46,33 +35,29 @@ function retryAfterSecondsUntil(retryAt: Date | undefined): number | undefined {
 }
 
 export const POST = withApiHandler(async (request) => {
-  // Clerk middleware already rejects anonymous callers (see proxy.ts), but the
-  // spend here lands on our Gemini account, so the route states the
+  // Clerk middleware already rejects anonymous callers (see middleware.ts), but the
+  // spend here lands on our Claude account, so the route states the
   // requirement itself rather than inheriting it from the route matcher.
   const user = await getCurrentUser()
   if (!user) {
     return NextResponse.json({ error: 'UNAUTHORIZED' }, { status: 401 })
   }
 
-  const ai = getGeminiClient()
-  const env = getServerEnv()
+  const client = getClaudeClient()
 
-  if (!ai || !env.GEMINI_API_KEY) {
+  if (!client) {
     logger.error(
-      { event: 'gemini_chat_unconfigured', outcomeCode: 'GEMINI_CHAT_NOT_CONFIGURED' },
-      'Gemini chat is not configured',
+      { event: 'ai_chat_unconfigured', outcomeCode: 'AI_CHAT_NOT_CONFIGURED' },
+      'AI chat is not configured',
     )
-    return NextResponse.json(
-      { error: 'Gemini API is not configured. Missing GEMINI_API_KEY environment variable.' },
-      { status: 503 }
-    )
+    return NextResponse.json({ error: 'AI chat is not configured.' }, { status: 503 })
   }
 
   /**
    * Per-account RATE brake, on top of the global/ip tiers withApiHandler already charged.
    * Those two are keyed on an IP or a userId with a 100-300/min allowance sized for ordinary
    * API traffic; neither is a meaningful bound on an endpoint where every request bills a
-   * generateContent call against OUR key and sign-up is public. `ai` is the tier sized for
+   * Claude request against OUR key and sign-up is public. `ai` is the tier sized for
    * that (20/h, see LIMITER_CONFIG), and the identifier is the authenticated user id so a
    * caller cannot multiply their allowance by rotating networks. `ai` is in HASHED_TYPES,
    * so the id is HMAC'd before it becomes a Redis key.
@@ -97,11 +82,11 @@ export const POST = withApiHandler(async (request) => {
     // Issue count only: the raw issues carry the rejected input on `received`.
     logger.warn(
       {
-        event: 'gemini_chat_validation_failed',
-        outcomeCode: 'GEMINI_CHAT_INVALID_REQUEST',
+        event: 'ai_chat_validation_failed',
+        outcomeCode: 'AI_CHAT_INVALID_REQUEST',
         issueCount: parseResult.error.issues.length,
       },
-      'Gemini chat request validation failed',
+      'AI chat request validation failed',
     )
     // The schema's own messages are written for the chat user and are what the UI renders,
     // so they are returned verbatim rather than flattened into a generic "Validation failed".
@@ -110,7 +95,6 @@ export const POST = withApiHandler(async (request) => {
   }
 
   const { message, history } = parseResult.data
-  const modelName = env.GEMINI_MODEL || 'gemini-2.5-flash'
 
   /**
    * Per-tenant SPEND cap. This is a different control from the `ai` tier above and both are
@@ -126,8 +110,8 @@ export const POST = withApiHandler(async (request) => {
   if (!usage.allowed) {
     if (usage.reason === 'LIMITED') {
       logger.warn(
-        { event: 'gemini_chat_spend_limited', outcomeCode: 'GEMINI_CHAT_AI_BUDGET_EXHAUSTED' },
-        'Gemini chat blocked by the per-tenant AI usage budget',
+        { event: 'ai_chat_spend_limited', outcomeCode: 'AI_CHAT_BUDGET_EXHAUSTED' },
+        'AI chat blocked by the per-tenant AI usage budget',
       )
       // RateLimitError so withApiHandler renders the 429 and the Retry-After header through
       // the same path as RateLimiterService, instead of a parallel rendering here.
@@ -139,8 +123,8 @@ export const POST = withApiHandler(async (request) => {
     // The limiter could not be consulted, so it fails closed: we cannot tell whether this
     // request is inside the budget, and guessing "yes" is the failure mode that costs money.
     logger.error(
-      { event: 'gemini_chat_spend_limiter_unavailable', outcomeCode: 'GEMINI_CHAT_BUDGET_UNAVAILABLE' },
-      'Gemini chat blocked because the AI usage limiter is unavailable',
+      { event: 'ai_chat_spend_limiter_unavailable', outcomeCode: 'AI_CHAT_BUDGET_UNAVAILABLE' },
+      'AI chat blocked because the AI usage limiter is unavailable',
     )
     return NextResponse.json(
       { error: 'AI chat is temporarily unavailable. Please try again shortly.' },
@@ -148,72 +132,60 @@ export const POST = withApiHandler(async (request) => {
     )
   }
 
-  // Format contents for @google/genai SDK
-  const contents = [
-    ...history.map((msg) => ({
-      role: msg.role,
-      parts: [{ text: msg.content }],
-    })),
-    {
-      role: 'user' as const,
-      parts: [{ text: message }],
-    },
+  // The API needs a conversation that starts with the user and has no empty turns, and the
+  // history comes from the client, so both are enforced here rather than left to fail as a 400.
+  const turns = history
+    .filter((msg) => msg.content.trim())
+    .map((msg): Anthropic.Beta.BetaMessageParam => ({
+      role: msg.role === 'model' ? 'assistant' : 'user',
+      content: msg.content,
+    }))
+  const firstUserTurn = turns.findIndex((turn) => turn.role === 'user')
+  const messages: Anthropic.Beta.BetaMessageParam[] = [
+    ...(firstUserTurn === -1 ? [] : turns.slice(firstUserTurn)),
+    { role: 'user', content: message },
   ]
 
-  // Timeout protection via Promise.race
-  let timer: ReturnType<typeof setTimeout> | undefined
-  const timeoutPromise = new Promise<never>((_, reject) => {
-    timer = setTimeout(() => reject(new GeminiTimeoutError()), TIMEOUT_MS)
-  })
-
-  const apiPromise = ai.models.generateContent({
-    model: modelName,
-    contents,
-    config: {
-      systemInstruction: SYSTEM_INSTRUCTION,
-    },
-  })
-
-  let text: string | undefined
+  let text: string
   try {
-    const response = await Promise.race([apiPromise, timeoutPromise])
-    text = response.text
+    const response = await client.beta.messages.create(
+      {
+        model: CLAUDE_SMART_MODEL,
+        max_tokens: 2048,
+        system: SYSTEM_INSTRUCTION,
+        messages,
+        output_config: { effort: 'low' },
+        ...CLAUDE_REFUSAL_FALLBACK,
+      },
+      { timeout: TIMEOUT_MS, maxRetries: 0 },
+    )
+    text = claudeText(response)
   } catch (error: unknown) {
-    const timedOut = error instanceof GeminiTimeoutError
+    const timedOut = error instanceof Anthropic.APIConnectionTimeoutError
 
     // Scoped to the provider call on purpose: a RateLimitError or ValidationError raised
-    // above must reach withApiHandler untouched rather than be relabelled a Gemini failure.
+    // above must reach withApiHandler untouched rather than be relabelled a provider failure.
     logger.error(
       {
         err: error,
-        event: 'gemini_chat_failed',
-        outcomeCode: timedOut ? 'GEMINI_CHAT_TIMED_OUT' : 'GEMINI_CHAT_FAILED',
+        event: 'ai_chat_failed',
+        outcomeCode: timedOut ? 'AI_CHAT_TIMED_OUT' : 'AI_CHAT_FAILED',
       },
-      'Gemini chat request failed',
+      'AI chat request failed',
     )
 
     if (timedOut) {
-      return NextResponse.json({ error: 'Gemini API request timed out. Please try again.' }, { status: 504 })
+      return NextResponse.json({ error: 'The AI request timed out. Please try again.' }, { status: 504 })
     }
-    return NextResponse.json(
-      { error: 'An error occurred while generating a response from Gemini.' },
-      { status: 500 }
-    )
-  } finally {
-    // Without this the pending timer keeps the function alive for the rest of the 15s even
-    // when the provider answered immediately.
-    if (timer) clearTimeout(timer)
+    return NextResponse.json({ error: 'An error occurred while generating a response.' }, { status: 500 })
   }
 
   if (!text) {
     logger.warn(
-      { event: 'gemini_chat_empty_response', outcomeCode: 'GEMINI_CHAT_EMPTY_RESPONSE', model: modelName },
-      'Gemini returned an empty or blocked response',
+      { event: 'ai_chat_empty_response', outcomeCode: 'AI_CHAT_EMPTY_RESPONSE', model: CLAUDE_SMART_MODEL },
+      'Claude returned an empty or declined response',
     )
-    return NextResponse.json(
-      { error: 'Received an empty response from Gemini API or content was blocked by safety filters.' },
-      { status: 502 }
-    )
+    return NextResponse.json({ error: 'The AI returned no answer to that message.' }, { status: 502 })
   }
 
   return NextResponse.json({ reply: text })

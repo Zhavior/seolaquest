@@ -239,7 +239,7 @@ describe('ScanProviderService', () => {
               opportunityId: 'lead-1',
               leadId: 'lead-1',
               // The tenant has to ride the payload: the outbox worker has no session, and
-              // without it Aurora cannot meter its Gemini spend against anyone.
+              // without it Aurora cannot meter its Claude spend against anyone.
               userId: 'user-1',
               keywordId: 'kw-1',
               platform: 'TWITTER',
