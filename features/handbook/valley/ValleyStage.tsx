@@ -227,7 +227,10 @@ export function ValleyStage({
     let cleanup = () => {}
     const reducedQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
 
-    void import('./scene').then(({ createValley }) => {
+    // The valley takes hundreds of milliseconds of main-thread time to grow on
+    // a phone, so it waits until the page has loaded and the browser is idle.
+    // The painted dusk gradient holds the space until then.
+    const start = () => void import('./scene').then(({ createValley }) => {
       if (cancelled) return
       let valley: ValleyHandle
       try {
@@ -275,8 +278,16 @@ export function ValleyStage({
       }
     })
 
+    const idle = () => {
+      if ('requestIdleCallback' in window) window.requestIdleCallback(start, { timeout: 2000 })
+      else setTimeout(start, 200)
+    }
+    if (document.readyState === 'complete') idle()
+    else window.addEventListener('load', idle, { once: true })
+
     return () => {
       cancelled = true
+      window.removeEventListener('load', idle)
       cleanup()
     }
     // The valley is built once; `hasScan` is fixed for the page's lifetime.
@@ -359,7 +370,6 @@ export function ValleyStage({
 
   return (
     <>
-      <div className="hb-intro" aria-hidden="true" />
       <div ref={hostRef} className="hb-valley" data-live={live ? '' : undefined} aria-hidden="true">
         <canvas ref={canvasRef} className="hb-valley-canvas" />
       </div>

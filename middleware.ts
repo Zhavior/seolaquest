@@ -1,5 +1,5 @@
 import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'
-import { NextResponse } from 'next/server'
+import { NextResponse, type NextFetchEvent, type NextRequest } from 'next/server'
 import { BLOG_POST_SLUGS } from '@/lib/generated/blogSlugs'
 
 export const PUBLIC_ROUTE_PATTERNS = [
@@ -52,6 +52,35 @@ export const PUBLIC_ROUTE_PATTERNS = [
 
 const isPublicRoute = createRouteMatcher(PUBLIC_ROUTE_PATTERNS)
 
+/**
+ * Public pages that never read the session, so they skip Clerk entirely.
+ *
+ * Running Clerk here cost real time: on a first visit it can answer a page
+ * request with a handshake redirect through Clerk's own domain before the page
+ * loads (three extra hops, 230-440ms on a fast connection, measured 2026-10-31).
+ * These pages render the same for everyone and call neither auth() nor
+ * currentUser(); one that starts to must come off this list, or Clerk throws.
+ * Anything not listed still goes through Clerk, so a new route is guarded by
+ * default. Keep this a subset of PUBLIC_ROUTE_PATTERNS.
+ */
+export const SESSIONLESS_ROUTE_PATTERNS = [
+  '/',
+  '/pricing',
+  '/radar',
+  '/blog',
+  '/blog/(.*)',
+  '/status',
+  '/privacy',
+  '/terms',
+  '/api-terms',
+  '/robots.txt',
+  '/sitemap.xml',
+  '/opengraph-image',
+  '/monitoring(.*)',
+]
+
+const isSessionlessRoute = createRouteMatcher(SESSIONLESS_ROUTE_PATTERNS)
+
 /** A malformed escape such as /blog/100% cannot name a post, so it is a 404, not a URIError. */
 function isPublishedBlogSlug(rawSlug: string): boolean {
   try {
@@ -61,7 +90,19 @@ function isPublishedBlogSlug(rawSlug: string): boolean {
   }
 }
 
-export default clerkMiddleware(async (auth, request) => {
+/**
+ * Unknown article slugs get a real 404 here. The post route renders on demand
+ * (Cloudflare Workers has no cache to serve prerendered pages from), and a
+ * notFound() thrown under this middleware's rewrite answers HTTP 200, which
+ * search engines read as a soft 404.
+ */
+function blogNotFound(request: NextRequest): NextResponse | null {
+  const blogSlug = /^\/blog\/([^/]+)\/?$/.exec(request.nextUrl.pathname)?.[1]
+  if (blogSlug === undefined || isPublishedBlogSlug(blogSlug)) return null
+  return NextResponse.rewrite(new URL('/_blog-not-found', request.url), { status: 404 })
+}
+
+const withClerk = clerkMiddleware(async (auth, request) => {
   const legacyRedirects: Record<string, string> = {
     '/landing': '/',
     '/dashboard': '/app',
@@ -79,18 +120,15 @@ export default clerkMiddleware(async (auth, request) => {
     redirectUrl.pathname = destination
     return NextResponse.redirect(redirectUrl, 308)
   }
-  // Unknown article slugs get a real 404 here. The post route renders on
-  // demand (Cloudflare Workers has no cache to serve prerendered pages from),
-  // and a notFound() thrown under this middleware's rewrite answers HTTP 200,
-  // which search engines read as a soft 404.
-  const blogSlug = /^\/blog\/([^/]+)\/?$/.exec(request.nextUrl.pathname)?.[1]
-  if (blogSlug !== undefined && !isPublishedBlogSlug(blogSlug)) {
-    return NextResponse.rewrite(new URL('/_blog-not-found', request.url), { status: 404 })
-  }
   if (!isPublicRoute(request)) {
     await auth.protect()
   }
 })
+
+export default function middleware(request: NextRequest, event: NextFetchEvent) {
+  if (isSessionlessRoute(request)) return blogNotFound(request) ?? NextResponse.next()
+  return withClerk(request, event)
+}
 
 export const config = {
   matcher: [
