@@ -61,6 +61,13 @@ describe('runClaudeScan', () => {
     expect(fetch).toHaveBeenCalledTimes(3)
   })
 
+  it('fails a cut-off answer rather than scoring the citations it reached', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(message('max_tokens', [{ type: 'text', text: 'Partial' }])))
+
+    await expect(runClaudeScan('q', 'test-key')).rejects.toMatchObject({ code: 'UNFINISHED' })
+    expect(fetch).toHaveBeenCalledTimes(1)
+  })
+
   it('names a refusal instead of returning an empty answer', async () => {
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue(message('refusal', [])))
 

@@ -91,7 +91,8 @@ async function callClaude(topic: string): Promise<string | null> {
         output_config: { effort: 'medium' },
         ...CLAUDE_REFUSAL_FALLBACK,
       },
-      { timeout: 120_000 },
+      // No SDK retries: each one could bill a full draft, and the template is a safe answer.
+      { timeout: 120_000, maxRetries: 0 },
     )
     return claudeText(response) || null
   } catch {

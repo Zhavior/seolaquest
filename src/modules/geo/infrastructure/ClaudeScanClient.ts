@@ -71,9 +71,12 @@ export async function runClaudeScan(query: string, apiKey: string): Promise<unkn
     usage.web_search_requests += response.usage.server_tool_use?.web_search_requests ?? 0
 
     if (response.stop_reason === 'refusal') throw new ClaudeScanRequestError('REFUSED')
-    if (response.stop_reason !== 'pause_turn') {
+    if (response.stop_reason === 'end_turn') {
       return { id: response.id, model: response.model, stop_reason: response.stop_reason, content, usage }
     }
+    // A cut-off answer can stop before the citation that names the brand, so anything
+    // short of a finished turn fails the scan rather than reporting the brand as absent.
+    if (response.stop_reason !== 'pause_turn') throw new ClaudeScanRequestError('UNFINISHED')
     messages.push({ role: 'assistant', content: response.content })
   }
 
