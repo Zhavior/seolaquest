@@ -2,8 +2,9 @@ import { z } from 'zod'
 import { classifySource, hostMatches, hostnameOf, type ClassificationBasis, type SourceType } from './sourceType'
 
 /**
- * Parses a Perplexity Agent API (`POST /v1/agent`) response into the sources a
- * scan cares about.
+ * Parses an engine's response into the sources a scan cares about: a Perplexity
+ * Agent API (`POST /v1/agent`) response here, a Claude one in
+ * `parseClaudeScanResponse` below.
  *
  * Two different things are kept apart on purpose:
  * - retrieved: every page the engine's web search returned (`search_results`).
@@ -105,6 +106,44 @@ export interface BrandPresence {
 const MARKER = /\[(?:web:)?(\d+)\]/g
 const SNIPPET_LIMIT = 300
 
+/**
+ * Turns an engine's retrieved pages and its citations, in answer order, into the
+ * one source list every engine shares. The first citation of a page sets its rank.
+ */
+function assembleSources(
+  retrieved: { url: string; title: string; snippet: string }[],
+  citations: { url: string; title?: string; snippet?: string }[],
+): GeoSource[] {
+  const citedRankByUrl = new Map<string, number>()
+  for (const citation of citations) {
+    if (!citedRankByUrl.has(citation.url)) citedRankByUrl.set(citation.url, citedRankByUrl.size + 1)
+  }
+
+  const sources: GeoSource[] = []
+  const seen = new Set<string>()
+  const addSource = (url: string, title: string, snippet: string, retrievedRank: number | null) => {
+    if (seen.has(url)) return
+    seen.add(url)
+    const citedRank = citedRankByUrl.get(url) ?? null
+    const citation = citations.find((entry) => entry.url === url)
+    sources.push({
+      url,
+      domain: hostnameOf(url),
+      title: title || citation?.title || '',
+      snippet: (snippet || citation?.snippet || '').slice(0, SNIPPET_LIMIT),
+      retrievedRank,
+      cited: citedRank !== null,
+      citedRank,
+      ...classifySource(url),
+    })
+  }
+
+  retrieved.forEach((result) => addSource(result.url, result.title, result.snippet, seen.size + 1))
+  // A citation can point at a page that was not in the search results payload.
+  for (const url of citedRankByUrl.keys()) addSource(url, '', '', null)
+  return sources
+}
+
 export function parseAgentResponse(raw: unknown): ParsedAgentResponse {
   const response = responseSchema.parse(raw)
 
@@ -146,32 +185,7 @@ export function parseAgentResponse(raw: unknown): ParsedAgentResponse {
   }
   events.sort((a, b) => a.position - b.position)
 
-  const citedRankByUrl = new Map<string, number>()
-  for (const event of events) {
-    if (!citedRankByUrl.has(event.url)) citedRankByUrl.set(event.url, citedRankByUrl.size + 1)
-  }
-
-  const sources: GeoSource[] = []
-  const seen = new Set<string>()
-  const addSource = (url: string, title: string, snippet: string, retrievedRank: number | null) => {
-    if (seen.has(url)) return
-    seen.add(url)
-    const citedRank = citedRankByUrl.get(url) ?? null
-    sources.push({
-      url,
-      domain: hostnameOf(url),
-      title,
-      snippet: snippet.slice(0, SNIPPET_LIMIT),
-      retrievedRank,
-      cited: citedRank !== null,
-      citedRank,
-      ...classifySource(url),
-    })
-  }
-
-  results.forEach((result) => addSource(result.url, result.title, result.snippet, seen.size + 1))
-  // Annotations can cite a page that was not in the search results payload.
-  for (const url of citedRankByUrl.keys()) addSource(url, '', '', null)
+  const sources = assembleSources(results, events.map((event) => ({ url: event.url })))
 
   const cost = response.usage?.cost
   return {
@@ -184,6 +198,88 @@ export function parseAgentResponse(raw: unknown): ParsedAgentResponse {
     outputTokens: response.usage?.output_tokens ?? null,
     costUsd: cost ? cost.total_cost : null,
     costDetails: cost ? (cost as Record<string, unknown>) : null,
+  }
+}
+
+const claudeMessageSchema = z.object({
+  id: z.string().optional(),
+  model: z.string().optional(),
+  stop_reason: z.string().nullish(),
+  content: z.array(z.unknown()).default([]),
+  usage: z
+    .object({
+      input_tokens: z.number().int(),
+      output_tokens: z.number().int(),
+      web_search_requests: z.number().int().optional(),
+    })
+    .optional(),
+})
+
+const claudeSearchBlockSchema = z.object({
+  type: z.literal('web_search_tool_result'),
+  // On failure this is one error object, not a list, and that search adds no pages.
+  content: z.array(z.object({ url: z.string(), title: z.string().nullish() })),
+})
+
+const claudeTextBlockSchema = z.object({
+  type: z.literal('text'),
+  text: z.string().default(''),
+  citations: z
+    .array(
+      z.object({
+        type: z.string(),
+        url: z.string().optional(),
+        title: z.string().nullish(),
+        cited_text: z.string().optional(),
+      }),
+    )
+    .nullish(),
+})
+
+/**
+ * Parses the merged message from `runClaudeScan` into the same shape as a
+ * Perplexity scan. Retrieved means pages returned by a search block; cited means
+ * pages a text block's citations point at, in answer order.
+ *
+ * `costUsd` stays null: the Messages API reports tokens and search counts, not
+ * dollars, and those counts are kept in `costDetails` rather than priced here
+ * from a rate card that can change.
+ */
+export function parseClaudeScanResponse(raw: unknown): ParsedAgentResponse {
+  const response = claudeMessageSchema.parse(raw)
+
+  const retrieved: { url: string; title: string; snippet: string }[] = []
+  const citations: { url: string; title?: string; snippet?: string }[] = []
+  const answer: string[] = []
+
+  for (const block of response.content) {
+    const search = claudeSearchBlockSchema.safeParse(block)
+    if (search.success) {
+      for (const result of search.data.content) {
+        retrieved.push({ url: result.url, title: result.title ?? '', snippet: '' })
+      }
+      continue
+    }
+    const text = claudeTextBlockSchema.safeParse(block)
+    if (!text.success) continue
+    answer.push(text.data.text)
+    for (const citation of text.data.citations ?? []) {
+      if (citation.type === 'web_search_result_location' && citation.url) {
+        citations.push({ url: citation.url, title: citation.title ?? undefined, snippet: citation.cited_text })
+      }
+    }
+  }
+
+  return {
+    responseId: response.id ?? null,
+    model: response.model ?? null,
+    status: response.stop_reason ?? null,
+    answerText: answer.join('').trim(),
+    sources: assembleSources(retrieved, citations),
+    inputTokens: response.usage?.input_tokens ?? null,
+    outputTokens: response.usage?.output_tokens ?? null,
+    costUsd: null,
+    costDetails: response.usage ? { webSearchRequests: response.usage.web_search_requests ?? 0 } : null,
   }
 }
 

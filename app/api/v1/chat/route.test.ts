@@ -1,18 +1,20 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import Anthropic from '@anthropic-ai/sdk'
 import { RateLimitError } from '@/src/modules/core/infrastructure/errors'
 
 const mocks = vi.hoisted(() => ({
   getCurrentUser: vi.fn(),
-  getGeminiClient: vi.fn(),
-  getServerEnv: vi.fn(),
-  generateContent: vi.fn(),
+  getClaudeClient: vi.fn(),
+  create: vi.fn(),
   enforce: vi.fn(),
   aiUsageCheck: vi.fn(),
 }))
 
 vi.mock('@/lib/auth', () => ({ getCurrentUser: mocks.getCurrentUser }))
-vi.mock('@/lib/gemini', () => ({ getGeminiClient: mocks.getGeminiClient }))
-vi.mock('@/lib/env', () => ({ getServerEnv: mocks.getServerEnv }))
+vi.mock('@/lib/anthropic', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/lib/anthropic')>()),
+  getClaudeClient: mocks.getClaudeClient,
+}))
 // Limiter internals are covered by RateLimiter.test.ts / AiUsageLimiter.test.ts; these cases
 // exercise how the route reacts to their verdicts.
 vi.mock('@/src/modules/core/security/RateLimiter', () => ({
@@ -27,32 +29,30 @@ import { POST } from './route'
 const context = { params: {} }
 
 const jsonRequest = (body: unknown) =>
-  new Request('https://seolaquest.test/api/gemini/chat', {
+  new Request('https://seolaquest.test/api/v1/chat', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),
   })
 
 const rawRequest = (body: string) =>
-  new Request('https://seolaquest.test/api/gemini/chat', {
+  new Request('https://seolaquest.test/api/v1/chat', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body,
   })
 
-describe('gemini chat route', () => {
+describe('chat route', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     mocks.getCurrentUser.mockResolvedValue({ id: 'user-1' })
-    mocks.getServerEnv.mockReturnValue({ GEMINI_API_KEY: 'server-owned-key', GEMINI_MODEL: 'gemini-2.5-flash' })
-    mocks.getGeminiClient.mockReturnValue({ models: { generateContent: mocks.generateContent } })
+    mocks.getClaudeClient.mockReturnValue({ beta: { messages: { create: mocks.create } } })
     mocks.enforce.mockResolvedValue(undefined)
     mocks.aiUsageCheck.mockResolvedValue({ allowed: true })
-    mocks.generateContent.mockResolvedValue({ text: 'Here is the answer.' })
-  })
-
-  afterEach(() => {
-    vi.useRealTimers()
+    mocks.create.mockResolvedValue({
+      stop_reason: 'end_turn',
+      content: [{ type: 'text', text: 'Here is the answer.' }],
+    })
   })
 
   it('rejects an unauthenticated caller before any billable work', async () => {
@@ -62,7 +62,7 @@ describe('gemini chat route', () => {
 
     expect(response.status).toBe(401)
     await expect(response.json()).resolves.toEqual({ error: 'UNAUTHORIZED' })
-    expect(mocks.generateContent).not.toHaveBeenCalled()
+    expect(mocks.create).not.toHaveBeenCalled()
   })
 
   it('charges the ai tier against the authenticated user id and 429s when it is spent', async () => {
@@ -80,7 +80,7 @@ describe('gemini chat route', () => {
     expect(response.status).toBe(429)
     expect(response.headers.get('Retry-After')).toBe('42')
     await expect(response.json()).resolves.toMatchObject({ code: 'RATE_LIMIT_EXCEEDED' })
-    expect(mocks.generateContent).not.toHaveBeenCalled()
+    expect(mocks.create).not.toHaveBeenCalled()
   })
 
   it('stops a caller whose per-tenant AI spend budget is exhausted', async () => {
@@ -94,7 +94,7 @@ describe('gemini chat route', () => {
 
     expect(mocks.aiUsageCheck).toHaveBeenCalledWith('user-1')
     expect(response.status).toBe(429)
-    expect(mocks.generateContent).not.toHaveBeenCalled()
+    expect(mocks.create).not.toHaveBeenCalled()
   })
 
   it('fails closed with 503 when the spend limiter cannot be consulted', async () => {
@@ -103,20 +103,19 @@ describe('gemini chat route', () => {
     const response = await POST(jsonRequest({ message: 'hi' }), context)
 
     expect(response.status).toBe(503)
-    expect(mocks.generateContent).not.toHaveBeenCalled()
+    expect(mocks.create).not.toHaveBeenCalled()
   })
 
-  it('answers 503 when GEMINI_API_KEY is not configured', async () => {
-    mocks.getGeminiClient.mockReturnValue(null)
-    mocks.getServerEnv.mockReturnValue({ GEMINI_API_KEY: undefined, GEMINI_MODEL: undefined })
+  it('answers 503 when Claude is not configured', async () => {
+    mocks.getClaudeClient.mockReturnValue(null)
 
     const response = await POST(jsonRequest({ message: 'hi' }), context)
 
     expect(response.status).toBe(503)
     await expect(response.json()).resolves.toMatchObject({
-      error: expect.stringContaining('GEMINI_API_KEY'),
+      error: expect.stringContaining('not configured'),
     })
-    expect(mocks.generateContent).not.toHaveBeenCalled()
+    expect(mocks.create).not.toHaveBeenCalled()
   })
 
   it.each([
@@ -127,7 +126,7 @@ describe('gemini chat route', () => {
 
     expect(response.status).toBe(400)
     await expect(response.json()).resolves.toMatchObject({ code: 'VALIDATION_ERROR' })
-    expect(mocks.generateContent).not.toHaveBeenCalled()
+    expect(mocks.create).not.toHaveBeenCalled()
   })
 
   it('answers 400 with the schema message when validation fails', async () => {
@@ -135,7 +134,7 @@ describe('gemini chat route', () => {
 
     expect(response.status).toBe(400)
     await expect(response.json()).resolves.toEqual({ error: 'Message cannot be empty.' })
-    expect(mocks.generateContent).not.toHaveBeenCalled()
+    expect(mocks.create).not.toHaveBeenCalled()
   })
 
   it('answers 400 when the message exceeds the length ceiling', async () => {
@@ -145,25 +144,23 @@ describe('gemini chat route', () => {
     await expect(response.json()).resolves.toEqual({
       error: 'Message is too long (max 1000 characters).',
     })
-    expect(mocks.generateContent).not.toHaveBeenCalled()
+    expect(mocks.create).not.toHaveBeenCalled()
   })
 
   it('answers 504 when the provider exceeds the 15s budget', async () => {
-    vi.useFakeTimers()
-    mocks.generateContent.mockReturnValue(new Promise(() => {}))
+    mocks.create.mockRejectedValue(new Anthropic.APIConnectionTimeoutError({ message: 'timed out' }))
 
-    const pending = POST(jsonRequest({ message: 'hi' }), context)
-    await vi.advanceTimersByTimeAsync(15_000)
-    const response = await pending
+    const response = await POST(jsonRequest({ message: 'hi' }), context)
 
     expect(response.status).toBe(504)
     await expect(response.json()).resolves.toMatchObject({
       error: expect.stringContaining('timed out'),
     })
+    expect(mocks.create).toHaveBeenCalledWith(expect.anything(), { timeout: 15_000, maxRetries: 0 })
   })
 
-  it('answers 502 when the provider returns an empty or safety-blocked response', async () => {
-    mocks.generateContent.mockResolvedValue({ text: '' })
+  it('answers 502 when the provider returns an empty or declined response', async () => {
+    mocks.create.mockResolvedValue({ stop_reason: 'refusal', content: [] })
 
     const response = await POST(jsonRequest({ message: 'hi' }), context)
 
@@ -171,7 +168,7 @@ describe('gemini chat route', () => {
   })
 
   it('answers 500 when the provider itself errors', async () => {
-    mocks.generateContent.mockRejectedValue(new Error('upstream exploded'))
+    mocks.create.mockRejectedValue(new Error('upstream exploded'))
 
     const response = await POST(jsonRequest({ message: 'hi' }), context)
 
@@ -191,14 +188,38 @@ describe('gemini chat route', () => {
 
     expect(response.status).toBe(200)
     await expect(response.json()).resolves.toEqual({ reply: 'Here is the answer.' })
-    expect(mocks.generateContent).toHaveBeenCalledWith(
+    expect(mocks.create).toHaveBeenCalledWith(
       expect.objectContaining({
-        model: 'gemini-2.5-flash',
-        contents: [
-          { role: 'user', parts: [{ text: 'hello' }] },
-          { role: 'user', parts: [{ text: 'What does Axion do?' }] },
+        model: 'claude-sonnet-5-5',
+        betas: ['server-side-fallback-2026-07-01'],
+        fallbacks: 'default',
+        messages: [
+          { role: 'user', content: 'hello' },
+          { role: 'user', content: 'What does Axion do?' },
         ],
       }),
+      expect.anything(),
     )
+  })
+
+  it('maps model turns to assistant, and drops empty and leading non-user turns the API rejects', async () => {
+    await POST(
+      jsonRequest({
+        message: 'And then?',
+        history: [
+          { role: 'model', content: 'Welcome back.' },
+          { role: 'user', content: 'hello' },
+          { role: 'model', content: '  ' },
+          { role: 'model', content: 'Hi there.' },
+        ],
+      }),
+      context,
+    )
+
+    expect(mocks.create.mock.calls[0][0].messages).toEqual([
+      { role: 'user', content: 'hello' },
+      { role: 'assistant', content: 'Hi there.' },
+      { role: 'user', content: 'And then?' },
+    ])
   })
 })

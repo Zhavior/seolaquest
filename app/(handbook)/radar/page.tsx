@@ -31,8 +31,8 @@ export default function SampleScanPage() {
       <HandbookPage volume="try" title="Try it" note="No account. No engine was asked. Every site here is invented.">
         <div className="hb-stack" style={{ '--gap': '2rem' } as React.CSSProperties}>
           <p className="hb-lede">
-            This is what one scan shows, on an invented question about CRMs. A real scan asks Perplexity your question
-            and checks your site.
+            This is what one scan shows, on an invented question about CRMs. A real scan asks Perplexity or Claude your
+            question and checks your site.
           </p>
           <GeoSampleScan />
           <div className="hb-row">

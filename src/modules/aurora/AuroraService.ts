@@ -8,7 +8,7 @@ import { CanonicalPolicyScorer } from './classifiers/CanonicalPolicyScorer';
 import { EventFactory } from '../core/events/EventFactory';
 import { EventStore } from '../core/events/EventStore';
 import { logger } from '@/src/modules/core/infrastructure/logger';
-import { getServerEnv } from '@/lib/env';
+import { CLAUDE_FAST_MODEL } from '@/lib/anthropic';
 
 export class AuroraService {
   constructor(
@@ -124,19 +124,16 @@ export class AuroraService {
     let semanticFailureCode: string | null = null;
 
     /**
-     * Provenance is read from the configured model rather than hardcoded.
-     *
-     * Both branches previously wrote the literal 'gemini-1.5-flash', a model string that
-     * appears nowhere else in this codebase — `GEMINI_MODEL` defaults to gemini-2.5-flash.
-     * Provenance whose only job is to answer "which model decided this?" was answering it
+     * Provenance comes from the constant the classifier itself calls, not a second literal.
+     * Provenance whose only job is to answer "which model decided this?" once answered it
      * wrong, and would have kept doing so silently after any model upgrade.
      */
     if (evaluationStatus === 'LIVE') {
-      classifierProvider = 'Gemini';
-      classifierModel = getServerEnv().GEMINI_MODEL;
+      classifierProvider = 'Anthropic';
+      classifierModel = CLAUDE_FAST_MODEL;
     } else if (evaluationStatus === 'FALLBACK') {
-      classifierProvider = 'Gemini';
-      classifierModel = getServerEnv().GEMINI_MODEL;
+      classifierProvider = 'Anthropic';
+      classifierModel = CLAUDE_FAST_MODEL;
       semanticFailureCode = semanticResult?.failureCode || 'PROVIDER_ERROR';
     } else if (evaluationStatus === 'UNAVAILABLE') {
       // An UNAVAILABLE row used to carry no provenance at all — null provider, null model,

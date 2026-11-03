@@ -76,7 +76,7 @@ describe('Errata and FAQ', () => {
   it('names that scans have not run and only one engine exists', () => {
     render(<ErrataList checkoutOpen={false} />)
     expect(screen.getByText(/no real scan has run/)).toBeInTheDocument()
-    expect(screen.getByText(/One engine: Perplexity/)).toBeInTheDocument()
+    expect(screen.getByText(/Two engines: Perplexity and Claude/)).toBeInTheDocument()
     expect(screen.getByText(/Nothing on this site can be bought/)).toBeInTheDocument()
   })
 

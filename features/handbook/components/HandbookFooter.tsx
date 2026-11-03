@@ -24,8 +24,8 @@ export function HandbookFooter() {
         <div>
           <Brand />
           <p className="hb-desk-fine" style={{ marginTop: '0.9rem' }}>
-            See who AI answers cite. Sample data on this site is invented and labelled. Perplexity and X are
-            trademarks of their owners; SEOlaQuest is an independent product and is not affiliated with either.
+            See who AI answers cite. Sample data on this site is invented and labelled. Perplexity, Claude and X
+            are trademarks of their owners; SEOlaQuest is an independent product and is not affiliated with them.
           </p>
         </div>
         <nav aria-label="Read">

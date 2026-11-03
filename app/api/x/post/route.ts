@@ -76,7 +76,7 @@ export async function POST(request: Request) {
      * before it becomes a Redis key.
      *
      * Charged AFTER validation and immediately before the billable call, matching
-     * AiUsageLimiter in app/api/gemini/chat. The budget meters posts actually sent to X,
+     * AiUsageLimiter in app/api/v1/chat. The budget meters posts actually sent to X,
      * and at 8 per 24h it is small enough that spending it on requests that never reach
      * X is a real outage: 8 malformed bodies from a buggy client used to lock the admin
      * out for a full day, with nothing posted. Only an allowlisted admin can get this

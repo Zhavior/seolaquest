@@ -15,7 +15,7 @@ const implemented = [
   'Clerk session authentication for interactive product routes',
   'Stripe Checkout and signed webhook processing behind disabled-by-default launch switches',
   'Webhook inbox, idempotent credit ledger, entitlement checks, and SSRF-resistant CRM delivery',
-  'GEO citation scan against Perplexity: source sorting, brand check and per-scan cost record, covered by tests. Off unless a feature switch and an API key are both set, and capped at 20 scans per account per day',
+  'GEO citation scan against Perplexity or Claude: source sorting, brand check and per-scan cost record, covered by tests. Off unless a feature switch and an API key are both set, and capped at 20 scans per account per day',
 ]
 
 const pending = [

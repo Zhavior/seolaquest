@@ -2,6 +2,7 @@ import fs from 'fs'
 import path from 'path'
 import { createHash } from 'node:crypto'
 import { calculateReadingTime } from './blog'
+import { CLAUDE_REFUSAL_FALLBACK, CLAUDE_SMART_MODEL, claudeText, getClaudeClient } from './anthropic'
 
 export interface GenerateBlogPostOptions {
   topic: string
@@ -9,7 +10,6 @@ export interface GenerateBlogPostOptions {
   author?: string
   authorRole?: string
   authorAvatar?: string
-  apiKey?: string
 }
 
 export interface GeneratedBlogResult {
@@ -73,68 +73,28 @@ WRITING RULES:
 
 /* ─────────────── LLM Callers ─────────────── */
 
-async function callOpenAI(apiKey: string, topic: string): Promise<string | null> {
+async function callClaude(topic: string): Promise<string | null> {
+  const client = getClaudeClient()
+  if (!client) return null
   try {
-    const res = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${apiKey}`,
-      },
-      body: JSON.stringify({
-        model: 'gpt-4o-mini',
+    const response = await client.beta.messages.create(
+      {
+        model: CLAUDE_SMART_MODEL,
+        max_tokens: 16000,
+        system: SYSTEM_PROMPT,
         messages: [
-          { role: 'system', content: SYSTEM_PROMPT },
           {
             role: 'user',
             content: `Write an in-depth article about: "${topic}". Follow all writing rules exactly.`,
           },
         ],
-        temperature: 0.72,
-        max_tokens: 4000,
-      }),
-      signal: AbortSignal.timeout(30_000),
-    })
-
-    if (!res.ok) return null
-    const json = (await res.json()) as {
-      choices?: Array<{ message?: { content?: string } }>
-    }
-    return json.choices?.[0]?.message?.content || null
-  } catch {
-    return null
-  }
-}
-
-async function callGemini(apiKey: string, topic: string): Promise<string | null> {
-  try {
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`
-    const res = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [
-          {
-            parts: [
-              {
-                text: `${SYSTEM_PROMPT}\n\n---\n\nWrite an in-depth article about: "${topic}". Follow all writing rules exactly.`,
-              },
-            ],
-          },
-        ],
-        generationConfig: {
-          temperature: 0.72,
-          maxOutputTokens: 4000,
-        },
-      }),
-      signal: AbortSignal.timeout(30_000),
-    })
-
-    if (!res.ok) return null
-    const json = (await res.json()) as {
-      candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }>
-    }
-    return json.candidates?.[0]?.content?.parts?.[0]?.text || null
+        output_config: { effort: 'medium' },
+        ...CLAUDE_REFUSAL_FALLBACK,
+      },
+      // No SDK retries: each one could bill a full draft, and the template is a safe answer.
+      { timeout: 120_000, maxRetries: 0 },
+    )
+    return claudeText(response) || null
   } catch {
     return null
   }
@@ -167,7 +127,6 @@ export async function generateAndSaveBlogPost(
     tag = '⚔️ SPEED-TO-LEAD',
     author = 'SEOlaQuest Editorial Draft',
     authorRole = 'Unverified draft',
-    apiKey,
   } = options
 
   const slug = safeSlug(topic)
@@ -178,34 +137,8 @@ export async function generateAndSaveBlogPost(
   const generatedTitle = `⚡ ${topic}`
   const generatedDescription = `Unverified editorial draft about ${topic}. Review evidence and product claims before publication.`
 
-  // Attempt LLM generation
-  let markdownBody: string | null = null
-
-  if (apiKey) {
-    if (apiKey.startsWith('sk-') || apiKey.startsWith('gsk_')) {
-      markdownBody = await callOpenAI(apiKey, topic)
-    } else if (apiKey.startsWith('AI') || apiKey.length > 30) {
-      // Gemini API keys typically start with 'AI' or are long alphanumeric strings
-      markdownBody = await callGemini(apiKey, topic)
-    }
-  }
-
-  // Try environment keys as fallback
-  if (!markdownBody) {
-    const envOpenAI = process.env.OPENAI_API_KEY
-    const envGemini = process.env.GEMINI_API_KEY || process.env.GOOGLE_AI_API_KEY
-    if (envOpenAI) {
-      markdownBody = await callOpenAI(envOpenAI, topic)
-    }
-    if (!markdownBody && envGemini) {
-      markdownBody = await callGemini(envGemini, topic)
-    }
-  }
-
-  // Final fallback: structured template
-  if (!markdownBody) {
-    markdownBody = generateFallbackTemplate(topic)
-  }
+  // Without Claude the draft is the claim-free template, never invented copy.
+  const markdownBody = (await callClaude(topic)) ?? generateFallbackTemplate(topic)
 
   const readTimeMinutes = calculateReadingTime(markdownBody)
 

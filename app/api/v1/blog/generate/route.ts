@@ -76,7 +76,6 @@ export const POST = withApiHandler(async (req) => {
       tag: resolvedTag,
       author,
       authorRole,
-      apiKey: process.env.OPENAI_API_KEY || process.env.GEMINI_API_KEY,
     })
 
     return NextResponse.json({

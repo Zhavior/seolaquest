@@ -9,6 +9,7 @@ const mocks = vi.hoisted(() => {
     tx,
     getCurrentUser: vi.fn(),
     runPerplexityAgent: vi.fn(),
+    runClaudeScan: vi.fn(),
     prisma: {
       $transaction: vi.fn(async (fn: (client: typeof tx) => unknown) => fn(tx)),
       geoQuery: { update: vi.fn(), findMany: vi.fn() },
@@ -24,8 +25,14 @@ vi.mock('../infrastructure/PerplexityAgentClient', async (importOriginal) => ({
   runPerplexityAgent: mocks.runPerplexityAgent,
 }))
 
+vi.mock('../infrastructure/ClaudeScanClient', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('../infrastructure/ClaudeScanClient')>()),
+  runClaudeScan: mocks.runClaudeScan,
+}))
+
 import { GeoScanDisabledError, GeoScanService, MAX_GEO_SCANS_PER_DAY } from './GeoScanService'
 import { PerplexityRequestError } from '../infrastructure/PerplexityAgentClient'
+import { ClaudeScanRequestError } from '../infrastructure/ClaudeScanClient'
 import { RateLimitError, UnauthorizedError, ValidationError } from '@/src/modules/core/infrastructure/errors'
 
 const baseRow = {
@@ -147,5 +154,76 @@ describe('GeoScanService.runScan', () => {
     mocks.runPerplexityAgent.mockResolvedValue({ output: 'not an array' })
     const scan = await GeoScanService.runScan(input)
     expect(scan).toMatchObject({ status: 'FAILED', errorCode: 'UNPARSEABLE_RESPONSE' })
+  })
+})
+
+describe('GeoScanService.runScan with the Claude engine', () => {
+  const claudeMessage = {
+    id: 'msg_1',
+    model: 'claude-sonnet-5-5',
+    stop_reason: 'end_turn',
+    content: [
+      {
+        type: 'web_search_tool_result',
+        content: [{ type: 'web_search_result', url: 'https://rival.com/', title: 'Rival' }],
+      },
+      {
+        type: 'text',
+        text: 'Rival.',
+        citations: [{ type: 'web_search_result_location', url: 'https://rival.com/', cited_text: 'Rival' }],
+      },
+    ],
+    usage: { input_tokens: 10, output_tokens: 5, web_search_requests: 1 },
+  }
+  const scan = { query: 'best crm for agencies', brandDomain: 'acme.com', engine: 'CLAUDE' as const }
+
+  beforeEach(() => {
+    vi.clearAllMocks()
+    vi.stubEnv('GEO_SCAN_ENABLED', 'true')
+    vi.stubEnv('PERPLEXITY_API_KEY', '')
+    vi.stubEnv('ANTHROPIC_API_KEY', 'test-key')
+    mocks.getCurrentUser.mockResolvedValue({ id: 'user-1' })
+    mocks.tx.geoQuery.count.mockResolvedValue(0)
+    mocks.tx.geoQuery.create.mockResolvedValue({ id: 'scan-1' })
+    mocks.prisma.geoQuery.update.mockImplementation(async ({ data }: { data: object }) => ({
+      ...baseRow,
+      ...data,
+    }))
+  })
+
+  afterEach(() => vi.unstubAllEnvs())
+
+  it('runs on its own key, records the engine, and never sends the brand', async () => {
+    mocks.runClaudeScan.mockResolvedValue(claudeMessage)
+
+    const result = await GeoScanService.runScan(scan)
+
+    expect(mocks.runClaudeScan).toHaveBeenCalledWith('best crm for agencies', 'test-key')
+    expect(mocks.runPerplexityAgent).not.toHaveBeenCalled()
+    expect(mocks.tx.geoQuery.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({ engine: 'CLAUDE', enginePreset: 'web_search_20260209' }),
+      }),
+    )
+    expect(result.status).toBe('COMPLETED')
+    expect(result.brandCited).toBe(false)
+    expect(result.costUsd).toBeNull()
+  })
+
+  it('fails closed without the Anthropic key, before any write', async () => {
+    vi.stubEnv('ANTHROPIC_API_KEY', '')
+
+    await expect(GeoScanService.runScan(scan)).rejects.toBeInstanceOf(GeoScanDisabledError)
+    expect(mocks.tx.geoQuery.create).not.toHaveBeenCalled()
+    expect(mocks.runClaudeScan).not.toHaveBeenCalled()
+  })
+
+  it('records a declined question as a failed scan, not an answer', async () => {
+    mocks.runClaudeScan.mockRejectedValue(new ClaudeScanRequestError('REFUSED'))
+
+    const result = await GeoScanService.runScan(scan)
+
+    expect(result.status).toBe('FAILED')
+    expect(result.errorCode).toBe('REFUSED')
   })
 })

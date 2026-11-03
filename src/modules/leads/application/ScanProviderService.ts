@@ -163,7 +163,7 @@ async function persistCompletedAttempt(args: {
        * `findMany` below deliberately re-reads every id in the batch so `LeadMatch` rows are
        * written for re-observed posts too. That means the post-insert read cannot tell a
        * first sighting from a repeat one, and `opportunity.discovered` must fire only on a
-       * first sighting: Aurora bills a Gemini call per event, and re-emitting for a post seen
+       * first sighting: Aurora bills a Claude call per event, and re-emitting for a post seen
        * on every daily scan would re-evaluate the same lead forever. Aurora's own idempotency
        * key is derived from the *event* id, so it would not dedupe them either.
        */
