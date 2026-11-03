@@ -66,25 +66,6 @@
   right: 0;
 }
 
-.hb-intro {
-  position: fixed;
-  inset: 0;
-  z-index: 50;
-  background: #05040c;
-  pointer-events: none;
-  animation: hb-introfade 2.2s ease-out 0.2s both;
-}
-
-@keyframes hb-introfade {
-  0% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 0;
-    visibility: hidden;
-  }
-}
-
 /* ── the bar ───────────────────────────────────────────────────────── */
 
 .hb-topbar {
@@ -480,7 +461,7 @@
   text-transform: uppercase;
   color: #ffd6a0;
   text-shadow: 0 1px 0 rgb(11 8 24 / 0.8), 0 0 16px rgb(11 8 24 / 0.9);
-  animation: hb-rise 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) 0.3s both;
+  animation: hb-rise 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) both;
 }
 
 .hb-hero-stage .hb-display {
@@ -495,7 +476,7 @@
   color: transparent;
   text-shadow: none;
   filter: drop-shadow(0 4px 0 rgb(11 8 24 / 0.7)) drop-shadow(0 0 24px rgb(255 179 71 / 0.2));
-  animation: hb-rise 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) 0.5s both;
+  animation: hb-rise 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) 0.05s both;
 }
 
 .hb-hero-lead {
@@ -506,7 +487,7 @@
   line-height: 1.55;
   color: #eadfc8;
   text-shadow: 0 1px 0 rgb(11 8 24 / 0.6), 0 0 18px rgb(11 8 24 / 0.7);
-  animation: hb-rise 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) 0.75s both;
+  animation: hb-rise 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) 0.1s both;
 }
 
 .hb-ctas {
@@ -514,7 +495,7 @@
   flex-wrap: wrap;
   gap: 1rem;
   margin-top: 1.75rem;
-  animation: hb-rise 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) 0.95s both;
+  animation: hb-rise 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) 0.15s both;
 }
 
 .hb-ctas--center {
@@ -1017,9 +998,6 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .hb-intro {
-    display: none;
-  }
   .hb {
     scroll-behavior: auto;
   }

@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 const mocks = vi.hoisted(() => ({
   middlewareHandler: vi.fn(),
+  clerkEntry: vi.fn(),
 }))
 
 vi.mock('@clerk/nextjs/server', () => ({
@@ -15,11 +16,12 @@ vi.mock('@clerk/nextjs/server', () => ({
   }),
   clerkMiddleware: vi.fn((middleware) => {
     mocks.middlewareHandler.mockImplementation(middleware)
-    return vi.fn()
+    return mocks.clerkEntry
   }),
 }))
 
-import { PUBLIC_ROUTE_PATTERNS } from './middleware'
+import type { NextFetchEvent, NextRequest } from 'next/server'
+import middleware, { PUBLIC_ROUTE_PATTERNS, SESSIONLESS_ROUTE_PATTERNS } from './middleware'
 
 const ORIGIN = 'https://seolaquest.example'
 
@@ -36,6 +38,41 @@ async function invokeProxy(path: string) {
 
   return { protect, response }
 }
+
+function route(path: string) {
+  const url = new URL(path, ORIGIN)
+  const request = { nextUrl: { pathname: url.pathname }, url: url.href } as unknown as NextRequest
+  return middleware(request, {} as NextFetchEvent)
+}
+
+describe('routes that skip Clerk', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
+  it('answers a marketing page without touching Clerk', () => {
+    for (const path of ['/', '/pricing', '/radar', '/blog', '/status', '/privacy']) {
+      expect(route(path)).toBeInstanceOf(Response)
+    }
+    expect(mocks.clerkEntry).not.toHaveBeenCalled()
+  })
+
+  it('sends the signed-in app, auth pages and APIs through Clerk', () => {
+    for (const path of ['/app', '/app/settings', '/welcome', '/sign-in', '/sign-up', '/api/v1/geo/scans', '/admin']) {
+      route(path)
+    }
+    expect(mocks.clerkEntry).toHaveBeenCalledTimes(7)
+  })
+
+  it('still answers an unknown article with a real 404', () => {
+    expect((route('/blog/no-such-post') as Response).status).toBe(404)
+    expect(mocks.clerkEntry).not.toHaveBeenCalled()
+  })
+
+  it('is a subset of the public routes, so it can never expose a protected page', () => {
+    for (const pattern of SESSIONLESS_ROUTE_PATTERNS) expect(PUBLIC_ROUTE_PATTERNS).toContain(pattern)
+  })
+})
 
 describe('Clerk public route boundary', () => {
   beforeEach(() => {
@@ -142,11 +179,9 @@ describe('Clerk public route boundary', () => {
 
   it.each(['/blog/does-not-exist', '/blog/phase-zero', '/blog/does-not-exist/', '/blog/100%', '/blog/%FF'])(
     'answers an unknown article %s with a real 404, without auth',
-    async (path) => {
-      const { protect, response } = await invokeProxy(path)
-
-      expect(protect).not.toHaveBeenCalled()
-      expect(response?.status).toBe(404)
+    (path) => {
+      expect((route(path) as Response).status).toBe(404)
+      expect(mocks.clerkEntry).not.toHaveBeenCalled()
     },
   )
 

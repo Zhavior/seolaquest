@@ -11,6 +11,11 @@ import { Alegreya, Alegreya_Sans, Grenze, Grenze_Gotisch, Martian_Mono } from 'n
  *   sans    — Alegreya Sans again, for controls, tabs and capitalised labels
  *   quote   — Alegreya italic, for ledes and quoted posts
  *   mono    — Martian Mono, slightly narrowed: scores, XP, ledgers, sample labels
+ *
+ * Only the gothic cut is preloaded, for the headline. Preloading a family
+ * fetches every weight and style in it whether the page uses them or not (13
+ * files, 345 KB on the home page). Without it the browser fetches only the
+ * files the page draws with, and `display: swap` shows text straight away.
  */
 export const handbookGothic = Grenze_Gotisch({
   subsets: ['latin'],
@@ -19,6 +24,7 @@ export const handbookGothic = Grenze_Gotisch({
 })
 
 export const handbookDisplay = Grenze({
+  preload: false,
   subsets: ['latin'],
   weight: ['500', '600', '700', '800'],
   display: 'swap',
@@ -26,6 +32,7 @@ export const handbookDisplay = Grenze({
 })
 
 export const handbookText = Alegreya_Sans({
+  preload: false,
   subsets: ['latin'],
   weight: ['400', '500', '700', '800'],
   style: ['normal', 'italic'],
@@ -34,6 +41,7 @@ export const handbookText = Alegreya_Sans({
 })
 
 export const handbookQuote = Alegreya({
+  preload: false,
   subsets: ['latin'],
   style: ['normal', 'italic'],
   display: 'swap',
@@ -41,6 +49,7 @@ export const handbookQuote = Alegreya({
 })
 
 export const handbookMono = Martian_Mono({
+  preload: false,
   subsets: ['latin'],
   axes: ['wdth'],
   display: 'swap',
